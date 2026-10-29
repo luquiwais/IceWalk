@@ -1,0 +1,336 @@
+{
+  "mission_id": "s1094b-eva1",
+  "plan_id": "plan-demo0001",
+  "replanned_from": null,
+  "stations": [
+    {
+      "id": "S5",
+      "order": 1,
+      "position": [
+        -700.0,
+        -150.0
+      ],
+      "lonlat": [
+        189.785567,
+        35.087469
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "neutron_spectrometer"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Portable neutron spectrometer"
+        ],
+        "EV2": [
+          "Document site (photos, notes)",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 12,
+      "hypothesis": "Shallow ice (<= 1 m) present at this terrain unit",
+      "p_ice": 0.48,
+      "uncertainty": 0.25,
+      "value": 0.245,
+      "planetary_protection": "none",
+      "terrain_unit": 1
+    },
+    {
+      "id": "S1",
+      "order": 2,
+      "position": [
+        420.0,
+        610.0
+      ],
+      "lonlat": [
+        189.80866,
+        35.100291
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "neutron_spectrometer"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Portable neutron spectrometer"
+        ],
+        "EV2": [
+          "Document site (photos, notes)",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 12,
+      "hypothesis": "Shallow ice (<= 1 m) present at this terrain unit",
+      "p_ice": 0.55,
+      "uncertainty": 0.24,
+      "value": 0.252,
+      "planetary_protection": "none",
+      "terrain_unit": 2
+    },
+    {
+      "id": "S2",
+      "order": 3,
+      "position": [
+        -350.0,
+        900.0
+      ],
+      "lonlat": [
+        189.792784,
+        35.105184
+      ],
+      "priority": "medium",
+      "objective_ranks": [
+        1,
+        4
+      ],
+      "tools": [
+        "neutron_spectrometer",
+        "camera_spectrometer",
+        "sample_kit"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Portable neutron spectrometer",
+          "Run Handheld camera / spectrometer"
+        ],
+        "EV2": [
+          "Document site (photos, notes)",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 25,
+      "hypothesis": "Shallow ice (<= 1 m) present at this terrain unit",
+      "p_ice": 0.62,
+      "uncertainty": 0.22,
+      "value": 0.246,
+      "planetary_protection": "none",
+      "terrain_unit": 1
+    },
+    {
+      "id": "S4",
+      "order": 4,
+      "position": [
+        0.0,
+        120.0
+      ],
+      "lonlat": [
+        189.8,
+        35.092024
+      ],
+      "priority": "medium",
+      "objective_ranks": [
+        3
+      ],
+      "tools": [
+        "camera_spectrometer"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Handheld camera / spectrometer"
+        ],
+        "EV2": [
+          "Document site (photos, notes)",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 5,
+      "hypothesis": "See objective",
+      "p_ice": 0.9,
+      "uncertainty": 0.08,
+      "value": 0.112,
+      "planetary_protection": "sensitive",
+      "terrain_unit": 3
+    }
+  ],
+  "route": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": {
+          "kind": "traverse",
+          "is_mock": true
+        },
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+              189.775259,
+              35.074816
+            ],
+            [
+              189.785567,
+              35.087469
+            ],
+            [
+              189.80866,
+              35.100291
+            ],
+            [
+              189.792784,
+              35.105184
+            ],
+            [
+              189.8,
+              35.092024
+            ],
+            [
+              189.775259,
+              35.074816
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "timeline": [
+    {
+      "t_start_min": 0,
+      "t_end_min": 45,
+      "kind": "egress",
+      "label": "Egress",
+      "station_id": null
+    },
+    {
+      "t_start_min": 45,
+      "t_end_min": 80.2,
+      "kind": "traverse",
+      "label": "Traverse to S5",
+      "station_id": "S5"
+    },
+    {
+      "t_start_min": 80.2,
+      "t_end_min": 92.2,
+      "kind": "station",
+      "label": "Station S5",
+      "station_id": "S5",
+      "walkback_margin_min": 226.7
+    },
+    {
+      "t_start_min": 92.2,
+      "t_end_min": 144.9,
+      "kind": "traverse",
+      "label": "Traverse to S1",
+      "station_id": "S1"
+    },
+    {
+      "t_start_min": 144.9,
+      "t_end_min": 156.9,
+      "kind": "station",
+      "label": "Station S1",
+      "station_id": "S1",
+      "walkback_margin_min": 110.7
+    },
+    {
+      "t_start_min": 156.9,
+      "t_end_min": 189.0,
+      "kind": "traverse",
+      "label": "Traverse to S2",
+      "station_id": "S2"
+    },
+    {
+      "t_start_min": 189.0,
+      "t_end_min": 214.0,
+      "kind": "station",
+      "label": "Station S2",
+      "station_id": "S2",
+      "walkback_margin_min": 62.3
+    },
+    {
+      "t_start_min": 214.0,
+      "t_end_min": 247.4,
+      "kind": "traverse",
+      "label": "Traverse to S4",
+      "station_id": "S4"
+    },
+    {
+      "t_start_min": 247.4,
+      "t_end_min": 252.4,
+      "kind": "station",
+      "label": "Station S4",
+      "station_id": "S4",
+      "walkback_margin_min": 40.2
+    },
+    {
+      "t_start_min": 252.4,
+      "t_end_min": 313.8,
+      "kind": "traverse",
+      "label": "Return to habitat",
+      "station_id": null
+    },
+    {
+      "t_start_min": 313.8,
+      "t_end_min": 343.8,
+      "kind": "ingress",
+      "label": "Ingress",
+      "station_id": null
+    },
+    {
+      "t_start_min": 343.8,
+      "t_end_min": 480,
+      "kind": "reserve",
+      "label": "Walkback reserve",
+      "station_id": null
+    }
+  ],
+  "branches": [
+    {
+      "station_id": "S5",
+      "if_result": "ice",
+      "next_station_ids": [
+        "S1",
+        "S2",
+        "S4"
+      ],
+      "note": "Continue nominal plan"
+    },
+    {
+      "station_id": "S5",
+      "if_result": "no_ice",
+      "next_station_ids": [
+        "S6",
+        "S1",
+        "S2",
+        "S4"
+      ],
+      "note": "Drop nearby stations of the same unit; add the next most valuable one"
+    }
+  ],
+  "equipment": [
+    {
+      "tool": "neutron_spectrometer",
+      "count": 1,
+      "mass_kg": null,
+      "justification": "Required by stations using Portable neutron spectrometer"
+    },
+    {
+      "tool": "camera_spectrometer",
+      "count": 1,
+      "mass_kg": null,
+      "justification": "Required by stations using Handheld camera / spectrometer"
+    },
+    {
+      "tool": "sample_kit",
+      "count": 1,
+      "mass_kg": null,
+      "justification": "Required by stations using Clean sample containers"
+    }
+  ],
+  "summary": {
+    "duration_min": 343.8,
+    "distance_km": 7.16,
+    "max_distance_from_habitat_km": 2.21,
+    "min_walkback_margin_min": 40.2,
+    "dose_estimate_msv": 0.16,
+    "expected_uncertainty_reduction": 0.47,
+    "crew": 2,
+    "is_mock": true
+  },
+  "alerts": []
+}

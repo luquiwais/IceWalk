@@ -1,0 +1,119 @@
+# Registro de capas. Sumar una capa = un adaptador en data/adapters/ + una entrada acá.
+# role: evidence (entra al modelo de hielo) | cost (transitabilidad) | visual (solo mapa)
+# Toda capa lleva fuente y cita (las reglas de Space Apps exigen citar todo).
+
+site:
+  id: s1094b
+  center_lat_deg: 35.09
+  center_lon_east_deg: 189.8
+
+layers:
+  - id: swim_ci_0_1m
+    name: SWIM combined ice consistency (0-1 m)
+    role: evidence
+    resolution_m: 3000
+    units: consistency [-1, 1], nodata -30
+    source: SWIM (PSI / JPL), global products updated 2025
+    url: https://swim.psi.edu/SWIM4MIMProducts.php
+    citation: Morgan et al. (2021) Nature Astronomy; SWIM project, swim.psi.edu
+    status: download manually from the products page (GeoTIFF)
+
+  - id: swim_neutron
+    name: SWIM neutron consistency
+    role: evidence
+    resolution_m: 3000
+    source: SWIM, individual dataset (Mars Odyssey neutron spectrometer)
+    url: https://swim.psi.edu/SWIM4MIMProducts.php
+    status: download manually
+
+  - id: swim_thermal
+    name: SWIM thermal consistency
+    role: evidence
+    resolution_m: 3000
+    source: SWIM, individual dataset (TES/THEMIS)
+    url: https://swim.psi.edu/SWIM4MIMProducts.php
+    status: download manually
+
+  - id: swim_radar_surface
+    name: SWIM radar surface power consistency
+    role: evidence
+    resolution_m: 3000
+    source: SWIM, individual dataset (SHARAD)
+    url: https://swim.psi.edu/SWIM4MIMProducts.php
+    status: download manually
+
+  - id: swim_geomorph
+    name: SWIM shallow geomorphology consistency
+    role: evidence
+    resolution_m: 3000
+    source: SWIM, individual dataset
+    url: https://swim.psi.edu/SWIM4MIMProducts.php
+    status: download manually
+
+  - id: hirise_dtm
+    name: HiRISE DTM DTEEC_073578_2155_073077_2155_A01
+    role: cost
+    resolution_m: 1
+    units: m (areoid, tied to MOLA)
+    source: HiRISE (University of Arizona / NASA JPL)
+    url: https://hirise.lpl.arizona.edu/PDS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.IMG
+    citation: NASA/JPL-Caltech/UArizona
+    status: scripted (data/download.py)
+
+  - id: hirise_ortho_1m
+    name: HiRISE ortho ESP_073578_2155 RED 1 m
+    role: evidence
+    resolution_m: 1
+    source: HiRISE
+    url: https://hirise.lpl.arizona.edu/PDS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/ESP_073578_2155_RED_C_01_ORTHO.JP2
+    citation: NASA/JPL-Caltech/UArizona
+    status: scripted
+
+  - id: hirise_ortho_25cm
+    name: HiRISE ortho ESP_073578_2155 RED 25 cm (boulder detection)
+    role: cost
+    resolution_m: 0.25
+    source: HiRISE
+    url: https://hirise.lpl.arizona.edu/PDS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/ESP_073578_2155_RED_A_01_ORTHO.JP2
+    citation: NASA/JPL-Caltech/UArizona
+    status: scripted
+
+  - id: ctx_context
+    name: Global CTX Mosaic (Murray Lab) V01, tile E-172_N32
+    role: visual
+    resolution_m: 5
+    source: Caltech Murray Lab / MRO CTX
+    url: https://murray-lab.caltech.edu/CTX/V01/tiles/
+    citation: "Dickson et al. (2024) Earth and Space Science; data credit NASA/JPL/MSSS/The Murray Lab"
+    notes: Tiles named by lower-left corner. Site at 189.8E = -170.2E, 35.09N -> tile covering lon -172..-168, lat 32..36. Verify exact file name in the tile index.
+    status: download manually (one tile)
+
+  - id: themis_ti
+    name: THEMIS thermal inertia mosaic, quantitative, 100 m
+    role: evidence
+    resolution_m: 100
+    source: USGS Astrogeology / ASU
+    url: https://astrogeology.usgs.gov/search?pmi-target=mars&q=THEMIS%20Thermal%20Inertia%20Mosaic%20Quantitative
+    citation: Fergason et al. (2006) JGR
+    notes: Pick the 30N-60N quadrant that contains 189.8E. Verify exact product name.
+    status: download manually
+
+  - id: mola_hrsc
+    name: MOLA-HRSC blended DEM 200 m
+    role: visual
+    resolution_m: 200
+    source: USGS Astrogeology
+    url: https://planetarymaps.usgs.gov/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif
+    citation: Fergason, Hare & Laura (2018) USGS
+    notes: 11 GB global file. Clip remotely with GDAL /vsicurl/, never download whole.
+    status: scripted (clip)
+
+labels:
+  - id: new_craters
+    name: New craters on Mars (with/without ice exposure)
+    url: https://zenodo.org/record/6604912
+    citation: Daubar et al. (2022) JGR Planets, doi:10.1029/2021JE007145
+  - id: ice_exposures
+    name: Ice-exposing scarps and new craters, mid-latitudes
+    url: https://doi.org/10.5066/P9Y8FR1R
+    citation: Dundas et al. (2021) USGS data release

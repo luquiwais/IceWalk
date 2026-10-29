@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icewalk/measurement.schema.json",
+  "title": "Medición en una estación",
+  "type": "object",
+  "required": ["station_id", "tool", "result", "position", "timestamp"],
+  "additionalProperties": false,
+  "properties": {
+    "station_id": { "type": "string" },
+    "tool": { "type": "string" },
+    "result": { "enum": ["ice", "no_ice", "inconclusive"] },
+    "depth_m": { "type": ["number", "null"], "minimum": 0 },
+    "weh_percent": { "type": ["number", "null"], "minimum": 0, "maximum": 100, "description": "Agua equivalente de hidrógeno (espectrómetro de neutrones)" },
+    "position": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[x, y] en metros de la grilla"
+    },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "crew_member": { "enum": ["EV1", "EV2"] },
+    "notes": { "type": "string" }
+  }
+}

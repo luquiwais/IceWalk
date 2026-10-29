@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icewalk/plan.schema.json",
+  "title": "Plan de EVA (respuesta de POST /plan y POST /replan)",
+  "type": "object",
+  "required": ["mission_id", "plan_id", "stations", "route", "timeline", "summary"],
+  "properties": {
+    "mission_id": { "type": "string" },
+    "plan_id": { "type": "string" },
+    "replanned_from": { "type": ["string", "null"] },
+    "stations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "order", "position", "priority", "objective_ranks", "tools", "tasks", "duration_min", "hypothesis", "p_ice", "uncertainty", "value"],
+        "properties": {
+          "id": { "type": "string" },
+          "order": { "type": "integer", "minimum": 1 },
+          "position": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "lonlat": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "priority": { "enum": ["high", "medium", "low"] },
+          "objective_ranks": { "type": "array", "items": { "type": "integer" } },
+          "tools": { "type": "array", "items": { "type": "string" } },
+          "tasks": {
+            "type": "object",
+            "properties": {
+              "EV1": { "type": "array", "items": { "type": "string" } },
+              "EV2": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "duration_min": { "type": "number", "minimum": 0 },
+          "hypothesis": { "type": "string" },
+          "p_ice": { "type": "number", "minimum": 0, "maximum": 1 },
+          "uncertainty": { "type": "number", "minimum": 0 },
+          "value": { "type": "number", "minimum": 0 },
+          "planetary_protection": { "enum": ["none", "sensitive"] },
+          "terrain_unit": { "type": "integer" }
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "description": "GeoJSON FeatureCollection; coordenadas en lon/lat este",
+      "required": ["type", "features"]
+    },
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["t_start_min", "t_end_min", "kind", "label"],
+        "properties": {
+          "t_start_min": { "type": "number" },
+          "t_end_min": { "type": "number" },
+          "kind": { "enum": ["egress", "traverse", "station", "ingress", "reserve"] },
+          "label": { "type": "string" },
+          "station_id": { "type": ["string", "null"] },
+          "walkback_margin_min": { "type": "number" }
+        }
+      }
+    },
+    "branches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["station_id", "if_result", "next_station_ids"],
+        "properties": {
+          "station_id": { "type": "string" },
+          "if_result": { "enum": ["ice", "no_ice"] },
+          "next_station_ids": { "type": "array", "items": { "type": "string" } },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "equipment": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tool", "count"],
+        "properties": {
+          "tool": { "type": "string" },
+          "count": { "type": "integer" },
+          "mass_kg": { "type": ["number", "null"] },
+          "justification": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["duration_min", "distance_km", "expected_uncertainty_reduction"],
+      "properties": {
+        "duration_min": { "type": "number" },
+        "distance_km": { "type": "number" },
+        "max_distance_from_habitat_km": { "type": "number" },
+        "min_walkback_margin_min": { "type": "number" },
+        "dose_estimate_msv": { "type": "number" },
+        "expected_uncertainty_reduction": { "type": "number", "minimum": 0, "maximum": 1 },
+        "crew": { "type": "integer" },
+        "is_mock": { "type": "boolean" }
+      }
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["level", "message"],
+        "properties": {
+          "level": { "enum": ["advisory", "caution", "warning"] },
+          "message": { "type": "string" },
+          "source": { "type": "string" }
+        }
+      }
+    }
+  }
+}

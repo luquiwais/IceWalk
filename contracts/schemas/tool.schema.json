@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icewalk/tool.schema.json",
+  "title": "Catálogo de herramientas de EVA",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "name", "detects", "depth_m", "time_min", "crew", "mode", "generates_heat", "source", "assumption"],
+    "additionalProperties": false,
+    "properties": {
+      "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+      "name": { "type": "string" },
+      "detects": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+      "measures": { "type": "array", "items": { "type": "string" } },
+      "depth_m": { "type": "number", "minimum": 0 },
+      "vertical_resolution_m": { "type": "number", "minimum": 0 },
+      "time_min": { "type": "number", "minimum": 0, "description": "En estación; para mode=traverse, overhead de encendido" },
+      "mass_kg": { "type": ["number", "null"], "minimum": 0 },
+      "crew": { "type": "integer", "minimum": 1 },
+      "mode": { "enum": ["stop", "traverse"] },
+      "generates_heat": { "type": "boolean", "description": "Relevante para protección planetaria" },
+      "returns_sample": { "type": "boolean" },
+      "analog": { "type": "string", "description": "Instrumento real en el que se basa" },
+      "source": { "type": "string" },
+      "assumption": { "type": "boolean", "description": "true si algún valor no tiene fuente directa" },
+      "notes": { "type": "string" }
+    }
+  }
+}

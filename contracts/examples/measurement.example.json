@@ -1,0 +1,11 @@
+{
+  "station_id": "S1",
+  "tool": "neutron_spectrometer",
+  "result": "no_ice",
+  "depth_m": null,
+  "weh_percent": 3.1,
+  "position": [420, 610],
+  "timestamp": "2040-03-12T14:35:00Z",
+  "crew_member": "EV1",
+  "notes": "Demo scenario: first station negative, triggers replan."
+}

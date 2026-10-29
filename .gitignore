@@ -1,0 +1,29 @@
+# Datos pesados (se publican en GitHub Releases)
+data/raw/
+data/processed/
+*.tif
+*.tiff
+*.IMG
+*.img
+*.JP2
+*.jp2
+*.cub
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Varios
+.env
+.DS_Store
+*.log

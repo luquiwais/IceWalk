@@ -1,0 +1,66 @@
+{
+  "mission_id": "s1094b-eva1",
+  "site_id": "s1094b",
+  "constraints": {
+    "eva_max_h": 8,
+    "reserve": 0.2,
+    "max_slope_deg": 20,
+    "walkback_max_km": 10,
+    "crew": 2,
+    "mass_budget_kg": null,
+    "walking_speed_kmh": 2.0
+  },
+  "objectives": [
+    {
+      "rank": 1,
+      "title": "Lateral extent and depth of shallow ice around S1094b",
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "purpose": "both",
+      "trace": "NASEM 2025: characterize water and CO2 reservoirs in the exploration zone",
+      "measurement": {
+        "variable": "ice_presence",
+        "depth_max_m": 1,
+        "coverage": "all_terrain_units",
+        "min_stations": 4,
+        "sample_return": false
+      }
+    },
+    {
+      "rank": 2,
+      "title": "Ice purity and depth at the most reliable site",
+      "hypothesis": "The ice is clean excess ice, as at other new craters.",
+      "purpose": "both",
+      "trace": "NASEM 2025 water/CO2 objective; ISRU resource characterization",
+      "measurement": {
+        "variable": "ice_purity",
+        "depth_max_m": 1,
+        "coverage": "single_best_site",
+        "sample_return": true
+      }
+    },
+    {
+      "rank": 3,
+      "title": "Document sublimation of exposed ice",
+      "hypothesis": "Exposed ice at this latitude is unstable at the surface.",
+      "purpose": "science",
+      "trace": "HiRISE team: key data point on current ice stability",
+      "measurement": {
+        "variable": "surface_change",
+        "coverage": "targets",
+        "targets": [[0, 120], [-80, -60]]
+      }
+    },
+    {
+      "rank": 4,
+      "title": "Geologic context of the ejecta",
+      "hypothesis": "Dark excavated units are more mafic volcanic material.",
+      "purpose": "science",
+      "trace": "DPS 2023 S1094b geologic map",
+      "measurement": {
+        "variable": "geologic_context",
+        "coverage": "highest_value",
+        "sample_return": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "site_id": "s1094b",
+  "description": "Grilla común del sitio. Todas las capas se alinean a esta grilla.",
+  "crs": {
+    "type": "equirectangular",
+    "body": "Mars",
+    "sphere_radius_m": 3396190,
+    "center_lat_deg": 35.09,
+    "center_lon_east_deg": 189.8,
+    "proj4": "+proj=eqc +lat_ts=35.09 +lat_0=35.09 +lon_0=189.8 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs",
+    "origin": "x, y en metros desde el centro del sitio (el cráter); x hacia el este, y hacia el norte. El hábitat es un punto configurable.",
+    "notes": "Esfera de Marte como en los productos HiRISE. Longitud este 0-360. Verificar contra el label del DTM el día 1."
+  },
+  "extent_m": {
+    "xmin": -2500,
+    "xmax": 2500,
+    "ymin": -7500,
+    "ymax": 7500,
+    "status": "PROVISORIO: reemplazar por la huella real del DTM al bajarlo"
+  },
+  "cell_size_m": 10,
+  "station_grid_cell_size_m": 100,
+  "elevation_reference": "areoide (MOLA), metros",
+  "nodata": -9999,
+  "dtype": "float32",
+  "formats": {
+    "analysis": "Cloud Optimized GeoTIFF",
+    "web": "PNG + JSON con bounds lat/lon y escala de colores"
+  }
+}
