@@ -6,6 +6,8 @@ Planificador de EVAs de prospección de hielo en Marte. Combina datos de varias 
 
 NASA Space Apps Challenge 2026 · Sitio de demostración: cráter S1094b, Amazonis Planitia (35.09°N, 189.8°E).
 
+**Guía del proyecto:** [`docs/PRD.md`](docs/PRD.md). Para Claude Code: [`CLAUDE.md`](CLAUDE.md).
+
 ## Estructura
 
 | Carpeta | Dueño | Qué hay |
