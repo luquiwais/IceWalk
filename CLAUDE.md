@@ -42,9 +42,23 @@ python data/download.py --list                     # capas y links
 
 ## Reglas de trabajo
 
+- Mensajes de commit en español.
 - Ramas `rol/tarea`; PR con una revisión; `main` siempre desplegable. CI corre validación de contratos, ruff y pytest.
 - Datos pesados (`.tif`, `.IMG`, `.JP2`) nunca a Git: GitHub Releases.
 - Unidades SI; coordenadas internas en metros de la grilla (`contracts/grid.json`), lat/lon solo hacia la web (`app/contracts.py:xy_to_lonlat`).
 - Secretos (token de Cesium ion, etc.) en `.env`, nunca commiteados.
 - Al reemplazar el mock por el planificador real, la API y el contrato de `plan.schema.json` no cambian.
-- Registrá decisiones nuevas en `docs/DECISIONS.md` (una línea).
+
+## Registro: obligatorio
+
+Todo queda anotado en archivos, no solo en la conversación. **Antes de investigar o probar algo, revisá estos archivos para no repetirlo.** Al terminar una tarea, actualizalos:
+
+| Archivo | Qué va |
+| --- | --- |
+| `docs/DECISIONS.md` | Cada decisión tomada, en una línea, con su motivo |
+| `docs/OPEN_QUESTIONS.md` | Lo que falta decidir o averiguar; al resolverlo, sale de acá |
+| `docs/EXPERIMENTS.md` | Lo que se probó y su resultado, **incluido lo que falló** |
+| `docs/research/` | Hallazgos por tema, con fuentes, y qué no se pudo verificar |
+| `docs/log/AAAA-MM-DD.md` | Qué se hizo, decidió, encontró y quedó pendiente en cada día |
+| `docs/plans/` | Plan vigente de cada módulo |
+| `docs/ROLES.md` | Quién hace qué |

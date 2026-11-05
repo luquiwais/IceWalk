@@ -48,8 +48,8 @@ El usuario principal es un astronauta en una caminata (EVA) de prospección; el 
 
 **Restricciones reales que usamos como requisitos:**
 
-- Pendiente máxima caminable con traje: 20° ([NASA xEVA](https://ntrs.nasa.gov/api/citations/20210000827/downloads/Exporation%20EVA%20Testing%20and%20Analogs%2020210000827.pdf)).
-- Distancia de regreso caminando: \~10 km como máximo, criterio heredado de Apollo ([Walkback Test](https://bvbvf1.bib-bvb.de/vufind/PrimoRecord/cdi_jstor_primary_44719456/Details)).
+- Pendiente máxima caminable con traje: 20°, valor lunar; usarlo en Marte es un supuesto ([NASA xEVA](https://ntrs.nasa.gov/api/citations/20210000827/downloads/Exporation%20EVA%20Testing%20and%20Analogs%2020210000827.pdf)).
+- Regreso a pie: los \~10 km son para falla de un rover. Caminando, el alcance de referencia es \~2 km del refugio ([xEVA Con Ops](https://ntrs.nasa.gov/api/citations/20205008200/downloads/EVA-EXP-0042%20xEVA%20System%20Con%20Ops%20Rev%20B%20Final%20dtd%2010192020_REF%20DOC.pdf)), también lunar: NASA deja los rangos de Marte como trabajo pendiente. Criterio heredado de Apollo ([Walkback Test](https://bvbvf1.bib-bvb.de/vufind/PrimoRecord/cdi_jstor_primary_44719456/Details)).
 - Hielo cercano a la superficie (\~1 m) se confirma en el suelo con espectrómetro de neutrones; el más profundo, con radar ([National Academies](https://www.nationalacademies.org/read/28594/chapter/5)).
 
 **Insight:** el cuello de botella no es encontrar zonas con posible hielo (SWIM ya lo hace a escala global). Es decidir, con recursos limitados, dónde medir para pasar de «probable» a «confirmado».
@@ -111,7 +111,7 @@ El MVP es el ciclo completo en un sitio: STM → mapas → estaciones → plan �
 | 9 | Re-planificación en vivo | MVP | La medición actualiza mapas y plan en segundos |
 | 10 | Antes/después | MVP | Cuánto bajó la incertidumbre del sitio con la EVA |
 | 11 | Protección planetaria | Alta | Zonas sensibles y protocolo de muestreo en el plan |
-| 12 | Alertas de radiación y polvo | Alta | Condiciones del entorno y su efecto en el plan (el challenge lo sugiere) |
+| 12 | Ventana de EVA | MVP | Por estación y hora: temperatura, viento, polvo, luz y clima espacial (DONKI), con niveles advisory, caution y warning |
 | 13 | Radar mientras se camina | Media | La ruta recolecta información, no solo las estaciones |
 | 14 | Vista Science | Baja | Mapa de incertidumbre, registro de mediciones, aprobar el plan |
 | 15 | Segundo sitio (Erebus Montes) | Baja | Mismo sistema, otro lugar: prueba que es general |
@@ -195,7 +195,7 @@ Todas las capas se alinean a una misma grilla, definida en un único `grid.json`
 
 | Parámetro | Valor | Motivo |
 | --- | --- | --- |
-| Extensión | Huella del HiRISE DTM del sitio (\~5 km de ancho, con el cráter adentro) | Es donde hay topografía a 1 m; afuera solo contexto (CTX/MOLA) |
+| Extensión | Caja de 6.56 × 11.63 km que contiene la huella del HiRISE DTM (rotada, \~5.4 km de ancho), con origen en el cráter | Es donde hay topografía a 1 m; afuera solo contexto (CTX/MOLA) |
 | Celda base | 10 m | Transitabilidad, ruta y evidencia; A\* rápido sobre \~10⁵-10⁶ celdas |
 | Detalle en cada celda | Pendiente máxima y rugosidad calculadas desde el DTM de 1 m | Un escalón corto no se pierde: más seguro que el promedio |
 | Paradas candidatas | Subgrilla de 100 m | Re-planificación en segundos |
@@ -204,11 +204,11 @@ Todas las capas se alinean a una misma grilla, definida en un único `grid.json`
 | Formato web | PNG + JSON con límites lat/lon y escala de colores | Lo consume Cesium directo |
 | Remuestreo | Bilineal para continuas, vecino más cercano para categóricas; cada capa guarda su resolución original | El modelo sabe qué capas son «borrosas» |
 
-**DTM del sitio verificado:** existe `DTEEC_073578_2155_073077_2155_A01`, a 1 m/píxel, centrado en 35.09°N, 189.8°E, equirectangular y atado a elevaciones MOLA ([HiRISE](https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155)). Elevación entre −3962 y −3926 m: el terreno es casi plano fuera del cráter, así que la ruta la condicionan sobre todo el cráter y los bloques, no la pendiente. Antes de usarlo, revisar el relieve sombreado y el mapa de calidad (FOM) por artefactos conocidos de los DTM ([README](https://hirise.lpl.arizona.edu/PDS/EXTRAS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/README_DTEEC_073578_2155_073077_2155_A01.TXT)).
+**DTM del sitio verificado:** existe `DTEEC_073578_2155_073077_2155_A01`, a 1 m/píxel, con centro cerca de 35.09°N, 189.83°E (el cráter está en 35.1105°N, 189.8273°E, medido sobre el orto), equirectangular y atado a elevaciones MOLA ([HiRISE](https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155)). Elevación entre −3962 y −3926 m: el terreno es casi plano fuera del cráter, así que la ruta la condicionan sobre todo el cráter y los bloques, no la pendiente. Antes de usarlo, revisar el relieve sombreado y el mapa de calidad (FOM) por artefactos conocidos de los DTM ([README](https://hirise.lpl.arizona.edu/PDS/EXTRAS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/README_DTEEC_073578_2155_073077_2155_A01.TXT)).
 
 ### Lista de descarga (día 1)
 
-Sitio: S1094b, 35.09°N, 189.8°E (−170.2° en longitud con signo). **Atajo clave:** SWIM ya publica, además del mapa combinado, un mapa de consistencia de hielo por cada fuente (neutrones, térmico, radar, geomorfología) en GeoTIFF. No bajamos los datos crudos de cada instrumento: usamos esas capas.
+Sitio: S1094b, 35.11°N, 189.83°E (−170.17° en longitud con signo). **Atajo clave:** SWIM ya publica, además del mapa combinado, un mapa de consistencia de hielo por cada fuente (neutrones, térmico, radar, geomorfología) en GeoTIFF. No bajamos los datos crudos de cada instrumento: usamos esas capas.
 
 | Capa | Producto | Dónde | Formato / tamaño | Para qué |
 | --- | --- | --- | --- | --- |
@@ -251,7 +251,8 @@ El modelo responde esa pregunta con probabilidades en todo el mapa; el astronaut
 | Anomalías | No supervisado | Marca zonas que no se parecen al resto en HiRISE (brillos, texturas): posible hielo expuesto o ciencia | Umbral de albedo |
 | Prior regional | Supervisado (clasificador simple) | Probabilidad de hielo según latitud, elevación, inercia térmica, SWIM, hidrógeno y tamaño del cráter. Entrenado con el [catálogo de cráteres nuevos](https://pubs.usgs.gov/publication/70248034) que indica si cada impacto expuso hielo | Prior de SWIM |
 | Campo local | Proceso gaussiano | Probabilidad e incertidumbre por celda de 10 m; combina lo anterior y cada medición. Alcance de \~100-300 m, porque el hielo varía en decenas a cientos de metros ([Dundas et al. 2021](https://usgs.gov/publications/widespread-exposures-extensive-clean-shallow-ice-mid-latitudes-mars)) | — |
-| Bloques | Visión (detección) | Obstáculos para la ruta; los brillantes, posibles bloques de hielo | Detección por sombras |
+| Bloques | Visión (detección) | Obstáculos y ancho de pasillo para la ruta | Detección por sombras |
+| Formas del terreno | Visión | Polígonos y similares: indicio indirecto de hielo para el GP | Geomorfología de SWIM |
 
 Un cráter que no expuso hielo no prueba que no haya: puede ser poco profundo. Por eso el tamaño del cráter entra como variable. Descartamos aprendizaje por refuerzo para la ruta: no hay datos para entrenarlo y un planificador clásico es más confiable y explicable.
 
@@ -265,7 +266,7 @@ VoI(x) = w(x) \cdot \sum_{c \in \text{zona}} \left[ \sigma^2_{\text{antes}}(c) -
 
 w(x) pondera el propósito (recurso o ciencia) y la probabilidad de hielo. Con un proceso gaussiano, la reducción de incertidumbre se calcula antes de ir, así que el plan completo sale de una.
 
-**Transitabilidad.** Costo por celda = tiempo estimado de caminar, según pendiente máxima, rugosidad y bloques. Pendiente > 20° o bloques grandes = celda prohibida. En S1094b el terreno es casi plano: mandan el cráter y los bloques.
+**Factibilidad, con el método de NASA.** Como el modelo de traverse de la Mars Campaign Office ([ICES-2025-129](https://ntrs.nasa.gov/api/citations/20250001829/downloads/ICES%202025%20TraverseModel.pdf?attachment=true)): una **capa de exclusión** (pendiente > 20° y celdas sin pasillo), un **costo metabólico** (pendiente, velocidad, peso, carga y terreno) y límites de **consumibles, duración y regreso a un refugio**. No encontramos una fuente que fije qué tamaño de roca sortea un astronauta: una celda se prohíbe solo si no queda un pasillo que la cruce, y el ancho mínimo es un supuesto declarado. En S1094b el terreno es casi plano: mandan el cráter y los bloques.
 
 **Entrada: la matriz de trazabilidad científica (STM) de la misión.** No hay tipos de misión fijos. Como en la práctica de NASA ([BASALT](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6442241/), [JETT3/Artemis](https://ntrs.nasa.gov/api/citations/20230003806/downloads/Young.theintegration.poster.pdf)), el usuario carga sus objetivos **ordenados por prioridad** ([Artemis III](https://ntrs.nasa.gov/api/citations/20250002094/downloads/a3gt_updates_lpsc2025_final.pdf)) y, para cada uno, su requisito de medición: qué variable, a qué profundidad, con qué densidad de muestreo y si hace falta traer muestra. Plantillas opcionales solo como punto de partida editable.
 
@@ -320,6 +321,10 @@ w(x) pondera el propósito (recurso o ciencia) y la probabilidad de hielo. Con u
 
 - Fuente: los reportes semanales de clima de MARCI (MRO), que siguen tormentas de polvo en todo el planeta, incluidas las que cruzan Arcadia ([NASA](https://science.nasa.gov/resource/martian-weather-report/)).
 - En el plan: nivel de polvo como aviso operativo (visibilidad y navegación), cargado por la tripulación o el equipo científico; no es un dato en tiempo real.
+
+### Ventana de EVA
+
+El clima cambia poco dentro del sitio, así que no va como capa del mapa: define **cuándo salir**. El plan muestra, por estación y hora, temperatura, viento, polvo, luz y clima espacial, con niveles advisory, caution y warning. El viento importa por el polvo que levanta más que por su empuje. Fuente candidata: [Mars Climate Database](https://trac.lmd.jussieu.fr/Planeto/export/971/trunk/UTIL/PYTHON/mcd/proto/index5.html) (confirmar acceso y licencia). No encontramos umbrales oficiales para una EVA en Marte: todo límite va como supuesto.
 
 ### Protección planetaria
 
@@ -399,7 +404,7 @@ icewalk/
 
 ### Contratos (resumen)
 
-**`grid.json`**: proyección (equirectangular centrada en 35.09°N, 189.8°E, esfera de Marte), origen, tamaño de celda (10 m), filas, columnas y tamaño de la subgrilla de estaciones (100 m).
+**`grid.json`**: proyección (equirectangular centrada en el cráter, 35.1105°N, 189.8273°E, con el radio de los productos HiRISE), origen, tamaño de celda (10 m), filas, columnas y tamaño de la subgrilla de estaciones (100 m).
 
 **STM** (entrada del planificador):
 
@@ -455,8 +460,9 @@ Cada rol es dueño de una parte y de su carpeta en el repo. Nadie toca la carpet
 | --- | --- | --- | --- | --- |
 | 1. Producto, investigación y pitch (líder) | Luqui | Visión, alineación con NASA, STM de la demo, contacto con expertos, priorización, video y slides | STM de la demo, guion, pitch, decisiones de alcance | Todos |
 | 2. Datos | A definir | Descarga y procesamiento de capas a la grilla, registro de capas, catálogo de cráteres | Paquete de capas del sitio + `grid.json` | Sitio |
-| 3. IA y modelo | A definir | Prior regional, unidades de terreno, anomalías, campo local (GP), detección de bloques, validación con Martes simulados | Mapas de probabilidad e incertidumbre + métricas | Datos |
-| 4. Planificador y backend | A definir | STM y catálogo de herramientas, transitabilidad, valor de medir, estaciones, ruta, ramas, re-planificación, API | API de plan y re-planificación | Datos, modelo |
+| 3a. Modelo de hielo (GP) | Luqui | Prior regional, campo local, valor de medir, validación con Martes simulados ([plan](plans/gp.md)) | Mapas de probabilidad e incertidumbre + métricas | Datos, visión |
+| 3b. Visión | A definir | Bloques y pasillos, formas del terreno, zonas, hielo expuesto; anomalías opcional ([plan](plans/vision.md)) | Capas de costo y evidencia + catálogo | Datos |
+| 4. Planificador y backend | A definir | STM y catálogo de herramientas, factibilidad (exclusión, costo metabólico, consumibles, regreso), ventana de EVA, estaciones, ruta, ramas, re-planificación, API | API de plan y re-planificación | Datos, modelo |
 | 5. Frontend 3D | A definir | Globo, vista Planning, vista EV sobre el terreno 3D, conexión con la API | App web navegable | API, diseño |
 | 6. Diseño UX/UI | A definir | Tres vistas según prácticas y estándares de NASA, editor de STM, HUD, identidad, assets del video | Figma + assets | Producto |
 
