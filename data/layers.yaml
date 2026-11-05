@@ -119,6 +119,26 @@ layers:
     citation: NASA/JPL-Caltech/UArizona
     status: scripted
 
+  - id: hirise_feb2022_red
+    name: HiRISE RDR ESP_073077_2155 RED 25 cm (27 Feb 2022), not orthorectified
+    role: visual
+    notes: Marco de pixeles de la tabla de crateres de Dundas 2023. Corrido ~50 m al oeste y ~120 m al norte del orto; el corrimiento varia con la posicion.
+    resolution_m: 0.25
+    source: HiRISE
+    url: https://hirise.lpl.arizona.edu/PDS/RDR/ESP/ORB_073000_073099/ESP_073077_2155/ESP_073077_2155_RED.JP2
+    citation: NASA/JPL-Caltech/UArizona
+    status: scripted
+
+  - id: dundas2023_craters
+    name: Tabla de 349 crateres mayores a 5 m, con diametro de fondo plano (Dundas 2023, suplemento)
+    role: evidence
+    notes: Columnas X, Y (pixeles del RED ESP_073077), D_crater, D_resistant (-1 sin capa resistente). Licencia sin confirmar; fuera de Git. El sitio web bloquea descargas automaticas.
+    resolution_m: 0.25
+    source: Geophysical Research Letters
+    url: https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2022GL100747
+    citation: Dundas et al. (2023) GRL, doi:10.1029/2022GL100747
+    status: download manually
+
   - id: hirise_dec2022_red
     name: HiRISE RDR ESP_076677_2155 RED 25 cm (5 Dec 2022), not orthorectified
     role: visual

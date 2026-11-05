@@ -50,6 +50,28 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Dosis RAD 0.67 mSv/día | Hassler et al. (2014) Science |
 | Regiones especiales | Kminek et al. (2010) Advances in Space Research (COSPAR) |
 | Playbook, SUITS, NASA-STD-3001 | Ver sección Interfaz del PRD |
+| Cota de cráteres sin fondo plano: `d > 0.2 × diámetro`. El paper presenta 0.1 y 0.2; se usa 0.2 porque es coherente con su tabla | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
+| Tabla de 349 cráteres: `X, Y, D_crater, D_resistant` (suplemento, `2022GL100747-sup-0002-Table SI-S01.csv`). Licencia sin confirmar | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
+| Get Aheads, borrado, Cribsheet, flight rules | Kagey (2024), https://ntrs.nasa.gov/api/citations/20240005248/downloads/EVA%20Ops%20101%20for%20Artemis%203%20External%20Teams.pdf |
+| Science Officer y SER | Young (2025), https://ntrs.nasa.gov/api/citations/20250004322/downloads/Young_LSSWMay2025_ScienceOpsOverview_v2.pdf; Bell et al. (2023) LPSC #2460, https://www.hou.usra.edu/meetings/lpsc2023/pdf/2460.pdf |
+| BASALT: ConOps, capacidades, decisión táctica, soporte científico y replanificación | Beaton et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238/ y https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237/; Stevens et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282/; Payler et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442258/; Marquez et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442304/ |
+| Dos ConOps bajo latencia | Lim et al. (2019), https://ntrs.nasa.gov/api/citations/20190001439/downloads/20190001439.pdf |
+| NEEMO: tareas dependientes, Science Team, flexecution | https://ntrs.nasa.gov/api/citations/20150019627/downloads/20150019627.pdf; https://ntrs.nasa.gov/api/citations/20170000367/downloads/20170000367.pdf; Coan (2016), https://nasa.gov/wp-content/uploads/2017/02/ops_field_test_spacecom2016_20161109_final.pdf |
+| Ciencia táctica y estratégica, flexecution | Eppler et al., https://ntrs.nasa.gov/api/citations/20130014887/downloads/20130014887.pdf; Hurtado et al., https://ntrs.nasa.gov/api/citations/20120010224/downloads/20120010224.pdf |
+| VIPER: respaldos, planes, kriging, fases, replan | Lim et al. (2024), https://ntrs.nasa.gov/api/citations/20240001709/downloads/20240001709-LPSC2024_Lim%20et%20al_vFINAL.pdf; Ennico-Smith et al. (2023), https://ntrs.nasa.gov/api/citations/20230004239/downloads/SSR2023-VIPER-Planning-Ennico.pdf; Ennico-Smith et al. (2022), https://ntrs.nasa.gov/api/citations/20220005327/downloads/VIPER-SRR-June2022-Ennico.pdf; Shirley y Balaban (2022), https://ntrs.nasa.gov/api/citations/20220008301/downloads/2022-06-02-spaceops-viper-planning.pdf; briefing 2025, https://assets.science.nasa.gov/content/dam/science/psd/lunar-science/documents/2025-02-13_VIPER_Updated_Technical_Briefing_Presentation-Shared.pdf |
+| Resource Prospector y MVP | Colaprete et al., https://ntrs.nasa.gov/api/citations/20150022157/downloads/20150022157.pdf; instrumentación, https://ntrs.nasa.gov/api/citations/20160005053/downloads/20160005053.pdf; Heldmann et al. (2015), https://www.hou.usra.edu/meetings/lpsc2015/pdf/2165.pdf; Elphic et al., https://ntrs.nasa.gov/api/citations/20160000570/downloads/20160000570.pdf |
+| Mars 2020: estrategia y operación | Sun y Sholes (2024), https://sfsholes.github.io/papers/SunSholes2024_Mars2020StrategicPlanningProcess.pdf; https://robotics.jpl.nasa.gov/media/documents/ro_final_v1.pdf |
+| Apollo: walkback y taladro | ALSJ, https://apollojournals.org/alsj/a17/a17.sta4.html; https://apollojournals.org/alsj/a15/a15mr-1.htm |
+| Kriging y expectation propagation para el GP | Rasmussen y Williams (2006), Gaussian Processes for Machine Learning, caps. 2 y 3, https://gaussianprocess.org/gpml/chapters/RW3.pdf |
+
+## Supuestos del GP
+
+Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del plan, con análisis de sensibilidad.
+
+| Valor | Qué es | Por qué ese valor |
+| --- | --- | --- |
+| `BOUND_SIGMA_LOG = 0.1` | Cuán blanda es una cota, en `log d` | Margen de ~10 % en profundidad; sin fuente |
+| `CRATER_ERROR_M = 0.15`, usado en un taladro | Error de un taladro que no informa el suyo | Se reutiliza el valor de cráteres: 1 px en Dundas et al. (2023). Para taladro, sin fuente |
 
 ## Software
 
@@ -58,3 +80,4 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | FastAPI, pydantic, uvicorn | MIT / BSD |
 | CesiumJS | Apache 2.0 (Cesium ion: términos aparte si se usa Cesium Mars) |
 | GDAL, rasterio | MIT / BSD |
+| numpy, scipy | BSD |

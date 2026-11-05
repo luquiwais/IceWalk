@@ -36,6 +36,20 @@
 3. Un taladro de 1 m queda en el límite; el radar gana peso.
 4. Los cráteres permiten estimar el alcance con un variograma real en lugar de suponer 100-300 m.
 
+## Tabla de cráteres de Dundas 2023 (hallada el 2026-11-05)
+
+El suplemento publica la tabla, cráter por cráter: 349 filas, con `X, Y, D_crater, D_resistant`. Copia local, fuera de Git: `data/raw/dundas2023_craters.csv`. Interpretación nuestra de `-1`: sin capa resistente.
+
+- **Profundidad:** `d = (0.86 × D - Df) / 2 × tan(33°)`. Da 0.969 ± 0.254 m y 0.151 m por píxel, igual que el paper. La forma y `k = 0.86` se dedujeron porque reproducen esos números: **no se contrastaron con Bart 2014**. Con ángulos de 30° y 38°, da -11 % y +20 %; el paper informa -12 % y +17 %.
+- **El 0.97 m describe solo a los cráteres con fondo plano:** son 48 de 349 (14 %). De esos 48, el 60 % tiene `d ≤ 1 m`, es decir, 8 % del total.
+- **El fondo plano depende mucho del tamaño:** 3 % con D de 5-6 m; 9 % con 6-7 m; 19 % con 7-8 m; 41 % con 8-10 m; 64 % con ≥ 10 m.
+- **La cota de los cráteres sin fondo plano pesa muchísimo:** con 0.2 × D, el 90 % de esos cráteres dice `d > 1 m`; con 0.1 × D, el 1 %. El paper presenta ambas. Según sus mediciones de sombras, los secundarios sin fondo plano más grandes tienen una relación profundidad/diámetro parecida a la de primarios chicos, sin explicación clara.
+- **Marco confirmado:** `X, Y` son muestra y línea de `ESP_073077_2155_RED.JP2`. Hay que corregir un corrimiento de ~50 m al oeste y ~120 m al norte para llevarlos al orto y a la grilla.
+- **Los datos favorecen `0.2 × D`.** Con esa relación, mediana de 2.35 m y `P(d ≤ 1 m)` ≈ 0.06: **el hielo a ≤ 1 m sería raro en el sitio**. El 0.97 m describe a la minoría con fondo plano.
+- **Estructura:** no es fuerte a escala del sitio. Un dato informa a lo sumo unos 100-200 m a su alrededor.
+
+Detalle de todas las pruebas: `EXPERIMENTS.md`.
+
 ## Catálogo de Daubar 2022
 
 Contado por el agente de investigación sobre la tabla de Zenodo: 1203 sitios; 48 con hielo, 20 posibles, 1135 sin. Norte 30-40°: 87 sitios, 2 con hielo. Norte 30-50°: 140 sitios, 16 con hielo. Hielo más al sur en el norte: 39.1°N. Diámetro máximo con hielo: 48 m.
@@ -70,7 +84,7 @@ Agente, en la compu de desarrollo, implementación ingenua, grilla de 500 × 150
 
 ## Sin verificar
 
-- Si el suplemento de Dundas 2023 publica posiciones por cráter.
+- La descripción de la tabla en el suplemento de Dundas 2023: se leyeron las páginas 1-3 de 15. Marco y unidades se comprobaron contra la imagen, y `-1` sigue siendo interpretación nuestra.
 - Bart 2014 y Mellon 2004 en el original. Piqueux 2019 y el estudio de Amazonis de USGS dieron error.
 - Sensibilidad de un espectrómetro portátil para detectar hielo.
 - Si existe una cobertura posterior de Mars Climate Sounder.

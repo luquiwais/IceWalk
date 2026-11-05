@@ -1,6 +1,6 @@
 # Plan del GP: el mapa de calor de hielo
 
-**Dueño:** Luqui. **Código previsto:** `model/gp/`. **Estado:** diseño adoptado el 2026-11-04. Todavía sin código.
+**Dueño:** Luqui. **Código:** `model/gp/`. **Estado:** diseño adoptado el 2026-11-04. Paso 1 hecho el 2026-11-05, con datos sintéticos.
 
 ## Qué hace
 
@@ -32,7 +32,7 @@ Es el mismo razonamiento que hacer kriging de la profundidad de una napa, con pe
 
 1. **Deriva externa:** las capas arman la superficie base `μ0(x) = β0 + Σ βi · capa_i(x)`.
 2. **Kriging de residuos:** ajusta alrededor de cada dato, con alcance y variograma.
-3. **Datos censurados:** cada observación es un intervalo, no un valor exacto. El ajuste se hace con aproximación de Laplace.
+3. **Datos censurados:** cada observación es un valor con error o una cota. El ajuste se hace con expectation propagation (EP): Laplace falló con las cotas y a veces ignoraba un "no" (ver `docs/EXPERIMENTS.md`).
 
 | Observación | Qué dice |
 | --- | --- |
@@ -96,11 +96,16 @@ Es el mismo razonamiento que hacer kriging de la profundidad de una napa, con pe
 | 4 | Valor de medir | Reducción esperada de área ambigua por minuto | Aceptada |
 | 5 | Alcance | Variograma con los cráteres; si no alcanza, promediar 100, 200 y 300 m | Aceptada, ajustada |
 | 6 | Librería | numpy/scipy en vivo | Aceptada |
+| 7 | Inferencia | EP en lugar de Laplace | Aceptada |
+| 8 | Resultado de una medición | Por dentro, la profundidad o cota completa, no sí/no. Falta definir las ramas del plan: se investiga cómo opera NASA | Núcleo aceptado; ramas abiertas |
+| 9 | Otras zonas | Prior, alcance, grilla y capas por sitio, fuera del código; sin trasladar los valores de S1094b | Aceptada |
+| 10 | Cráteres sin fondo plano | `d > 0.2 × D`: los datos la favorecen | Aceptada |
+| 11 | Objetivo de profundidad | Umbral configurable. Con `0.2 × D`, hielo a ≤ 1 m sería raro en el sitio | A revisar con Planificador |
 
 ## Lo que cambia respecto del PRD
 
 - **La prueba clave no valida.** En Daubar 2022 hay 1203 sitios (48 con hielo, 20 posibles, 1135 sin); el hielo más al sur está a 39.1°N y el cráter más grande con hielo mide 48 m. S1094b está a 35°N y mide 155 m: es una extrapolación, y se reporta así. Validación nueva: dejar afuera una zona de cráteres del sitio.
-- **"Milisegundos" no vale para toda la grilla.** Hay que actualizar por ventana y medir en el free tier: en una prueba, sin Laplace y con otra grilla, tardó 0.37-2.5 s la grilla completa y 16-110 ms una ventana de ±900 m.
+- **"Milisegundos" no vale para toda la grilla.** Hay que actualizar por ventana y medir en el free tier: en la compu de desarrollo, con 200 datos, tardó 6.1 s la grilla completa y 0.26 s una ventana de ±900 m.
 - **Falta definir `uncertainty`** en `plan.schema.json`. Propuesta: entropía de `P(d ≤ 1 m)` y desvío de `d`.
 - **El objetivo 1 de la STM** y el catálogo dependen del espectrómetro: revisar con Producto.
 
@@ -110,18 +115,20 @@ Es el mismo razonamiento que hacer kriging de la profundidad de una napa, con pe
 # model/gp/
 fit_prior(layers, catalog) -> PriorModel                  # precalculado
 posterior(prior, observations) -> Posterior               # en vivo
-Posterior.maps(threshold_m=1.0) -> {p_ice, depth_mean, depth_sd, entropy}
+Posterior.maps(x_m, y_m, threshold_m=1.0) -> {p_ice, depth_mean, depth_sd, entropy}  # ventana o grilla
 Posterior.value(candidates, cost_min) -> value            # subgrilla de 100 m
-Posterior.simulate(candidate, tool, result) -> Posterior  # ramas por resultado
+Posterior.simulate(candidate, tool, result) -> Posterior  # forma de `result` a revisar: ver decisión 8
 ```
+
+**Ya existen** `posterior` y `maps`, con un prior constante (`Prior`); `fit_prior`, `value` y `simulate` llegan en sus pasos. `gp.observations.from_measurement` traduce una medición del contrato, con el alcance de cada herramienta tomado del catálogo.
 
 Visión entrega un catálogo de cráteres (`resistant_layer_depth_m` o cota inferior, con error). Planificador usa `value` y `simulate`, y sigue dueño del A* y del costo metabólico. Al reemplazar el mock, `/plan` y `/replan` no cambian.
 
 ## Pasos
 
-1. **Núcleo sintético:** `posterior` con datos censurados y prior constante; tests del "sí" y el "no". Primero esto: define la demo.
-2. **Catálogo de cráteres:** coordinar con visión. Mapa manual inicial en una zona chica, para ver si alcanza.
-3. **Variograma real** con esos cráteres: alcance, y si hay estructura espacial. **Si no hay estructura, se replantea acá.**
+1. **Núcleo sintético (hecho):** `posterior` con datos censurados y prior constante; tests del "sí" y el "no". Primero esto: define la demo.
+2. **Catálogo de cráteres (hecho como análisis):** la tabla de Dundas 2023 trae 349 cráteres, ya llevados a la grilla y comprobados contra la imagen. Falta pasar el código a `model/gp/`, con tests.
+3. **Estructura espacial (hecho como análisis):** no hay estructura fuerte a escala del sitio; un dato informa a lo sumo unos 100-200 m a su alrededor (ver `EXPERIMENTS.md`). **El diseño se ajusta, no se descarta:** el kriging vale de cerca, y lejos de los datos manda el prior. Por eso el prior del paso 4 pasa a ser lo que más pesa en la mayor parte del mapa.
 4. **Prior simple:** SWIM + Daubar, con validación por bloques, contra SWIM solo.
 5. **Modelo de instrumentos y capas locales.**
 6. **Valor de medir y ramas,** conectados a `/plan` y `/replan`. **Acá existe el ciclo real.**
@@ -131,7 +138,7 @@ Visión entrega un catálogo de cráteres (`resistant_layer_depth_m` o cota infe
 
 ## Criterios de aceptación
 
-- Un "sí" y un "no" en el mismo punto generan mapas y planes distintos, con test.
+- Un "sí" y un "no" en el mismo punto, y dos profundidades medidas distintas, generan mapas y planes distintos, con test. Los mapas ya están probados; los planes llegan en el paso 6.
 - Lejos de los datos, el mapa vuelve al prior.
 - Validación cruzada por zonas de cráteres: error de profundidad y cobertura de los intervalos, contra la media simple.
 - Simulación contra las 3 estrategias, con intervalo, incluso con supuestos equivocados.
@@ -146,12 +153,13 @@ Visión entrega un catálogo de cráteres (`resistant_layer_depth_m` o cota infe
 | Mapearlos lleva más tiempo que el disponible | Empezar a mano en una zona; automatizar solo si rinde |
 | Precisión falsa: el mapa a 10 m sale del GP | Mostrar la incertidumbre siempre |
 | Valores supuestos de instrumentos | `"assumption": true` y sensibilidad |
-| Laplace sobreconfiada con datos contradictorios | Test de calibración |
+| EP queda corrida en la celda de una cota y a pocos metros (hasta ~0.07) | Declarado; test contra la respuesta exacta |
+| Una falla del instrumento rompe la suposición de cotas limpias, y EP puede costar más en converger | Se trata en el paso 5; `converged` avisa si no converge |
 | Compite con Producto, que también tenés a cargo | Decidir quién cubre qué |
 
 ## Lo que no se pudo verificar
 
-Los datos por cráter de Dundas 2023: leímos el paper, no el suplemento. Hay que ver si publica posiciones; si no, se pide o se vuelve a mapear. Tampoco se abrieron Bart 2014 ni Mellon 2004 en el original; Piqueux 2019 y el estudio de Amazonis de USGS dieron error; Dundas 2021 solo por resumen.
+El marco de las posiciones en la tabla de Dundas 2023. Tampoco se abrieron Bart 2014 ni Mellon 2004 en el original; Piqueux 2019 y el estudio de Amazonis de USGS dieron error; Dundas 2021 solo por resumen.
 
 ## Fuentes
 
