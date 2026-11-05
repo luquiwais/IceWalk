@@ -9,6 +9,13 @@ data/processed/
 *.jp2
 *.cub
 *.zip
+*.gpkg
+
+# Pesos de modelos
+*.pth
+*.pt
+*.ckpt
+*.safetensors
 
 # Python
 __pycache__/
