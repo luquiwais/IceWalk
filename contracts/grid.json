@@ -4,19 +4,19 @@
   "crs": {
     "type": "equirectangular",
     "body": "Mars",
-    "sphere_radius_m": 3396190,
-    "center_lat_deg": 35.09,
-    "center_lon_east_deg": 189.8,
-    "proj4": "+proj=eqc +lat_ts=35.09 +lat_0=35.09 +lon_0=189.8 +x_0=0 +y_0=0 +R=3396190 +units=m +no_defs",
-    "origin": "x, y en metros desde el centro del sitio (el cráter); x hacia el este, y hacia el norte. El hábitat es un punto configurable.",
-    "notes": "Esfera de Marte como en los productos HiRISE. Longitud este 0-360. Verificar contra el label del DTM el día 1."
+    "sphere_radius_m": 3389574.3490888,
+    "center_lat_deg": 35.1105,
+    "center_lon_east_deg": 189.8273,
+    "proj4": "+proj=eqc +lat_ts=35.1105 +lat_0=35.1105 +lon_0=189.8273 +x_0=0 +y_0=0 +R=3389574.3490888 +units=m +no_defs",
+    "origin": "x, y en metros desde el centro del cráter; x hacia el este, y hacia el norte. El hábitat es un punto configurable.",
+    "notes": "Radio del label PDS del DTM y de las imágenes HiRISE de este sitio. Centro medido sobre el orto ESP_073578_2155 (error aprox. 15 m). Otros productos usan otra proyección o radio (por ejemplo MOLA-HRSC, 3396190 m): reproyectar siempre."
   },
   "extent_m": {
-    "xmin": -2500,
-    "xmax": 2500,
-    "ymin": -7500,
-    "ymax": 7500,
-    "status": "PROVISORIO: reemplazar por la huella real del DTM al bajarlo"
+    "xmin": -3250,
+    "xmax": 3310,
+    "ymin": -6740,
+    "ymax": 4890,
+    "status": "Caja que contiene la huella del DTM DTEEC_073578_2155_073077_2155_A01. La huella está rotada: las esquinas quedan en nodata."
   },
   "cell_size_m": 10,
   "station_grid_cell_size_m": 100,
