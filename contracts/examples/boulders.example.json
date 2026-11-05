@@ -1,0 +1,48 @@
+{
+  "type": "FeatureCollection",
+  "site_id": "s1094b",
+  "is_mock": true,
+  "generated_by": "contracts/examples (a mano, ilustrativo)",
+  "detection_limit_m": 1.5,
+  "source_images": ["ESP_073578_2155", "ESP_083099_2155"],
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [189.82831, 35.11219] },
+      "properties": {
+        "id": "B000001",
+        "x_m": 49.0,
+        "y_m": 100.0,
+        "diameter_m": 3.2,
+        "height_m": 2.1,
+        "height_source": "shadow",
+        "composition": "rock",
+        "form": "block",
+        "persistence": "persistent",
+        "last_seen_image": "ESP_083099_2155",
+        "confidence": 0.91,
+        "evidence": ["shadow", "multitemporal"],
+        "method": "mock"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [189.82427, 35.10881] },
+      "properties": {
+        "id": "B000002",
+        "x_m": -147.0,
+        "y_m": -100.0,
+        "diameter_m": 1.8,
+        "height_m": null,
+        "height_source": null,
+        "composition": "ice_candidate",
+        "form": "block",
+        "persistence": "not_visible_latest",
+        "last_seen_image": "ESP_073578_2155",
+        "confidence": 0.64,
+        "evidence": ["color", "multitemporal"],
+        "method": "mock"
+      }
+    }
+  ]
+}

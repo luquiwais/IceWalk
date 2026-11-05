@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icewalk/boulders.schema.json",
+  "title": "Catalogo de objetos detectados desde orbita (GeoJSON)",
+  "description": "Separa composicion, forma, persistencia y certeza. El efecto sobre la ruta (avoid, cost_only, unresolved) lo calcula el planificador.",
+  "type": "object",
+  "required": ["type", "site_id", "is_mock", "generated_by", "detection_limit_m", "source_images", "features"],
+  "additionalProperties": false,
+  "properties": {
+    "type": { "const": "FeatureCollection" },
+    "site_id": { "type": "string" },
+    "is_mock": { "type": "boolean", "description": "true si los datos son ilustrativos" },
+    "generated_by": { "type": "string", "description": "Script o metodo que genero el catalogo" },
+    "detection_limit_m": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Diametro desde el que la deteccion es confiable. Debajo de este valor, 'none detected' no significa 'clear'."
+    },
+    "source_images": { "type": "array", "items": { "type": "string" } },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "geometry", "properties"],
+        "additionalProperties": false,
+        "properties": {
+          "type": { "const": "Feature" },
+          "geometry": {
+            "type": "object",
+            "required": ["type", "coordinates"],
+            "additionalProperties": false,
+            "properties": {
+              "type": { "const": "Point" },
+              "coordinates": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 2,
+                "maxItems": 2,
+                "description": "[lon este 0-360, lat] en grados, para la web"
+              }
+            }
+          },
+          "properties": {
+            "type": "object",
+            "required": ["id", "x_m", "y_m", "diameter_m", "height_m", "height_source", "composition", "form", "persistence", "last_seen_image", "confidence", "evidence", "method"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "x_m": { "type": "number", "description": "Metros de la grilla, hacia el este" },
+              "y_m": { "type": "number", "description": "Metros de la grilla, hacia el norte" },
+              "diameter_m": { "type": "number", "exclusiveMinimum": 0 },
+              "height_m": { "type": ["number", "null"], "minimum": 0 },
+              "height_source": { "enum": ["shadow", "dtm", null] },
+              "composition": {
+                "enum": ["rock", "ice_candidate", "indeterminate"],
+                "description": "ice_candidate exige evidencia de color: el brillo solo no alcanza"
+              },
+              "form": { "enum": ["block", "patch", "indeterminate"] },
+              "persistence": {
+                "enum": ["persistent", "fading", "not_visible_latest", "single_epoch"],
+                "description": "not_visible_latest no implica que desaparecio: el hielo puede quedar cubierto por un residuo"
+              },
+              "last_seen_image": { "type": ["string", "null"] },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+              "evidence": {
+                "type": "array",
+                "items": { "enum": ["shadow", "color", "multitemporal", "dtm", "appearance"] },
+                "uniqueItems": true
+              },
+              "method": { "enum": ["shadow", "bouldernet", "ensemble", "manual", "mock"] }
+            },
+            "allOf": [
+              {
+                "if": { "properties": { "composition": { "const": "ice_candidate" } } },
+                "then": { "properties": { "evidence": { "contains": { "const": "color" } } } }
+              },
+              {
+                "if": { "properties": { "height_m": { "type": "null" } } },
+                "then": { "properties": { "height_source": { "type": "null" } } },
+                "else": { "properties": { "height_source": { "enum": ["shadow", "dtm"] } } }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
