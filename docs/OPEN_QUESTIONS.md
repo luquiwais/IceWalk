@@ -6,11 +6,10 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 
 | # | Cuestión | Recomendación | Quién | Desde |
 | --- | --- | --- | --- | --- |
-| 1 | ¿El GP modela profundidad censurada? | Sí; plan B binario. Primero ver si hay estructura en los cráteres | Luqui | 04/11 |
 | 2 | ¿Un mapa solo para la tabla de hielo, o también para la capa masiva? | Tabla primero; masiva si hay tiempo | Luqui | 04/11 |
-| 3 | ¿Quién toma cada rol? | Ver `docs/ROLES.md` | Equipo | 04/11 |
+| 3 | ¿Quién toma cada rol, y cuántas personas tiene cada uno? | Ver `docs/ROLES.md` | Equipo | 04/11 |
 | 4 | ¿Se aceptan regla del pasillo y factibilidad de NASA? | Sí | Planificador | 04/11 |
-| 5 | ¿Cambian la STM y el catálogo, dado que el espectrómetro casi no llega al hielo? | Sí: subir radar, revisar taladro y objetivo 1 | Ciencia + GP | 04/11 |
+| 5 | ¿Cambian la STM y el catálogo, dado que el espectrómetro casi no llega al hielo? | Sí: subir radar, revisar taladro y objetivo 1 | Planificador + GP | 04/11 |
 | 21 | ¿Se elimina el rol de Datos, con cada dueño preparando sus capas? | Sí, con función de reproyección compartida. Ver `docs/ROLES.md` | Equipo | 04/11 |
 | 6 | ¿Cambia el pitch a "motor para la campaña: robots primero, tripulación después"? | Sí | Producto | 04/11 |
 | 7 | ¿Se suma PDF del plan de EVA? | Sí, si el ciclo ya anda | Producto | 04/11 |

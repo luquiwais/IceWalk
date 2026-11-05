@@ -26,5 +26,5 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 | 2026-11-04 | Grilla corregida: centro en el cráter (35.1105°N, 189.8273°E), radio de HiRISE, caja de 6.56 × 11.63 km | El centro anterior quedaba a ~1.8 km del cráter |
 | 2026-11-04 | Luqui toma el GP; visión pasa a otro integrante | Interés personal; el GP define la demo. Ver `docs/plans/` |
 | 2026-11-04 | Persistencia de bloques cerca del cráter con ESP_077719 (feb 2023), no con ESP_083099 (abr 2024) | La imagen de 2024 tiene una franja sin datos sobre el cráter, también en color |
-| 2026-11-04 | Propuesta (a confirmar): el GP modela la profundidad a la tabla de hielo con datos censurados, usando cráteres de fondo plano | En S1094b el hielo poroso empieza cerca de 1 m y el masivo a varios metros (Dundas 2023, Wójcicka 2025) |
+| 2026-11-04 | El GP modela la profundidad a la tabla de hielo con datos censurados, usando cráteres de fondo plano; plan B, modelo sí/no | En S1094b el hielo poroso empieza cerca de 1 m y el masivo a varios metros (Dundas 2023, Wójcicka 2025) |
 | 2026-11-04 | `hirise_ortho_25cm` pasa de rol `cost` a `visual` | Es imagen cruda; a transitabilidad llegan las capas `boulder_*` |

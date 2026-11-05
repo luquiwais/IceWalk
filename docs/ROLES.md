@@ -1,15 +1,21 @@
 # Roles
 
-Propuesta del 2026-11-04, a confirmar con el equipo. Space Apps permite hasta 6 integrantes.
+Propuesta del 2026-11-04, a confirmar con el equipo. Un rol puede tener más de una persona. Space Apps permite hasta 6 integrantes por equipo.
 
-| # | Rol | Persona | De qué se encarga | Carpeta | Primera tarea | Depende de |
+| Rol | Personas sugeridas | Quién | De qué se encarga | Carpeta | Primera tarea | Depende de |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | **GP y liderazgo** | Luqui | Mapas de probabilidad e incertidumbre, valor de medir, simulación; decisiones de alcance | `model/gp/` | Núcleo con datos sintéticos | Visión |
-| 2 | **Visión** | A definir | Bloques, pasillos, cráteres de fondo plano, formas del terreno, zonas | `model/vision/` | Etiquetar en QGIS y detector de sombras | - |
-| 3 | **Planificador y backend** | A definir | Factibilidad de NASA, ventana de EVA, estaciones, ruta, ramas, API | `planner/` | Regla del pasillo y costo metabólico | GP, Visión |
-| 4 | **Frontend 3D** | A definir | Globo, vista Planning, vista EV, rocas 3D, demo con link directo | `web/` | Esqueleto con capas falsas | Planificador, Diseño |
-| 5 | **Ciencia y validación** | A definir | STM, catálogo de herramientas, contacto con expertos, revisión de fuentes, apoyo al GP en la simulación | `docs/`, `contracts/` | Revisar la STM: el espectrómetro casi no llega al hielo | GP |
-| 6 | **Diseño y pitch** | A definir | Tres vistas, video de 30 s, página del proyecto, presentación | `design/` | Guion y bocetos | Frontend, GP |
+| **GP y liderazgo** | 1 | Luqui | Mapas de probabilidad e incertidumbre, valor de medir, simulación; alcance, expertos y decisiones de producto | `model/gp/` | Núcleo con datos censurados sintéticos | Visión |
+| **Visión** | 1 | A definir | Cráteres de fondo plano, bloques, pasillos, formas del terreno, zonas | `model/vision/` | Mapear cráteres en una zona; etiquetar en QGIS | - |
+| **Planificador y backend** | 2 | A definir | Factibilidad de NASA, ventana de EVA, STM y catálogo de herramientas, estaciones, ruta, ramas, API | `planner/`, `contracts/` | Regla del pasillo, costo metabólico y revisión de la STM | GP, Visión |
+| **Frontend 3D** | 1 | A definir | Globo, vista Planning, vista EV, rocas 3D, demo con link directo | `web/` | Esqueleto con capas falsas | Planificador, Diseño |
+| **Diseño y pitch** | 1 | A definir | Tres vistas, video de 30 s, página del proyecto, presentación | `design/` | Guion y bocetos | Frontend, GP |
+
+## Cómo dividir Planificador y backend entre dos
+
+| Persona | Foco |
+| --- | --- |
+| **Factibilidad** | Exclusión, costo metabólico, consumibles, regreso a pie, ventana de EVA, DONKI, STM y catálogo |
+| **Plan y API** | Estaciones, ruta, ramas, timeline, `/plan`, `/replan`, integración con el GP |
 
 ## Datos: sin rol propio
 
@@ -19,8 +25,8 @@ Cada dueño prepara las capas que usa. Las capas casi no se comparten, y traerla
 | --- | --- | --- |
 | SWIM, THEMIS, albedo, Daubar | GP | GP |
 | HiRISE (imágenes y color) | Visión | Visión |
-| DTM: pendiente, rugosidad, orientación | Planificador | Planificador, GP, frontend |
-| DONKI, Mars Climate Database | Planificador | Planificador |
+| DTM: pendiente, rugosidad, orientación | Planificador y backend | Planificador, GP, frontend |
+| DONKI, Mars Climate Database | Planificador y backend | Planificador |
 | CTX, MOLA | Frontend | Frontend |
 
 **Reglas para que esto funcione:**

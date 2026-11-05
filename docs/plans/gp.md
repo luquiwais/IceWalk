@@ -1,6 +1,6 @@
 # Plan del GP: el mapa de calor de hielo
 
-**Dueño:** Luqui. **Código previsto:** `model/gp/`. **Estado:** revisado tras la investigación; falta confirmar la decisión 1. Todavía sin código.
+**Dueño:** Luqui. **Código previsto:** `model/gp/`. **Estado:** diseño adoptado el 2026-11-04. Todavía sin código.
 
 ## Qué hace
 
@@ -24,7 +24,7 @@ Desde órbita casi no se ve: los neutrones indican < 15 % de agua en los primero
 3. **El taladro de 1 m queda justo en el límite;** el radar (hasta ~10 m, según el catálogo) pasa a ser clave.
 4. **Las mediciones reales de profundidad ya existen desde órbita:** los cráteres.
 
-## Diseño recomendado: kriging de la profundidad a la tabla de hielo
+## Diseño: kriging de la profundidad a la tabla de hielo
 
 Es el mismo razonamiento que hacer kriging de la profundidad de una napa, con perforaciones que a veces no llegan.
 
@@ -90,7 +90,7 @@ Es el mismo razonamiento que hacer kriging de la profundidad de una napa, con pe
 
 | # | Decisión | Recomendación | Estado |
 | --- | --- | --- | --- |
-| 1 | Variable objetivo | Profundidad censurada; plan B, oculta binaria | **A confirmar** |
+| 1 | Variable objetivo | Profundidad censurada; plan B, oculta binaria | **Aceptada** |
 | 2 | Capas de hielo | Tabla de hielo primero; capa masiva como segundo mapa, si hay tiempo | A confirmar |
 | 3 | Pesos de capas | SWIM y Daubar por regresión; capas finas ajustadas con los cráteres y análisis de sensibilidad | Aceptada, ajustada |
 | 4 | Valor de medir | Reducción esperada de área ambigua por minuto | Aceptada |
