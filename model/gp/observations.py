@@ -8,8 +8,8 @@ Sin fuente (se ajusta en el paso 5 del plan, con análisis de sensibilidad): `BO
 Con fuente:
 - `CRATER_ERROR_M`, 1 px de error de medición en Dundas et al. 2023. También se usa como error de
   un taladro que no informa el suyo, y ese uso es supuesto.
-- `NON_FLAT_RATIO`: Dundas et al. 2023 presenta 0.1 y 0.2. Elegir 0.1 es supuesto nuestro, y los
-  datos favorecen 0.2 (ver `docs/EXPERIMENTS.md`). A confirmar.
+- `NON_FLAT_RATIO`: Dundas et al. 2023 presenta 0.1 y 0.2. Se usa 0.2 porque es coherente con su
+  tabla de 349 cráteres, y 0.1 no (ver `docs/EXPERIMENTS.md`).
 
 La cota blanda no modela una falla del instrumento: eso también queda para el paso 5.
 """
@@ -24,7 +24,7 @@ Kind = Literal["depth", "deeper_than", "shallower_than"]
 
 CRATER_ERROR_M = 0.15
 BOUND_SIGMA_LOG = 0.1
-NON_FLAT_RATIO = 0.1
+NON_FLAT_RATIO = 0.2
 
 
 @dataclass(frozen=True)

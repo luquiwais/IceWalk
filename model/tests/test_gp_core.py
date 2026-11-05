@@ -62,7 +62,8 @@ def test_error_de_profundidad_pasa_a_log():
 def test_crater_sin_fondo_plano_es_cota_inferior():
     obs = non_flat_crater(0.0, 0.0, diameter_m=20.0)
     assert obs.kind == "deeper_than"
-    assert obs.depth_m == pytest.approx(2.0)
+    assert obs.depth_m == pytest.approx(4.0)
+    assert non_flat_crater(0.0, 0.0, diameter_m=20.0, ratio=0.1).depth_m == pytest.approx(2.0)
 
 
 @pytest.mark.parametrize(
