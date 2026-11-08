@@ -28,10 +28,19 @@ Para leer las capas de costo:
 
 ```bash
 cd packages/model
-uv sync --extra dev                    # o: pip install -e ".[dev]"
+uv sync --extra dev --extra vision     # o: pip install -e ".[dev,vision]"
 uv run python -m vision.mock_layers    # capas FALSAS (is_mock) para integrar ya
 uv run ruff check . && uv run pytest -q
 ```
+
+Grupos de dependencias:
+
+| Grupo | Qué trae | Quién lo necesita |
+| --- | --- | --- |
+| (núcleo) | numpy, scipy | El GP: `gp.posterior`, `gp.observations`, `gp.craters`, `gp.simulation`, `gp.validation`. Es lo que instala el planificador |
+| `vision` | rasterio, scikit-image | `vision/`, `gp.covariates` y `gp.craters.red_table_to_grid` |
+| `ml` | torch, timm | Solo la variable de textura (DINOv2) de `gp.covariates` |
+| `dev` | pytest, ruff, jsonschema, pyyaml | Tests y lint; los tests de visión piden también `vision` |
 
 ## Primeros pasos
 

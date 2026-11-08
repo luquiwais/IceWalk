@@ -65,7 +65,7 @@ Hoy la ruta es línea recta con un factor de 1.3, como en el mock. El A* con cos
 
 ## Cómo usar el GP desde el planificador
 
-Decisión aprobada: el planificador instala `packages/model` como dependencia local (`pip install -e ../../packages/model`, o `uv` con `path`). Para que la API no cargue `rasterio` ni `scikit-image`, que solo usa visión, **el equipo del GP los va a pasar a un grupo opcional `vision`**. El núcleo del GP solo necesita numpy y scipy. Eso cambia la línea de instalación de CI en `.github/workflows/ci.yml`.
+Decisión aprobada: el planificador instala `packages/model` como dependencia local (`pip install -e ../../packages/model`, o `uv` con `path`). **Hecho el 2026-11-08:** `rasterio` y `scikit-image` pasaron a un grupo opcional `vision`. El núcleo del GP solo instala numpy y scipy (comprobado en un entorno limpio), y CI instala `packages/model[dev,vision]`.
 
 Lo que ya existe en `packages/model/gp/`:
 
