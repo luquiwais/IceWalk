@@ -63,6 +63,8 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Mars 2020: estrategia y operación | Sun y Sholes (2024), https://sfsholes.github.io/papers/SunSholes2024_Mars2020StrategicPlanningProcess.pdf; https://robotics.jpl.nasa.gov/media/documents/ro_final_v1.pdf |
 | Apollo: walkback y taladro | ALSJ, https://apollojournals.org/alsj/a17/a17.sta4.html; https://apollojournals.org/alsj/a15/a15mr-1.htm |
 | Viabilidad: ISRU, misiones de agua, instrumentos, variables orbitales y evaluación de sitios (unas 90 fuentes) | Tabla "Fuentes para docs/SOURCES.md" en `docs/research/viabilidad-expediciones.md` |
+| DTM y ortos de HiRISE en COG | USGS Astrogeology, STAC, CC0: https://stac.astrogeology.usgs.gov/api |
+| Inercia térmica THEMIS, tesela 30N180E, 100 m | Fergason et al. (2006) JGR; USGS, https://astrogeology.usgs.gov/search/map/themis_thermal_inertia_mosaic_quantitative_30n180e_100mpp |
 | Kriging y expectation propagation para el GP | Rasmussen y Williams (2006), Gaussian Processes for Machine Learning, caps. 2 y 3, https://gaussianprocess.org/gpml/chapters/RW3.pdf |
 
 ## Supuestos del GP
@@ -82,3 +84,5 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | CesiumJS | Apache 2.0 (Cesium ion: términos aparte si se usa Cesium Mars) |
 | GDAL, rasterio | MIT / BSD |
 | numpy, scipy | BSD |
+| PyTorch | BSD |
+| timm y pesos `vit_small_patch14_dinov2.lvd142m` (DINOv2, Oquab et al. 2023) | Apache 2.0 |

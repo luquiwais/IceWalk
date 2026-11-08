@@ -28,6 +28,9 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 | 2026-11-04 | Persistencia de bloques cerca del cráter con ESP_077719 (feb 2023), no con ESP_083099 (abr 2024) | La imagen de 2024 tiene una franja sin datos sobre el cráter, también en color |
 | 2026-11-04 | El GP modela la profundidad a la tabla de hielo con datos censurados, usando cráteres de fondo plano; plan B, modelo sí/no | En S1094b el hielo poroso empieza cerca de 1 m y el masivo a varios metros (Dundas 2023, Wójcicka 2025) |
 | 2026-11-04 | `hirise_ortho_25cm` pasa de rol `cost` a `visual` | Es imagen cruda; a transitabilidad llegan las capas `boulder_*` |
+| 2026-11-08 | El mapa de calor es prior regional más cráteres y mediciones, sin variables locales | Ninguna variable del terreno (pendiente, rugosidad, THEMIS, textura con DINOv2) mejoró la predicción en los 349 cráteres. Aprobado por Luqui |
+| 2026-11-08 | Fuera de alcance: elegir dónde aterrizar y comparar sitios. El sitio es una entrada; IceWalk trabaja dentro de él | Decisión de Luqui: es otro desafío de NASA y agrega demasiada complejidad. Cierra la cuestión 31 (tarjeta de sitio) |
+| 2026-11-08 | Prioridad: el mapa de calor de potencial de hielo e incertidumbre a partir de variables que lo sugieran, comprobado antes de la simulación larga | Decisión de Luqui |
 | 2026-11-08 | Excepción: `model/gp` pasó a `main` por push directo (`0b8517b..2d719c2`), sin PR ni revisión | Pedido de Luqui. La regla de PR sigue vigente |
 | 2026-11-05 | El GP usa EP en lugar de Laplace | Laplace falló con las cotas y a veces ignoraba un "no"; EP iguala media y desvío de la respuesta exacta. Ver `EXPERIMENTS.md` |
 | 2026-11-05 | El feedback de una medición no se reduce a sí/no; las ramas del plan no quedan simplificadas a `ice` / `no_ice` sin investigar antes cómo opera NASA | Pedido de Luqui: radar y taladro dan profundidad, y el taladro también da cotas |

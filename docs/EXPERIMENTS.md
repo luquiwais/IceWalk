@@ -152,6 +152,26 @@ Contra 300 permutaciones: mejor ventaja observada 0.98, p = 0.09. El 95 % del az
 
 **Conclusión:** no hay estructura espacial fuerte a escala del sitio, y sí potencia para verla: alcances ≥ 400 m con estructura marcada quedan descartados. Puede existir estructura débil de 100-200 m: hay un indicio no significativo, y ahí la potencia es solo parcial. **Un dato informa a lo sumo unos 100-200 m a su alrededor.** No se probó el efecto de variables locales (pendiente, THEMIS), que podrían explicar parte de la variación.
 
+## 2026-11-08: ¿alguna variable del terreno predice la profundidad?
+
+Código en el repo: `model/gp/craters.py`, `covariates.py` y `covariate_test.py`. Resultados en `data/processed/s1094b/covariate_test.json`, fuera de Git.
+
+**Cómo:** modelo de `log d` sin estructura espacial (los cráteres casi no la tienen), con fondos planos como profundidad medida y los demás como cota `d > 0.2 × D`. Validación cruzada en 5 pliegues de bloques de 2 km (96, 93, 62, 62 y 36 cráteres). La ganancia es la verosimilitud media por cráter que quedó afuera, frente al modelo sin variables. Control: 200 permutaciones de cada variable. Cada variable se mide alrededor del cráter, no sobre él.
+
+| Variable | Dato | Ganancia/cráter | p | Azar 95 % |
+| --- | --- | --- | --- | --- |
+| Distancia al principal | Catálogo | -0.0047 | 0.84 | +0.0030 |
+| Pendiente, anillo desde D | DTM de HiRISE, 1 m | +0.0068 | 0.01 | +0.0025 |
+| Pendiente hacia el polo | DTM | -0.0007 | 0.29 | +0.0026 |
+| Rugosidad | DTM | +0.0002 | 0.18 | +0.0026 |
+| Inercia térmica | THEMIS, 100 m, previo al impacto | -0.0028 | 0.68 | +0.0053 |
+| Textura, componentes 1 a 5 | DINOv2 ViT-S/14 sobre el orto de feb 2022 | -0.0063 a +0.0012 | 0.13 a 0.92 | - |
+| Todas juntas | - | **-0.0205** | - | - |
+
+**Control de la pendiente:** con el anillo desde 2D, ganancia +0.0041 (p = 0.04); desde 3D, +0.0006 (p = 0.17). La señal se apaga al alejarse del cráter, así que viene del borde o la eyecta del propio cráter, no del paisaje. Además, con 10 variables probadas, p = 0.01 corregido da ~0.1.
+
+**Conclusión: ninguna variable mejora la predicción de forma robusta**, incluida la textura con IA. Todas juntas empeoran por sobreajuste. Coincide con la investigación (`research/indicadores-finos.md`). El detalle local del mapa sale de los cráteres y las mediciones; la base, del prior regional. Límites: un solo sitio, variables medidas a 30 m del cráter, textura con un modelo preentrenado sin ajustar, y formas del terreno sin mapear.
+
 ## 2026-11-05: código del GP
 
 | Prueba | Resultado |

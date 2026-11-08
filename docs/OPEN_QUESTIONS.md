@@ -9,7 +9,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 23 | ¿Planificador acepta las ramas como puntos de decisión con opciones ordenadas? Incluye qué `result` lleva un radar que ve hielo a 1.5 m | Luqui aprobó llevarlo como propuesta: opción C recortada de `research/decisiones-nasa.md`. Falta persona en el rol | Planificador | 05/11 |
 | 29 | ¿Cambia la pregunta del producto a "¿vale la caminata, con qué herramienta y adónde primero?", y el rol de la tripulación a delimitar el hielo y elegir dónde perforar? | Sí. Ver `research/viabilidad-expediciones.md` | Luqui + Producto | 08/11 |
 | 30 | ¿Se cambian el espectrómetro y el radar por observaciones blandas en `observations.py`? | Sí: hoy son las más sobreconfiadas | Luqui | 08/11 |
-| 31 | ¿Se suma la tarjeta de sitio (`site_assessment`, con `INSUFFICIENT_DATA`, `NO_GO`, `CONDITIONAL` y `GO`)? | Sí, sin tocar `/plan` ni `/replan`; umbrales como supuesto | Luqui + Plan y API | 08/11 |
+| 36 | ¿Se corrige `layers.yaml` con lo de `research/recursos-y-ml.md`? SWIM se puede bajar por script, la URL de THEMIS es exacta, y los productos individuales de SWIM no aparecen en la página citada | Sí, en un solo cambio | Luqui | 08/11 |
+| 37 | ¿Hay imágenes HiRISE posteriores a feb 2023 con el cráter cubierto? El STAC de USGS lista 13 más; falta mirar cuáles tienen píxeles | Revisarlas: sirven para visión | Visión | 08/11 |
 | 32 | ¿Corremos ya la simulación del paso 7, con la opción de apuntar a cráteres? | Sí, primero: elegir por varianza puede empatar con una grilla | Luqui | 08/11 |
 | 33 | ¿Corregimos el catálogo de herramientas (`measures`, análogos NSS y ALSD, masas, resolución del radar)? | Sí, en un PR de contrato | Todos | 08/11 |
 | 34 | ¿Cómo explicamos que Sizemore 2026 publique 97 cm para S1094b y nosotros una mediana de 2.35 m? | Sus 97 cm son los fondos planos; preparar la respuesta para el jurado | Luqui | 08/11 |
