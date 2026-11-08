@@ -1,0 +1,12 @@
+{
+  "name": "icewalk",
+  "private": true,
+  "packageManager": "bun@1.4.2",
+  "scripts": {
+    "moon": "MOON_HOME=.moon/home PROTO_HOME=.moon/proto moon"
+  },
+  "trustedDependencies": ["@moonrepo/cli"],
+  "devDependencies": {
+    "@moonrepo/cli": "2.6.5"
+  }
+}

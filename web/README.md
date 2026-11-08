@@ -13,6 +13,15 @@ Dueño: Frontend. App web de IceWalk: globo y terreno 3D, vista Planning y vista
 
 ## Comandos
 
+Desde la raíz, con moon (cachea y es lo mismo que corre CI):
+
+```bash
+bun run moon run web:dev                      # http://localhost:3000
+bun run moon run web:lint web:typecheck web:test web:build
+```
+
+O directo en la carpeta:
+
 ```bash
 cd web
 bun install

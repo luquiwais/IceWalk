@@ -34,3 +34,9 @@ dist/
 .env
 .DS_Store
 *.log
+
+# moon
+.moon/cache
+.moon/docker
+.moon/home
+.moon/proto

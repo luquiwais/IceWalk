@@ -16,9 +16,26 @@ NASA Space Apps Challenge 2026 · Sitio de demostración: cráter S1094b, Amazon
 | `data/` | Datos | Registro de capas (`layers.yaml`) y scripts de descarga |
 | `model/` | IA y modelo | Prior regional, unidades, anomalías, GP local, bloques, validación |
 | `planner/` | Planificador y backend | API FastAPI (hoy con respuestas de ejemplo) |
-| `web/` | Frontend | React + Cesium; `web/mock/` tiene JSON para arrancar sin API |
+| `web/` | Frontend | Next.js + Cesium; `web/mock/` tiene JSON para arrancar sin API |
 | `design/` | Diseño | Exports de Figma y assets |
 | `docs/` | Producto | Fuentes citadas y decisiones |
+
+## Monorepo con moon
+
+Las tareas de todas las carpetas se corren con [moon](https://moonrepo.dev), instalado **dentro del repo** como devDependency de Bun (nada global). Siempre con `bun run moon ...`, así su store queda en `.moon/home`.
+
+```bash
+bun install                       # en la raíz: instala moon (requiere Bun 1.4.2)
+bun run moon projects             # web, planner, model, contracts
+bun run moon tasks                # tareas de cada proyecto
+bun run moon run web:dev          # web en :3000
+bun run moon run planner:dev      # API en :8000
+bun run moon run :lint :test      # lint y tests de todos los proyectos
+bun run moon run web:build        # cachea: si nada cambió, no vuelve a correr
+bun run moon ci                   # lo mismo que CI: solo lo afectado por los cambios
+```
+
+Configuración: `.moon/workspace.yml` (proyectos, Git), `.moon/toolchains.yml` (Bun) y un `moon.yml` en cada proyecto con sus tareas. Las tareas de Python usan el Python del sistema: antes hay que instalar el entorno de cada proyecto (abajo).
 
 ## Arranque rápido
 

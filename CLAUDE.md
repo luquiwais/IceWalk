@@ -31,8 +31,14 @@ No modifiques la carpeta de otro rol sin que la tarea lo pida.
 
 ## Comandos
 
+Monorepo con [moon](https://moonrepo.dev), instalado en el repo (devDependency de Bun en `package.json`, nada global). Usar siempre `bun run moon ...` (su store queda en `.moon/home`). Bun, no npm ni pnpm.
+
 ```bash
-python contracts/validate.py                       # ejemplos y mocks vs esquemas
+bun install                                        # raíz: instala moon
+bun run moon run :lint :test                       # todos los proyectos
+bun run moon run web:dev                           # web en :3000
+bun run moon ci                                    # lo que corre CI (solo lo afectado)
+python contracts/validate.py                       # ejemplos y mocks vs esquemas (o: bun run moon run contracts:validate)
 cd planner && pip install -e ".[dev]"              # o: uv sync
 cd planner && uvicorn app.main:app --reload        # API en :8000, docs en /docs
 cd planner && ruff check . && pytest -q            # lint + tests
@@ -45,7 +51,7 @@ cd web && bun run lint && bun run typecheck && bun run test
 ## Reglas de trabajo
 
 - Mensajes de commit en español.
-- Ramas `rol/tarea`; PR con una revisión; `main` siempre desplegable. CI corre validación de contratos, ruff y pytest, y en `web/` lint, typecheck, tests y build con Bun.
+- Ramas `rol/tarea`; PR con una revisión; `main` siempre desplegable. CI corre `moon ci`: solo las tareas afectadas (validación de contratos, ruff, pytest, y en `web/` lint, typecheck, tests y build).
 - Datos pesados (`.tif`, `.IMG`, `.JP2`) nunca a Git: GitHub Releases.
 - Unidades SI; coordenadas internas en metros de la grilla (`contracts/grid.json`), lat/lon solo hacia la web (`app/contracts.py:xy_to_lonlat`).
 - Secretos (token de Cesium ion, etc.) en `.env`, nunca commiteados.

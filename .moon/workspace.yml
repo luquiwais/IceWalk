@@ -1,0 +1,20 @@
+# Workspace de moon: https://moonrepo.dev/docs/config/workspace
+# moon se instala dentro del repo (devDependency de Bun en package.json).
+# Usarlo siempre con `bun run moon ...`: así su store queda en .moon/home.
+
+projects:
+  web: "web"
+  planner: "planner"
+  model: "model"
+  contracts: "contracts"
+
+vcs:
+  client: "git"
+  provider: "github"
+  defaultBranch: "main"
+
+# La versión exacta se fija en package.json; esto evita correr otra.
+versionConstraint: ">=2.6.5 <3.0.0"
+
+# No mandar datos de uso anónimos a moonrepo.
+telemetry: false
