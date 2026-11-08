@@ -1,69 +1,64 @@
-# Plan del planificador y backend: traspaso
+# Plan del planificador y backend
 
-**Dueño:** Planificador y backend. **Código:** `apps/planner/`. **Estado:** mock andando, planificador real sin empezar. Escrito el 2026-11-08 por el dueño del GP para el traspaso.
+**Dueño:** Planificador (mercho40). **Código:** `apps/planner/`. **Estado:** transitabilidad y planificador real hechos el 2026-11-08 (`app/eva_planner.py`). Alineado ese mismo día con las decisiones vigentes (ver "Alineación" abajo). Falta el catálogo de cráteres en el despliegue (licencia, cuestión 26).
 
-**Leé primero:** este archivo, `docs/DECISIONS.md` (las líneas del 2026-11-08) y la sección "Lo que cambió" de abajo. Lo que diga esta página manda sobre `CLAUDE.md` y el PRD hasta que se actualicen.
+## Qué hace
 
-## Lo que cambió (y todavía no está en `CLAUDE.md` ni en el PRD)
+Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del contrato (`plan.schema.json`): estaciones, ruta, timeline, ramas, equipo y margen de regreso. Cada medición re-planifica. La API no cambia al reemplazar el mock.
 
-| Antes | Ahora | Por qué |
+## Piezas
+
+| Pieza | Estado | Dónde |
 | --- | --- | --- |
-| Objetivo: hielo a ≤ 1 m | Umbral configurable desde la STM; **3 m** en la STM de ejemplo | A ≤ 1 m, un "no" sale el 94 % de las veces en S1094b |
-| Espectrómetro de neutrones como herramienta del objetivo 1 | **Radar como herramienta principal**; taladro para confirmar donde el hielo podría estar a ≤ 1 m | El neutrón llega a ~60 cm y diría "no" casi siempre |
-| "Elegimos dónde medir para aprender más" | **No prometemos dónde.** IceWalk dice con qué herramienta ir, arma una EVA factible y segura, y aprende de cada medición por si hay un patrón que desde órbita no se ve | Los cráteres reales no muestran estructura predictiva (AUC 0.52). La herramienta cambia de ~0.3 a ~4 puntos con hielo por EVA |
-| Ramas `ice` / `no_ice` | Propuesta: puntos de decisión con opciones ordenadas (opción C de `research/decisiones-nasa.md`). **El contrato no cambia hasta que vos lo acuerdes** | NASA no usa árboles a nivel de EVA |
-| "La EVA baja la incertidumbre más que una grilla" | Se saca esa promesa | La simulación la desmiente |
+| Capas del terreno (elevación, pendiente máx./media a 10 m, rugosidad) | Hecho | `app/traverse/terrain.py` |
+| Exclusión: pendiente > `max_slope_deg`, fuera del DTM, pasillo < 1.02 m (si hay capa de visión) | Hecho | `app/traverse/route.py` |
+| Costo de caminar: tiempo con velocidad que cae con la pendiente | Hecho | `app/traverse/route.py`, `config/traverse.yaml` |
+| Rutas y tiempo de regreso desde cada celda (Dijkstra uno a todos) | Hecho | `TraverseMap.route`, `TraverseMap.time_from` |
+| Tramos reales en `/plan` y `/replan` | Hecho | `app/eva_planner.py`; `app/mock_planner.py` de respaldo |
+| Costo metabólico (Pandolf con gravedad) | Pendiente, cuestión 39 | — |
+| Herramientas desde la STM; mínimo por rango; objetivos fijos; tareas en el mejor sitio; Get Aheads | Hecho | `app/eva_planner.py` |
+| Elegir estaciones con el GP (potencial + incertidumbre, kriging believer) | Hecho | `app/eva_planner.py`, `app/ice.py` |
+| `/replan` con las mediciones acumuladas en el GP | Hecho | `app/main.py` |
+| Reordenar la ruta para caminar menos (2-opt, mover una estación) | Hecho | `EvaPlanner.improve` |
+| Timeline, tareas EV1/EV2, equipo con masa | Hecho (masas del catálogo, casi todas null) | `app/eva_planner.py` |
+| Ramas | Sobre la primera estación de hielo, re-planificando con el resultado simulado; forma final abierta (cuestión 23) | `app/eva_planner.py` |
+| Ventana de EVA y DONKI en vivo | Pendiente | `app/main.py` |
 
-Detalle y números: `docs/EXPERIMENTS.md` (2026-11-08) y `docs/research/viabilidad-expediciones.md`.
+## Próximos pasos
 
-## Qué tiene que hacer el planificador real
+1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui.
+2. Fijar `uncertainty`, `value` y los campos nuevos en el esquema (cuestión 41).
+3. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
+4. Capas en GitHub Releases y carga al arrancar la API en el deploy.
 
-Reemplazar `app/mock_planner.py` **sin cambiar la API ni `plan.schema.json`** (regla de `CLAUDE.md`). El mock queda como respaldo si faltan los datos.
+## Cómo se corre
 
-1. **Al arrancar:** cargar el catálogo de cráteres y calcular el posterior del GP una vez.
-2. **Candidatas:** celdas cada 100 m dentro del radio de caminata desde el hábitat. Excluir las de pendiente > 20° (`max_slope_deg` de la STM; fuente: ICES-2025-129, en `research/factibilidad.md`).
-3. **Selección de estaciones:** criterio por defecto **"potencial + incertidumbre"**, la profundidad más somera posible contando la duda. Es decisión del 2026-11-08: nunca pierde contra una grilla y gana si aparece estructura. Elegir en orden, respetando:
-   - tiempo: `eva_max_h` = 8 h, `reserve` = 20 % y `walking_speed_kmh` = 2, de la STM;
-   - tiempo en estación: `time_min` de cada herramienta, del catálogo;
-   - margen para volver a pie: `walkback_max_km` = 10, de la STM;
-   - egress e ingress: 45 y 30 min en el mock, supuestos.
-4. **Herramientas por estación:** el objetivo 1 usa radar en la caminata y en la estación, y taladro donde `P(d <= 1 m)` sea alta. Los demás objetivos siguen como en el mock (`TOOLS_FOR_OBJECTIVE`).
-5. **Campos de cada estación:**
-   - `p_ice` = `P(d <= depth_max_m)` del GP.
-   - `uncertainty` = entropía de `p_ice` en bits. No está definido en el esquema: proponemos esto.
-   - `value` = el puntaje del criterio, llevado a un número ≥ 0.
-6. **Ramas reales (dentro del contrato actual):** para la primera estación, simular con el GP "hay hielo" y "no hay hielo", y armar el plan siguiente de cada caso.
-7. **`/replan`:** convertir la medición con `gp.observations.from_measurement`, sumarla al posterior y replanificar desde la posición actual con el tiempo que queda.
-8. **`summary.expected_uncertainty_reduction`:** el valor real va a ser chico (~0.1 % del sitio). Es honesto; no inflarlo.
-9. **Ventana de EVA por clima (`app/window.py`, nuevo):** para un día y hora dados, decir si conviene salir y generar alertas `advisory` / `caution` / `warning`. Decide **cuándo**, no dónde.
+```bash
+cd apps/planner && uv sync --extra dev        # instala también packages/model
+cd ../..                                      # desde la raíz:
+curl -o data/raw/DTEEC_073578_2155_073077_2155_A01.tif \
+  https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.tif   # 164 MB
+cd apps/planner && uv run python -m app.traverse.terrain   # ~15 s: data/processed/s1094b/terrain_*.tif
+uv run uvicorn app.main:app --reload
+```
 
-   | Condición | Peso | Fuente o dato |
-   | --- | --- | --- |
-   | Partículas solares | Alto | DONKI (ya en `main.py`, modo demo) |
-   | Tormentas de polvo | Alto | Grandes tormentas del norte en Ls 180-240° y 305-350° (`research/factibilidad.md`) |
-   | Temperatura | Alto | ~160-260 K en S1094b, leído a ojo de un gráfico |
-   | Luz | Medio | Sombras y orientación |
-   | Viento | Bajo | 20 m/s empujan ~1 % del peso (cuenta propia) |
+## Alineación con las decisiones del 2026-11-08
 
-   **No hay umbrales oficiales de NASA** de temperatura, viento ni polvo para una EVA en Marte: todo va con `"assumption": true`. Mars Climate Database sería la fuente por día y hora, pero su licencia está sin confirmar (cuestión 15).
-10. **Exportar mocks:** `scripts/export_mocks.py` tiene que regenerar `apps/web/mock/` con el planificador real, para frontend.
+Hecha al integrar `main` en esta rama:
 
-Hoy la ruta es línea recta con un factor de 1.3, como en el mock. El A* con costo metabólico (ICES-2025-129) queda para una segunda etapa.
-
-## Archivos acordados
-
-| Archivo | Cambio |
+| Qué | Cómo quedó |
 | --- | --- |
-| `apps/planner/app/site.py` (nuevo) | Carga cráteres, prior ajustado, candidatas y máscara de pendiente |
-| `apps/planner/app/planner.py` (nuevo) | `build_plan` y `replan` reales |
-| `apps/planner/app/window.py` (nuevo) | Ventana de EVA por clima |
-| `apps/planner/app/main.py` | Usa el planificador real y cae al mock si faltan datos. `/health` informa cuál está activo |
-| `apps/planner/app/mock_planner.py` | Queda sin cambios, como respaldo |
-| `apps/planner/tests/test_planner.py` (nuevo) | Con cráteres inventados: respeta el tiempo, cumple el contrato, un "no" cambia el plan |
-| `apps/planner/scripts/export_mocks.py` | Regenera los mocks con el planificador real |
-| `apps/planner/pyproject.toml` | Dependencia local de `packages/model` (ver abajo) |
+| Umbral | STM de ejemplo: objetivo 1 con `depth_max_m: 3`. El objetivo 2 (pureza, con muestra) sigue en 1 m |
+| Herramientas | Radar como principal, en la caminata. Si llega al umbral, la herramienta de estación más honda (taladro) confirma y no sale aviso. Aviso solo si ninguna llega |
+| Acceso al GP | `app/ice.py` usa `gp.planning` (prior ajustado y `rank_candidates`), la interfaz estable |
+| `value` | El de `gp.planning`: en [0, 1] y ordena igual que "potencial + incertidumbre". Reemplaza "umbral / profundidad optimista". Fijarlo en el esquema sigue en la cuestión 41 |
+| Hábitat por defecto | (300, -2200) en `config/eva.yaml` |
+| Segunda EVA | La sublimación del hielo expuesto (puntos fijos junto al cráter) pasó a `stm.s1094b-eva2.json`. La EVA 1 queda con hielo (1), pureza (2) y contexto geológico (3) |
+| Elección de estaciones | **Valor por minuto** (decisión 4 de `plans/gp.md`): puntaje del GP / (caminata + herramientas). Antes se elegía el mejor puntaje sin mirar la caminata; con puntajes casi iguales salía una estación a 3.6 km y entraba 1 de 4. Ahora entran 6, todas cerca del hábitat (~100-200 m entre sí), porque sin estructura espacial todos los puntos valen casi lo mismo |
+| Mocks de la web | `scripts/export_mocks.py` pasa por la API: sale el planificador real si están las capas, y la medición de ejemplo es un taladro sin hielo hasta 1 m en la primera estación de hielo |
+| Mensaje | No se promete "dónde": los cráteres reales no mostraron estructura predictiva (`docs/EXPERIMENTS.md`). El criterio nunca pierde contra una grilla |
 
-## Cómo usar el GP desde el planificador
+## Interfaz del GP
 
 Decisión aprobada: el planificador instala `packages/model` como dependencia local (`pip install -e ../../packages/model`, o `uv` con `path`). **Hecho el 2026-11-08:** `rasterio` y `scikit-image` pasaron a un grupo opcional `vision`. El núcleo del GP solo instala numpy y scipy (comprobado en un entorno limpio), y CI instala `packages/model[dev,vision]`.
 
@@ -100,27 +95,17 @@ En el sitio real, con el hábitat por defecto: espectrómetro ~165 estaciones po
 - **Cómo regenerar el catálogo:** necesita la imagen RED y el orto en `data/raw/`, y se corre `python -m gp.craters` desde `packages/model`. Pedile los archivos al dueño del GP.
 - **Hábitat por defecto:** (300, -2200) m en la grilla, marcado como supuesto (decisión del 2026-11-08). Es uno de los hábitats de la simulación con muchos cráteres cerca. Cuando se toque el contrato de la STM, sumar `habitat_xy`.
 
-## Contrato y cambios pendientes que te tocan
+## Contrato y cambios pendientes
 
 | Cuestión | Qué | Estado |
 | --- | --- | --- |
 | 23 | Ramas como puntos de decisión con opciones ordenadas | Propuesta aprobada por Luqui; falta tu acuerdo. Cambia `plan.schema.json` |
 | 30 | Observaciones blandas para espectrómetro y radar | Lo hace el GP |
 | 33 | Corregir el catálogo de herramientas: `measures`, análogos NSS y ALSD, masas, resolución del radar | PR de contrato |
-| - | STM de ejemplo: umbral 3 m y radar en el objetivo 1 | Decidido; falta hacerlo (PR de contrato) |
+| - | STM de ejemplo: umbral 3 m y radar en el objetivo 1 | Hecho en esta rama |
 | 15 | Licencia de Mars Climate Database | Sin averiguar |
 
 Un cambio de contrato es un solo PR que actualiza esquema, ejemplos, mocks y usos, y `python packages/contracts/validate.py` tiene que pasar.
-
-## Cómo correr
-
-```bash
-cd apps/planner && uv venv .venv && uv pip install --python .venv/Scripts/python.exe -e ".[dev]"
-cd apps/planner && .venv/Scripts/ruff check . && .venv/Scripts/python -m pytest -q
-cd apps/planner && uvicorn app.main:app --reload   # API en :8000, docs en /docs
-```
-
-Hoy pasan los 6 tests del mock.
 
 ## Para leer
 

@@ -1,0 +1,40 @@
+# Parámetros de la EVA para el planificador. Cada valor lleva su fuente; lo que no tiene respaldo
+# va con assumption: true (y en docs/SOURCES.md). Los límites de la misión (duración, reserva,
+# tripulación) vienen de la STM, no de acá.
+
+habitat_xy:
+  value: [300, -2200]
+  source: Decisión del 2026-11-08 (DECISIONS); uno de los hábitats de la simulación con muchos cráteres cerca
+  assumption: true
+  notes: Metros de la grilla desde el cráter, a ~2.2 km, fuera de la eyecta cercana. Antes era (-1200, -900), el punto del mock. Cuando se toque el contrato de la STM, pasar a `habitat_xy` en la STM.
+
+egress_min:
+  value: 45
+  source: Sin fuente; valor del planificador mock
+  assumption: true
+
+ingress_min:
+  value: 30
+  source: Sin fuente; valor del planificador mock
+  assumption: true
+
+sensitive_p_ice:
+  value: 0.5
+  source: >-
+    PRD, protección planetaria: estaciones con hielo probable y actividades que generan calor
+    requieren aprobación. "Probable" se lee como P(hielo) > 0.5
+  assumption: true
+
+min_station_separation_m:
+  value: 50
+  source: Media celda de la subgrilla de estaciones (100 m, grid.json)
+  assumption: true
+  notes: Evita dos estaciones en el mismo punto (por ejemplo, un objetivo fijo y una candidata).
+
+believer_error_m:
+  value: 0.15
+  source: >-
+    Error de una profundidad medida en el GP (CRATER_ERROR_M, 1 px en Dundas et al. 2023). Solo
+    se usa para planificar: la estación elegida se trata como medida en su valor esperado
+    (kriging believer, Ginsbourger et al. 2010), así la siguiente no cae al lado
+  assumption: true

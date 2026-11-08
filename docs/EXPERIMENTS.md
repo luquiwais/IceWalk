@@ -308,3 +308,38 @@ Evidencia temporal en `/tmp/icewalk-playbook-*.png` y
 `/tmp/icewalk-playbook-webkit-report.json`. Los IDs fuente y conclusiones se
 conservan en el repo y Brain para no depender de `/tmp`. La cobertura por familia
 no prueba paridad visual de todas las variantes.
+
+## 2026-11-08: planificador, transitabilidad sobre el DTM
+
+DTM `DTEEC_073578_2155_073077_2155_A01`, copia COG controlada de USGS (radio 3396190 m), llevada a la grilla con `vision.grid` y reducida a 10 m (`app/traverse/terrain.py`, 14 s).
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Alineación DTM–grilla | El punto más bajo cerca del centro cae en (5, 15) m | La copia controlada coincide con el centro del cráter de `grid.json` (error ~15 m) |
+| Cobertura | 78.1 % de las celdas con dato; elevación −3960 a −3927 m | Las esquinas de la caja quedan sin dato, como se esperaba |
+| Pendiente máxima por celda, base 2 m (lo que pedía el PRD) | Mediana 19.9°; **49.6 % de las celdas > 20°** | Domina el ruido: un sitio casi plano no puede estar medio prohibido |
+| Llanura de 1 km², pendiente por píxel según base | > 20°: 2.6 % (2 m), 1.1 % (4 m), 0.3 % (6 m), 0.1 % (10 m), 0.05 % (20 m) | El ruido cae con la base, como √2·σz/base |
+| Sobre el cráter, igual | > 20°: 3.5 % (2 m), 0.9 % (10 m), 0.8 % (20 m) | El relieve real se mantiene: el cráter sigue excluido |
+| Pendiente máxima por celda, base 10 m | Mediana 9.6°, p99 18.9°; **0.53 % de celdas > 20°**: el cráter (136 celdas a < 100 m), otros cráteres (grupos de 41-140 celdas) y manchas sueltas de 1-3 celdas en la unidad rugosa del SE | Adoptado. Las manchas sueltas pueden ser artefactos: cuestión 40 |
+| Rugosidad (desvío de un plano en 10 m) | Mediana 0.18 m, p99 0.45 m | Del orden de la precisión del DTM: no entra al costo todavía |
+| Grafo de 8 vecinos sobre la grilla entera | 4.7 M aristas; carga + grafo 0.3 s; Dijkstra uno a todos 0.12 s; tramos siguientes desde el mismo punto ~3 ms | No hace falta A* ni recortar la grilla |
+| Hábitat mock (−1200, −900) a las 6 estaciones mock | Rutas 1.01-1.08 × la recta, pendiente máxima en ruta 3.9-8.8°, ~2 km/h | El factor 1.3 del mock sobreestimaba |
+| Ruta de borde a borde del cráter, (−200, 0) → (200, 0) | 450 m, rodea por el sur | La exclusión funciona |
+| `/plan` y `/replan` con rutas reales | 1.07 s la primera vez (carga), 0.16 s `/replan`; 135 puntos de ruta; valida contra `plan.schema.json` | Dentro del umbral de 2 s propuesto |
+| Sin capas del terreno (CI) | Vuelve a recta × 1.3, `routing: straight_line`; 19 tests pasan | El contrato no depende de los datos |
+
+No verificado: el mapa FOM del DTM (calidad de correlación por píxel) y el relieve sombreado para buscar cajas o costuras; los coeficientes del costo metabólico para Marte.
+
+## 2026-11-08: planificador real (GP + transitabilidad)
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| STM de S1094b, terreno real, sin catálogo de cráteres (solo prior) | 5 estaciones de taladro; P(hielo ≤ 1 m) = 0.058 en todas; la primera cae en el hábitat (empate: la más cercana); objetivo 3 (blancos en el cráter) no entra; margen mínimo 5.5 min; valida contra el esquema | Sin cráteres el plan es estructuralmente correcto pero casi no informa (cuestión 42) |
+| Ramas con solo prior | `ice` sigue a 100 m (delimitar); `no_ice` se aleja | Un sí y un no cambian el plan, como pide el criterio de aceptación del GP |
+| Reducción esperada de ambigüedad en toda la zona alcanzable | ~0 % | Coincide con Luqui: una EVA no cambia el mapa del sitio entero (alcance 100-200 m) |
+| Terreno sintético con un grupo de cráteres de fondo plano a 0.3 m | Primera estación de hielo a < 200 m del grupo, P > 0.5; estaciones separadas ≥ 50 m; objetivos 2 y 4 en la estación más confiable | La selección hace lo esperado |
+| Tiempo con 349 cráteres sintéticos en el terreno real | Plan con ramas 1.1 s; re-plan 0.9 s; el 65 % es el reajuste del GP en cada believer | Dentro del umbral de 2 s propuesto |
+
+No verificado: el plan con el catálogo real de cráteres, que no está en este equipo.
+| Reordenar la ruta (2-opt + mover una estación), 4 juegos de 349 cráteres sintéticos en el terreno real | 1 de 4 mejora: −0.45 km, −14 min, margen mínimo de 5 a 19 min; en los otros 3 el orden codicioso ya era el mejor (3-4 estaciones de taladro). Sin costo de tiempo | Se mantiene: protege el margen cuando la elección zigzaguea |
+| Ramas con un grupo de 12 cráteres someros cerca | `ice` y `no_ice` dan la misma secuencia | Un dato más casi no mueve el mapa donde ya hay cráteres; las ramas solo difieren cuando la medición es la información nueva |

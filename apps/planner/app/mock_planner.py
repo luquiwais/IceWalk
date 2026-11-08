@@ -1,9 +1,13 @@
 """Planificador de ejemplo (MOCK).
 
 Produce planes con la forma exacta del contrato (packages/contracts/schemas/plan.schema.json)
-para que Frontend y Diseño trabajen desde el día 1. Los números son ilustrativos:
-el planificador real (valor de medir + A* sobre transitabilidad) reemplaza este módulo
-sin cambiar la API.
+para que Frontend y Diseño trabajen desde el día 1. Las estaciones, sus valores y las ramas son
+ilustrativos; el planificador real (estaciones elegidas con el GP) reemplaza este módulo sin
+cambiar la API.
+
+Los tramos ya son reales cuando existen las capas del terreno (`python -m app.traverse.terrain`):
+ruta de menor tiempo sobre el DTM, con exclusión por pendiente. Sin esas capas (CI, clon sin datos)
+se usa la distancia recta por un factor, como antes.
 """
 
 from __future__ import annotations
@@ -12,9 +16,11 @@ import math
 import uuid
 
 from .contracts import tools_by_id, xy_to_lonlat
+from .traverse.params import default_params
+from .traverse.route import NoRouteError, TraverseMap, cached_map
 
 HABITAT_XY = (-1200.0, -900.0)
-TORTUOSITY = 1.3  # MOCK: la ruta real sale de A*; acá distancia recta x factor
+TORTUOSITY = 1.3  # Solo sin capas del terreno: distancia recta x factor
 EGRESS_MIN = 45
 INGRESS_MIN = 30
 BASE_DOSE_MSV_PER_DAY = 0.67  # RAD/Curiosity, promedio GCR en superficie
@@ -40,6 +46,25 @@ TOOLS_FOR_OBJECTIVE = {
 
 def _dist_km(a: tuple[float, float], b: tuple[float, float]) -> float:
     return math.dist(a, b) / 1000.0
+
+
+def _traverse_map(stm: dict) -> TraverseMap | None:
+    """Mapa de caminata con los límites de la STM, o None si faltan las capas del terreno."""
+    try:
+        return cached_map(default_params().with_stm(stm))
+    except FileNotFoundError:
+        return None
+
+
+def _leg(
+    a: tuple[float, float], b: tuple[float, float], speed_kmh: float, tmap: TraverseMap | None
+) -> tuple[float, float, list[tuple[float, float]]]:
+    """(minutos, km, polilínea en metros) de A a B. Lanza NoRouteError si no hay camino."""
+    if tmap is not None:
+        r = tmap.route(a, b)
+        return r.time_s / 60, r.distance_m / 1000, r.xy
+    km = _dist_km(a, b) * TORTUOSITY
+    return km / speed_kmh * 60, km, [a, b]
 
 
 def _value(p: float, u: float) -> float:
@@ -105,6 +130,8 @@ def build_plan(
                          "label": "Egress", "station_id": None})
         t = EGRESS_MIN
 
+    tmap = _traverse_map(stm)
+    alerts: list[dict] = []
     pos = start_xy
     coords = [list(xy_to_lonlat(*pos))]
     total_km = 0.0
@@ -112,10 +139,15 @@ def build_plan(
     min_margin = float("inf")
     kept: list[dict] = []
     for st in stations:
-        leg = _dist_km(pos, tuple(st["position"])) * TORTUOSITY
-        back = _dist_km(tuple(st["position"]), HABITAT_XY) * TORTUOSITY
-        walk = leg / speed * 60
-        back_min = back / speed * 60
+        st_xy = tuple(st["position"])
+        try:
+            walk, leg, leg_xy = _leg(pos, st_xy, speed, tmap)
+            back_min, _, _ = _leg(st_xy, HABITAT_XY, speed, tmap)
+        except NoRouteError:
+            alerts.append({"level": "caution", "source": "planner",
+                           "message": f"No walkable route to {st['id']} (slope > "
+                                      f"{tmap.params.max_slope_deg:g} deg). Station dropped."})
+            continue
         if t + walk + st["duration_min"] + back_min + INGRESS_MIN > budget:
             continue  # no entra en el techo: se descarta
         timeline.append({"t_start_min": round(t, 1), "t_end_min": round(t + walk, 1),
@@ -129,17 +161,17 @@ def build_plan(
                          "station_id": st["id"], "walkback_margin_min": round(margin, 1)})
         t += st["duration_min"]
         total_km += leg
-        max_from_hab = max(max_from_hab, back / TORTUOSITY)
-        pos = tuple(st["position"])
-        coords.append(st["lonlat"])
+        max_from_hab = max(max_from_hab, _dist_km(st_xy, HABITAT_XY))
+        pos = st_xy
+        coords.extend(list(xy_to_lonlat(*p)) for p in leg_xy[1:])
         kept.append(st)
 
-    back = _dist_km(pos, HABITAT_XY) * TORTUOSITY
-    timeline.append({"t_start_min": round(t, 1), "t_end_min": round(t + back / speed * 60, 1),
+    back_min, back, back_xy = _leg(pos, HABITAT_XY, speed, tmap)
+    timeline.append({"t_start_min": round(t, 1), "t_end_min": round(t + back_min, 1),
                      "kind": "traverse", "label": "Return to habitat", "station_id": None})
-    t += back / speed * 60
+    t += back_min
     total_km += back
-    coords.append(list(xy_to_lonlat(*HABITAT_XY)))
+    coords.extend(list(xy_to_lonlat(*p)) for p in back_xy[1:])
     timeline.append({"t_start_min": round(t, 1), "t_end_min": round(t + INGRESS_MIN, 1),
                      "kind": "ingress", "label": "Ingress", "station_id": None})
     t += INGRESS_MIN
@@ -181,7 +213,8 @@ def build_plan(
         "route": {
             "type": "FeatureCollection",
             "features": [{"type": "Feature",
-                          "properties": {"kind": "traverse", "is_mock": True},
+                          "properties": {"kind": "traverse", "is_mock": tmap is None,
+                                         "routing": "dtm" if tmap else "straight_line"},
                           "geometry": {"type": "LineString", "coordinates": coords}}],
         },
         "timeline": timeline,
@@ -197,7 +230,7 @@ def build_plan(
             "crew": c["crew"],
             "is_mock": True,
         },
-        "alerts": [],
+        "alerts": alerts,
     }
 
 

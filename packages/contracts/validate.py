@@ -15,6 +15,7 @@ C = ROOT / "packages" / "contracts"
 
 PAIRS = [
     ("schemas/stm.schema.json", C / "examples/stm.s1094b.json"),
+    ("schemas/stm.schema.json", C / "examples/stm.s1094b-eva2.json"),
     ("schemas/tool.schema.json", C / "examples/tools.catalog.json"),
     ("schemas/measurement.schema.json", C / "examples/measurement.example.json"),
     ("schemas/boulders.schema.json", C / "examples/boulders.example.json"),

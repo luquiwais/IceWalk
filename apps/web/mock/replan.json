@@ -4,109 +4,195 @@
   "replanned_from": "plan-demo0001",
   "stations": [
     {
-      "id": "S6",
+      "id": "E04S22",
       "order": 1,
       "position": [
-        900.0,
-        -200.0
+        400.0,
+        -2200.0
       ],
       "lonlat": [
-        189.845897,
-        35.107119
+        189.835565,
+        35.073312
       ],
       "priority": "high",
       "objective_ranks": [
         1
       ],
       "tools": [
-        "neutron_spectrometer"
+        "core_drill"
       ],
       "tasks": {
         "EV1": [
-          "Run Portable neutron spectrometer"
+          "Run Hand core drill"
         ],
         "EV2": [
-          "Document site (photos, notes)",
+          "Assist Hand core drill",
           "Monitor consumables and walkback margin"
         ]
       },
-      "duration_min": 12,
-      "hypothesis": "Shallow ice (<= 1 m) present at this terrain unit",
-      "p_ice": 0.578,
-      "uncertainty": 0.229,
-      "value": 0.247,
-      "planetary_protection": "none",
-      "terrain_unit": 2
+      "duration_min": 40.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.667,
+      "uncertainty": 0.918,
+      "value": 0.924,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.37,
+      "depth_shallow_m": 1.37
     },
     {
-      "id": "S1",
+      "id": "E04S23",
       "order": 2,
       "position": [
-        420.0,
-        610.0
+        400.0,
+        -2300.0
       ],
       "lonlat": [
-        189.835979,
-        35.120811
+        189.835565,
+        35.071622
       ],
       "priority": "high",
       "objective_ranks": [
-        1
-      ],
-      "tools": [
-        "neutron_spectrometer"
-      ],
-      "tasks": {
-        "EV1": [
-          "Run Portable neutron spectrometer"
-        ],
-        "EV2": [
-          "Document site (photos, notes)",
-          "Monitor consumables and walkback margin"
-        ]
-      },
-      "duration_min": 12,
-      "hypothesis": "Shallow ice (<= 1 m) present at this terrain unit",
-      "p_ice": 0.545,
-      "uncertainty": 0.238,
-      "value": 0.249,
-      "planetary_protection": "none",
-      "terrain_unit": 2
-    },
-    {
-      "id": "S4",
-      "order": 3,
-      "position": [
-        0.0,
-        120.0
-      ],
-      "lonlat": [
-        189.8273,
-        35.112528
-      ],
-      "priority": "medium",
-      "objective_ranks": [
+        1,
+        2,
         3
       ],
       "tools": [
-        "camera_spectrometer"
+        "core_drill",
+        "camera_spectrometer",
+        "sample_kit"
       ],
       "tasks": {
         "EV1": [
+          "Run Hand core drill",
           "Run Handheld camera / spectrometer"
         ],
         "EV2": [
-          "Document site (photos, notes)",
+          "Assist Hand core drill",
+          "Run Clean sample containers",
           "Monitor consumables and walkback margin"
         ]
       },
-      "duration_min": 5,
-      "hypothesis": "See objective",
-      "p_ice": 0.841,
-      "uncertainty": 0.075,
-      "value": 0.101,
+      "duration_min": 53.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.668,
+      "uncertainty": 0.917,
+      "value": 0.924,
       "planetary_protection": "sensitive",
-      "terrain_unit": 3
+      "kind": "survey",
+      "depth_median_m": 2.36,
+      "depth_shallow_m": 1.37
+    },
+    {
+      "id": "E03S23",
+      "order": 3,
+      "position": [
+        300.0,
+        -2300.0
+      ],
+      "lonlat": [
+        189.833499,
+        35.071622
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "core_drill"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Hand core drill"
+        ],
+        "EV2": [
+          "Assist Hand core drill",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 40.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.667,
+      "uncertainty": 0.918,
+      "value": 0.924,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.37,
+      "depth_shallow_m": 1.37
+    },
+    {
+      "id": "E02S23",
+      "order": 4,
+      "position": [
+        200.0,
+        -2300.0
+      ],
+      "lonlat": [
+        189.831433,
+        35.071622
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "core_drill"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Hand core drill"
+        ],
+        "EV2": [
+          "Assist Hand core drill",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 40.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.669,
+      "uncertainty": 0.916,
+      "value": 0.925,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.36,
+      "depth_shallow_m": 1.37
+    },
+    {
+      "id": "E02S22",
+      "order": 5,
+      "position": [
+        200.0,
+        -2200.0
+      ],
+      "lonlat": [
+        189.831433,
+        35.073312
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "core_drill"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Hand core drill"
+        ],
+        "EV2": [
+          "Assist Hand core drill",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 40.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.665,
+      "uncertainty": 0.92,
+      "value": 0.923,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.38,
+      "depth_shallow_m": 1.38
     }
   ],
   "route": {
@@ -116,30 +202,40 @@
         "type": "Feature",
         "properties": {
           "kind": "traverse",
-          "is_mock": true
+          "is_mock": false,
+          "routing": "dtm",
+          "max_slope_deg": 6.5
         },
         "geometry": {
           "type": "LineString",
           "coordinates": [
             [
-              189.812836,
-              35.107964
+              189.833602,
+              35.073228
             ],
             [
-              189.845897,
-              35.107119
+              189.835669,
+              35.073228
             ],
             [
-              189.835979,
-              35.120811
+              189.835669,
+              35.071537
             ],
             [
-              189.8273,
-              35.112528
+              189.833602,
+              35.071537
             ],
             [
-              189.802504,
-              35.095287
+              189.831536,
+              35.071537
+            ],
+            [
+              189.831536,
+              35.073228
+            ],
+            [
+              189.833602,
+              35.073228
             ]
           ]
         }
@@ -148,66 +244,96 @@
   },
   "timeline": [
     {
-      "t_start_min": 120,
-      "t_end_min": 182.4,
+      "t_start_min": 120.0,
+      "t_end_min": 123.1,
       "kind": "traverse",
-      "label": "Traverse to S6",
-      "station_id": "S6"
+      "label": "Traverse to E04S22",
+      "station_id": "E04S22"
     },
     {
-      "t_start_min": 182.4,
-      "t_end_min": 194.4,
+      "t_start_min": 123.1,
+      "t_end_min": 163.1,
       "kind": "station",
-      "label": "Station S6",
-      "station_id": "S6",
-      "walkback_margin_min": 73.2
+      "label": "Station E04S22",
+      "station_id": "E04S22",
+      "walkback_margin_min": 187.8
     },
     {
-      "t_start_min": 194.4,
-      "t_end_min": 231.2,
+      "t_start_min": 163.1,
+      "t_end_min": 166.3,
       "kind": "traverse",
-      "label": "Traverse to S1",
-      "station_id": "S1"
+      "label": "Traverse to E04S23",
+      "station_id": "E04S23"
     },
     {
-      "t_start_min": 231.2,
-      "t_end_min": 243.2,
+      "t_start_min": 166.3,
+      "t_end_min": 219.3,
       "kind": "station",
-      "label": "Station S1",
-      "station_id": "S1",
-      "walkback_margin_min": 24.5
+      "label": "Station E04S23",
+      "station_id": "E04S23",
+      "walkback_margin_min": 130.3
     },
     {
-      "t_start_min": 243.2,
-      "t_end_min": 268.3,
+      "t_start_min": 219.3,
+      "t_end_min": 222.3,
       "kind": "traverse",
-      "label": "Traverse to S4",
-      "station_id": "S4"
+      "label": "Traverse to E03S23",
+      "station_id": "E03S23"
     },
     {
-      "t_start_min": 268.3,
-      "t_end_min": 273.3,
+      "t_start_min": 222.3,
+      "t_end_min": 262.3,
       "kind": "station",
-      "label": "Station S4",
-      "station_id": "S4",
-      "walkback_margin_min": 19.3
+      "label": "Station E03S23",
+      "station_id": "E03S23",
+      "walkback_margin_min": 88.5
     },
     {
-      "t_start_min": 273.3,
-      "t_end_min": 334.7,
+      "t_start_min": 262.3,
+      "t_end_min": 265.4,
+      "kind": "traverse",
+      "label": "Traverse to E02S23",
+      "station_id": "E02S23"
+    },
+    {
+      "t_start_min": 265.4,
+      "t_end_min": 305.4,
+      "kind": "station",
+      "label": "Station E02S23",
+      "station_id": "E02S23",
+      "walkback_margin_min": 44.2
+    },
+    {
+      "t_start_min": 305.4,
+      "t_end_min": 308.6,
+      "kind": "traverse",
+      "label": "Traverse to E02S22",
+      "station_id": "E02S22"
+    },
+    {
+      "t_start_min": 308.6,
+      "t_end_min": 348.6,
+      "kind": "station",
+      "label": "Station E02S22",
+      "station_id": "E02S22",
+      "walkback_margin_min": 2.2
+    },
+    {
+      "t_start_min": 348.6,
+      "t_end_min": 351.8,
       "kind": "traverse",
       "label": "Return to habitat",
       "station_id": null
     },
     {
-      "t_start_min": 334.7,
-      "t_end_min": 364.7,
+      "t_start_min": 351.8,
+      "t_end_min": 381.8,
       "kind": "ingress",
       "label": "Ingress",
       "station_id": null
     },
     {
-      "t_start_min": 364.7,
+      "t_start_min": 381.8,
       "t_end_min": 480,
       "kind": "reserve",
       "label": "Walkback reserve",
@@ -216,53 +342,75 @@
   ],
   "branches": [
     {
-      "station_id": "S6",
+      "station_id": "E04S22",
       "if_result": "ice",
       "next_station_ids": [
-        "S1",
-        "S4"
+        "E04S23",
+        "E03S23",
+        "E02S23",
+        "E02S22"
       ],
-      "note": "Continue nominal plan"
+      "note": "Replanned with the simulated result; ice model updated"
     },
     {
-      "station_id": "S6",
+      "station_id": "E04S22",
       "if_result": "no_ice",
       "next_station_ids": [
-        "S2",
-        "S1",
-        "S4"
+        "E04S23",
+        "E03S23",
+        "E02S23",
+        "E02S22"
       ],
-      "note": "Drop nearby stations of the same unit; add the next most valuable one"
+      "note": "Replanned with the simulated result; ice model updated"
     }
   ],
   "equipment": [
     {
-      "tool": "neutron_spectrometer",
+      "tool": "core_drill",
       "count": 1,
       "mass_kg": null,
-      "justification": "Required by stations using Portable neutron spectrometer"
+      "justification": "Objectives 1, 2, 3"
     },
     {
       "tool": "camera_spectrometer",
       "count": 1,
       "mass_kg": null,
-      "justification": "Required by stations using Handheld camera / spectrometer"
+      "justification": "Objectives 1, 2, 3"
+    },
+    {
+      "tool": "sample_kit",
+      "count": 1,
+      "mass_kg": null,
+      "justification": "Objectives 1, 2, 3"
+    },
+    {
+      "tool": "gpr",
+      "count": 1,
+      "mass_kg": 3,
+      "justification": "Objective 1: measures ice_presence while walking"
     }
   ],
   "summary": {
-    "duration_min": 364.7,
-    "distance_km": 6.19,
-    "max_distance_from_habitat_km": 2.21,
-    "min_walkback_margin_min": 19.3,
-    "dose_estimate_msv": 0.17,
-    "expected_uncertainty_reduction": 0.4,
+    "duration_min": 381.8,
+    "distance_km": 0.6,
+    "max_distance_from_habitat_km": 0.14,
+    "min_walkback_margin_min": 2.2,
+    "dose_estimate_msv": 0.178,
+    "expected_uncertainty_reduction": 0.0,
     "crew": 2,
-    "is_mock": true
+    "is_mock": false,
+    "ice_threshold_m": 3.0,
+    "craters_in_model": 349
   },
   "alerts": [
     {
       "level": "advisory",
-      "message": "No ice at S5. EVA replanned.",
+      "source": "planner",
+      "message": "No ice at E03S22. EVA replanned."
+    },
+    {
+      "level": "advisory",
+      "message": "Objective 1: terrain units not available yet; stations chosen by ice potential.",
       "source": "planner"
     }
   ]

@@ -19,7 +19,7 @@
       "trace": "NASEM 2025: characterize water and CO2 reservoirs in the exploration zone",
       "measurement": {
         "variable": "ice_presence",
-        "depth_max_m": 1,
+        "depth_max_m": 3,
         "coverage": "all_terrain_units",
         "min_stations": 4,
         "sample_return": false
@@ -40,18 +40,6 @@
     },
     {
       "rank": 3,
-      "title": "Document sublimation of exposed ice",
-      "hypothesis": "Exposed ice at this latitude is unstable at the surface.",
-      "purpose": "science",
-      "trace": "HiRISE team: key data point on current ice stability",
-      "measurement": {
-        "variable": "surface_change",
-        "coverage": "targets",
-        "targets": [[0, 120], [-80, -60]]
-      }
-    },
-    {
-      "rank": 4,
       "title": "Geologic context of the ejecta",
       "hypothesis": "Dark excavated units are more mafic volcanic material.",
       "purpose": "science",

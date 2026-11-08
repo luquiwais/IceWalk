@@ -7,6 +7,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Dato | Fuente | Crédito / cita |
 | --- | --- | --- |
 | HiRISE DTM y ortoimágenes de S1094b | https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155 | NASA/JPL-Caltech/UArizona |
+| HiRISE DTM, copia COG controlada (CC0), la que lee el planificador | https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.tif | NASA/JPL-Caltech/UArizona; USGS Astrogeology |
 | Mapas de consistencia de hielo SWIM | https://swim.psi.edu/SWIM4MIMProducts.php | Morgan et al. (2021) Nature Astronomy; SWIM (PSI/JPL) |
 | Mosaico global CTX | https://murray-lab.caltech.edu/CTX/ | Dickson et al. (2024) Earth and Space Science; NASA/JPL/MSSS/The Murray Lab |
 | Inercia térmica THEMIS | https://astrogeology.usgs.gov | Fergason et al. (2006) JGR; USGS / ASU |
@@ -118,3 +119,8 @@ Interacción del time wheel: [Apple HIG Pickers](https://developer.apple.com/des
 y [WWDC20 — Design with iOS pickers, menus and actions](https://developer.apple.com/videos/play/wwdc2020/10205/).
 Las ruedas admiten desplazamiento y entrada por teclado; la implementación web
 agrega pointer capture, snap/inercia y edición directa. No usa un select nativo.
+| Precisión de los DTM de HiRISE: decenas de cm a 1 m de grilla; resolución horizontal no mejor que 3-5 píxeles | HiRISE, https://www.uahirise.org/dtm/about.php; Sutton et al. (2022) Remote Sensing; Kirk, MSL 4th landing site workshop, https://marsoweb.nas.nasa.gov/landingsites/msl/workshops/4th_workshop/talks/3_Kirk_Slopes.pdf |
+| Ejemplo de precisión vertical 0.2 m (error de correlación de 0.2 px) | Butcher et al. (2023), dataset ORDA Sheffield, https://orda.shef.ac.uk/articles/dataset/_strong_HiRISE_digital_terrain_model_1_m_pixel_and_orthorectified_image_25_cm_pixel_of_a_viscous_flow_feature_incised_by_a_gully_in_Nereidum_Montes_Mars_strong_/23741973 |
+| README y artefactos conocidos del DTM de S1094b (RMS, FOM, cajas, costuras) | https://hirise.lpl.arizona.edu/PDS/EXTRAS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/README_DTEEC_073578_2155_073077_2155_A01.TXT |
+| Velocidad de caminata Apollo `V = -0.01θ + 0.75 m/s` y exclusión ±20° (flight rules) | ICES-2025-129 (Kim et al. 2025), ecs. 2 y figura 5 |
+| Kriging believer: elegir varios puntos suponiendo medido el valor esperado | Ginsbourger, Le Riche y Carraro (2010), Kriging is well-suited to parallelize optimization, en Computational Intelligence in Expensive Optimization Problems, Springer |
