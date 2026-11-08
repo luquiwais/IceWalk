@@ -11,7 +11,16 @@ Con fuente:
 - `NON_FLAT_RATIO`: Dundas et al. 2023 presenta 0.1 y 0.2. Se usa 0.2 porque es coherente con su
   tabla de 349 cráteres, y 0.1 no (ver `docs/EXPERIMENTS.md`).
 
-La cota blanda no modela una falla del instrumento: eso también queda para el paso 5.
+Radar y espectrómetro (supuestos marcados, ver `docs/SOURCES.md` y
+`docs/research/radar-confiabilidad.md`; no hay tasas publicadas de reflectores falsos ni de
+detecciones fallidas, solo casos sueltos):
+- El radar ve un reflector, no hielo. Su profundidad tiene error por la permitividad del suelo
+  (`RADAR_PERMITTIVITY_SIGMA_LOG`) y el reflector puede no ser hielo (`RADAR_FALSE_REFLECTOR_P`).
+  EP necesita datos con una sola forma de error, así que esa chance se aproxima ensanchando el
+  error: se suma `p / (1 - p)` veces la varianza de `log d` del sitio. Lo exacto sería una mezcla.
+- "Sin reflector" es una cota débil: puede ser atenuación o poco contraste.
+- El espectrómetro de neutrones ve hidrógeno con un alcance que se apaga de a poco entre ~0.4 y
+  1 m: su cota es blanda (`NEUTRON_SIGMA_LOG`).
 """
 
 from __future__ import annotations
@@ -25,6 +34,13 @@ Kind = Literal["depth", "deeper_than", "shallower_than"]
 CRATER_ERROR_M = 0.15
 BOUND_SIGMA_LOG = 0.1
 NON_FLAT_RATIO = 0.2
+
+# Radar y espectrómetro: supuestos (ver el docstring del módulo).
+RADAR_PERMITTIVITY_SIGMA_LOG = 0.18  # ~20 % a 1 desvío sin calibrar (permitividad 2.5-9 en Marte)
+RADAR_FALSE_REFLECTOR_P = 0.25  # supuesto, rango 0.10-0.45 (36 casos, ninguna tasa publicada)
+RADAR_NO_REFLECTOR_SIGMA_LOG = 0.5
+NEUTRON_SIGMA_LOG = 0.30  # alcance gradual: 0.4-1 m alrededor de 0.6 m es ~ +-1.5 desvíos
+SITE_LOG_VARIANCE = 0.299  # varianza de log d en S1094b (ajuste de los 349 cráteres)
 
 
 @dataclass(frozen=True)
@@ -88,6 +104,32 @@ def non_flat_crater(
     return deeper_than(x_m, y_m, ratio * diameter_m, "non_flat_crater")
 
 
+def is_radar(tool: dict[str, Any]) -> bool:
+    return "subsurface_layers" in tool.get("detects", [])
+
+
+def is_neutron(tool: dict[str, Any]) -> bool:
+    return "hydrogen" in tool.get("detects", [])
+
+
+def radar_reflector(
+    x_m: float,
+    y_m: float,
+    depth_m: float,
+    resolution_m: float = CRATER_ERROR_M,
+    false_reflector_p: float = RADAR_FALSE_REFLECTOR_P,
+    site_log_variance: float = SITE_LOG_VARIANCE,
+) -> Observation:
+    """Reflector de radar a `depth_m`: profundidad con error y chance de que no sea hielo."""
+    if not math.isfinite(depth_m) or depth_m <= 0:
+        raise ValueError(f"depth_m debe ser finito y positivo: {depth_m}")
+    if not 0 <= false_reflector_p < 1:
+        raise ValueError(f"false_reflector_p debe estar en [0, 1): {false_reflector_p}")
+    variance = (resolution_m / depth_m) ** 2 + RADAR_PERMITTIVITY_SIGMA_LOG**2
+    variance += false_reflector_p / (1 - false_reflector_p) * site_log_variance
+    return Observation(x_m, y_m, "depth", depth_m, math.sqrt(variance), "gpr_reflector")
+
+
 def from_measurement(measurement: dict[str, Any], tool: dict[str, Any]) -> Observation | None:
     """Traduce una medición de `measurement.schema.json`, con su herramienta del catálogo.
 
@@ -111,11 +153,19 @@ def from_measurement(measurement: dict[str, Any], tool: dict[str, Any]) -> Obser
     x_m, y_m = measurement["position"]
     depth_m = measurement.get("depth_m")
     source = tool["id"]
+    bound_sigma = BOUND_SIGMA_LOG
+    if is_neutron(tool):
+        bound_sigma = NEUTRON_SIGMA_LOG
+    elif is_radar(tool) and result == "no_ice":
+        bound_sigma = RADAR_NO_REFLECTOR_SIGMA_LOG
     if result == "no_ice":
         if depth_m == 0:
             return None
-        return deeper_than(x_m, y_m, reach_m if depth_m is None else depth_m, source)
+        reached = reach_m if depth_m is None else depth_m
+        return deeper_than(x_m, y_m, reached, source, sigma_log=bound_sigma)
     if depth_m:
         error_m = tool.get("vertical_resolution_m") or CRATER_ERROR_M
+        if is_radar(tool):
+            return radar_reflector(x_m, y_m, depth_m, error_m)
         return measured_depth(x_m, y_m, depth_m, error_m, source)
-    return shallower_than(x_m, y_m, reach_m, source)
+    return shallower_than(x_m, y_m, reach_m, source, sigma_log=bound_sigma)

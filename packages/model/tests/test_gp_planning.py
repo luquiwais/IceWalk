@@ -110,6 +110,8 @@ def test_rendimiento_por_herramienta():
     out = tool_yield(post, x, y, list(TOOLS.values()))
     assert "camera_spectrometer" not in out  # sin alcance en profundidad
     assert out["gpr"]["p_per_station"] > out["core_drill"]["p_per_station"]
+    assert out["gpr"]["p_best_station"] <= out["gpr"]["confirms_ice_p"] + 1e-12
+    assert out["gpr"]["confirms_ice_p"] == pytest.approx(0.75)
     assert out["core_drill"]["p_per_station"] > out["neutron_spectrometer"]["p_per_station"]
     p = out["core_drill"]["p_per_station"]
     assert out["core_drill"]["stations_for_one_hit"] == pytest.approx(1 / p)

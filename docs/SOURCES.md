@@ -74,6 +74,10 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | Valor | Qué es | Por qué ese valor |
 | --- | --- | --- |
 | `BOUND_SIGMA_LOG = 0.1` | Cuán blanda es una cota, en `log d` | Margen de ~10 % en profundidad; sin fuente |
+| `RADAR_FALSE_REFLECTOR_P = 0.25` | Chance de que un reflector de radar no sea hielo | Rango 0.10-0.45, de 36 casos sueltos; ninguna tasa publicada. `research/radar-confiabilidad.md` |
+| `RADAR_PERMITTIVITY_SIGMA_LOG = 0.18` | Error de profundidad del radar sin calibrar | ~20 % a 1 desvío; permitividad medida en Marte entre 2.5 y 9 (Bramson 2015, RIMFAX, Zhurong) |
+| `RADAR_NO_REFLECTOR_SIGMA_LOG = 0.5` | "Sin reflector" como cota débil | Atenuación o poco contraste; P(no detecta) ~0.30 en hielo poroso, sin tasa publicada |
+| `NEUTRON_SIGMA_LOG = 0.3` | Alcance gradual del espectrómetro | ~0.4-1 m alrededor de 0.6 m (`research/viabilidad-expediciones.md`) |
 | `CRATER_ERROR_M = 0.15`, usado en un taladro | Error de un taladro que no informa el suyo | Se reutiliza el valor de cráteres: 1 px en Dundas et al. (2023). Para taladro, sin fuente |
 
 ## Software

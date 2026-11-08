@@ -119,9 +119,42 @@ def test_taladro_que_no_profundizo_no_informa():
     assert from_measurement(measurement("core_drill", "no_ice", 0), TOOLS["core_drill"]) is None
 
 
-def test_radar_usa_su_resolucion_vertical():
+def test_radar_es_un_reflector_con_error_por_permitividad_y_falsos():
     obs = from_measurement(measurement("gpr", "ice", 1.5), TOOLS["gpr"])
-    assert obs.sigma_log == pytest.approx(TOOLS["gpr"]["vertical_resolution_m"] / 1.5)
+    resolution = TOOLS["gpr"]["vertical_resolution_m"] / 1.5
+    expected = math.sqrt(resolution**2 + 0.18**2 + 0.25 / 0.75 * 0.299)
+    assert obs.kind == "depth"
+    assert obs.sigma_log == pytest.approx(expected)
+
+
+def test_reflector_informa_menos_que_un_taladro():
+    radar = from_measurement(measurement("gpr", "ice", 1.5), TOOLS["gpr"])
+    drill = from_measurement(measurement("core_drill", "ice", 1.5), TOOLS["core_drill"])
+    _, var_radar = posterior(PRIOR, [radar]).predict([0.0], [0.0])
+    _, var_drill = posterior(PRIOR, [drill]).predict([0.0], [0.0])
+    assert var_radar[0] > var_drill[0]
+
+
+def test_sin_reflector_es_cota_debil():
+    obs = from_measurement(measurement("gpr", "no_ice"), TOOLS["gpr"])
+    assert (obs.kind, obs.depth_m, obs.sigma_log) == ("deeper_than", 10, 0.5)
+
+
+def test_espectrometro_tiene_alcance_gradual():
+    no = from_measurement(
+        measurement("neutron_spectrometer", "no_ice"), TOOLS["neutron_spectrometer"]
+    )
+    yes = from_measurement(
+        measurement("neutron_spectrometer", "ice"), TOOLS["neutron_spectrometer"]
+    )
+    assert no.sigma_log == pytest.approx(0.3) and yes.sigma_log == pytest.approx(0.3)
+
+
+def test_reflector_rechaza_probabilidad_invalida():
+    from gp.observations import radar_reflector
+
+    with pytest.raises(ValueError):
+        radar_reflector(0.0, 0.0, 1.5, false_reflector_p=1.0)
 
 
 @pytest.mark.parametrize(

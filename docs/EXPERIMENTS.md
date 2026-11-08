@@ -152,6 +152,20 @@ Contra 300 permutaciones: mejor ventaja observada 0.98, p = 0.09. El 95 % del az
 
 **Conclusión:** no hay estructura espacial fuerte a escala del sitio, y sí potencia para verla: alcances ≥ 400 m con estructura marcada quedan descartados. Puede existir estructura débil de 100-200 m: hay un indicio no significativo, y ahí la potencia es solo parcial. **Un dato informa a lo sumo unos 100-200 m a su alrededor.** No se probó el efecto de variables locales (pendiente, THEMIS), que podrían explicar parte de la variación.
 
+## 2026-11-08: radar y espectrómetro como observaciones blandas (paso 3)
+
+`gp/observations.py`: el radar da un reflector con error por permitividad (`RADAR_PERMITTIVITY_SIGMA_LOG` = 0.18, ~20 % sin calibrar) y una chance de no ser hielo (`RADAR_FALSE_REFLECTOR_P` = 0.25). "Sin reflector" es una cota débil (desvío de 0.5 en `log d`). El espectrómetro tiene alcance gradual (desvío de 0.3 alrededor de 0.6 m). Los valores salen de `research/radar-confiabilidad.md`: **no hay tasas publicadas**, solo 36 casos sueltos, así que son supuestos. La chance de reflector falso se aproxima ensanchando el error; lo exacto sería una mezcla.
+
+Sensibilidad al hábitat (300, -2200), con 1257 candidatas:
+
+| P(reflector falso) | Radar: P(confirma hielo) por estación | Estaciones por hallazgo | Desvío en `log d` de un reflector a 1.5 m | Varianza que queda en ese punto (prior 0.149) |
+| --- | --- | --- | --- | --- |
+| 0.10 | 0.896 | 1.1 | 0.275 | 0.090 |
+| 0.25 | 0.747 | 1.3 | 0.377 | 0.099 |
+| 0.45 | 0.548 | 1.8 | 0.536 | 0.111 |
+
+**Conclusión:** la ventaja de la herramienta aguanta en todo el rango (taladro ~17 estaciones por hallazgo, espectrómetro ~165). Un reflector informa bastante menos que un taladro a la misma profundidad.
+
 ## 2026-11-08: rendimiento por herramienta en el sitio real
 
 `gp.planning.tool_yield` sobre el posterior de los 349 cráteres, con 1257 candidatas cada 100 m a menos de 2 km del hábitat (300, -2200):

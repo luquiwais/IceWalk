@@ -22,7 +22,16 @@ import numpy as np
 from scipy.special import entr, ndtr
 
 from gp.craters import DEFAULT_CATALOG, load_catalog, to_observations
-from gp.observations import Observation, deeper_than, from_measurement, shallower_than
+from gp.observations import (
+    NEUTRON_SIGMA_LOG,
+    RADAR_FALSE_REFLECTOR_P,
+    Observation,
+    deeper_than,
+    from_measurement,
+    is_neutron,
+    is_radar,
+    shallower_than,
+)
 from gp.posterior import Posterior, Prior, posterior
 
 # Ajuste de la prueba de estructura con d > 0.2 D (docs/EXPERIMENTS.md, 2026-11-05).
@@ -125,7 +134,8 @@ def tool_yield(
       candidatas (1 / p_per_station). Supone estaciones independientes.
 
     Es el número de "con qué herramienta ir". Las herramientas sin alcance en profundidad
-    (`depth_m <= 0`) se omiten.
+    (`depth_m <= 0`) se omiten. El radar se multiplica por la chance de que el reflector sea hielo,
+    y el espectrómetro usa su alcance gradual.
     """
     x_m, y_m = np.asarray(x_m, dtype=float), np.asarray(y_m, dtype=float)
     mean, var = post.predict(x_m, y_m)
@@ -135,10 +145,14 @@ def tool_yield(
         reach = float(tool["depth_m"])
         if reach <= 0:
             continue
-        p = ndtr((math.log(reach) - mean) / total_sd)
+        soft = NEUTRON_SIGMA_LOG if is_neutron(tool) else 0.0
+        p = ndtr((math.log(reach) - mean) / np.sqrt(total_sd**2 + soft**2))
+        confirms = 1.0 - RADAR_FALSE_REFLECTOR_P if is_radar(tool) else 1.0
+        p = p * confirms
         mean_p = float(p.mean())
         out[tool["id"]] = {
             "reach_m": reach,
+            "confirms_ice_p": confirms,
             "p_per_station": mean_p,
             "p_best_station": float(p.max()),
             "stations_for_one_hit": (1 / mean_p) if mean_p > 0 else math.inf,
