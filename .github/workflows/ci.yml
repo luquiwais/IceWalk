@@ -28,10 +28,9 @@ jobs:
       - name: Entorno de Python (contracts, planner, model)
         run: |
           pip install jsonschema pyyaml
-          pip install -e "./planner[dev]" -e "./model[dev]"
+          pip install -e "./apps/planner[dev]" -e "./packages/model[dev]"
 
-      # Instala moon (devDependency de la raíz). Las dependencias de web/ las
-      # instala moon antes de correr sus tareas.
+      # Instala moon y los workspaces de Bun (apps/web, packages/ui).
       - run: bun install --frozen-lockfile
 
       # Corre solo las tareas afectadas por los cambios (lint, typecheck, test,

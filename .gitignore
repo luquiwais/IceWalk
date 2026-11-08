@@ -40,3 +40,4 @@ dist/
 .moon/docker
 .moon/home
 .moon/proto
+.next/

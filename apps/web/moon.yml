@@ -1,0 +1,58 @@
+# Proyecto web (Next.js): https://moonrepo.dev/docs/config/project
+language: "typescript"
+layer: "application"
+
+project:
+  title: "IceWalk web"
+  description: "App web: globo y terreno 3D, vistas Planning y EV."
+
+toolchains:
+  default: ["javascript", "bun"]
+
+fileGroups:
+  sources:
+    - "app/**/*"
+    - "components/**/*"
+    - "lib/**/*"
+    - "mock/**/*"
+    - "public/**/*"
+    - "/packages/ui/src/**/*"
+  configs:
+    - "package.json"
+    - "/bun.lock"
+    - "tsconfig.json"
+    - "next.config.ts"
+    - "eslint.config.mjs"
+    - "vitest.config.mts"
+    - "vitest.setup.ts"
+
+tasks:
+  dev:
+    command: "bun run dev"
+    preset: "server"
+
+  build:
+    command: "bun run build"
+    inputs:
+      - "@group(sources)"
+      - "@group(configs)"
+    outputs:
+      - ".next"
+
+  lint:
+    command: "bun run lint"
+    inputs:
+      - "@group(sources)"
+      - "@group(configs)"
+
+  typecheck:
+    command: "bun run typecheck"
+    inputs:
+      - "@group(sources)"
+      - "@group(configs)"
+
+  test:
+    command: "bun run test"
+    inputs:
+      - "@group(sources)"
+      - "@group(configs)"

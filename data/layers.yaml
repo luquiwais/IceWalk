@@ -189,7 +189,7 @@ layers:
     citation: NASA/JPL-Caltech/UArizona
     status: scripted
 
-  # Capas derivadas de vision (model/vision). Grilla de contracts/grid.json.
+  # Capas derivadas de vision (packages/model/vision). Grilla de packages/contracts/grid.json.
   # En capas de bloques, 0 = nada detectado sobre detection_limit_m (ver boulders.geojson), NO terreno libre.
   # nodata = fuera de la huella de la imagen: desconocido.
   - id: boulder_max_diam_m
@@ -200,7 +200,7 @@ layers:
     source: IceWalk vision (HiRISE)
     url: data/processed/s1094b/boulder_max_diam_m.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: boulder_max_height_m
     name: Maximum boulder height per cell
@@ -211,7 +211,7 @@ layers:
     url: data/processed/s1094b/boulder_max_height_m.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Altura medida por sombra, error aprox. 1 pixel.
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: cfa_detected
     name: Cumulative fractional area of detected boulders
@@ -222,7 +222,7 @@ layers:
     url: data/processed/s1094b/cfa_detected.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Solo bloques sobre el limite de deteccion.
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: boulder_density
     name: Boulder density
@@ -232,7 +232,7 @@ layers:
     source: IceWalk vision (HiRISE)
     url: data/processed/s1094b/boulder_density.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: boulder_unresolved_density
     name: Density of objects not visible in the latest image
@@ -243,7 +243,7 @@ layers:
     url: data/processed/s1094b/boulder_unresolved_density.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: "El planificador decide: pueden ser hielo sublimado o cubierto."
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: clear_path_width_m
     name: Width of the widest corridor crossing the cell
@@ -254,7 +254,7 @@ layers:
     url: data/processed/s1094b/clear_path_width_m.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: La celda se prohibe si no alcanza el ancho minimo que define el planificador (assumption).
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: ejecta_zone
     name: Proximal ejecta zone mask
@@ -265,7 +265,7 @@ layers:
     url: data/processed/s1094b/ejecta_zone.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Eyecta proximal hasta 1 radio del borde (Wojcicka et al. 2025).
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: periglacial_landform_score
     name: Periglacial landform score (polygons and similar)
@@ -276,7 +276,7 @@ layers:
     url: data/processed/s1094b/periglacial_landform_score.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Indica sobre todo perdida pasada de hielo. Entra al GP con peso declarado.
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: surface_unit
     name: Terrain unit id from unsupervised zoning
@@ -287,7 +287,7 @@ layers:
     url: data/processed/s1094b/surface_unit.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Zonas de terreno, no de hielo. Entra al GP y a la cobertura del plan.
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: ice_exposure_fraction
     name: Fraction of cell with exposed ice (2022 images)
@@ -298,7 +298,7 @@ layers:
     url: data/processed/s1094b/ice_exposure_fraction.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Solo dentro de la franja de color; nodata afuera. Hielo masivo excavado de varios metros; no prueba hielo a menos de 1 m.
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
   - id: visual_anomaly_score
     name: Visual anomaly score (optional)
@@ -309,7 +309,7 @@ layers:
     url: data/processed/s1094b/visual_anomaly_score.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Opcional. Sugiere lugares para mirar; no es evidencia de hielo ni un peligro.
-    status: derived (model/vision)
+    status: derived (packages/model/vision)
 
 labels:
   - id: new_craters

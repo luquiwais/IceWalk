@@ -5,7 +5,7 @@
 
 javascript:
   packageManager: "bun"
-  # Cada proyecto JS tiene su propio bun.lock (no hay workspaces de Bun).
+  # Workspaces de Bun en la raíz (apps/web, packages/ui), con un solo bun.lock.
   inferTasksFromScripts: false
 
 bun: {}

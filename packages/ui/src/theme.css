@@ -1,0 +1,314 @@
+/*
+ * IceWalk design tokens: a 1:1 port of Apple's visionOS 26 Figma kit
+ * (Community, file TE1ta1HNhtbwSZn3LztSL5): Colors, Materials, Text Styles,
+ * Buttons, Segmented Controls, Toolbars, Lists and Tooltips.
+ *
+ * visionOS materials are stacks of layers with blend modes (lighten,
+ * color-dodge, color-burn, luminosity). The web supports the same blend modes,
+ * so the layers are reproduced as-is. A layer only blends with what is behind
+ * it if no ancestor creates a stacking context, so surfaces and controls avoid
+ * transform, opacity, filter and z-index.
+ *
+ * Values marked "estimated" are not exported by the kit and were calibrated
+ * by sampling the kit's Materials page.
+ */
+
+@theme {
+  /* SF Pro is the visionOS system font; on the web it is only available
+     through the system stack (Apple devices). Inter is the fallback. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    var(--font-inter), system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* SF Pro weights used by the kit: Medium 510, Semibold 590. */
+  --font-weight-medium: 510;
+  --font-weight-semibold: 590;
+
+  /* Text styles (Figma: Text Styles). */
+  --text-xl-title-1: 3rem;
+  --text-xl-title-1--line-height: 3.5rem;
+  --text-xl-title-1--font-weight: 700;
+  --text-xl-title-2: 2.375rem;
+  --text-xl-title-2--line-height: 2.875rem;
+  --text-xl-title-2--font-weight: 700;
+  --text-large-title: 1.8125rem;
+  --text-large-title--line-height: 2.375rem;
+  --text-large-title--font-weight: 700;
+  --text-title-1: 1.5rem;
+  --text-title-1--line-height: 2rem;
+  --text-title-1--font-weight: 700;
+  --text-title-2: 1.375rem;
+  --text-title-2--line-height: 1.75rem;
+  --text-title-2--font-weight: 700;
+  --text-title-3: 1.1875rem;
+  --text-title-3--line-height: 1.5rem;
+  --text-title-3--font-weight: 700;
+  --text-headline: 1.0625rem;
+  --text-headline--line-height: 1.375rem;
+  --text-headline--font-weight: 700;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.375rem;
+  --text-body--font-weight: 510;
+  --text-callout: 0.9375rem;
+  --text-callout--line-height: 1.25rem;
+  --text-callout--font-weight: 590;
+  --text-subheadline: 0.9375rem;
+  --text-subheadline--line-height: 1.25rem;
+  --text-subheadline--font-weight: 400;
+  --text-footnote: 0.8125rem;
+  --text-footnote--line-height: 1.125rem;
+  --text-footnote--font-weight: 510;
+  --text-caption-1: 0.75rem;
+  --text-caption-1--line-height: 1rem;
+  --text-caption-1--font-weight: 510;
+  --text-caption-2: 0.75rem;
+  --text-caption-2--line-height: 1rem;
+  --text-caption-2--font-weight: 510;
+
+  /* Labels and controls (Figma: Labels/*, Controls/*, Separators/*). */
+  --color-label: rgb(255 255 255 / 0.96);
+  --color-label-disabled: rgb(112 112 112 / 0.5);
+  --color-selected: rgb(255 255 255 / 0.96);
+  --color-on-selected: #000;
+  --color-separator: rgb(140 140 140 / 0.21);
+
+  /* System colors (Figma: Colors). */
+  --color-system-red: #ff453a;
+  --color-system-orange: #ff9f0a;
+  --color-system-yellow: #ffd60a;
+  --color-system-green: #32d74b;
+  --color-system-mint: #66d4cf;
+  --color-system-teal: #6ac4dc;
+  --color-system-cyan: #5ac8f5;
+  --color-system-blue: #0a84ff;
+  --color-system-indigo: #5e5ce6;
+  --color-system-purple: #bf5af2;
+  --color-system-pink: #ff375f;
+  --color-system-brown: #ac8e68;
+  --color-system-gray: #98989d;
+
+  /* Alert levels (PRD). Warning and caution use the system red and yellow;
+     advisory cyan is an assumption to review with Design. */
+  --color-advisory: #5ac8f5;
+  --color-caution: #ffd60a;
+  --color-warning: #ff453a;
+
+  /* Mars palette: the scene behind the glass, never UI chrome. */
+  --color-mars-950: oklch(0.16 0.03 40);
+  --color-mars-900: oklch(0.22 0.05 42);
+  --color-mars-700: oklch(0.38 0.09 45);
+  --color-mars-500: oklch(0.56 0.13 48);
+  --color-mars-300: oklch(0.74 0.1 60);
+
+  /* Corner radii from the kit. */
+  --radius-window: 2.875rem; /* 46 */
+  --radius-row: 1rem; /* 16: inset list sections */
+  --radius-segment: 1.25rem; /* 20: selected segment */
+
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Vibrancy for text and symbols on glass (Figma: Labels/Secondary,
+   Labels/Tertiary). Calibrated as additive light: estimated. */
+@utility vibrant-secondary {
+  color: rgb(104 104 104);
+  mix-blend-mode: plus-lighter;
+
+  @supports not (mix-blend-mode: plus-lighter) {
+    color: rgb(255 255 255 / 0.62);
+    mix-blend-mode: normal;
+  }
+}
+
+@utility vibrant-tertiary {
+  color: rgb(33 33 33);
+  mix-blend-mode: plus-lighter;
+
+  @supports not (mix-blend-mode: plus-lighter) {
+    color: rgb(255 255 255 / 0.3);
+    mix-blend-mode: normal;
+  }
+}
+
+@layer components {
+  /* A surface paints its material layers first; its other children are lifted
+     above them (zero specificity, so utilities like `absolute` still win). */
+  .vision-surface > :where(:not([data-vision-layer])) {
+    position: relative;
+  }
+
+  .vision-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* Windows/Glass: background blur 100 (CSS 50px) + #808080 at 30%,
+     luminosity. */
+  .vision-glass {
+    background-color: rgb(128 128 128 / 0.3);
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
+    mix-blend-mode: luminosity;
+  }
+
+  /* Glass edge: 1px white at 40% on windows, 1.4px on toolbars. */
+  .vision-glass-stroke {
+    border: var(--glass-stroke-width, 1px) solid rgb(255 255 255 / 0.4);
+  }
+
+  /* Views/Recessed Material View: segmented control tracks, search fields. */
+  .vision-recessed-luminosity {
+    background-color: rgb(0 0 0 / 0.1);
+    mix-blend-mode: luminosity;
+  }
+  .vision-recessed-burn {
+    background-color: rgb(208 208 208 / 0.5);
+    mix-blend-mode: color-burn;
+  }
+  .vision-recessed-shadow {
+    box-shadow:
+      inset 0 -0.5px 1px 0 rgb(255 255 255 / 0.3),
+      inset 0 -0.5px 1px 0 rgb(255 255 255 / 0.25),
+      inset 1px 1.5px 4px 0 rgb(0 0 0 / 0.08),
+      inset 1px 1.5px 4px 0 rgb(0 0 0 / 0.1);
+  }
+
+  /* Views/Regular: inset grouped lists and sections. */
+  .vision-regular-burn {
+    background-color: rgb(214 214 214 / 0.45);
+    mix-blend-mode: color-burn;
+  }
+  .vision-regular-luminosity {
+    background-color: rgb(0 0 0 / 0.08);
+    mix-blend-mode: luminosity;
+  }
+
+  /* Views/Thick: a darker element on top of a regular area (estimated). */
+  .vision-thick-burn {
+    background-color: rgb(218 218 218 / 0.65);
+    mix-blend-mode: color-burn;
+  }
+  .vision-thick-luminosity {
+    background-color: rgb(0 0 0 / 0.22);
+    mix-blend-mode: luminosity;
+  }
+
+  /* Control fills (Controls/*). The host sets the layer values with custom
+     properties, so each state only swaps values. */
+  .vision-fill-lighten {
+    background-color: var(--fill-lighten, transparent);
+    background-image: var(--fill-glow, none);
+    mix-blend-mode: lighten;
+  }
+  .vision-fill-dodge {
+    background-color: var(--fill-dodge, transparent);
+    background-image: var(--fill-glow-dodge, none);
+    mix-blend-mode: color-dodge;
+  }
+
+  /* Idle (Platter) */
+  .vision-platter {
+    --fill-lighten: rgb(255 255 255 / 0.06);
+    --fill-dodge: rgb(94 94 94 / 0.18);
+  }
+
+  .vision-control {
+    --fill-lighten: rgb(255 255 255 / 0.06);
+    --fill-dodge: rgb(94 94 94 / 0.18);
+    color: var(--color-label);
+  }
+
+  /* Idle (No Platter) */
+  .vision-control[data-platter="false"] {
+    --fill-lighten: transparent;
+    --fill-dodge: transparent;
+  }
+
+  /* Hover: a glow rising from the bottom edge. */
+  @media (hover: hover) {
+    .vision-control:hover:not([data-disabled]) {
+      --fill-glow: radial-gradient(
+        100% 100% at 50% 100%,
+        rgb(255 255 255 / 0.07),
+        transparent 55.6%
+      );
+      --fill-glow-dodge: radial-gradient(
+        100% 100% at 50% 100%,
+        rgb(94 94 94 / 0.14),
+        transparent 73.8%
+      );
+    }
+
+    .vision-control[data-platter="false"]:hover:not([data-disabled], [data-pressed]) {
+      --fill-lighten: rgb(255 255 255 / 0.04);
+      --fill-dodge: rgb(94 94 94 / 0.06);
+    }
+  }
+
+  /* Pinch (pressed): estimated. */
+  .vision-control:active:not([data-disabled]) {
+    --fill-lighten: rgb(255 255 255 / 0.14);
+    --fill-dodge: rgb(94 94 94 / 0.4);
+  }
+
+  /* Disabled */
+  .vision-control[data-disabled] {
+    --fill-lighten: rgb(255 255 255 / 0.04);
+    --fill-dodge: rgb(94 94 94 / 0.07);
+    --fill-glow: none;
+    --fill-glow-dodge: none;
+    color: var(--color-label-disabled);
+    cursor: not-allowed;
+  }
+  .vision-control[data-platter="false"][data-disabled] {
+    --fill-lighten: transparent;
+    --fill-dodge: transparent;
+  }
+
+  /* Selected: solid white with black content. */
+  .vision-control[data-pressed]:not([data-appearance="toolbar"]) {
+    --fill-lighten: transparent;
+    --fill-dodge: transparent;
+    --fill-glow: none;
+    --fill-glow-dodge: none;
+    background-color: var(--color-selected);
+    color: var(--color-on-selected);
+  }
+
+  /* Toolbar items: idle text is secondary; selected is a platter. */
+  .vision-control[data-appearance="toolbar"]:not([data-pressed]) > [data-vision-content] {
+    color: rgb(104 104 104);
+    mix-blend-mode: plus-lighter;
+  }
+  .vision-control[data-appearance="toolbar"][data-pressed] {
+    --fill-lighten: rgb(255 255 255 / 0.07);
+    --fill-dodge: rgb(94 94 94 / 0.18);
+  }
+}
+
+@layer base {
+  /* Reduce Transparency: glass becomes an opaque dark surface. */
+  @media (prefers-reduced-transparency: reduce) {
+    .vision-glass {
+      background-color: rgb(58 58 60);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      mix-blend-mode: normal;
+    }
+  }
+
+  /* Increase Contrast: vibrant text becomes plain, brighter text. */
+  @media (prefers-contrast: more) {
+    .vibrant-secondary {
+      color: rgb(255 255 255 / 0.82);
+      mix-blend-mode: normal;
+    }
+    .vibrant-tertiary {
+      color: rgb(255 255 255 / 0.62);
+      mix-blend-mode: normal;
+    }
+  }
+}

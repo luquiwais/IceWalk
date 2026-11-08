@@ -1,7 +1,7 @@
 # Plan de visión: documento de traspaso
 
 **Para:** el integrante que toma visión (a definir).
-**Rama:** `model/vision-contract`. **Código:** `model/vision/`.
+**Rama:** `model/vision-contract`. **Código:** `packages/model/vision/`.
 
 ## Qué hace este módulo
 
@@ -18,7 +18,7 @@ Fotos HiRISE -> coregister -> boulders -> rasterize -> capas de costo -> Planifi
 
 ## Salidas
 
-Capas sobre `contracts/grid.json` (10 m, COG float32) y catálogo `boulders.geojson`, según `contracts/schemas/boulders.schema.json`. Hoy se generan **falsas** con `python -m vision.mock_layers`.
+Capas sobre `packages/contracts/grid.json` (10 m, COG float32) y catálogo `boulders.geojson`, según `packages/contracts/schemas/boulders.schema.json`. Hoy se generan **falsas** con `python -m vision.mock_layers`.
 
 | Capa | Rol | Prioridad |
 | --- | --- | --- |

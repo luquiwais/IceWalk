@@ -2,11 +2,11 @@
 # moon se instala dentro del repo (devDependency de Bun en package.json).
 # Usarlo siempre con `bun run moon ...`: así su store queda en .moon/home.
 
+# apps/: lo que se ejecuta (web, planner). packages/: lo que se comparte
+# (ui, model, contracts). El id de cada proyecto es el nombre de su carpeta.
 projects:
-  web: "web"
-  planner: "planner"
-  model: "model"
-  contracts: "contracts"
+  - "apps/*"
+  - "packages/*"
 
 vcs:
   client: "git"

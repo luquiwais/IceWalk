@@ -9,7 +9,7 @@ El modelo dice qué sabemos (probabilidad de hielo a ≤ 1 m e incertidumbre por
 ## Principios que no se negocian
 
 - **Todo alineado a prácticas documentadas de NASA**, con fuente. Nada de reglas inventadas: un valor sin fuente se marca `"assumption": true` y se anota en `docs/SOURCES.md`.
-- **Contratos primero.** `contracts/` (grilla, esquemas de STM, catálogo, medición y plan) es lo que conecta a los 6 roles. Cambiar un contrato = un solo PR que actualiza esquema, ejemplos, mocks y usos, y `python contracts/validate.py` pasa.
+- **Contratos primero.** `packages/contracts/` (grilla, esquemas de STM, catálogo, medición y plan) es lo que conecta a los 6 roles. Cambiar un contrato = un solo PR que actualiza esquema, ejemplos, mocks y usos, y `python contracts/validate.py` pasa.
 - **Capas intercambiables.** Una capa nueva entra con un adaptador + una línea en `data/layers.yaml`. Si obliga a tocar código fuera de su adaptador, el diseño está mal.
 - **Sin aprendizaje por refuerzo para rutas.** Planificador clásico (valor de medir + A*), explicable.
 - **Interfaz en inglés y con terminología NASA** (EV1/EV2, IV, station, traverse, egress/ingress, walkback, STM). Usuarios técnicos: números reales visibles, color solo para alertas (advisory / caution / warning).
@@ -17,13 +17,16 @@ El modelo dice qué sabemos (probabilidad de hielo a ≤ 1 m e incertidumbre por
 
 ## Estructura y dueños
 
+Monorepo: `apps/` tiene lo que se ejecuta y `packages/` lo que se comparte. Cada carpeta de `apps/` y `packages/` es un proyecto de moon (id = nombre de la carpeta).
+
 | Carpeta | Dueño | Notas |
 | --- | --- | --- |
-| `contracts/` | Todos | Esquemas JSON + ejemplos; `validate.py` |
+| `apps/web/` | Frontend | Next.js 16 + TS + Tailwind v4 + CesiumJS (`Ellipsoid.MARS`, Cesium Mars); Bun; `apps/web/mock/` para arrancar sin API |
+| `apps/planner/` | Planificador | FastAPI; hoy `app/mock_planner.py` (valores ilustrativos, `is_mock: true`) |
+| `packages/ui/` | Frontend | Sistema de diseño visionOS (Base UI + Tailwind), usado por `apps/web` |
+| `packages/model/` | IA y modelo | Prior regional, clustering, anomalías, GP local, bloques, validación |
+| `packages/contracts/` | Todos | Esquemas JSON + ejemplos; `validate.py` |
 | `data/` | Datos | `layers.yaml`, `download.py`; datos en `data/raw/` (fuera de Git) |
-| `model/` | IA y modelo | Prior regional, clustering, anomalías, GP local, bloques, validación |
-| `planner/` | Planificador | FastAPI; hoy `app/mock_planner.py` (valores ilustrativos, `is_mock: true`) |
-| `web/` | Frontend | Next.js 16 + TS + Tailwind v4 + Base UI (estilo visionOS) + CesiumJS (`Ellipsoid.MARS`, Cesium Mars); Bun; `web/mock/` para arrancar sin API |
 | `design/` | Diseño | Exports y assets |
 | `docs/` | Producto | `PRD.md`, `SOURCES.md`, `DECISIONS.md` |
 
@@ -38,14 +41,12 @@ bun install                                        # raíz: instala moon
 bun run moon run :lint :test                       # todos los proyectos
 bun run moon run web:dev                           # web en :3000
 bun run moon ci                                    # lo que corre CI (solo lo afectado)
-python contracts/validate.py                       # ejemplos y mocks vs esquemas (o: bun run moon run contracts:validate)
-cd planner && pip install -e ".[dev]"              # o: uv sync
-cd planner && uvicorn app.main:app --reload        # API en :8000, docs en /docs
-cd planner && ruff check . && pytest -q            # lint + tests
-cd planner && python scripts/export_mocks.py       # regenera web/mock/*.json
+python packages/contracts/validate.py              # ejemplos y mocks vs esquemas (o: bun run moon run contracts:validate)
+cd apps/planner && pip install -e ".[dev]"         # o: uv sync
+cd apps/planner && uvicorn app.main:app --reload   # API en :8000, docs en /docs
+cd apps/planner && ruff check . && pytest -q       # lint + tests
+cd apps/planner && python scripts/export_mocks.py  # regenera apps/web/mock/*.json
 python data/download.py --list                     # capas y links
-cd web && bun install && bun run dev              # web en :3000 (usar Bun, no npm/pnpm)
-cd web && bun run lint && bun run typecheck && bun run test
 ```
 
 ## Reglas de trabajo
@@ -53,7 +54,7 @@ cd web && bun run lint && bun run typecheck && bun run test
 - Mensajes de commit en español.
 - Ramas `rol/tarea`; PR con una revisión; `main` siempre desplegable. CI corre `moon ci`: solo las tareas afectadas (validación de contratos, ruff, pytest, y en `web/` lint, typecheck, tests y build).
 - Datos pesados (`.tif`, `.IMG`, `.JP2`) nunca a Git: GitHub Releases.
-- Unidades SI; coordenadas internas en metros de la grilla (`contracts/grid.json`), lat/lon solo hacia la web (`app/contracts.py:xy_to_lonlat`).
+- Unidades SI; coordenadas internas en metros de la grilla (`packages/contracts/grid.json`), lat/lon solo hacia la web (`app/contracts.py:xy_to_lonlat`).
 - Secretos (token de Cesium ion, etc.) en `.env`, nunca commiteados.
 - Al reemplazar el mock por el planificador real, la API y el contrato de `plan.schema.json` no cambian.
 

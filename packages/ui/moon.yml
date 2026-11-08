@@ -1,0 +1,33 @@
+# Sistema de diseño (visionOS): https://moonrepo.dev/docs/config/project
+language: "typescript"
+layer: "library"
+
+project:
+  title: "IceWalk UI"
+  description: "Componentes y tokens con estilo visionOS, compartidos por las apps web."
+
+toolchains:
+  default: ["javascript", "bun"]
+
+fileGroups:
+  sources:
+    - "src/**/*"
+  configs:
+    - "package.json"
+    - "tsconfig.json"
+    - "eslint.config.mjs"
+    - "vitest.config.mts"
+    - "vitest.setup.ts"
+
+tasks:
+  lint:
+    command: "bun run lint"
+    inputs: ["@group(sources)", "@group(configs)"]
+
+  typecheck:
+    command: "bun run typecheck"
+    inputs: ["@group(sources)", "@group(configs)"]
+
+  test:
+    command: "bun run test"
+    inputs: ["@group(sources)", "@group(configs)"]
