@@ -152,6 +152,18 @@ Contra 300 permutaciones: mejor ventaja observada 0.98, p = 0.09. El 95 % del az
 
 **Conclusión:** no hay estructura espacial fuerte a escala del sitio, y sí potencia para verla: alcances ≥ 400 m con estructura marcada quedan descartados. Puede existir estructura débil de 100-200 m: hay un indicio no significativo, y ahí la potencia es solo parcial. **Un dato informa a lo sumo unos 100-200 m a su alrededor.** No se probó el efecto de variables locales (pendiente, THEMIS), que podrían explicar parte de la variación.
 
+## 2026-11-08: rendimiento por herramienta en el sitio real
+
+`gp.planning.tool_yield` sobre el posterior de los 349 cráteres, con 1257 candidatas cada 100 m a menos de 2 km del hábitat (300, -2200):
+
+| Herramienta | Alcance | P(d <= alcance) media por estación | Mejor estación | Estaciones esperadas hasta un hallazgo |
+| --- | --- | --- | --- | --- |
+| Espectrómetro de neutrones | 0.6 m | 0.006 | 0.02 | ~165 |
+| Taladro | 1 m | 0.058 | 0.13 | ~17 |
+| Radar | 10 m | 0.996 | 1.00 | ~1 |
+
+**Salvedad:** el radar ve reflectores, no hielo, y el modelo todavía lo trata como confirmación (cuestión 30). Su valor es optimista. El orden de magnitud entre taladro y espectrómetro sí sale de la distribución real de profundidades, y no depende de la estructura espacial. Supone estaciones independientes.
+
 ## 2026-11-08: validación con cráteres reales y robustez de la simulación
 
 Código: `packages/model/gp/validation.py` y `simulation.py robustness`, con tests. Resultados en `data/processed/s1094b/validation.json` y `simulation_robustness.json`, fuera de Git.

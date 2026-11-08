@@ -77,11 +77,17 @@ Lo que ya existe en `packages/model/gp/`:
 | `from_measurement(medicion, herramienta)` | `gp/observations.py` | Convierte una medición del contrato en una observación |
 | `scores("potential_uncertainty", ...)` | `gp/simulation.py` | El criterio de selección, ya probado |
 
-**El equipo del GP va a sumar `gp/planning.py`** con una interfaz estable, para que el planificador no dependa de la simulación:
-- `rank_candidates(posterior, x, y, threshold_m) -> (p_ice, uncertainty, value)`
-- `simulate_outcome(posterior, x, y, result) -> posterior`, para las ramas
+**Ya existe `gp/planning.py` (2026-11-08):** es la interfaz estable. Usá solo esto; lo demás de `gp/` puede cambiar.
 
-Hasta que exista, podés llamar a `gp/simulation.py`.
+| Función | Devuelve |
+| --- | --- |
+| `site_posterior(catalog_path)` | Posterior del sitio con los cráteres. Calcularlo una vez al arrancar |
+| `rank_candidates(post, x, y, threshold_m)` | `p_ice`, `uncertainty` (entropía en bits) y `value` (en [0, 1], ordena igual que "potencial + incertidumbre") |
+| `add_measurement(post, medicion, herramienta)` | `(posterior nuevo, observación o None)`. Usa los contratos tal cual |
+| `simulate_outcome(post, x, y, threshold_m, "ice"/"no_ice")` | Posterior para cada rama |
+| `tool_yield(post, x, y, herramientas)` | Por herramienta: P por estación, mejor estación y estaciones esperadas hasta un hallazgo. Es el número de "con qué herramienta ir" |
+
+En el sitio real, con el hábitat por defecto: espectrómetro ~165 estaciones por hallazgo, taladro ~17 y radar ~1. El radar es optimista hasta la cuestión 30. Ver `EXPERIMENTS.md`.
 
 ## Datos y despliegue
 

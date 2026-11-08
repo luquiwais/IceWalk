@@ -27,8 +27,8 @@ import numpy as np
 from scipy.special import entr, ndtr
 
 from gp.craters import DEFAULT_CATALOG, REPO_ROOT, load_catalog, to_observations
-from gp.kernel import Matern32
 from gp.observations import Observation, deeper_than, measured_depth
+from gp.planning import FITTED, fitted_prior
 from gp.posterior import Prior, posterior
 
 RESULT = REPO_ROOT / "data" / "processed" / "s1094b" / "simulation.json"
@@ -36,7 +36,7 @@ GH_NODES, GH_WEIGHTS = np.polynomial.hermite_e.hermegauss(7)
 GH_WEIGHTS = GH_WEIGHTS / GH_WEIGHTS.sum()
 
 # Ajuste de la prueba de estructura con d > 0.2 D (docs/EXPERIMENTS.md, 2026-11-05).
-FITTED = {"mean": 0.86, "variance": 0.299, "rho": 0.5, "range_m": 100.0}
+# FITTED viene de gp.planning: un solo lugar para el ajuste del sitio.
 ADAPTIVE = ("max_variance", "information", "targets", "potential_uncertainty")
 STRATEGIES = ("random", "spread", "nearest", *ADAPTIVE)
 # "geologist": va al cráter de fondo plano más somero a menos de GEOLOGIST_RADIUS_M, sin modelo.
@@ -59,7 +59,7 @@ class Scenario:
 
 
 def make_prior(mean: float, variance: float, rho: float, range_m: float) -> Prior:
-    return Prior(mean, Matern32(rho * variance, range_m), nugget=(1 - rho) * variance)
+    return fitted_prior(mean, variance, rho, range_m)
 
 
 def candidates(scenario: Scenario) -> tuple[np.ndarray, np.ndarray]:
