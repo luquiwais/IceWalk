@@ -58,6 +58,7 @@ layers:
     source: HiRISE (University of Arizona / NASA JPL)
     url: https://hirise.lpl.arizona.edu/PDS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.IMG
     citation: NASA/JPL-Caltech/UArizona
+    notes: Copia COG de USGS (CC0), la que usa model/gp/covariates.py - https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.tif
     status: scripted (data/download.py)
 
   - id: hirise_ortho_1m
@@ -94,10 +95,10 @@ layers:
     role: evidence
     resolution_m: 100
     source: USGS Astrogeology / ASU
-    url: https://astrogeology.usgs.gov/search?pmi-target=mars&q=THEMIS%20Thermal%20Inertia%20Mosaic%20Quantitative
+    url: https://asc-astropedia.s3.us-west-2.amazonaws.com/Mars/Odyssey/THEMIS-Global-Thermal-Inertia-Mosaic/Quantitative-32-Bit/THEMIS_TI_Mosaic_Quant_30N180E_100mpp.cub
     citation: Fergason et al. (2006) JGR
-    notes: Pick the 30N-60N quadrant that contains 189.8E. Verify exact product name.
-    status: download manually
+    notes: Tesela 30N180E, ISIS3, 2.5 GB, dominio publico. Se lee a distancia solo el recorte del sitio (model/gp/covariates.py). Anterior al impacto de 2021.
+    status: scripted (lectura remota)
 
   - id: mola_hrsc
     name: MOLA-HRSC blended DEM 200 m
