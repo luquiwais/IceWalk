@@ -1,0 +1,36 @@
+{
+  "mission_id": "s1094b-eva2",
+  "site_id": "s1094b",
+  "constraints": {
+    "eva_max_h": 8,
+    "reserve": 0.2,
+    "max_slope_deg": 20,
+    "walkback_max_km": 10,
+    "crew": 2,
+    "mass_budget_kg": null,
+    "walking_speed_kmh": 2.0
+  },
+  "objectives": [
+    {
+      "rank": 1,
+      "title": "Document sublimation of exposed ice",
+      "hypothesis": "Exposed ice at this latitude is unstable at the surface.",
+      "purpose": "science",
+      "trace": "HiRISE team: key data point on current ice stability",
+      "measurement": {
+        "variable": "surface_change",
+        "coverage": "targets",
+        "targets": [
+          [
+            0,
+            120
+          ],
+          [
+            -80,
+            -60
+          ]
+        ]
+      }
+    }
+  ]
+}

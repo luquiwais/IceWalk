@@ -1,12 +1,12 @@
 {
-  "station_id": "W04N14",
+  "station_id": "E03S22",
   "tool": "core_drill",
   "result": "no_ice",
   "depth_m": 1,
   "weh_percent": null,
   "position": [
-    -400.0,
-    1400.0
+    300.0,
+    -2200.0
   ],
   "timestamp": "2040-03-12T14:35:00Z",
   "crew_member": "EV1",

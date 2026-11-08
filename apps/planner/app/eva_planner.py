@@ -282,7 +282,7 @@ class EvaPlanner:
         return taken
 
     def next_survey(self, stops: list[Stop], model: IceModel, req: Requirement) -> Stop | None:
-        """Mejor candidata (puntaje del GP) que entra al final del recorrido con regreso."""
+        """Mejor candidata por valor por minuto que entra al final del recorrido con regreso."""
         sched = self.schedule(stops)
         if sched is None:
             return None
@@ -295,8 +295,13 @@ class EvaPlanner:
         idx = np.flatnonzero(feasible)
         if idx.size == 0:
             return None
+        # Valor por minuto (decisión 4 de plans/gp.md): el puntaje del GP sobre el tiempo que
+        # cuesta sumar la estación (caminata desde la anterior + herramientas). Sin esto, con
+        # puntajes parecidos se elige una estación lejana por una diferencia mínima y la caminata
+        # se come la EVA.
         score = model.evaluate(self.cx[idx], self.cy[idx])["score"]
-        best = idx[np.lexsort((leg[idx], -score))[0]]  # mejor puntaje; empate: más cerca
+        rate = score / np.maximum(leg[idx] + dur, 1.0)
+        best = idx[np.lexsort((leg[idx], -rate))[0]]  # mejor valor por minuto; empate: más cerca
         stop = Stop(float(self.cx[best]), float(self.cy[best]), int(self.ccell[best]), "survey")
         stop.add(req.rank, req.tools)
         return stop

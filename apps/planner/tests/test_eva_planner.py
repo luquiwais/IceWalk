@@ -18,6 +18,8 @@ from app.traverse.params import TraverseParams
 from app.traverse.route import TraverseMap
 
 STM = json.loads((CONTRACTS / "examples" / "stm.s1094b.json").read_text())
+# Segunda EVA: sublimación del hielo expuesto junto al cráter (decisión 2026-11-08, cuestión 43).
+STM_EVA2 = json.loads((CONTRACTS / "examples" / "stm.s1094b-eva2.json").read_text())
 PLAN_SCHEMA = json.loads((CONTRACTS / "schemas" / "plan.schema.json").read_text())
 HALF = 1500.0
 CELL = 10.0
@@ -68,8 +70,8 @@ def test_tools_follow_the_stm_requirement():
     assert by_rank[1].tools == ["core_drill"]  # radar en la caminata; el taladro confirma
     assert by_rank[1].carried == ["gpr"]
     assert by_rank[1].is_survey and by_rank[1].min_stations == 4
-    assert by_rank[3].tools == ["camera_spectrometer"]
-    assert by_rank[4].tools == ["camera_spectrometer", "sample_kit"]  # pide muestra
+    assert by_rank[3].tools == ["camera_spectrometer", "sample_kit"]  # pide muestra
+    assert len(reqs) == 3  # la sublimación va en la EVA 2
     assert not alerts
 
     shallow = copy.deepcopy(STM)
@@ -131,13 +133,23 @@ def test_stations_are_spread_out(tmap, model):
             assert math.dist(a, b) >= CONFIG.min_station_separation_m
 
 
+def test_second_eva_photographs_the_exposed_ice():
+    reqs, alerts = requirements(STM_EVA2, tools_by_id())
+    assert [r.tools for r in reqs] == [["camera_spectrometer"]]
+    assert reqs[0].targets == [(0.0, 120.0), (-80.0, -60.0)]
+    assert not alerts
+
 def test_targets_inserted_when_near_and_objectives_attached(tmap, model):
+    # Se agrega a la EVA 1 el objetivo con puntos fijos de la EVA 2, en un punto cercano.
     stm = copy.deepcopy(STM)
-    stm["objectives"][2]["measurement"]["targets"] = [[150.0, -100.0]]
+    fixed = copy.deepcopy(STM_EVA2["objectives"][0])
+    fixed["rank"] = 4
+    fixed["measurement"]["targets"] = [[150.0, -100.0]]
+    stm["objectives"].append(fixed)
     plan = build(tmap, model, stm, branches=False)
     ranks = [r for st in plan["stations"] for r in st["objective_ranks"]]
     assert {1, 2, 3, 4} <= set(ranks)
-    target = next(st for st in plan["stations"] if 3 in st["objective_ranks"])
+    target = next(st for st in plan["stations"] if 4 in st["objective_ranks"])
     assert math.dist(target["position"], (150.0, -100.0)) < 15
     best = max((st for st in plan["stations"] if st["kind"] == "survey"), key=lambda s: s["p_ice"])
     assert 2 in best["objective_ranks"]  # pureza: en el sitio más confiable

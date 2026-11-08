@@ -52,7 +52,9 @@ Hecha al integrar `main` en esta rama:
 | Herramientas | Radar como principal, en la caminata. Si llega al umbral, la herramienta de estación más honda (taladro) confirma y no sale aviso. Aviso solo si ninguna llega |
 | Acceso al GP | `app/ice.py` usa `gp.planning` (prior ajustado y `rank_candidates`), la interfaz estable |
 | `value` | El de `gp.planning`: en [0, 1] y ordena igual que "potencial + incertidumbre". Reemplaza "umbral / profundidad optimista". Fijarlo en el esquema sigue en la cuestión 41 |
-| Hábitat por defecto | (300, -2200) en `config/eva.yaml`. **Costo:** con los objetivos fijos del objetivo 3 junto al cráter, entra 1 de 4 estaciones de hielo; revisar con Producto |
+| Hábitat por defecto | (300, -2200) en `config/eva.yaml` |
+| Segunda EVA | La sublimación del hielo expuesto (puntos fijos junto al cráter) pasó a `stm.s1094b-eva2.json`. La EVA 1 queda con hielo (1), pureza (2) y contexto geológico (3) |
+| Elección de estaciones | **Valor por minuto** (decisión 4 de `plans/gp.md`): puntaje del GP / (caminata + herramientas). Antes se elegía el mejor puntaje sin mirar la caminata; con puntajes casi iguales salía una estación a 3.6 km y entraba 1 de 4. Ahora entran 6, todas cerca del hábitat (~100-200 m entre sí), porque sin estructura espacial todos los puntos valen casi lo mismo |
 | Mocks de la web | `scripts/export_mocks.py` pasa por la API: sale el planificador real si están las capas, y la medición de ejemplo es un taladro sin hielo hasta 1 m en la primera estación de hielo |
 | Mensaje | No se promete "dónde": los cráteres reales no mostraron estructura predictiva (`docs/EXPERIMENTS.md`). El criterio nunca pierde contra una grilla |
 

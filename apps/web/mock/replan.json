@@ -4,15 +4,15 @@
   "replanned_from": "plan-demo0001",
   "stations": [
     {
-      "id": "W11N19",
+      "id": "E04S22",
       "order": 1,
       "position": [
-        -1100.0,
-        1900.0
+        400.0,
+        -2200.0
       ],
       "lonlat": [
-        189.80457,
-        35.142617
+        189.835565,
+        35.073312
       ],
       "priority": "high",
       "objective_ranks": [
@@ -32,13 +32,167 @@
       },
       "duration_min": 40.0,
       "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
-      "p_ice": 0.95,
-      "uncertainty": 0.285,
-      "value": 0.991,
+      "p_ice": 0.667,
+      "uncertainty": 0.918,
+      "value": 0.924,
       "planetary_protection": "sensitive",
       "kind": "survey",
-      "depth_median_m": 1.34,
-      "depth_shallow_m": 0.82
+      "depth_median_m": 2.37,
+      "depth_shallow_m": 1.37
+    },
+    {
+      "id": "E04S23",
+      "order": 2,
+      "position": [
+        400.0,
+        -2300.0
+      ],
+      "lonlat": [
+        189.835565,
+        35.071622
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1,
+        2,
+        3
+      ],
+      "tools": [
+        "core_drill",
+        "camera_spectrometer",
+        "sample_kit"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Hand core drill",
+          "Run Handheld camera / spectrometer"
+        ],
+        "EV2": [
+          "Assist Hand core drill",
+          "Run Clean sample containers",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 53.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.668,
+      "uncertainty": 0.917,
+      "value": 0.924,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.36,
+      "depth_shallow_m": 1.37
+    },
+    {
+      "id": "E03S23",
+      "order": 3,
+      "position": [
+        300.0,
+        -2300.0
+      ],
+      "lonlat": [
+        189.833499,
+        35.071622
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "core_drill"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Hand core drill"
+        ],
+        "EV2": [
+          "Assist Hand core drill",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 40.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.667,
+      "uncertainty": 0.918,
+      "value": 0.924,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.37,
+      "depth_shallow_m": 1.37
+    },
+    {
+      "id": "E02S23",
+      "order": 4,
+      "position": [
+        200.0,
+        -2300.0
+      ],
+      "lonlat": [
+        189.831433,
+        35.071622
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "core_drill"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Hand core drill"
+        ],
+        "EV2": [
+          "Assist Hand core drill",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 40.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.669,
+      "uncertainty": 0.916,
+      "value": 0.925,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.36,
+      "depth_shallow_m": 1.37
+    },
+    {
+      "id": "E02S22",
+      "order": 5,
+      "position": [
+        200.0,
+        -2200.0
+      ],
+      "lonlat": [
+        189.831433,
+        35.073312
+      ],
+      "priority": "high",
+      "objective_ranks": [
+        1
+      ],
+      "tools": [
+        "core_drill"
+      ],
+      "tasks": {
+        "EV1": [
+          "Run Hand core drill"
+        ],
+        "EV2": [
+          "Assist Hand core drill",
+          "Monitor consumables and walkback margin"
+        ]
+      },
+      "duration_min": 40.0,
+      "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales.",
+      "p_ice": 0.665,
+      "uncertainty": 0.92,
+      "value": 0.923,
+      "planetary_protection": "sensitive",
+      "kind": "survey",
+      "depth_median_m": 2.38,
+      "depth_shallow_m": 1.38
     }
   ],
   "route": {
@@ -50,654 +204,34 @@
           "kind": "traverse",
           "is_mock": false,
           "routing": "dtm",
-          "max_slope_deg": 7.9
+          "max_slope_deg": 6.5
         },
         "geometry": {
           "type": "LineString",
           "coordinates": [
             [
-              189.819138,
-              35.13408
+              189.833602,
+              35.073228
             ],
             [
-              189.816658,
-              35.136109
+              189.835669,
+              35.073228
             ],
             [
-              189.816452,
-              35.136109
+              189.835669,
+              35.071537
             ],
             [
-              189.816245,
-              35.136278
-            ],
-            [
-              189.816038,
-              35.136278
-            ],
-            [
-              189.815625,
-              35.136616
-            ],
-            [
-              189.815419,
-              35.136616
-            ],
-            [
-              189.815005,
-              35.136954
-            ],
-            [
-              189.814799,
-              35.136954
-            ],
-            [
-              189.80922,
-              35.141518
-            ],
-            [
-              189.809013,
-              35.141518
-            ],
-            [
-              189.808806,
-              35.141687
-            ],
-            [
-              189.80798,
-              35.141687
-            ],
-            [
-              189.807567,
-              35.142025
-            ],
-            [
-              189.806947,
-              35.142025
-            ],
-            [
-              189.80674,
-              35.142194
-            ],
-            [
-              189.806533,
-              35.142194
-            ],
-            [
-              189.806327,
-              35.142363
-            ],
-            [
-              189.80612,
-              35.142363
-            ],
-            [
-              189.805913,
-              35.142532
-            ],
-            [
-              189.804674,
-              35.142532
-            ],
-            [
-              189.80488,
-              35.142363
-            ],
-            [
-              189.80488,
-              35.141349
-            ],
-            [
-              189.805087,
-              35.14118
-            ],
-            [
-              189.805087,
-              35.140335
-            ],
-            [
-              189.805294,
-              35.140166
-            ],
-            [
-              189.805294,
-              35.13763
-            ],
-            [
-              189.8055,
-              35.137461
-            ],
-            [
-              189.8055,
-              35.131883
-            ],
-            [
-              189.805707,
-              35.131714
-            ],
-            [
-              189.805707,
-              35.131376
-            ],
-            [
-              189.805913,
-              35.131207
-            ],
-            [
-              189.805913,
-              35.128502
-            ],
-            [
-              189.80612,
-              35.128333
-            ],
-            [
-              189.80612,
-              35.128164
-            ],
-            [
-              189.806327,
-              35.127995
-            ],
-            [
-              189.806327,
-              35.1236
-            ],
-            [
-              189.806533,
-              35.123431
-            ],
-            [
-              189.806533,
-              35.122924
-            ],
-            [
-              189.80674,
-              35.122755
-            ],
-            [
-              189.80674,
-              35.122586
-            ],
-            [
-              189.806947,
-              35.122417
-            ],
-            [
-              189.806947,
-              35.122248
-            ],
-            [
-              189.807153,
-              35.122079
-            ],
-            [
-              189.807153,
-              35.120389
-            ],
-            [
-              189.807567,
-              35.12005
-            ],
-            [
-              189.807567,
-              35.119712
-            ],
-            [
-              189.807773,
-              35.119543
-            ],
-            [
-              189.807773,
-              35.119205
-            ],
-            [
-              189.80798,
-              35.119036
-            ],
-            [
-              189.80798,
-              35.118529
-            ],
-            [
-              189.808393,
-              35.118191
-            ],
-            [
-              189.808393,
-              35.116332
-            ],
-            [
-              189.808806,
-              35.115994
-            ],
-            [
-              189.808806,
-              35.114979
-            ],
-            [
-              189.809013,
-              35.11481
-            ],
-            [
-              189.809013,
-              35.113965
-            ],
-            [
-              189.809633,
-              35.113458
-            ],
-            [
-              189.809633,
-              35.113289
-            ],
-            [
-              189.810046,
-              35.112951
-            ],
-            [
-              189.810046,
-              35.112275
-            ],
-            [
-              189.810253,
-              35.112106
-            ],
-            [
-              189.810253,
-              35.111599
-            ],
-            [
-              189.810666,
-              35.111261
-            ],
-            [
-              189.810666,
-              35.110923
-            ],
-            [
-              189.810873,
-              35.110754
-            ],
-            [
-              189.810873,
-              35.110585
-            ],
-            [
-              189.811493,
-              35.110077
-            ],
-            [
-              189.811493,
-              35.109401
-            ],
-            [
-              189.811906,
-              35.109063
-            ],
-            [
-              189.811906,
-              35.108218
-            ],
-            [
-              189.812112,
-              35.108049
-            ],
-            [
-              189.812112,
-              35.107035
-            ],
-            [
-              189.812319,
-              35.106866
-            ],
-            [
-              189.812319,
-              35.105344
-            ],
-            [
-              189.812526,
-              35.105175
-            ],
-            [
-              189.812526,
-              35.104837
-            ],
-            [
-              189.812732,
-              35.104668
-            ],
-            [
-              189.812732,
-              35.10433
-            ],
-            [
-              189.813559,
-              35.103654
-            ],
-            [
-              189.813559,
-              35.103485
-            ],
-            [
-              189.813972,
-              35.103147
-            ],
-            [
-              189.813972,
-              35.102978
-            ],
-            [
-              189.814179,
-              35.102809
-            ],
-            [
-              189.814179,
-              35.102471
-            ],
-            [
-              189.814385,
-              35.102302
-            ],
-            [
-              189.814385,
-              35.099935
-            ],
-            [
-              189.814799,
-              35.099597
-            ],
-            [
-              189.814799,
-              35.098921
-            ],
-            [
-              189.815005,
-              35.098752
-            ],
-            [
-              189.815005,
-              35.098076
-            ],
-            [
-              189.815212,
-              35.097907
-            ],
-            [
-              189.815212,
-              35.097738
-            ],
-            [
-              189.815625,
-              35.0974
-            ],
-            [
-              189.815625,
-              35.097231
-            ],
-            [
-              189.816452,
-              35.096555
-            ],
-            [
-              189.816452,
-              35.096217
-            ],
-            [
-              189.817278,
-              35.09554
-            ],
-            [
-              189.817278,
-              35.095371
-            ],
-            [
-              189.817485,
-              35.095202
-            ],
-            [
-              189.817485,
-              35.094695
-            ],
-            [
-              189.819345,
-              35.093174
-            ],
-            [
-              189.819345,
-              35.093005
-            ],
-            [
-              189.819758,
-              35.092667
-            ],
-            [
-              189.819758,
-              35.092498
-            ],
-            [
-              189.819965,
-              35.092329
-            ],
-            [
-              189.819965,
-              35.091991
-            ],
-            [
-              189.820171,
-              35.091822
-            ],
-            [
-              189.820171,
-              35.091653
-            ],
-            [
-              189.820378,
-              35.091484
-            ],
-            [
-              189.820378,
-              35.091314
-            ],
-            [
-              189.821618,
-              35.0903
-            ],
-            [
-              189.821618,
-              35.090131
-            ],
-            [
-              189.822031,
-              35.089793
-            ],
-            [
-              189.822031,
-              35.089455
-            ],
-            [
-              189.822444,
-              35.089117
-            ],
-            [
-              189.822444,
-              35.088948
-            ],
-            [
-              189.822857,
-              35.08861
-            ],
-            [
-              189.822857,
-              35.088441
-            ],
-            [
-              189.823064,
-              35.088272
-            ],
-            [
-              189.823064,
-              35.088103
-            ],
-            [
-              189.823271,
-              35.087934
-            ],
-            [
-              189.823271,
-              35.087765
-            ],
-            [
-              189.823891,
-              35.087258
-            ],
-            [
-              189.823891,
-              35.087089
-            ],
-            [
-              189.824304,
-              35.086751
-            ],
-            [
-              189.824304,
-              35.086412
-            ],
-            [
-              189.824717,
-              35.086074
-            ],
-            [
-              189.824717,
-              35.085736
-            ],
-            [
-              189.82575,
-              35.084891
-            ],
-            [
-              189.82575,
-              35.084384
-            ],
-            [
-              189.826164,
-              35.084046
-            ],
-            [
-              189.826164,
-              35.083877
-            ],
-            [
-              189.82637,
-              35.083708
-            ],
-            [
-              189.82637,
-              35.083201
-            ],
-            [
-              189.826577,
-              35.083032
-            ],
-            [
-              189.826577,
-              35.082694
-            ],
-            [
-              189.826783,
-              35.082525
-            ],
-            [
-              189.826783,
-              35.082187
-            ],
-            [
-              189.82699,
-              35.082018
-            ],
-            [
-              189.82699,
-              35.081849
-            ],
-            [
-              189.82823,
-              35.080834
-            ],
-            [
-              189.82823,
-              35.080496
-            ],
-            [
-              189.828436,
-              35.080327
-            ],
-            [
-              189.828436,
-              35.080158
-            ],
-            [
-              189.828643,
-              35.079989
-            ],
-            [
-              189.828643,
-              35.079651
-            ],
-            [
-              189.829263,
-              35.079144
-            ],
-            [
-              189.829263,
-              35.078806
+              189.833602,
+              35.071537
             ],
             [
               189.831536,
-              35.076946
+              35.071537
             ],
             [
               189.831536,
-              35.076439
-            ],
-            [
-              189.831743,
-              35.07627
-            ],
-            [
-              189.831743,
-              35.075763
-            ],
-            [
-              189.831949,
-              35.075594
-            ],
-            [
-              189.831949,
-              35.075425
-            ],
-            [
-              189.832363,
-              35.075087
-            ],
-            [
-              189.832363,
-              35.074918
-            ],
-            [
-              189.832982,
-              35.074411
-            ],
-            [
-              189.832982,
-              35.074242
-            ],
-            [
-              189.833189,
-              35.074073
-            ],
-            [
-              189.833189,
-              35.073566
+              35.073228
             ],
             [
               189.833602,
@@ -711,35 +245,95 @@
   "timeline": [
     {
       "t_start_min": 120.0,
-      "t_end_min": 147.8,
+      "t_end_min": 123.1,
       "kind": "traverse",
-      "label": "Traverse to W11N19",
-      "station_id": "W11N19"
+      "label": "Traverse to E04S22",
+      "station_id": "E04S22"
     },
     {
-      "t_start_min": 147.8,
-      "t_end_min": 187.8,
+      "t_start_min": 123.1,
+      "t_end_min": 163.1,
       "kind": "station",
-      "label": "Station W11N19",
-      "station_id": "W11N19",
-      "walkback_margin_min": 22.9
+      "label": "Station E04S22",
+      "station_id": "E04S22",
+      "walkback_margin_min": 187.8
     },
     {
-      "t_start_min": 187.8,
-      "t_end_min": 331.1,
+      "t_start_min": 163.1,
+      "t_end_min": 166.3,
+      "kind": "traverse",
+      "label": "Traverse to E04S23",
+      "station_id": "E04S23"
+    },
+    {
+      "t_start_min": 166.3,
+      "t_end_min": 219.3,
+      "kind": "station",
+      "label": "Station E04S23",
+      "station_id": "E04S23",
+      "walkback_margin_min": 130.3
+    },
+    {
+      "t_start_min": 219.3,
+      "t_end_min": 222.3,
+      "kind": "traverse",
+      "label": "Traverse to E03S23",
+      "station_id": "E03S23"
+    },
+    {
+      "t_start_min": 222.3,
+      "t_end_min": 262.3,
+      "kind": "station",
+      "label": "Station E03S23",
+      "station_id": "E03S23",
+      "walkback_margin_min": 88.5
+    },
+    {
+      "t_start_min": 262.3,
+      "t_end_min": 265.4,
+      "kind": "traverse",
+      "label": "Traverse to E02S23",
+      "station_id": "E02S23"
+    },
+    {
+      "t_start_min": 265.4,
+      "t_end_min": 305.4,
+      "kind": "station",
+      "label": "Station E02S23",
+      "station_id": "E02S23",
+      "walkback_margin_min": 44.2
+    },
+    {
+      "t_start_min": 305.4,
+      "t_end_min": 308.6,
+      "kind": "traverse",
+      "label": "Traverse to E02S22",
+      "station_id": "E02S22"
+    },
+    {
+      "t_start_min": 308.6,
+      "t_end_min": 348.6,
+      "kind": "station",
+      "label": "Station E02S22",
+      "station_id": "E02S22",
+      "walkback_margin_min": 2.2
+    },
+    {
+      "t_start_min": 348.6,
+      "t_end_min": 351.8,
       "kind": "traverse",
       "label": "Return to habitat",
       "station_id": null
     },
     {
-      "t_start_min": 331.1,
-      "t_end_min": 361.1,
+      "t_start_min": 351.8,
+      "t_end_min": 381.8,
       "kind": "ingress",
       "label": "Ingress",
       "station_id": null
     },
     {
-      "t_start_min": 361.1,
+      "t_start_min": 381.8,
       "t_end_min": 480,
       "kind": "reserve",
       "label": "Walkback reserve",
@@ -748,20 +342,24 @@
   ],
   "branches": [
     {
-      "station_id": "W11N19",
+      "station_id": "E04S22",
       "if_result": "ice",
       "next_station_ids": [
-        "E00N01",
-        "W01S01"
+        "E04S23",
+        "E03S23",
+        "E02S23",
+        "E02S22"
       ],
       "note": "Replanned with the simulated result; ice model updated"
     },
     {
-      "station_id": "W11N19",
+      "station_id": "E04S22",
       "if_result": "no_ice",
       "next_station_ids": [
-        "E00N01",
-        "W01S01"
+        "E04S23",
+        "E03S23",
+        "E02S23",
+        "E02S22"
       ],
       "note": "Replanned with the simulated result; ice model updated"
     }
@@ -771,7 +369,19 @@
       "tool": "core_drill",
       "count": 1,
       "mass_kg": null,
-      "justification": "Objectives 1"
+      "justification": "Objectives 1, 2, 3"
+    },
+    {
+      "tool": "camera_spectrometer",
+      "count": 1,
+      "mass_kg": null,
+      "justification": "Objectives 1, 2, 3"
+    },
+    {
+      "tool": "sample_kit",
+      "count": 1,
+      "mass_kg": null,
+      "justification": "Objectives 1, 2, 3"
     },
     {
       "tool": "gpr",
@@ -781,11 +391,11 @@
     }
   ],
   "summary": {
-    "duration_min": 361.1,
-    "distance_km": 5.59,
-    "max_distance_from_habitat_km": 4.33,
-    "min_walkback_margin_min": 22.9,
-    "dose_estimate_msv": 0.168,
+    "duration_min": 381.8,
+    "distance_km": 0.6,
+    "max_distance_from_habitat_km": 0.14,
+    "min_walkback_margin_min": 2.2,
+    "dose_estimate_msv": 0.178,
     "expected_uncertainty_reduction": 0.0,
     "crew": 2,
     "is_mock": false,
@@ -796,12 +406,7 @@
     {
       "level": "advisory",
       "source": "planner",
-      "message": "No ice at W04N14. EVA replanned."
-    },
-    {
-      "level": "caution",
-      "message": "Objective 1: 2 of 4 required stations fit the EVA.",
-      "source": "planner"
+      "message": "No ice at E03S22. EVA replanned."
     },
     {
       "level": "advisory",
