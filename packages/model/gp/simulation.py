@@ -39,6 +39,8 @@ GH_WEIGHTS = GH_WEIGHTS / GH_WEIGHTS.sum()
 FITTED = {"mean": 0.86, "variance": 0.299, "rho": 0.5, "range_m": 100.0}
 ADAPTIVE = ("max_variance", "information", "targets", "potential_uncertainty")
 STRATEGIES = ("random", "spread", "nearest", *ADAPTIVE)
+# "geologist": va al cráter de fondo plano más somero a menos de GEOLOGIST_RADIUS_M, sin modelo.
+GEOLOGIST_RADIUS_M = 150.0
 
 
 @dataclass(frozen=True)
@@ -123,8 +125,31 @@ def expected_entropy_drop(
 
 
 def scores(
-    strategy: str, post, prior: Prior, x, y, pos, visited, scenario: Scenario, rng
+    strategy: str,
+    post,
+    prior: Prior,
+    x,
+    y,
+    pos,
+    visited,
+    scenario: Scenario,
+    rng,
+    craters: list[Observation] | None = None,
 ) -> np.ndarray:
+    if strategy == "geologist":
+        flat = [o for o in (craters or []) if o.kind == "depth"]
+        sx = np.r_[scenario.start_x, x[visited]]
+        sy = np.r_[scenario.start_y, y[visited]]
+        spread = np.min(np.hypot(x[:, None] - sx[None, :], y[:, None] - sy[None, :]), axis=1)
+        fallback = -100.0 + spread / 1e6  # sin cráter cerca: repartir, siempre por debajo
+        if not flat:
+            return fallback
+        fx = np.array([o.x_m for o in flat])
+        fy = np.array([o.y_m for o in flat])
+        depth = np.array([o.depth_m for o in flat])
+        dist = np.hypot(x[:, None] - fx[None, :], y[:, None] - fy[None, :])
+        near = np.where(dist <= GEOLOGIST_RADIUS_M, depth[None, :], np.inf).min(axis=1)
+        return np.where(np.isfinite(near), -near, fallback)
     if strategy == "random":
         return rng.random(len(x))
     if strategy == "nearest":
@@ -159,7 +184,10 @@ def run_eva(
     y: np.ndarray,
     scenario: Scenario,
     rng,
-) -> dict[str, float]:
+    visited: np.ndarray | None = None,
+    return_state: bool = False,
+):
+    """Una EVA. Con `visited` y `return_state` se encadenan EVAs de una campaña."""
     observations = list(craters)
     post = posterior(prior, observations)
     log_t = math.log(scenario.reach_m)
@@ -167,7 +195,9 @@ def run_eva(
     entropy0 = binary_entropy(ndtr((log_t - mean0) / np.sqrt(var0 + prior.nugget))).sum()
 
     pos = (scenario.start_x, scenario.start_y)
-    walked, visited = 0.0, np.zeros(len(x), bool)
+    walked = 0.0
+    visited = np.zeros(len(x), bool) if visited is None else visited.copy()
+    start_visited = visited.copy()
     hits = 0
     for _ in range(scenario.stations):
         step = np.hypot(x - pos[0], y - pos[1])
@@ -175,7 +205,7 @@ def run_eva(
         feasible = (~visited) & (walked + step + back <= scenario.budget_m)
         if not feasible.any():
             break
-        score = scores(strategy, post, prior, x, y, pos, visited, scenario, rng)
+        score = scores(strategy, post, prior, x, y, pos, visited, scenario, rng, craters)
         score = np.where(feasible, score, -np.inf)
         i = int(np.argmax(score))
         walked += step[i]
@@ -193,14 +223,41 @@ def run_eva(
     entropy1 = binary_entropy(p1).sum()
     unvisited = np.flatnonzero(~visited)
     best = unvisited[np.argmax(p1[unvisited])]
-    return {
+    metrics = {
         "hits": float(hits),
         "any_hit": float(hits > 0),
         "entropy_drop_pct": float(100 * (entropy0 - entropy1) / entropy0),
         "next_site_ok": float(math.exp(truth[best]) <= scenario.reach_m),
         "walked_km": walked / 1000,
-        "stations": float(visited.sum()),
+        "stations": float((visited & ~start_visited).sum()),
     }
+    if return_state:
+        return metrics, observations, visited
+    return metrics
+
+
+def run_campaign(
+    strategy: str,
+    prior: Prior,
+    craters: list[Observation],
+    truth: np.ndarray,
+    x: np.ndarray,
+    y: np.ndarray,
+    scenario: Scenario,
+    rng,
+    n_evas: int = 3,
+) -> dict[str, float]:
+    """Varias EVAs seguidas: cada una aprende de las anteriores y no repite estaciones."""
+    observations, visited = list(craters), np.zeros(len(x), bool)
+    total, first = 0.0, float(n_evas + 1)
+    for k in range(n_evas):
+        metrics, observations, visited = run_eva(
+            strategy, prior, observations, truth, x, y, scenario, rng, visited, True
+        )
+        total += metrics["hits"]
+        if metrics["hits"] > 0 and first > n_evas:
+            first = float(k + 1)
+    return {"campaign_hits": total, "first_hit_eva": first}
 
 
 def summarize(rows: list[dict[str, float]], baseline: list[dict[str, float]] | None) -> dict:
@@ -255,6 +312,66 @@ def run(
     return results
 
 
+ROBUST_RESULT = REPO_ROOT / "data" / "processed" / "s1094b" / "simulation_robustness.json"
+
+
+def robustness(
+    n_worlds: int,
+    seed: int = 3,
+    truth_rhos: tuple[float, ...] = (1e-6, 0.25, 0.5),
+    strategies: tuple[str, ...] = (
+        "random",
+        "spread",
+        "geologist",
+        "targets",
+        "potential_uncertainty",
+    ),
+    campaign_strategies: tuple[str, ...] = ("spread", "geologist", "potential_uncertainty"),
+    n_evas: int = 3,
+) -> dict:
+    """¿La ventaja sobrevive si la estructura espacial real es menor que la ajustada?
+
+    El modelo de las estrategias sigue siendo el ajustado (rho = 0.5); solo cambia la verdad.
+    """
+    craters = to_observations(load_catalog(DEFAULT_CATALOG))
+    model = make_prior(**FITTED)
+    rng = np.random.default_rng(seed)
+    out = {}
+    for rho in truth_rhos:
+        truth_prior = make_prior(FITTED["mean"], FITTED["variance"], rho, FITTED["range_m"])
+        for scenario in default_scenarios():
+            x, y = candidates(scenario)
+            near = local(craters, scenario)
+            single = {s: [] for s in strategies}
+            campaign = {s: [] for s in campaign_strategies}
+            for _ in range(n_worlds):
+                truth = sample_world(truth_prior, near, x, y, rng)
+                for s in strategies:
+                    eva_rng = np.random.default_rng(rng.integers(1 << 32))
+                    single[s].append(run_eva(s, model, near, truth, x, y, scenario, eva_rng))
+                for s in campaign_strategies:
+                    eva_rng = np.random.default_rng(rng.integers(1 << 32))
+                    campaign[s].append(
+                        run_campaign(s, model, near, truth, x, y, scenario, eva_rng, n_evas)
+                    )
+            key = (
+                f"rho_verdad={rho:.2f} start=({scenario.start_x:.0f},{scenario.start_y:.0f})"
+                f" reach={scenario.reach_m} m"
+            )
+            out[key] = {
+                "craters_nearby": len(near),
+                "single": {
+                    s: summarize(r, single["spread"] if s != "spread" else None)
+                    for s, r in single.items()
+                },
+                "campaign": {
+                    s: summarize(r, campaign["spread"] if s != "spread" else None)
+                    for s, r in campaign.items()
+                },
+            }
+    return out
+
+
 def default_scenarios() -> list[Scenario]:
     """Tres hábitats a más de 2 km del cráter principal, dentro de la zona con cráteres."""
     starts = [(-600.0, 2600.0), (300.0, -2200.0), (-300.0, -4600.0)]
@@ -263,6 +380,27 @@ def default_scenarios() -> list[Scenario]:
 
 if __name__ == "__main__":
     import sys
+
+    if len(sys.argv) > 1 and sys.argv[1] == "robustness":
+        worlds = int(sys.argv[2]) if len(sys.argv) > 2 else 30
+        result = robustness(worlds)
+        ROBUST_RESULT.write_text(json.dumps(result, indent=1), encoding="utf-8")
+        for scen, res in result.items():
+            print(f"\n{scen} (cráteres {res['craters_nearby']})")
+            for name, m in res["single"].items():
+                diff = m["hits"].get("diff_vs_spread")
+                ci = m["hits"].get("diff_90ci")
+                extra = f" dif {diff:+.2f} [{ci[0]:+.2f},{ci[1]:+.2f}]" if diff is not None else ""
+                print(
+                    f"  {name:22s} hielo/EVA {m['hits']['mean']:.2f}{extra}"
+                    f"  P(alguno) {m['any_hit']['mean']:.2f}"
+                )
+            for name, m in res["campaign"].items():
+                print(
+                    f"  campaña {name:14s} hielo en 3 EVAs {m['campaign_hits']['mean']:.2f}"
+                    f"  primera EVA con hielo {m['first_hit_eva']['mean']:.2f}"
+                )
+        sys.exit(0)
 
     worlds = int(sys.argv[1]) if len(sys.argv) > 1 else 50
     output = {

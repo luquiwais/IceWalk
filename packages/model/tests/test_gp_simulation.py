@@ -13,6 +13,7 @@ from gp.simulation import (
     expected_entropy_drop,
     make_prior,
     measure,
+    run_campaign,
     run_eva,
     sample_world,
     scores,
@@ -100,3 +101,37 @@ def test_mundos_respetan_un_dato_preciso():
     samples = np.array([sample_world(prior, craters, x, y, rng) for _ in range(200)])
     assert abs(samples[:, 0].mean() - 0.0) < 0.02
     assert samples[:, 1].std() == pytest.approx(math.sqrt(0.15), rel=0.2)
+
+
+def test_geologo_va_al_crater_somero_cercano():
+    craters = [flat_floor_crater(300.0, 0.0, 0.6), flat_floor_crater(-300.0, 0.0, 2.0)]
+    x, y = np.array([300.0, -300.0, 0.0]), np.array([0.0, 0.0, 500.0])
+    post = posterior(PRIOR, craters)
+    s = scores(
+        "geologist", post, PRIOR, x, y, (0.0, 0.0), np.zeros(3, bool), SCENARIO, None, craters
+    )
+    assert np.argmax(s) == 0
+    assert s[2] < s[1]  # sin cráter cerca queda por debajo
+
+
+def test_geologo_sin_crateres_reparte():
+    x, y = np.array([100.0, 500.0]), np.array([0.0, 0.0])
+    post = posterior(PRIOR, [])
+    s = scores("geologist", post, PRIOR, x, y, (0.0, 0.0), np.zeros(2, bool), SCENARIO, None, [])
+    assert np.argmax(s) == 1
+
+
+def test_campana_no_repite_estaciones_y_cuenta_la_primera_eva():
+    rng = np.random.default_rng(3)
+    x, y = candidates(SCENARIO)
+    craters = [flat_floor_crater(200.0, 100.0, 1.0)]
+    truth = sample_world(PRIOR, craters, x, y, rng)
+    metrics, obs, visited = run_eva(
+        "spread", PRIOR, craters, truth, x, y, SCENARIO, rng, None, True
+    )
+    _, _, visited2 = run_eva("spread", PRIOR, obs, truth, x, y, SCENARIO, rng, visited, True)
+    assert visited2.sum() > visited.sum()
+    assert (visited2 & visited).sum() == visited.sum()
+    result = run_campaign("potential_uncertainty", PRIOR, craters, truth, x, y, SCENARIO, rng, 3)
+    assert 0 <= result["campaign_hits"] <= 3 * SCENARIO.stations
+    assert 1 <= result["first_hit_eva"] <= 4
