@@ -65,7 +65,7 @@ def test_tools_follow_the_stm_requirement():
     catalog = tools_by_id()
     reqs, alerts = requirements(STM, catalog)
     by_rank = {r.rank: r for r in reqs}
-    assert by_rank[1].tools == ["core_drill"]  # el único de estación que llega a 1 m
+    assert by_rank[1].tools == ["core_drill"]  # radar en la caminata; el taladro confirma
     assert by_rank[1].carried == ["gpr"]
     assert by_rank[1].is_survey and by_rank[1].min_stations == 4
     assert by_rank[3].tools == ["camera_spectrometer"]
@@ -76,9 +76,17 @@ def test_tools_follow_the_stm_requirement():
     shallow["objectives"][0]["measurement"]["depth_max_m"] = 0.5
     assert requirements(shallow, catalog)[0][0].tools == ["neutron_spectrometer"]
 
+    # Radar como herramienta principal (decisión del 2026-11-08): si llega al umbral, el taladro
+    # confirma donde alcanza y no hay aviso.
     deep = copy.deepcopy(STM)
     deep["objectives"][0]["measurement"]["depth_max_m"] = 5
     reqs, alerts = requirements(deep, catalog)
+    assert reqs[0].tools == ["core_drill"] and reqs[0].carried == ["gpr"]
+    assert not any("no tool reaches" in a["message"] for a in alerts)
+
+    beyond = copy.deepcopy(STM)
+    beyond["objectives"][0]["measurement"]["depth_max_m"] = 20
+    reqs, alerts = requirements(beyond, catalog)
     assert reqs[0].tools == ["core_drill"]
     assert any("no tool reaches" in a["message"] for a in alerts)
 

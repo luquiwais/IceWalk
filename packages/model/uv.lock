@@ -270,9 +270,6 @@ source = { editable = "." }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "rasterio", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "rasterio", version = "1.5.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "scikit-image" },
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
@@ -289,6 +286,11 @@ ml = [
     { name = "timm" },
     { name = "torch" },
 ]
+vision = [
+    { name = "rasterio", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "rasterio", version = "1.5.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "scikit-image" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -297,14 +299,14 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pyyaml", marker = "extra == 'dev'", specifier = ">=6" },
-    { name = "rasterio", specifier = ">=1.4" },
+    { name = "rasterio", marker = "extra == 'vision'", specifier = ">=1.4" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4" },
-    { name = "scikit-image", specifier = ">=0.22" },
+    { name = "scikit-image", marker = "extra == 'vision'", specifier = ">=0.22" },
     { name = "scipy", specifier = ">=1.12" },
     { name = "timm", marker = "extra == 'ml'", specifier = ">=1.0" },
     { name = "torch", marker = "extra == 'ml'", specifier = ">=2.2" },
 ]
-provides-extras = ["dev", "ml"]
+provides-extras = ["vision", "dev", "ml"]
 
 [[package]]
 name = "idna"

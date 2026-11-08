@@ -152,6 +152,49 @@ Contra 300 permutaciones: mejor ventaja observada 0.98, p = 0.09. El 95 % del az
 
 **Conclusión:** no hay estructura espacial fuerte a escala del sitio, y sí potencia para verla: alcances ≥ 400 m con estructura marcada quedan descartados. Puede existir estructura débil de 100-200 m: hay un indicio no significativo, y ahí la potencia es solo parcial. **Un dato informa a lo sumo unos 100-200 m a su alrededor.** No se probó el efecto de variables locales (pendiente, THEMIS), que podrían explicar parte de la variación.
 
+## 2026-11-08: rendimiento por herramienta en el sitio real
+
+`gp.planning.tool_yield` sobre el posterior de los 349 cráteres, con 1257 candidatas cada 100 m a menos de 2 km del hábitat (300, -2200):
+
+| Herramienta | Alcance | P(d <= alcance) media por estación | Mejor estación | Estaciones esperadas hasta un hallazgo |
+| --- | --- | --- | --- | --- |
+| Espectrómetro de neutrones | 0.6 m | 0.006 | 0.02 | ~165 |
+| Taladro | 1 m | 0.058 | 0.13 | ~17 |
+| Radar | 10 m | 0.996 | 1.00 | ~1 |
+
+**Salvedad:** el radar ve reflectores, no hielo, y el modelo todavía lo trata como confirmación (cuestión 30). Su valor es optimista. El orden de magnitud entre taladro y espectrómetro sí sale de la distribución real de profundidades, y no depende de la estructura espacial. Supone estaciones independientes.
+
+## 2026-11-08: validación con cráteres reales y robustez de la simulación
+
+Código: `packages/model/gp/validation.py` y `simulation.py robustness`, con tests. Resultados en `data/processed/s1094b/validation.json` y `simulation_robustness.json`, fuera de Git.
+
+**Validación con cráteres reales.** Cada cráter se esconde y se predice con los vecinos a menos de 600 m. Etiqueta: fondo plano con `d <= 1 m` (29 de 349); con 1 m las etiquetas son limpias, porque toda cota `0.2 D` supera 1 m. Control: 100 permutaciones de las posiciones.
+
+| Medida | Modelo | Control |
+| --- | --- | --- |
+| AUC | 0.520 | media 0.506; 95 %: 0.601 (p = 0.46) |
+| Aciertos entre los 29 mejor puntuados | 3 | 2.4 al azar (p = 0.43) |
+
+**Los vecinos no predicen dónde hay hielo somero.** La estructura espacial que daba ventaja en la simulación no aparece en los datos reales a la escala de los cráteres (vecino más cercano: mediana de 93 m). Puede existir a escalas menores, que los cráteres no resuelven.
+
+**Robustez** (30 mundos por escenario; modelo de las estrategias fijo en `rho` = 0.5; cambia solo la verdad). Diferencia de puntos con hielo por EVA contra la grilla, con intervalo del 90 %:
+
+| Verdad | Alcance | Potencial + incertidumbre | Geólogo (cráter somero a ojo) |
+| --- | --- | --- | --- |
+| Sin estructura (`rho` 0) | 1 m | +0.03 a +0.17, todos con intervalo que toca 0 | -0.03 a +0.20 |
+| Sin estructura | 3 m | -0.07 a +0.17, todos tocan 0 | +0.03 a +0.43 |
+| Débil (`rho` 0.25) | 3 m, hábitats con cráteres | +0.90 y +0.37 | +0.07 y 0.00 |
+| Ajustada (`rho` 0.5) | 1 m, hábitats con cráteres | +0.70 y +0.53 | +0.33 y +0.37 |
+| Ajustada | 3 m, hábitats con cráteres | +1.33 y +0.60 | +0.37 y +0.37 |
+
+Campaña de 3 EVAs: con verdad sin estructura, todas las estrategias quedan parejas (por ejemplo, 11.5-12.3 puntos con hielo de 18 con 3 m); con `rho` 0.5, potencial + incertidumbre suma 1-2 puntos más en los hábitats con cráteres.
+
+**Conclusión:**
+- **Sin estructura, elegir dónde medir no le gana a la grilla.** Y los cráteres reales no muestran estructura predictiva. El ×2.8 de la simulación anterior **no está respaldado por datos reales** y no va al pitch.
+- Potencial + incertidumbre **nunca pierde** de forma clara y gana si hay estructura, así que sigue siendo un buen criterio por defecto, sin costo. Con estructura, también le gana al geólogo.
+- **La palanca grande es la herramienta, no el lugar:** con cualquier estrategia, 1 m da ~0.2-0.5 puntos con hielo por EVA y 3 m da ~4 de 6.
+- Lo que queda por ver es si las mediciones de la EVA revelan estructura a menos de ~100 m, que los cráteres no resuelven. Solo una EVA real podría mostrarlo.
+
 ## 2026-11-08: simulación del paso 7, ¿elegir dónde medir rinde más?
 
 Código: `model/gp/simulation.py`, con tests. Resultados en `data/processed/s1094b/simulation.json`, fuera de Git.

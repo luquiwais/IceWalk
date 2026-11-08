@@ -98,12 +98,17 @@ def requirements(stm: dict, catalog: dict[str, dict]) -> tuple[list[Requirement]
                                  f"catalog measures {var}. Not planned."))
             continue
         reaching = [t for t in stop if t["depth_m"] >= depth]
+        mapped = [t for t in able if t["mode"] == "traverse" and t["depth_m"] >= depth]
         if reaching:
             chosen = min(reaching, key=lambda t: t["time_min"])
         else:
+            # Decisión del 2026-11-08: el radar (en la caminata) es la herramienta principal; si
+            # llega al umbral, la herramienta de estación más honda confirma donde alcanza.
             chosen = max(stop, key=lambda t: t["depth_m"])
-            alerts.append(_alert("caution", f"Objective {obj['rank']}: no tool reaches "
-                                 f"{depth:g} m; using {chosen['name']} ({chosen['depth_m']:g} m)."))
+            if not mapped:
+                alerts.append(_alert(
+                    "caution", f"Objective {obj['rank']}: no tool reaches {depth:g} m; "
+                    f"using {chosen['name']} ({chosen['depth_m']:g} m)."))
         tools = [chosen["id"]]
         if m.get("sample_return") and not chosen.get("returns_sample"):
             samplers = [
@@ -495,7 +500,7 @@ def build(
             "hypothesis": reqs[rank].hypothesis,
             "p_ice": round(p_ice, 3),
             "uncertainty": round(float(ev["entropy"][i]), 3),
-            "value": round(model.threshold_m / float(ev["depth_shallow_m"][i]), 3),
+            "value": round(float(ev["value"][i]), 3),
             "planetary_protection": "sensitive" if heat or p_ice > cfg.sensitive_p_ice else "none",
             "kind": s.kind,
             "depth_median_m": round(float(ev["depth_median_m"][i]), 2),

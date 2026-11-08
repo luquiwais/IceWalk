@@ -3,10 +3,10 @@
 # tripulación) vienen de la STM, no de acá.
 
 habitat_xy:
-  value: [-1200, -900]
-  source: Punto de demo; grid.json dice que el hábitat es configurable
+  value: [300, -2200]
+  source: Decisión del 2026-11-08 (DECISIONS); uno de los hábitats de la simulación con muchos cráteres cerca
   assumption: true
-  notes: Metros de la grilla desde el cráter. Es el mismo del planificador mock y de los mocks de la web.
+  notes: Metros de la grilla desde el cráter, a ~2.2 km, fuera de la eyecta cercana. Antes era (-1200, -900), el punto del mock. Cuando se toque el contrato de la STM, pasar a `habitat_xy` en la STM.
 
 egress_min:
   value: 45

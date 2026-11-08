@@ -1,27 +1,26 @@
 """Mapa de hielo para el planificador: el GP de `packages/model` con los cráteres del sitio.
 
-El GP es de Luqui (`packages/model/gp/`); acá solo se arma y se consulta. El prior usa el ajuste
-de la prueba de estructura (`gp.simulation.FITTED`). Los cráteres de Dundas et al. 2023 entran si
-existe su catálogo en `data/processed/` (licencia sin confirmar: fuera de Git). Sin catálogo, el
-mapa es solo el prior, y el plan lo avisa.
+El GP es de Luqui (`packages/model/gp/`); acá solo se arma y se consulta, siempre a través de su
+interfaz estable `gp.planning` (prior ajustado y `rank_candidates`). Los cráteres de Dundas et al.
+2023 entran si existe su catálogo en `data/processed/` (licencia sin confirmar: fuera de Git). Sin
+catálogo, el mapa es solo el prior, y el plan lo avisa.
 
-Puntaje de una estación: "potencial + incertidumbre" (DECISIONS 2026-11-08, simulación del paso 7),
-la profundidad más somera plausible, `-(media - desvío)` de `log d`. Es el de
-`gp.simulation.scores(..., "potential_uncertainty")`.
+Puntaje de una estación: "potencial + incertidumbre" (DECISIONS 2026-11-08), la profundidad más
+somera plausible. Se usa `value` de `gp.planning.rank_candidates`: está en [0, 1] y ordena igual
+que `-(media - desvío)` de `log d`. No promete "dónde": los cráteres reales no mostraron estructura
+predictiva (EXPERIMENTS, 2026-11-08), pero el criterio nunca pierde contra una grilla.
 """
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
 from gp.craters import DEFAULT_CATALOG, load_catalog, to_observations
 from gp.observations import Observation, measured_depth
+from gp.planning import fitted_prior, rank_candidates
 from gp.posterior import Posterior, posterior
-from gp.simulation import FITTED, make_prior
-from scipy.special import entr, ndtr
 
 CRATER_MARGIN_M = 500.0  # Cráteres más lejos que esto de la zona no influyen (alcance ~100 m).
 
@@ -31,7 +30,7 @@ class IceModel:
     observations: list[Observation]
     threshold_m: float = 1.0
     craters: int = 0
-    prior: object = field(default_factory=lambda: make_prior(**FITTED))
+    prior: object = field(default_factory=fitted_prior)
     _post: Posterior | None = field(default=None, init=False, repr=False)
 
     @classmethod
@@ -67,16 +66,16 @@ class IceModel:
         """Probabilidad de hielo a ≤ umbral, entropía (bits), desvío y puntaje en cada punto."""
         x_m, y_m = np.asarray(x_m, dtype=float), np.asarray(y_m, dtype=float)
         mean, var = self.post.predict(x_m, y_m)
-        total = var + self.prior.nugget
-        sd = np.sqrt(total)
-        p_ice = ndtr((math.log(self.threshold_m) - mean) / sd)
+        sd = np.sqrt(var + self.prior.nugget)
+        ranked = rank_candidates(self.post, x_m, y_m, self.threshold_m)
         return {
             "mean_log_depth": mean,
-            "p_ice": p_ice,
-            "entropy": (entr(p_ice) + entr(1 - p_ice)) / math.log(2),
+            "p_ice": ranked["p_ice"],
+            "entropy": ranked["uncertainty"],
             "depth_median_m": np.exp(mean),
             "depth_shallow_m": np.exp(mean - sd),  # profundidad optimista (1 desvío)
-            "score": -(mean - sd),
+            "value": ranked["value"],
+            "score": ranked["value"],  # mismo orden que "potencial + incertidumbre"
         }
 
     def believe(self, x_m: float, y_m: float, error_m: float) -> IceModel:

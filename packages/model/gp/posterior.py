@@ -123,10 +123,13 @@ class Posterior:
         nu: np.ndarray,
         iterations: int,
         converged: bool,
+        observations: tuple[Observation, ...] = (),
     ) -> None:
         self.prior = prior
         self.iterations = iterations
         self.converged = converged
+        self.observations = observations
+        """Datos con los que se condicionó, para sumar otros sin perderlos."""
         self._x, self._y = x_m, y_m
         self._sqrt_tau, self._chol = None, None
         self._alpha = np.empty(0)
@@ -224,4 +227,4 @@ def posterior(
     tau, nu, iterations, converged = _expectation_propagation(
         cov, targets, sigmas, signs, max_iter, tol, damping
     )
-    return Posterior(prior, x_m, y_m, tau, nu, iterations, converged)
+    return Posterior(prior, x_m, y_m, tau, nu, iterations, converged, tuple(observations))

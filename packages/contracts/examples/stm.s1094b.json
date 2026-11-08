@@ -19,7 +19,7 @@
       "trace": "NASEM 2025: characterize water and CO2 reservoirs in the exploration zone",
       "measurement": {
         "variable": "ice_presence",
-        "depth_max_m": 1,
+        "depth_max_m": 3,
         "coverage": "all_terrain_units",
         "min_stations": 4,
         "sample_return": false

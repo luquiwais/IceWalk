@@ -1,14 +1,14 @@
 {
-  "station_id": "S5",
-  "tool": "neutron_spectrometer",
+  "station_id": "W04N14",
+  "tool": "core_drill",
   "result": "no_ice",
-  "depth_m": null,
-  "weh_percent": 3.1,
+  "depth_m": 1,
+  "weh_percent": null,
   "position": [
-    -700.0,
-    -150.0
+    -400.0,
+    1400.0
   ],
   "timestamp": "2040-03-12T14:35:00Z",
   "crew_member": "EV1",
-  "notes": "Demo scenario: first station negative, triggers replan."
+  "notes": "Demo scenario: no ice down to 1 m at the first station; triggers replan."
 }

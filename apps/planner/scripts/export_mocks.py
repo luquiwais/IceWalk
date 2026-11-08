@@ -1,4 +1,11 @@
-"""Genera apps/web/mock/plan.json y apps/web/mock/replan.json desde el planificador mock.
+"""Genera apps/web/mock/plan.json, replan.json y measurement.json pasando por la API.
+
+Usa los mismos `POST /plan` y `POST /replan` que la web, así que sale el planificador real si están
+las capas del terreno (y el GP con los cráteres si está el catálogo), o el mock si no.
+
+La medición de ejemplo se adapta a la primera estación de hielo: su herramienta de hielo llega a
+su alcance sin encontrar hielo, que es lo más probable con 1 m en S1094b (P ~ 0.06,
+`docs/EXPERIMENTS.md`). Es la escena clave de la demo: un "no" que re-planifica.
 
 Uso (desde apps/planner/): python scripts/export_mocks.py
 """
@@ -9,22 +16,43 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app import mock_planner  # noqa: E402
-from app.contracts import CONTRACTS, ROOT  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
-stm = json.loads((CONTRACTS / "examples" / "stm.s1094b.json").read_text())
-meas = json.loads((CONTRACTS / "examples" / "measurement.example.json").read_text())
+from app.contracts import CONTRACTS, ROOT, tools_by_id  # noqa: E402
+from app.main import app  # noqa: E402
 
-plan = mock_planner.build_plan(stm)
-plan["plan_id"] = "plan-demo0001"
-first = plan["stations"][0]
-meas = {**meas, "station_id": first["id"], "position": first["position"]}
-re = mock_planner.replan(stm, plan, meas, elapsed_min=120)
-re["plan_id"] = "plan-demo0002"
+ICE_TOOLS = ("core_drill", "neutron_spectrometer")
+
+client = TestClient(app)
+example = json.loads((CONTRACTS / "examples" / "measurement.example.json").read_text())
+
+plan = client.post("/plan", json={}).json()
+# Primera estación que lleva una herramienta de hielo (no un objetivo fijo de cámara).
+first = next(
+    (s for s in plan["stations"] if any(t in s["tools"] for t in ICE_TOOLS)), plan["stations"][0]
+)
+tool_id = next((t for t in ICE_TOOLS if t in first["tools"]), first["tools"][0])
+reach = tools_by_id()[tool_id]["depth_m"]
+meas = {
+    **example,
+    "station_id": first["id"],
+    "tool": tool_id,
+    "result": "no_ice",
+    "depth_m": reach,
+    "weh_percent": example["weh_percent"] if tool_id == "neutron_spectrometer" else None,
+    "position": first["position"],
+    "notes": f"Demo scenario: no ice down to {reach:g} m at the first station; triggers replan.",
+}
+replan = client.post(
+    "/replan", json={"plan_id": plan["plan_id"], "measurement": meas, "elapsed_min": 120}
+).json()
+
+plan["plan_id"], replan["plan_id"] = "plan-demo0001", "plan-demo0002"
+replan["replanned_from"] = "plan-demo0001"
 
 out = ROOT / "apps" / "web" / "mock"
 out.mkdir(parents=True, exist_ok=True)
 (out / "plan.json").write_text(json.dumps(plan, indent=2))
-(out / "replan.json").write_text(json.dumps(re, indent=2))
+(out / "replan.json").write_text(json.dumps(replan, indent=2))
 (out / "measurement.json").write_text(json.dumps(meas, indent=2))
-print("ok:", [p.name for p in out.iterdir()])
+print("ok:", [p.name for p in out.iterdir()], "| planner:", client.get("/health").json())
