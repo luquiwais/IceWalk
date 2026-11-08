@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+/*
+ * IceWalk design tokens, modeled on Apple's visionOS guidelines:
+ * - Materials: https://developer.apple.com/design/human-interface-guidelines/materials#visionOS
+ * - Color:     https://developer.apple.com/design/human-interface-guidelines/color#visionOS
+ * - Type:      https://developer.apple.com/design/human-interface-guidelines/typography#visionOS
+ * Values are web approximations of the native materials, not Apple specs.
+ */
+
+@theme {
+  /* SF Pro is the visionOS system font; on the web it can only be used through
+     the system stack (Apple devices). Inter is the fallback elsewhere. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    var(--font-inter), system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale. visionOS uses bolder body and title styles. */
+  --text-large-title: 2.25rem;
+  --text-large-title--line-height: 2.625rem;
+  --text-title-1: 1.75rem;
+  --text-title-1--line-height: 2.125rem;
+  --text-title-2: 1.375rem;
+  --text-title-2--line-height: 1.75rem;
+  --text-title-3: 1.1875rem;
+  --text-title-3--line-height: 1.5rem;
+  --text-headline: 1.0625rem;
+  --text-headline--line-height: 1.375rem;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.375rem;
+  --text-callout: 1rem;
+  --text-callout--line-height: 1.3125rem;
+  --text-subheadline: 0.9375rem;
+  --text-subheadline--line-height: 1.25rem;
+  --text-footnote: 0.8125rem;
+  --text-footnote--line-height: 1.125rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+
+  /* Vibrancy levels for text on glass: label, secondaryLabel, tertiaryLabel.
+     visionOS shows text in white by default for contrast on glass. */
+  --color-label: oklch(1 0 0 / 0.96);
+  --color-label-secondary: oklch(1 0 0 / 0.64);
+  --color-label-tertiary: oklch(1 0 0 / 0.4);
+  --color-separator: oklch(1 0 0 / 0.14);
+
+  /* Fills for controls on glass (the thin material in visionOS). */
+  --color-fill: oklch(1 0 0 / 0.1);
+  --color-fill-hover: oklch(1 0 0 / 0.18);
+  --color-fill-active: oklch(1 0 0 / 0.26);
+
+  /* Toggled/selected state: white fill with dark content. The HIG reserves this
+     style for the toggled state, so never use it for an ordinary button. */
+  --color-selected: oklch(0.98 0 0);
+  --color-on-selected: oklch(0.2 0 0);
+
+  /* Alert levels (PRD: advisory, caution, warning). Hues follow the usual
+     red/amber convention for warning/caution; advisory cyan is an assumption
+     to review with Design. */
+  --color-advisory: oklch(0.83 0.09 230);
+  --color-caution: oklch(0.86 0.15 85);
+  --color-warning: oklch(0.7 0.19 27);
+
+  /* Mars palette, used for the scene behind the glass, not for UI chrome. */
+  --color-mars-950: oklch(0.16 0.03 40);
+  --color-mars-900: oklch(0.22 0.05 42);
+  --color-mars-700: oklch(0.38 0.09 45);
+  --color-mars-500: oklch(0.56 0.13 48);
+  --color-mars-300: oklch(0.74 0.1 60);
+
+  --radius-window: 2rem;
+  --radius-section: 1.25rem;
+
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Glass: the default window material. Translucent, blurred, limited luminance,
+   with a specular rim and layered shadows (ambient + direct). */
+@utility material-glass {
+  background-color: oklch(0.34 0.006 60 / 0.46);
+  backdrop-filter: blur(48px) saturate(1.6) brightness(0.94);
+  -webkit-backdrop-filter: blur(48px) saturate(1.6) brightness(0.94);
+  box-shadow:
+    inset 0 1px 0 0 oklch(1 0 0 / 0.2),
+    inset 0 0 0 1px oklch(1 0 0 / 0.07),
+    0 1px 2px oklch(0 0 0 / 0.22),
+    0 24px 64px -16px oklch(0 0 0 / 0.55);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: oklch(0.3 0.006 60 / 0.92);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: oklch(0.3 0.006 60 / 0.96);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Light that catches the edge of the glass, stronger at the top. */
+@utility glass-rim {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      160deg,
+      oklch(1 0 0 / 0.34),
+      oklch(1 0 0 / 0.06) 32%,
+      oklch(1 0 0 / 0.02) 68%,
+      oklch(1 0 0 / 0.12)
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+}
+
+/* Regular: separates sections inside a window (like a grouped list). */
+@utility material-regular {
+  background-color: oklch(0 0 0 / 0.16);
+}
+
+/* Thick: a dark element that stays distinct on top of a regular area. */
+@utility material-thick {
+  background-color: oklch(0 0 0 / 0.32);
+}
+
+/* Placeholder for the 3D scene until Cesium is wired in. */
+@utility mars-backdrop {
+  background-color: var(--color-mars-950);
+  background-image:
+    radial-gradient(
+      ellipse 70% 55% at 62% 58%,
+      oklch(0.5 0.12 46 / 0.75),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 45% 35% at 30% 30%,
+      oklch(0.66 0.11 58 / 0.45),
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at 75% 20%,
+      oklch(0.3 0.07 40 / 0.9),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--color-mars-900), var(--color-mars-950));
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    color: var(--color-label);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button {
+    touch-action: manipulation;
+  }
+
+  @media (prefers-contrast: more) {
+    :root {
+      --color-label-secondary: oklch(1 0 0 / 0.82);
+      --color-label-tertiary: oklch(1 0 0 / 0.64);
+      --color-separator: oklch(1 0 0 / 0.32);
+    }
+  }
+}

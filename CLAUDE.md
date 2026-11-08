@@ -23,7 +23,7 @@ El modelo dice qué sabemos (probabilidad de hielo a ≤ 1 m e incertidumbre por
 | `data/` | Datos | `layers.yaml`, `download.py`; datos en `data/raw/` (fuera de Git) |
 | `model/` | IA y modelo | Prior regional, clustering, anomalías, GP local, bloques, validación |
 | `planner/` | Planificador | FastAPI; hoy `app/mock_planner.py` (valores ilustrativos, `is_mock: true`) |
-| `web/` | Frontend | React + Vite + TS + CesiumJS (`Ellipsoid.MARS`, Cesium Mars); `web/mock/` para arrancar sin API |
+| `web/` | Frontend | Next.js 16 + TS + Tailwind v4 + Base UI (estilo visionOS) + CesiumJS (`Ellipsoid.MARS`, Cesium Mars); Bun; `web/mock/` para arrancar sin API |
 | `design/` | Diseño | Exports y assets |
 | `docs/` | Producto | `PRD.md`, `SOURCES.md`, `DECISIONS.md` |
 
@@ -38,12 +38,14 @@ cd planner && uvicorn app.main:app --reload        # API en :8000, docs en /docs
 cd planner && ruff check . && pytest -q            # lint + tests
 cd planner && python scripts/export_mocks.py       # regenera web/mock/*.json
 python data/download.py --list                     # capas y links
+cd web && bun install && bun run dev              # web en :3000 (usar Bun, no npm/pnpm)
+cd web && bun run lint && bun run typecheck && bun run test
 ```
 
 ## Reglas de trabajo
 
 - Mensajes de commit en español.
-- Ramas `rol/tarea`; PR con una revisión; `main` siempre desplegable. CI corre validación de contratos, ruff y pytest.
+- Ramas `rol/tarea`; PR con una revisión; `main` siempre desplegable. CI corre validación de contratos, ruff y pytest, y en `web/` lint, typecheck, tests y build con Bun.
 - Datos pesados (`.tif`, `.IMG`, `.JP2`) nunca a Git: GitHub Releases.
 - Unidades SI; coordenadas internas en metros de la grilla (`contracts/grid.json`), lat/lon solo hacia la web (`app/contracts.py:xy_to_lonlat`).
 - Secretos (token de Cesium ion, etc.) en `.env`, nunca commiteados.
