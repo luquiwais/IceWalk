@@ -7,7 +7,7 @@
 ## Respuesta corta
 
 - No existe un dato satelital de hielo a 10 m.
-- En S1094b, el hielo poroso empezaría cerca de 1 m, y el masivo a varios metros.
+- En S1094b, la capa resistente (hielo poroso, según Dundas) está a ~1 m solo en el 14 % de los cráteres, los de fondo plano. Con todos los cráteres, la mediana sería ~2.35 m. El hielo masivo empieza a varios metros. Ver la sección de la tabla de Dundas 2023.
 - Los **cráteres secundarios de fondo plano** dan profundidades reales desde órbita. Es el mejor dato fino que encontramos.
 - Recomendación: kriging de la **profundidad a la tabla de hielo con datos censurados**.
 

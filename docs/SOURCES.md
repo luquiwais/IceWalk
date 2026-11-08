@@ -62,6 +62,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Resource Prospector y MVP | Colaprete et al., https://ntrs.nasa.gov/api/citations/20150022157/downloads/20150022157.pdf; instrumentación, https://ntrs.nasa.gov/api/citations/20160005053/downloads/20160005053.pdf; Heldmann et al. (2015), https://www.hou.usra.edu/meetings/lpsc2015/pdf/2165.pdf; Elphic et al., https://ntrs.nasa.gov/api/citations/20160000570/downloads/20160000570.pdf |
 | Mars 2020: estrategia y operación | Sun y Sholes (2024), https://sfsholes.github.io/papers/SunSholes2024_Mars2020StrategicPlanningProcess.pdf; https://robotics.jpl.nasa.gov/media/documents/ro_final_v1.pdf |
 | Apollo: walkback y taladro | ALSJ, https://apollojournals.org/alsj/a17/a17.sta4.html; https://apollojournals.org/alsj/a15/a15mr-1.htm |
+| Viabilidad: ISRU, misiones de agua, instrumentos, variables orbitales y evaluación de sitios (unas 90 fuentes) | Tabla "Fuentes para docs/SOURCES.md" en `docs/research/viabilidad-expediciones.md` |
 | Kriging y expectation propagation para el GP | Rasmussen y Williams (2006), Gaussian Processes for Machine Learning, caps. 2 y 3, https://gaussianprocess.org/gpml/chapters/RW3.pdf |
 
 ## Supuestos del GP

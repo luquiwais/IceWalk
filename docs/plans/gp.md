@@ -40,9 +40,11 @@ Es el mismo razonamiento que hacer kriging de la profundidad de una napa, con pe
 | Cráter sin fondo plano | `d >` 0.1-0.2 × diámetro |
 | Taladro que toca hielo | `d ≈` valor medido |
 | Taladro que no toca | `d >` profundidad alcanzada |
-| Espectrómetro con "sí" | `d <` ~0.6 m |
-| Espectrómetro con "no" | `d >` ~0.6 m, si no hay falla del instrumento |
-| Radar en la caminata | `d ≈` valor medido a lo largo de la ruta |
+| Espectrómetro con "sí" | `d <` ~0.6 m. **A revisar:** mide hidrógeno y su alcance cae de forma gradual entre ~0.4 y 1 m; conviene una cota blanda |
+| Espectrómetro con "no" | `d >` ~0.6 m, si no hay falla del instrumento. Misma revisión |
+| Radar en la caminata | `d ≈` valor medido a lo largo de la ruta. **A revisar:** ve reflectores, no hielo, y sin permitividad conocida la profundidad tiene un error de decenas de % |
+
+Revisiones de `docs/research/viabilidad-expediciones.md`, pendientes en `model/gp/observations.py` (cuestión 30).
 
 **El mapa de calor sale solo:** `P(d ≤ 1 m)` en cada celda, o cualquier otro umbral que pida la STM. Para la probabilidad a 1 m, esto equivale al modelo binario anterior cuando el dato es solo sí o no: lo incluye como caso particular.
 
@@ -69,11 +71,11 @@ Es el mismo razonamiento que hacer kriging de la profundidad de una napa, con pe
 | Variable | Qué aporta | Resolución | Estado | Acción |
 | --- | --- | --- | --- | --- |
 | **Cráteres de fondo plano y no planos** | Profundidad directa | ≥ 5 m | Falta | **Sumar: prioridad máxima.** Lo mapea visión |
-| SWIM 0-1 m | Nivel general | 3 km | Registrada | Usar |
+| SWIM 0-1 m | Nivel general | 3 km | Registrada | Usar como covariable: el índice Ci no es una probabilidad |
 | SWIM 1-5 m y > 5 m | Capa masiva | 3 km | Falta | Sumar |
 | SWIM por fuente (neutrones, térmico, radar, geomorfología) | Control y sensibilidad | 3 km | Registradas | Usar sin contar dos veces lo que ya está en el combinado |
 | Latitud, elevación, diámetro | Prior regional, con Daubar | Puntos | Previstas | Usar en el prior |
-| THEMIS (inercia térmica) | Controla la estabilidad | 100 m | Registrada | Usar |
+| THEMIS (inercia térmica) | Controla la estabilidad | 100 m | Registrada | Probar con los 349 cráteres: la relación publicada vale para hielo a < 20-50 cm |
 | Albedo | Controla la estabilidad y la pérdida de hielo | Variable | Falta | Sumar al prior; localmente con cuidado, porque HiRISE RED no da albedo calibrado directo |
 | Pendiente, orientación y rugosidad | Mueven el límite de estabilidad | 1 m (DTM) | Solo como costo | Derivar como evidencia; peso bajo: el terreno es casi plano |
 | Formas del terreno (hummocky, cráteres expandidos, montículos, terrazas) | Indican **pérdida pasada** de hielo | Metros | Registrada, sin detallar | Separar por tipo |

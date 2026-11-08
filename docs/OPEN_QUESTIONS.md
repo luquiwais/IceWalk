@@ -7,6 +7,12 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | # | Cuestión | Recomendación | Quién | Desde |
 | --- | --- | --- | --- | --- |
 | 23 | ¿Planificador acepta las ramas como puntos de decisión con opciones ordenadas? Incluye qué `result` lleva un radar que ve hielo a 1.5 m | Luqui aprobó llevarlo como propuesta: opción C recortada de `research/decisiones-nasa.md`. Falta persona en el rol | Planificador | 05/11 |
+| 29 | ¿Cambia la pregunta del producto a "¿vale la caminata, con qué herramienta y adónde primero?", y el rol de la tripulación a delimitar el hielo y elegir dónde perforar? | Sí. Ver `research/viabilidad-expediciones.md` | Luqui + Producto | 08/11 |
+| 30 | ¿Se cambian el espectrómetro y el radar por observaciones blandas en `observations.py`? | Sí: hoy son las más sobreconfiadas | Luqui | 08/11 |
+| 31 | ¿Se suma la tarjeta de sitio (`site_assessment`, con `INSUFFICIENT_DATA`, `NO_GO`, `CONDITIONAL` y `GO`)? | Sí, sin tocar `/plan` ni `/replan`; umbrales como supuesto | Luqui + Plan y API | 08/11 |
+| 32 | ¿Corremos ya la simulación del paso 7, con la opción de apuntar a cráteres? | Sí, primero: elegir por varianza puede empatar con una grilla | Luqui | 08/11 |
+| 33 | ¿Corregimos el catálogo de herramientas (`measures`, análogos NSS y ALSD, masas, resolución del radar)? | Sí, en un PR de contrato | Todos | 08/11 |
+| 34 | ¿Cómo explicamos que Sizemore 2026 publique 97 cm para S1094b y nosotros una mediana de 2.35 m? | Sus 97 cm son los fondos planos; preparar la respuesta para el jurado | Luqui | 08/11 |
 | 27 | ¿Se mantiene el objetivo de hielo a ≤ 1 m? Con `0.2 × D` sería raro en el sitio: `P` ≈ 0.06, y ≈ 0.67 a ≤ 3 m | Mantener el umbral configurable y revisar la STM con el catálogo: el radar gana peso y el taladro de 1 m pierde | Luqui + Planificador | 05/11 |
 | 28 | Un dato informa unos 100-200 m. ¿Cambia el mensaje de la demo y el valor de medir? | Sí: mostrar el alcance real, y que el mapa fuera de ese radio sea el prior | Luqui | 05/11 |
 | 25 | ¿Se corrigen las 4 afirmaciones del PRD que no respalda la investigación de NASA? | Sí. Ver `research/decisiones-nasa.md` | Producto | 05/11 |
