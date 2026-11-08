@@ -98,11 +98,12 @@ def test_plan_goes_to_shallow_ice_and_respects_limits(tmap, model):
     stations = plan["stations"]
     survey = [s for s in stations if s["kind"] == "survey"]
     assert len(survey) >= 4
-    first = survey[0]
-    assert math.dist(first["position"], SHALLOW) < 200
-    assert first["p_ice"] > 0.5
+    # El orden es para caminar menos; la mejor estación de hielo está en el grupo somero.
+    best = max(survey, key=lambda st: st["p_ice"])
+    assert math.dist(best["position"], SHALLOW) < 200
+    assert best["p_ice"] > 0.5
     far = model.evaluate([-1000.0], [-1000.0])["p_ice"][0]
-    assert first["p_ice"] > far
+    assert best["p_ice"] > far
 
     s = plan["summary"]
     budget = STM["constraints"]["eva_max_h"] * 60 * (1 - STM["constraints"]["reserve"])
@@ -134,15 +135,24 @@ def test_targets_inserted_when_near_and_objectives_attached(tmap, model):
     assert 2 in best["objective_ranks"]  # pureza: en el sitio más confiable
 
 
-def test_branches_differ_by_result(tmap, model):
+def test_branches_exist_and_skip_measured_station(tmap, model):
     plan = build(tmap, model)
     by = {b["if_result"]: b["next_station_ids"] for b in plan["branches"]}
     assert set(by) == {"ice", "no_ice"}
-    assert by["ice"] != by["no_ice"]
     branched = next(b["station_id"] for b in plan["branches"])
     measures_ice = next(st for st in plan["stations"] if "core_drill" in st["tools"])
     assert branched == measures_ice["id"]
     assert branched not in by["ice"] + by["no_ice"]
+
+
+def test_branches_differ_when_the_measurement_is_the_only_information(tmap):
+    """Sin cráteres, un sí o un no en la primera estación cambia hacia dónde sigue la EVA.
+
+    Con un grupo de cráteres cerca pueden coincidir: un dato más casi no mueve el mapa allí.
+    """
+    plan = build(tmap, IceModel([], threshold_m=1.0, craters=0))
+    by = {b["if_result"]: b["next_station_ids"] for b in plan["branches"]}
+    assert by["ice"] != by["no_ice"]
 
 
 def test_replan_after_no_ice_moves_away_and_lowers_p(tmap, model):
@@ -181,3 +191,20 @@ def test_schedule_rejects_unreachable_return(tmap, model):
                            [1], ["core_drill"] * 1)
     # Diez estaciones de 40 min en la esquina no entran en el presupuesto.
     assert planner.schedule([far] * 10) is None
+
+
+def test_improve_removes_zigzag(tmap, model):
+    planner = EvaPlanner(STM, tmap, model, config=CONFIG)
+    planner.plan_stops()
+
+    def stop(x, y):
+        return eva_planner.Stop(x, y, tmap.cell(x, y), "survey", [1], ["camera_spectrometer"])
+
+    zigzag = [stop(500, 0), stop(-500, 0), stop(600, 0), stop(-600, 0)]
+    before = planner.schedule(zigzag)
+    better = planner.improve(list(zigzag))
+    after = planner.schedule(better)
+    assert after.end_min < before.end_min - 30  # ahorra más de 30 min de caminata
+    assert sorted((s.x, s.y) for s in better) == sorted((s.x, s.y) for s in zigzag)
+    assert all(v.margin_min >= 0 for v in after.visits)
+    assert planner.improve(list(better)) == better  # ya no mejora

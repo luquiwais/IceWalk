@@ -384,11 +384,43 @@ class EvaPlanner:
                 self.alerts.append(
                     _alert("advisory", f"Objective {req.rank} does not fit the EVA.")
                 )
-        # 3. Get Aheads: más estaciones de hielo con el tiempo que sobra.
-        for req in survey_reqs:
-            while add_survey(req):
-                pass
+        # 3. Get Aheads: más estaciones de hielo con el tiempo que sobra. Reordenar la ruta
+        #    libera tiempo, que se vuelve a ofrecer hasta que no entre ninguna más.
+        stops[:] = self.improve(stops)
+        while True:
+            added = False
+            for req in survey_reqs:
+                while add_survey(req):
+                    added = True
+            if not added:
+                break
+            stops[:] = self.improve(stops)
         self.planned_model = model
+        return stops
+
+    def improve(self, stops: list[Stop]) -> list[Stop]:
+        """Reordena para terminar antes (caminar menos), sin dejar estaciones sin margen.
+
+        Búsqueda local: invertir tramos (2-opt) y mover una estación a otra posición (or-opt),
+        mientras alguna de las dos acorte la EVA. Las estaciones no cambian, solo el orden.
+        """
+        best = self.schedule(stops)
+        if best is None or len(stops) < 3:
+            return stops
+        improved = True
+        while improved:
+            improved = False
+            n = len(stops)
+            trials = [stops[:i] + stops[i : j + 1][::-1] + stops[j + 1 :]
+                      for i in range(n - 1) for j in range(i + 1, n)]
+            for i in range(n):
+                rest = stops[:i] + stops[i + 1 :]
+                trials += [rest[:j] + [stops[i]] + rest[j:] for j in range(n) if j != i]
+            for trial in trials:
+                sched = self.schedule(trial)
+                if sched is not None and sched.end_min < best.end_min - 1e-6:
+                    stops, best, improved = trial, sched, True
+                    break
         return stops
 
 

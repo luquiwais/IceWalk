@@ -284,3 +284,5 @@ No verificado: el mapa FOM del DTM (calidad de correlación por píxel) y el rel
 | Tiempo con 349 cráteres sintéticos en el terreno real | Plan con ramas 1.1 s; re-plan 0.9 s; el 65 % es el reajuste del GP en cada believer | Dentro del umbral de 2 s propuesto |
 
 No verificado: el plan con el catálogo real de cráteres, que no está en este equipo.
+| Reordenar la ruta (2-opt + mover una estación), 4 juegos de 349 cráteres sintéticos en el terreno real | 1 de 4 mejora: −0.45 km, −14 min, margen mínimo de 5 a 19 min; en los otros 3 el orden codicioso ya era el mejor (3-4 estaciones de taladro). Sin costo de tiempo | Se mantiene: protege el margen cuando la elección zigzaguea |
+| Ramas con un grupo de 12 cráteres someros cerca | `ice` y `no_ice` dan la misma secuencia | Un dato más casi no mueve el mapa donde ya hay cráteres; las ramas solo difieren cuando la medición es la información nueva |

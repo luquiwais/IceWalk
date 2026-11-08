@@ -19,6 +19,7 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 | Herramientas desde la STM; mínimo por rango; objetivos fijos; tareas en el mejor sitio; Get Aheads | Hecho | `app/eva_planner.py` |
 | Elegir estaciones con el GP (potencial + incertidumbre, kriging believer) | Hecho | `app/eva_planner.py`, `app/ice.py` |
 | `/replan` con las mediciones acumuladas en el GP | Hecho | `app/main.py` |
+| Reordenar la ruta para caminar menos (2-opt, mover una estación) | Hecho | `EvaPlanner.improve` |
 | Timeline, tareas EV1/EV2, equipo con masa | Hecho (masas del catálogo, casi todas null) | `app/eva_planner.py` |
 | Ramas | Sobre la primera estación de hielo, re-planificando con el resultado simulado; forma final abierta (cuestión 23) | `app/eva_planner.py` |
 | Ventana de EVA y DONKI en vivo | Pendiente | `app/main.py` |
@@ -27,9 +28,8 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 
 1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui.
 2. Fijar `uncertainty`, `value` y los campos nuevos en el esquema (cuestión 41).
-3. Reordenar la ruta al final para caminar menos (2-opt), sin perder factibilidad.
-4. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
-5. Capas en GitHub Releases y carga al arrancar la API en el deploy.
+3. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
+4. Capas en GitHub Releases y carga al arrancar la API en el deploy.
 
 ## Cómo se corre
 
