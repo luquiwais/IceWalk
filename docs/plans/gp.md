@@ -134,7 +134,7 @@ Visión entrega un catálogo de cráteres (`resistant_layer_depth_m` o cota infe
 4. **Prior simple:** SWIM + Daubar, con validación por bloques, contra SWIM solo. Las variables locales (pendiente, rugosidad, THEMIS, textura con DINOv2) no mejoraron la predicción en los 349 cráteres (`EXPERIMENTS.md`, 2026-11-08): el detalle local sale de cráteres y mediciones.
 5. **Modelo de instrumentos y capas locales.**
 6. **Valor de medir y ramas,** conectados a `/plan` y `/replan`. **Acá existe el ciclo real.**
-7. **Simulación** con supuestos equivocados y las 3 estrategias.
+7. **Simulación (hecha como primera versión):** potencial + incertidumbre gana a la grilla donde hay cráteres; elegir por información o incertidumbre no gana. Ver `EXPERIMENTS.md`, 2026-11-08.
 
 **Plan B de calendario:** si el paso 6 no llega al 8 nov, usar el modelo binario o el gaussiano, con el criterio de ambigüedad.
 

@@ -11,7 +11,6 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 30 | ¿Se cambian el espectrómetro y el radar por observaciones blandas en `observations.py`? | Sí: hoy son las más sobreconfiadas | Luqui | 08/11 |
 | 36 | ¿Se corrige `layers.yaml` con lo de `research/recursos-y-ml.md`? SWIM se puede bajar por script, la URL de THEMIS es exacta, y los productos individuales de SWIM no aparecen en la página citada | Sí, en un solo cambio | Luqui | 08/11 |
 | 37 | ¿Hay imágenes HiRISE posteriores a feb 2023 con el cráter cubierto? El STAC de USGS lista 13 más; falta mirar cuáles tienen píxeles | Revisarlas: sirven para visión | Visión | 08/11 |
-| 32 | ¿Corremos ya la simulación del paso 7, con la opción de apuntar a cráteres? | Sí, primero: elegir por varianza puede empatar con una grilla | Luqui | 08/11 |
 | 33 | ¿Corregimos el catálogo de herramientas (`measures`, análogos NSS y ALSD, masas, resolución del radar)? | Sí, en un PR de contrato | Todos | 08/11 |
 | 34 | ¿Cómo explicamos que Sizemore 2026 publique 97 cm para S1094b y nosotros una mediana de 2.35 m? | Sus 97 cm son los fondos planos; preparar la respuesta para el jurado | Luqui | 08/11 |
 | 27 | ¿Se mantiene el objetivo de hielo a ≤ 1 m? Con `0.2 × D` sería raro en el sitio: `P` ≈ 0.06, y ≈ 0.67 a ≤ 3 m | Mantener el umbral configurable y revisar la STM con el catálogo: el radar gana peso y el taladro de 1 m pierde | Luqui + Planificador | 05/11 |

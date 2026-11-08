@@ -352,3 +352,41 @@ def test_coordenadas_invalidas_se_rechazan():
         result.predict([0.0, 1.0], [0.0])
     with pytest.raises(ValueError):
         result.predict([math.nan], [0.0])
+
+
+# Nugget y covarianza
+
+
+def test_nugget_invalido_se_rechaza():
+    with pytest.raises(ValueError):
+        Prior(0.0, Matern32(0.25, 200.0), nugget=-0.1)
+
+
+def test_nugget_suma_incertidumbre_en_los_mapas():
+    base = Prior(0.0, Matern32(0.25, 200.0))
+    noisy = Prior(0.0, Matern32(0.25, 200.0), nugget=0.25)
+    sd = posterior(base, []).maps([0.0], [0.0])["depth_sd"][0]
+    sd_noisy = posterior(noisy, []).maps([0.0], [0.0])["depth_sd"][0]
+    assert sd_noisy > sd
+
+
+def test_con_nugget_un_dato_no_deja_la_celda_resuelta():
+    prior = Prior(0.0, Matern32(0.15, 100.0), nugget=0.15)
+    result = posterior(prior, [measured_depth(0.0, 0.0, 1.0, 0.01, "drill")])
+    _, variance = result.predict([0.0], [0.0])
+    assert variance[0] > 0.05  # sin nugget quedaría en ~0.0001
+
+
+def test_covarianza_coincide_con_kriging_exacto():
+    observations = [flat_floor_crater(0.0, 0.0, 1.3), flat_floor_crater(150.0, 40.0, 0.8)]
+    x_obs, y_obs = np.array([0.0, 150.0]), np.array([0.0, 40.0])
+    xq, yq = np.array([70.0, 300.0, 20.0]), np.array([10.0, -20.0, 5.0])
+    kernel = PRIOR.kernel
+    noise = np.diag([(0.15 / 1.3) ** 2, (0.15 / 0.8) ** 2])
+    inv = np.linalg.inv(kernel(x_obs, y_obs, x_obs, y_obs) + noise)
+    cross = kernel(x_obs, y_obs, xq, yq)
+    expected = kernel(xq, yq, xq, yq) - cross.T @ inv @ cross
+    cov = posterior(PRIOR, observations).covariance(xq, yq)
+    assert cov == pytest.approx(expected, abs=1e-10)
+    _, variance = posterior(PRIOR, observations).predict(xq, yq)
+    assert np.diag(cov) == pytest.approx(variance, abs=1e-10)

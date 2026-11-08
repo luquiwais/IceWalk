@@ -31,14 +31,22 @@ _MIN_CAVITY_PRECISION = 1e-10
 
 @dataclass(frozen=True)
 class Prior:
-    """Prior constante, para el núcleo sintético. El prior con capas llega en el paso 4."""
+    """Prior constante, para el núcleo sintético. El prior con capas llega en el paso 4.
+
+    `nugget` es la varianza de `log d` que no se correlaciona entre puntos: variación a escala
+    menor que la celda. En S1094b es cerca de la mitad del total (ver `docs/EXPERIMENTS.md`). Se
+    suma al error de cada dato y a la incertidumbre de cada celda en `maps`.
+    """
 
     mean_log_depth: float
     kernel: Matern32
+    nugget: float = 0.0
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.mean_log_depth):
             raise ValueError("mean_log_depth debe ser finito")
+        if not math.isfinite(self.nugget) or self.nugget < 0:
+            raise ValueError(f"nugget debe ser finito y no negativo: {self.nugget}")
 
 
 def _factor(cov: np.ndarray, tau: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -140,8 +148,21 @@ class Posterior:
         mean = self.prior.mean_log_depth + self._alpha @ cross
         return mean, self.prior.kernel.sill - np.sum(half**2, axis=0)
 
+    def covariance(self, x_m, y_m) -> np.ndarray:
+        """Covarianza a posteriori de la parte espacial de `log d` entre los puntos (sin nugget)."""
+        x_m = np.asarray(x_m, dtype=float).ravel()
+        y_m = np.asarray(y_m, dtype=float).ravel()
+        prior_cov = self.prior.kernel(x_m, y_m, x_m, y_m)
+        if self._chol is None:
+            return prior_cov
+        cross = self.prior.kernel(self._x, self._y, x_m, y_m)
+        half = solve_triangular(
+            self._chol, self._sqrt_tau[:, None] * cross, lower=True, check_finite=False
+        )
+        return prior_cov - half.T @ half
+
     def predict(self, x_m, y_m, chunk_cells: int = _CHUNK_CELLS) -> tuple[np.ndarray, np.ndarray]:
-        """Media y varianza de `log d`. Acepta arreglos de cualquier forma; x e y, la misma."""
+        """Media y varianza de la parte espacial de `log d` (sin nugget). Cualquier forma."""
         x_m, y_m = np.asarray(x_m, dtype=float), np.asarray(y_m, dtype=float)
         if x_m.shape != y_m.shape:
             raise ValueError(f"x e y con formas distintas: {x_m.shape} y {y_m.shape}")
@@ -165,6 +186,7 @@ class Posterior:
         if not math.isfinite(threshold_m) or threshold_m <= 0:
             raise ValueError(f"threshold_m debe ser finito y positivo: {threshold_m}")
         mean, variance = self.predict(x_m, y_m)
+        variance = variance + self.prior.nugget
         p_ice = ndtr((math.log(threshold_m) - mean) / np.sqrt(variance))
         depth_mean = np.exp(mean + 0.5 * variance)
         return {
@@ -195,7 +217,8 @@ def posterior(
         return Posterior(prior, x_m, y_m, np.empty(0), np.empty(0), 0, True)
 
     targets = np.array([math.log(o.depth_m) for o in observations]) - prior.mean_log_depth
-    sigmas = np.array([o.sigma_log for o in observations], dtype=float)
+    # El nugget se integra como error independiente de cada dato: también vale para las cotas.
+    sigmas = np.sqrt(np.array([o.sigma_log for o in observations], dtype=float) ** 2 + prior.nugget)
     signs = np.array([_SIGN[o.kind] for o in observations])
     cov = prior.kernel(x_m, y_m, x_m, y_m)
     tau, nu, iterations, converged = _expectation_propagation(

@@ -152,6 +152,37 @@ Contra 300 permutaciones: mejor ventaja observada 0.98, p = 0.09. El 95 % del az
 
 **Conclusión:** no hay estructura espacial fuerte a escala del sitio, y sí potencia para verla: alcances ≥ 400 m con estructura marcada quedan descartados. Puede existir estructura débil de 100-200 m: hay un indicio no significativo, y ahí la potencia es solo parcial. **Un dato informa a lo sumo unos 100-200 m a su alrededor.** No se probó el efecto de variables locales (pendiente, THEMIS), que podrían explicar parte de la variación.
 
+## 2026-11-08: simulación del paso 7, ¿elegir dónde medir rinde más?
+
+Código: `model/gp/simulation.py`, con tests. Resultados en `data/processed/s1094b/simulation.json`, fuera de Git.
+
+**Cómo:** 60 mundos por escenario, sacados del modelo ajustado (media de `log d` 0.86, varianza 0.299, mitad espacial con alcance de 100 m y mitad nugget) y condicionados a los cráteres. Tres hábitats, con 157, 133 y 25 cráteres cerca. EVA de 6 estaciones, presupuesto de 8 km ida y vuelta, radio de 2 km, candidatas cada 100 m, herramienta de 1 m o 3 m. Siete estrategias en los mismos mundos; las diferencias van contra "repartida" (tipo grilla), con intervalo del 90 %. Todos los valores de la EVA son supuestos.
+
+**Hielo confirmado por EVA (estaciones con hielo dentro del alcance, de 6):**
+
+| Hábitat (cráteres cerca) | Alcance | Repartida | Blancos | Potencial + incertidumbre | Información | Máx. incertidumbre |
+| --- | --- | --- | --- | --- | --- | --- |
+| (-600, 2600) (157) | 1 m | 0.63 | 1.17 (+0.53 [0.26, 0.81]) | 1.17 (+0.53) | 1.02 (+0.38) | 0.28 (-0.35) |
+| (-600, 2600) (157) | 3 m | 3.98 | 5.25 (+1.27 [0.96, 1.57]) | 5.37 (+1.38 [1.08, 1.68]) | 3.58 (-0.40) | 4.07 (+0.08) |
+| (300, -2200) (133) | 1 m | 0.23 | 0.62 (+0.38 [0.21, 0.56]) | 0.62 (+0.38) | 0.57 (+0.33) | 0.45 (+0.22) |
+| (300, -2200) (133) | 3 m | 3.82 | 4.75 (+0.93 [0.60, 1.26]) | 4.68 (+0.87) | 3.68 (-0.13) | 4.20 (+0.38) |
+| (-300, -4600) (25) | 1 m | 0.30 | 0.40 (+0.10 [-0.12, 0.32]) | 0.40 | 0.40 | 0.22 |
+| (-300, -4600) (25) | 3 m | 4.13 | 3.97 (-0.17 [-0.55, 0.21]) | 3.97 | 4.05 | 4.10 |
+
+Con alcance de 1 m, la chance de confirmar al menos un punto con hielo sube de 0.47 a 0.77 en el primer hábitat y de 0.18 a 0.50 en el segundo.
+
+**Verdad distinta del modelo** (alcance real de 200 m y 80 % espacial; el modelo sigue suponiendo 100 m y 50 %), alcance de 3 m: blancos y potencial + incertidumbre ganan +1.3 a +2.0 puntos con hielo en los tres hábitats, incluido el de 25 cráteres. "Información" pierde entre 0.5 y 1.05.
+
+**Ambigüedad del sitio entero:** ninguna estrategia la baja más de ~0.12 %. Con alcance corto, una EVA no cambia el mapa del sitio.
+
+**Conclusión:**
+- **Apuntar a los puntos con más potencial, contando la incertidumbre, sí rinde más que una grilla**: entre +0.9 y +1.4 puntos con hielo de 6 donde hay cráteres cerca, y la chance de confirmar hielo a 1 m se multiplica por 1.6 a 2.8.
+- Donde casi no hay cráteres, no hay ventaja con el modelo ajustado. Si el hielo tiene más estructura que la estimada, la ventaja crece y aparece también ahí.
+- **Elegir "donde más se aprende" o "donde más incertidumbre hay" no le gana a la grilla.** La promesa del PRD de bajar la incertidumbre más que las estrategias simples no se sostiene.
+- Potencial + incertidumbre y blancos dan casi lo mismo.
+
+**Límites:** la verdad sale del mismo modelo, salvo en el caso distinto. Caminata en línea recta. El "próximo sitio" sale peor en blancos porque ya visitaron los mejores: es un efecto de la métrica. Son 60 mundos por escenario.
+
 ## 2026-11-08: ¿alguna variable del terreno predice la profundidad?
 
 Código en el repo: `model/gp/craters.py`, `covariates.py` y `covariate_test.py`. Resultados en `data/processed/s1094b/covariate_test.json`, fuera de Git.
