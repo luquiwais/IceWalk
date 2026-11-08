@@ -62,7 +62,7 @@ export type Plan = {
   route: { type: "FeatureCollection"; features: unknown[] };
   timeline: TimelineItem[];
   branches?: unknown[];
-  equipment?: unknown[];
+  equipment?: { tool: string; count: number; mass_kg?: number | null; justification?: string }[];
   summary: PlanSummary;
   alerts?: PlanAlert[];
 };

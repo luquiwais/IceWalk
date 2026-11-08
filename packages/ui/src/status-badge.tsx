@@ -2,6 +2,7 @@ import { Info, OctagonAlert, TriangleAlert } from "lucide-react";
 import type * as React from "react";
 
 import { MaterialLayers } from "./material";
+import { Subheadline } from "./text";
 import { cn } from "./utils";
 
 type AlertLevel = "advisory" | "caution" | "warning";
@@ -31,14 +32,18 @@ function StatusBadge({ level, children, className }: StatusBadgeProps) {
       role={level === "warning" ? "alert" : "status"}
       data-level={level}
       className={cn(
-        "vision-surface vision-platter relative inline-flex min-h-8 max-w-full items-center gap-2 self-start rounded-full py-1.5 pr-3.5 pl-3 text-subheadline",
+        "vision-surface vision-platter relative inline-flex min-h-8 max-w-full items-center gap-2 self-start rounded-full py-1.5 pr-3.5 pl-3",
         className,
       )}
     >
       <MaterialLayers kind="platter" />
       <Icon aria-hidden className={cn("size-4 shrink-0", color)} strokeWidth={2.5} />
-      <span className={cn("font-bold", color)}>{name}</span>
-      <span className="min-w-0 truncate">{children}</span>
+      <Subheadline as="span" tone="inherit" weight="bold" className={color}>
+        {name}
+      </Subheadline>
+      <Subheadline as="span" className="min-w-0 truncate">
+        {children}
+      </Subheadline>
     </div>
   );
 }

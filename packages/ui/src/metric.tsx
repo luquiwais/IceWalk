@@ -1,5 +1,6 @@
 import type * as React from "react";
 
+import { Callout, Footnote, Title2 } from "./text";
 import { cn } from "./utils";
 
 /** A grid of metrics. Real numbers stay visible: the users are technical. */
@@ -26,16 +27,20 @@ type MetricProps = {
 function Metric({ label, value, unit, className }: MetricProps) {
   return (
     <div className={cn("flex min-w-0 flex-col gap-0.5", className)}>
-      <dt className="vibrant-secondary truncate text-footnote">{label}</dt>
-      <dd className="text-title-2 whitespace-nowrap">
+      <Footnote as="dt" tone="secondary" className="truncate">
+        {label}
+      </Footnote>
+      <Title2 as="dd" className="whitespace-nowrap">
         <span className="tabular-nums">{value}</span>
         {unit ? (
           <>
             {" "}
-            <span className="vibrant-secondary text-callout">{unit}</span>
+            <Callout as="span" tone="secondary">
+              {unit}
+            </Callout>
           </>
         ) : null}
-      </dd>
+      </Title2>
     </div>
   );
 }

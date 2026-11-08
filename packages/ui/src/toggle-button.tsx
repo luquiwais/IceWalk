@@ -7,6 +7,7 @@ import type * as React from "react";
 import { ButtonContent, buttonVariants } from "./button";
 import { MaterialLayers } from "./material";
 import { cn } from "./utils";
+import { Vibrancy } from "./vibrancy";
 
 type ToggleButtonProps = TogglePrimitive.Props &
   VariantProps<typeof buttonVariants> & {
@@ -37,13 +38,13 @@ function ToggleButton({
       data-platter={isToolbar || !platter ? "false" : undefined}
       className={cn(
         buttonVariants({ shape, size }),
-        isToolbar && "h-11 px-5 text-[1.1875rem] leading-6",
+        isToolbar && "h-11 px-5 text-title-3 font-semibold",
         className,
       )}
       {...props}
     >
       <MaterialLayers kind="platter" />
-      <ButtonContent>{children as React.ReactNode}</ButtonContent>
+      <ButtonContent>{isToolbar ? <Vibrancy>{children as React.ReactNode}</Vibrancy> : children as React.ReactNode}</ButtonContent>
     </TogglePrimitive>
   );
 }

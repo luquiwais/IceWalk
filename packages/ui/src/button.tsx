@@ -11,7 +11,7 @@ import { cn } from "./utils";
 /*
  * visionOS buttons (Figma: Buttons). Sizes, paddings, radii and type come from
  * the kit:
- *   text    small 32 (px 12, 15/20) · regular 44 (px 20, 17/22) · large 52 (px 25, 19/24)
+ *   text    small 32 (px 12, Callout) · regular 44 (px 20, Body semibold) · large 52 (px 25, Title 3 semibold)
  *   symbol  mini 28 · small 32 · regular 44 · large 52 · extra-large 64
  *   radius  capsule; rounded rect 8 / 12 / 16
  * States (hover glow, pinch, disabled, selected) live in globals.css.
@@ -32,10 +32,10 @@ const buttonVariants = cva(
       },
       size: {
         mini: "h-7 px-2.5 text-footnote [&_svg]:size-3.5",
-        small: "h-8 px-3 text-[0.9375rem] leading-5 [&_svg]:size-4",
-        regular: "h-11 px-5 text-[1.0625rem] leading-[1.375rem] [&_svg]:size-5",
-        large: "h-13 px-[1.5625rem] text-[1.1875rem] leading-6 [&_svg]:size-6",
-        "extra-large": "h-16 px-7 text-[1.1875rem] leading-6 [&_svg]:size-7",
+        small: "h-8 px-3 text-callout [&_svg]:size-4",
+        regular: "h-11 px-5 text-body font-semibold [&_svg]:size-5",
+        large: "h-13 px-[1.5625rem] text-title-3 font-semibold [&_svg]:size-[1.625rem]",
+        "extra-large": "h-16 px-7 text-title-3 font-semibold [&_svg]:size-8",
       },
     },
     compoundVariants: [
@@ -86,6 +86,7 @@ function Button({
   return (
     <ButtonPrimitive
       data-slot="button"
+      data-control-size={size ?? "regular"}
       data-platter={variant === "plain" ? "false" : undefined}
       className={cn(buttonVariants({ shape, size }), className)}
       {...props}

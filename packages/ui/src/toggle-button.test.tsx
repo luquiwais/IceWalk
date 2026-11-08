@@ -28,4 +28,17 @@ describe("ToggleButton", () => {
 
     expect(onPressedChange).toHaveBeenCalledWith(false, expect.anything());
   });
+
+  it.each(["solid", "toolbar"] as const)("preserves a disabled %s toggle without activating it", async (appearance) => {
+    const onPressedChange = vi.fn();
+    render(<ToggleButton appearance={appearance} defaultPressed disabled onPressedChange={onPressedChange}>Probability</ToggleButton>);
+
+    const toggle = screen.getByRole("button", { name: "Probability" });
+    expect(toggle).toBeDisabled();
+    await userEvent.click(toggle);
+    await userEvent.tab();
+    expect(toggle).not.toHaveFocus();
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    expect(onPressedChange).not.toHaveBeenCalled();
+  });
 });

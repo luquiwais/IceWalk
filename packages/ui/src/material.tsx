@@ -5,15 +5,17 @@ import { cn } from "./utils";
 type MaterialKind = "glass" | "recessed" | "regular" | "thick" | "platter";
 
 const LAYERS: Record<MaterialKind, string[]> = {
-  glass: ["vision-glass", "vision-glass-stroke"],
+  glass: ["vision-glass-blur", "vision-glass", "vision-glass-stroke"],
   recessed: [
-    "vision-recessed-luminosity",
     "vision-recessed-burn",
+    "vision-recessed-luminosity",
+    "vision-recessed-overlay",
     "vision-recessed-shadow",
   ],
-  regular: ["vision-regular-burn", "vision-regular-luminosity"],
-  thick: ["vision-thick-burn", "vision-thick-luminosity"],
-  platter: ["vision-fill-lighten", "vision-fill-dodge"],
+  // Figma paints the first fill on top; DOM layers paint last on top.
+  regular: ["vision-regular-luminosity", "vision-regular-burn"],
+  thick: ["vision-thick-luminosity", "vision-thick-burn"],
+  platter: ["vision-fill-dodge", "vision-fill-lighten"],
 };
 
 /**
@@ -31,21 +33,34 @@ function MaterialLayers({ kind }: { kind: MaterialKind }) {
   );
 }
 
-type MaterialProps = React.ComponentProps<"div"> & { kind: MaterialKind };
+type ScrollDirection = "vertical" | "horizontal" | "both";
+
+/** Scroll content inside a material, never the element that paints its layers. */
+function SurfaceScroll({ direction = "vertical", className, ...props }: React.ComponentProps<"div"> & { direction?: ScrollDirection }) {
+  return <div data-slot="surface-scroll" className={cn(
+    "min-h-0 min-w-0 overscroll-contain",
+    direction === "vertical" && "overflow-x-hidden overflow-y-auto",
+    direction === "horizontal" && "overflow-x-auto overflow-y-hidden",
+    direction === "both" && "overflow-auto",
+    className,
+  )} {...props} />;
+}
+
+type MaterialProps = React.ComponentProps<"div"> & { kind: MaterialKind; scrollable?: ScrollDirection };
 
 /** A block with a visionOS material behind its content. */
-function Material({ kind, className, children, ...props }: MaterialProps) {
+function Material({ kind, className, children, scrollable, ...props }: MaterialProps) {
   return (
     <div
       data-slot="material"
-      className={cn("vision-surface relative", kind === "platter" && "vision-platter", className)}
+      className={cn("vision-surface relative", scrollable && "flex min-h-0 flex-col overflow-clip", kind === "platter" && "vision-platter", className)}
       {...props}
     >
       <MaterialLayers kind={kind} />
-      {children}
+      {scrollable ? <SurfaceScroll direction={scrollable} className="flex-1">{children}</SurfaceScroll> : children}
     </div>
   );
 }
 
-export { Material, MaterialLayers };
+export { Material, MaterialLayers, SurfaceScroll };
 export type { MaterialKind };

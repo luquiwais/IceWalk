@@ -2,7 +2,7 @@
 
 import { Toolbar } from "@base-ui/react/toolbar";
 
-import { MaterialLayers } from "./material";
+import { MaterialLayers, SurfaceScroll } from "./material";
 import { cn } from "./utils";
 
 /*
@@ -16,14 +16,16 @@ function Ornament({ className, children, ...props }: Toolbar.Root.Props) {
     <Toolbar.Root
       data-slot="ornament"
       className={cn(
-        "vision-surface relative flex items-center gap-2 rounded-full p-3 text-label [--glass-stroke-width:1.4px]",
+        "vision-surface relative flex items-center overflow-clip rounded-full p-3 text-label [--glass-stroke-width:1.4px]",
         "data-[orientation=vertical]:flex-col",
         className,
       )}
       {...props}
     >
       <MaterialLayers kind="glass" />
-      {children}
+      <SurfaceScroll direction={props.orientation === "vertical" ? "vertical" : "horizontal"} data-orientation={props.orientation} className="flex flex-1 items-center gap-2 [scrollbar-width:none] data-[orientation=vertical]:flex-col">
+        {children}
+      </SurfaceScroll>
     </Toolbar.Root>
   );
 }

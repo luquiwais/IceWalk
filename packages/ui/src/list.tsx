@@ -5,7 +5,9 @@ import { ChevronRight } from "lucide-react";
 import type * as React from "react";
 
 import { MaterialLayers } from "./material";
+import { Footnote, Title3 } from "./text";
 import { cn } from "./utils";
+import { Vibrancy } from "./vibrancy";
 
 type ListSectionProps = Omit<React.ComponentProps<"section">, "title"> & {
   /** Section header (Title 3), above the rows. */
@@ -27,15 +29,19 @@ function ListSection({ header, footer, headerId, className, children, ...props }
       {...props}
     >
       {header ? (
-        <h3 id={headerId} className="px-5 pb-[7px] text-title-3">
+        <Title3 as="h3" id={headerId} className="px-5 pb-[0.4375rem]">
           {header}
-        </h3>
+        </Title3>
       ) : null}
       <ul className="vision-surface relative flex flex-col rounded-row">
         <MaterialLayers kind="regular" />
         {children}
       </ul>
-      {footer ? <p className="vibrant-secondary px-5 pt-1.5 text-footnote">{footer}</p> : null}
+      {footer ? (
+        <Footnote tone="secondary" className="px-5 pt-2">
+          {footer}
+        </Footnote>
+      ) : null}
     </section>
   );
 }
@@ -46,10 +52,11 @@ type ListRowProps = {
   trailing?: React.ReactNode;
   /** Makes the row a button with a disclosure chevron. */
   onClick?: () => void;
+  disabled?: boolean;
   className?: string;
 };
 
-function ListRow({ children, trailing, onClick, className }: ListRowProps) {
+function ListRow({ children, trailing, onClick, disabled, className }: ListRowProps) {
   const content = (
     <>
       <span className="flex min-w-0 flex-1 items-center gap-3 text-left">{children}</span>
@@ -62,6 +69,7 @@ function ListRow({ children, trailing, onClick, className }: ListRowProps) {
       {onClick ? (
         <ButtonPrimitive
           onClick={onClick}
+          disabled={disabled}
           data-platter="false"
           className={cn(
             "vision-control vision-surface relative flex min-h-15 w-full items-center gap-2 py-2 pr-2 pl-5 text-body outline-none",
@@ -72,7 +80,7 @@ function ListRow({ children, trailing, onClick, className }: ListRowProps) {
           <MaterialLayers kind="platter" />
           {content}
           <span className="flex size-11 shrink-0 items-center justify-center">
-            <ChevronRight aria-hidden className="vibrant-secondary size-[18px]" strokeWidth={2.5} />
+            <Vibrancy><ChevronRight aria-hidden className="size-[18px]" strokeWidth={2.5} /></Vibrancy>
           </span>
         </ButtonPrimitive>
       ) : (

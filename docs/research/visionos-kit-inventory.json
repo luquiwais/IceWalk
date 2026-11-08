@@ -1,0 +1,2948 @@
+{
+  "fileKey": "TE1ta1HNhtbwSZn3LztSL5",
+  "inspected": "2026-11-08",
+  "pages": {
+    "Alerts": {
+      "page": "Alerts",
+      "groups": [
+        {
+          "id": "487:15548",
+          "name": "_Alert Buttons",
+          "variants": [
+            {
+              "id": "487:15549",
+              "name": "Type=Destructive, State=Idle"
+            },
+            {
+              "id": "487:15551",
+              "name": "Type=Destructive, State=Hover"
+            },
+            {
+              "id": "487:15553",
+              "name": "Type=Secondary, State=Idle"
+            },
+            {
+              "id": "487:15555",
+              "name": "Type=Secondary, State=Hover"
+            },
+            {
+              "id": "487:15557",
+              "name": "Type=Default, State=Idle"
+            },
+            {
+              "id": "487:15559",
+              "name": "Type=Default, State=Hover"
+            }
+          ]
+        },
+        {
+          "id": "487:15474",
+          "name": "Alert",
+          "variants": [
+            {
+              "id": "487:15475",
+              "name": "Type=Input Field and 2 Actions"
+            },
+            {
+              "id": "487:15484",
+              "name": "Type=Code"
+            },
+            {
+              "id": "487:15500",
+              "name": "Type=Code Input"
+            },
+            {
+              "id": "487:15516",
+              "name": "Type=3 Actions"
+            },
+            {
+              "id": "487:15526",
+              "name": "Type=2 Actions"
+            },
+            {
+              "id": "487:15535",
+              "name": "Type=1 Action"
+            },
+            {
+              "id": "487:15543",
+              "name": "Type=No Actions"
+            }
+          ]
+        }
+      ],
+      "standalone": [
+        {
+          "id": "501:4516",
+          "name": "Header"
+        }
+      ]
+    },
+    "Color Pickers": {
+      "page": "Color Pickers",
+      "groups": [
+        {
+          "id": "487:15576",
+          "name": "Color Picker",
+          "variants": [
+            {
+              "id": "487:15577",
+              "name": "Tab=Sliders"
+            },
+            {
+              "id": "487:15639",
+              "name": "Tab=Spectrum"
+            },
+            {
+              "id": "487:15673",
+              "name": "Tab=Grid"
+            }
+          ]
+        },
+        {
+          "id": "487:15835",
+          "name": "_Header Buttons",
+          "variants": [
+            {
+              "id": "487:15836",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:15838",
+              "name": "State=Idle (Platter)"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Dropdown Buttons": {
+      "page": "Dropdown Buttons",
+      "groups": [
+        {
+          "id": "487:10611",
+          "name": "Drop Down Button",
+          "variants": [
+            {
+              "id": "487:10612",
+              "name": "State=Disabled, Size=Regular"
+            },
+            {
+              "id": "2525:3605",
+              "name": "State=Disabled, Size=Small"
+            },
+            {
+              "id": "487:10615",
+              "name": "State=Selected, Size=Regular"
+            },
+            {
+              "id": "2525:3601",
+              "name": "State=Selected, Size=Small"
+            },
+            {
+              "id": "487:10618",
+              "name": "State=Hover, Size=Regular"
+            },
+            {
+              "id": "2525:3590",
+              "name": "State=Hover, Size=Small"
+            },
+            {
+              "id": "487:10623",
+              "name": "State=Idle (No Platter), Size=Regular"
+            },
+            {
+              "id": "2525:3587",
+              "name": "State=Idle (No Platter), Size=Small"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Menus": {
+      "page": "Menus",
+      "groups": [
+        {
+          "id": "487:11248",
+          "name": "Menu Item",
+          "variants": [
+            {
+              "id": "487:11249",
+              "name": "Selectable=True, State=Hover"
+            },
+            {
+              "id": "487:11261",
+              "name": "Selectable=True, State=Selected"
+            },
+            {
+              "id": "487:11273",
+              "name": "Selectable=True, State=Disabled"
+            },
+            {
+              "id": "487:11285",
+              "name": "Selectable=False, State=Hover"
+            },
+            {
+              "id": "487:11295",
+              "name": "Selectable=False, State=Selected"
+            },
+            {
+              "id": "487:11305",
+              "name": "Selectable=False, State=Disabled"
+            },
+            {
+              "id": "487:11315",
+              "name": "Selectable=True, State=Idle"
+            },
+            {
+              "id": "487:11325",
+              "name": "Selectable=False, State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "487:11335",
+          "name": "Context Menu",
+          "variants": [
+            {
+              "id": "487:11347",
+              "name": "Type=Actions + Accessory Bar"
+            },
+            {
+              "id": "487:11362",
+              "name": "Type=Selectable Options"
+            }
+          ]
+        },
+        {
+          "id": "487:11373",
+          "name": "_Accessory Button",
+          "variants": [
+            {
+              "id": "487:11374",
+              "name": "Property 1=Edit Action 1"
+            },
+            {
+              "id": "487:11376",
+              "name": "Property 1=Edit Action 3"
+            }
+          ]
+        }
+      ],
+      "standalone": [
+        {
+          "id": "548:11948",
+          "name": "Header"
+        },
+        {
+          "id": "548:11944",
+          "name": "Section Header"
+        },
+        {
+          "id": "548:11959",
+          "name": "Context Menu - Accessory Items Menu"
+        }
+      ]
+    },
+    "Notifications": {
+      "page": "Notifications",
+      "groups": [
+        {
+          "id": "487:17752",
+          "name": "_Notification Buttons",
+          "variants": [
+            {
+              "id": "487:17753",
+              "name": "Type=Destructive, State=Hover"
+            },
+            {
+              "id": "487:17755",
+              "name": "Type=Dismiss, State=Hover"
+            },
+            {
+              "id": "487:17757",
+              "name": "Type=Default, State=Hover"
+            },
+            {
+              "id": "487:17759",
+              "name": "Type=Destructive, State=Idle"
+            },
+            {
+              "id": "487:17761",
+              "name": "Type=Dismiss, State=Idle"
+            },
+            {
+              "id": "487:17763",
+              "name": "Type=Default, State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "487:17766",
+          "name": "_Header Buttons",
+          "variants": [
+            {
+              "id": "487:17767",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:17769",
+              "name": "State=Idle (Platter)"
+            }
+          ]
+        },
+        {
+          "id": "487:17771",
+          "name": "Notification",
+          "variants": [
+            {
+              "id": "487:17772",
+              "name": "Expanded=False"
+            },
+            {
+              "id": "487:17779",
+              "name": "Expanded=True"
+            }
+          ]
+        },
+        {
+          "id": "501:4250",
+          "name": "Temporary Notices",
+          "variants": [
+            {
+              "id": "501:4261",
+              "name": "Style=Button"
+            },
+            {
+              "id": "2525:1878",
+              "name": "Style=No Button"
+            }
+          ]
+        },
+        {
+          "id": "2525:3459",
+          "name": "_Symbol Type",
+          "variants": [
+            {
+              "id": "2525:1955",
+              "name": "Style=Icon"
+            },
+            {
+              "id": "2525:3462",
+              "name": "Style=Progress Indicator"
+            },
+            {
+              "id": "2525:3505",
+              "name": "Style=Image"
+            }
+          ]
+        }
+      ],
+      "standalone": [
+        {
+          "id": "548:8487",
+          "name": "_Content Preview"
+        }
+      ]
+    },
+    "Page Controls": {
+      "page": "Page Controls",
+      "groups": [
+        {
+          "id": "487:11697",
+          "name": "Page Control",
+          "variants": [
+            {
+              "id": "487:11698",
+              "name": "Mode=Dark, Dots=8+, Selection=8"
+            },
+            {
+              "id": "487:11710",
+              "name": "Mode=Dark, Dots=8+, Selection=7"
+            },
+            {
+              "id": "487:11722",
+              "name": "Mode=Dark, Dots=8+, Selection=6"
+            },
+            {
+              "id": "487:11734",
+              "name": "Mode=Dark, Dots=8+, Selection=5"
+            },
+            {
+              "id": "487:11750",
+              "name": "Mode=Dark, Dots=8+, Selection=4"
+            },
+            {
+              "id": "487:11762",
+              "name": "Mode=Dark, Dots=8+, Selection=3"
+            },
+            {
+              "id": "487:11774",
+              "name": "Mode=Dark, Dots=8+, Selection=2"
+            },
+            {
+              "id": "487:11786",
+              "name": "Mode=Dark, Dots=8+, Selection=1"
+            },
+            {
+              "id": "487:11798",
+              "name": "Mode=Dark, Dots=7, Selection=7"
+            },
+            {
+              "id": "487:11808",
+              "name": "Mode=Dark, Dots=7, Selection=6"
+            },
+            {
+              "id": "487:11818",
+              "name": "Mode=Dark, Dots=7, Selection=5"
+            },
+            {
+              "id": "487:11828",
+              "name": "Mode=Dark, Dots=7, Selection=4"
+            },
+            {
+              "id": "487:11838",
+              "name": "Mode=Dark, Dots=7, Selection=3"
+            },
+            {
+              "id": "487:11848",
+              "name": "Mode=Dark, Dots=7, Selection=2"
+            },
+            {
+              "id": "487:11858",
+              "name": "Mode=Dark, Dots=7, Selection=1"
+            },
+            {
+              "id": "487:11868",
+              "name": "Mode=Dark, Dots=6, Selection=6"
+            },
+            {
+              "id": "487:11876",
+              "name": "Mode=Dark, Dots=6, Selection=5"
+            },
+            {
+              "id": "487:11884",
+              "name": "Mode=Dark, Dots=6, Selection=4"
+            },
+            {
+              "id": "487:11892",
+              "name": "Mode=Dark, Dots=6, Selection=3"
+            },
+            {
+              "id": "487:11900",
+              "name": "Mode=Dark, Dots=6, Selection=2"
+            },
+            {
+              "id": "487:11908",
+              "name": "Mode=Dark, Dots=6, Selection=1"
+            },
+            {
+              "id": "487:11916",
+              "name": "Mode=Dark, Dots=5, Selection=5"
+            },
+            {
+              "id": "487:11923",
+              "name": "Mode=Dark, Dots=5, Selection=4"
+            },
+            {
+              "id": "487:11930",
+              "name": "Mode=Dark, Dots=5, Selection=3"
+            },
+            {
+              "id": "487:11937",
+              "name": "Mode=Dark, Dots=5, Selection=2"
+            },
+            {
+              "id": "487:11944",
+              "name": "Mode=Dark, Dots=5, Selection=1"
+            },
+            {
+              "id": "487:11951",
+              "name": "Mode=Dark, Dots=4, Selection=4"
+            },
+            {
+              "id": "487:11957",
+              "name": "Mode=Dark, Dots=4, Selection=3"
+            },
+            {
+              "id": "487:11963",
+              "name": "Mode=Dark, Dots=4, Selection=2"
+            },
+            {
+              "id": "487:11969",
+              "name": "Mode=Dark, Dots=4, Selection=1"
+            },
+            {
+              "id": "487:11975",
+              "name": "Mode=Dark, Dots=3, Selection=3"
+            },
+            {
+              "id": "487:11980",
+              "name": "Mode=Dark, Dots=3, Selection=2"
+            },
+            {
+              "id": "487:11985",
+              "name": "Mode=Dark, Dots=3, Selection=1"
+            },
+            {
+              "id": "487:11990",
+              "name": "Mode=Dark, Dots=2, Selection=2"
+            },
+            {
+              "id": "487:11994",
+              "name": "Mode=Dark, Dots=2, Selection=1"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Pickers": {
+      "page": "Pickers",
+      "groups": [
+        {
+          "id": "487:12000",
+          "name": "_Date Picker Days",
+          "variants": [
+            {
+              "id": "487:12001",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:12004",
+              "name": "State=Selected"
+            },
+            {
+              "id": "487:12006",
+              "name": "State=Default"
+            },
+            {
+              "id": "487:12008",
+              "name": "State=Null"
+            }
+          ]
+        },
+        {
+          "id": "487:12009",
+          "name": "Time Picker - Wheels",
+          "variants": [
+            {
+              "id": "487:12010",
+              "name": "Hover=Column 3"
+            },
+            {
+              "id": "487:12038",
+              "name": "Hover=Column 2"
+            },
+            {
+              "id": "487:12066",
+              "name": "Hover=Column 1"
+            },
+            {
+              "id": "487:12094",
+              "name": "Hover=None"
+            }
+          ]
+        },
+        {
+          "id": "487:12121",
+          "name": "Date Picker - Collapsed",
+          "variants": [
+            {
+              "id": "487:12122",
+              "name": "State=Disabled"
+            },
+            {
+              "id": "487:12125",
+              "name": "State=Selected"
+            },
+            {
+              "id": "487:12128",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:12131",
+              "name": "State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "487:12134",
+          "name": "Time Picker - Collapsed",
+          "variants": [
+            {
+              "id": "487:12135",
+              "name": "State=Disabled"
+            },
+            {
+              "id": "487:12137",
+              "name": "State=Selected"
+            },
+            {
+              "id": "487:12139",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:12141",
+              "name": "State=Idle"
+            }
+          ]
+        }
+      ],
+      "standalone": [
+        {
+          "id": "2578:2146",
+          "name": "Date Picker - Expanded"
+        }
+      ]
+    },
+    "Progress Indicators": {
+      "page": "Progress Indicators",
+      "groups": [
+        {
+          "id": "487:12235",
+          "name": "Activity Indicator",
+          "variants": [
+            {
+              "id": "487:12236",
+              "name": "Size=Medium"
+            },
+            {
+              "id": "487:12245",
+              "name": "Size=Large"
+            },
+            {
+              "id": "487:12254",
+              "name": "Size=Small"
+            }
+          ]
+        },
+        {
+          "id": "487:12263",
+          "name": "Progress Bar",
+          "variants": [
+            {
+              "id": "487:12264",
+              "name": "Value=100%"
+            },
+            {
+              "id": "487:12266",
+              "name": "Value=90%"
+            },
+            {
+              "id": "487:12268",
+              "name": "Value=80%"
+            },
+            {
+              "id": "487:12270",
+              "name": "Value=70%"
+            },
+            {
+              "id": "487:12272",
+              "name": "Value=60%"
+            },
+            {
+              "id": "487:12274",
+              "name": "Value=50%"
+            },
+            {
+              "id": "487:12276",
+              "name": "Value=40%"
+            },
+            {
+              "id": "487:12278",
+              "name": "Value=30%"
+            },
+            {
+              "id": "487:12280",
+              "name": "Value=20%"
+            },
+            {
+              "id": "487:12282",
+              "name": "Value=10%"
+            },
+            {
+              "id": "487:12284",
+              "name": "Value=0%"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Search Tokens": {
+      "page": "Search Tokens",
+      "groups": [
+        {
+          "id": "487:12288",
+          "name": "Search Tokens",
+          "variants": [
+            {
+              "id": "487:12289",
+              "name": "State=Selected"
+            },
+            {
+              "id": "487:12291",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:12295",
+              "name": "State=Idle (No Platter)"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Share Sheets": {
+      "page": "Share Sheets",
+      "groups": [
+        {
+          "id": "487:15875",
+          "name": "Share Sheet",
+          "variants": [
+            {
+              "id": "487:15876",
+              "name": "Type=Modal"
+            },
+            {
+              "id": "487:15902",
+              "name": "Type=No Collaboration"
+            },
+            {
+              "id": "487:15926",
+              "name": "Type=Collaboration"
+            }
+          ]
+        },
+        {
+          "id": "487:15951",
+          "name": "_App Icon",
+          "variants": [
+            {
+              "id": "487:15952",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:15955",
+              "name": "State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "487:15958",
+          "name": "_Contact",
+          "variants": [
+            {
+              "id": "487:15959",
+              "name": "State=Hover"
+            },
+            {
+              "id": "487:15962",
+              "name": "State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "548:13945",
+          "name": "_Row - Share Sheet",
+          "variants": [
+            {
+              "id": "548:13990",
+              "name": "Height=Regular, Position=Single"
+            },
+            {
+              "id": "548:13999",
+              "name": "Height=Regular, Position=Last"
+            },
+            {
+              "id": "548:14008",
+              "name": "Height=Regular, Position=Middle"
+            },
+            {
+              "id": "548:14017",
+              "name": "Height=Regular, Position=First"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Sliders": {
+      "page": "Sliders",
+      "groups": [
+        {
+          "id": "487:12699",
+          "name": "Slider - Segmented",
+          "variants": [
+            {
+              "id": "487:12700",
+              "name": "Size=Large, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:12711",
+              "name": "Size=Large, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:12721",
+              "name": "Size=Large, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:12731",
+              "name": "Size=Large, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:12741",
+              "name": "Size=Large, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:12751",
+              "name": "Size=Large, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:12763",
+              "name": "Size=Large, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:12775",
+              "name": "Size=Large, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:12787",
+              "name": "Size=Large, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:12799",
+              "name": "Size=Large, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:12811",
+              "name": "Size=Large, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:12823",
+              "name": "Size=Large, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:12835",
+              "name": "Size=Large, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:12847",
+              "name": "Size=Large, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:12859",
+              "name": "Size=Large, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:12871",
+              "name": "Size=Large, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:12882",
+              "name": "Size=Large, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:12893",
+              "name": "Size=Large, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:12904",
+              "name": "Size=Large, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:12915",
+              "name": "Size=Large, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:12926",
+              "name": "Size=Regular, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:12937",
+              "name": "Size=Regular, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:12947",
+              "name": "Size=Regular, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:12957",
+              "name": "Size=Regular, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:12967",
+              "name": "Size=Regular, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:12977",
+              "name": "Size=Regular, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:12989",
+              "name": "Size=Regular, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:13001",
+              "name": "Size=Regular, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:13013",
+              "name": "Size=Regular, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:13025",
+              "name": "Size=Regular, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:13037",
+              "name": "Size=Regular, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:13049",
+              "name": "Size=Regular, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:13061",
+              "name": "Size=Regular, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:13073",
+              "name": "Size=Regular, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:13085",
+              "name": "Size=Regular, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:13097",
+              "name": "Size=Regular, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:13108",
+              "name": "Size=Regular, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:13119",
+              "name": "Size=Regular, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:13130",
+              "name": "Size=Regular, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:13141",
+              "name": "Size=Regular, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:13152",
+              "name": "Size=Small, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:13163",
+              "name": "Size=Small, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:13173",
+              "name": "Size=Small, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:13183",
+              "name": "Size=Small, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:13193",
+              "name": "Size=Small, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:13203",
+              "name": "Size=Small, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:13215",
+              "name": "Size=Small, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:13227",
+              "name": "Size=Small, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:13239",
+              "name": "Size=Small, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:13251",
+              "name": "Size=Small, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:13263",
+              "name": "Size=Small, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:13275",
+              "name": "Size=Small, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:13287",
+              "name": "Size=Small, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:13299",
+              "name": "Size=Small, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:13311",
+              "name": "Size=Small, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:13323",
+              "name": "Size=Small, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:13334",
+              "name": "Size=Small, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:13345",
+              "name": "Size=Small, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:13356",
+              "name": "Size=Small, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:13367",
+              "name": "Size=Small, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:13378",
+              "name": "Size=Mini, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:13389",
+              "name": "Size=Mini, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:13399",
+              "name": "Size=Mini, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:13409",
+              "name": "Size=Mini, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:13419",
+              "name": "Size=Mini, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:13429",
+              "name": "Size=Mini, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:13441",
+              "name": "Size=Mini, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:13453",
+              "name": "Size=Mini, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:13465",
+              "name": "Size=Mini, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:13477",
+              "name": "Size=Mini, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:13489",
+              "name": "Size=Mini, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:13501",
+              "name": "Size=Mini, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:13513",
+              "name": "Size=Mini, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:13525",
+              "name": "Size=Mini, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:13537",
+              "name": "Size=Mini, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:13549",
+              "name": "Size=Mini, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:13560",
+              "name": "Size=Mini, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:13571",
+              "name": "Size=Mini, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:13582",
+              "name": "Size=Mini, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:13593",
+              "name": "Size=Mini, Value=0%, State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "487:13604",
+          "name": "Slider - Color",
+          "variants": [
+            {
+              "id": "487:13605",
+              "name": "Size=Large, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:13608",
+              "name": "Size=Large, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:13611",
+              "name": "Size=Large, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:13614",
+              "name": "Size=Large, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:13617",
+              "name": "Size=Large, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:13620",
+              "name": "Size=Large, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:13623",
+              "name": "Size=Large, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:13626",
+              "name": "Size=Large, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:13629",
+              "name": "Size=Large, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:13632",
+              "name": "Size=Large, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:13635",
+              "name": "Size=Large, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:13638",
+              "name": "Size=Large, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:13641",
+              "name": "Size=Large, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:13644",
+              "name": "Size=Large, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:13647",
+              "name": "Size=Large, Value=0%, State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "487:13650",
+          "name": "Slider - Min/Max Labels",
+          "variants": [
+            {
+              "id": "487:13651",
+              "name": "Size=Large, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:13656",
+              "name": "Size=Large, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:13661",
+              "name": "Size=Large, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:13666",
+              "name": "Size=Large, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:13671",
+              "name": "Size=Large, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:13676",
+              "name": "Size=Large, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:13684",
+              "name": "Size=Large, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:13692",
+              "name": "Size=Large, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:13700",
+              "name": "Size=Large, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:13708",
+              "name": "Size=Large, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:13716",
+              "name": "Size=Large, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:13724",
+              "name": "Size=Large, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:13732",
+              "name": "Size=Large, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:13740",
+              "name": "Size=Large, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:13748",
+              "name": "Size=Large, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:13756",
+              "name": "Size=Large, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:13761",
+              "name": "Size=Large, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:13766",
+              "name": "Size=Large, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:13771",
+              "name": "Size=Large, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:13776",
+              "name": "Size=Large, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:13781",
+              "name": "Size=Regular, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:13786",
+              "name": "Size=Regular, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:13791",
+              "name": "Size=Regular, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:13796",
+              "name": "Size=Regular, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:13801",
+              "name": "Size=Regular, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:13806",
+              "name": "Size=Regular, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:13814",
+              "name": "Size=Regular, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:13822",
+              "name": "Size=Regular, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:13830",
+              "name": "Size=Regular, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:13838",
+              "name": "Size=Regular, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:13846",
+              "name": "Size=Regular, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:13854",
+              "name": "Size=Regular, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:13862",
+              "name": "Size=Regular, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:13870",
+              "name": "Size=Regular, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:13878",
+              "name": "Size=Regular, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:13886",
+              "name": "Size=Regular, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:13891",
+              "name": "Size=Regular, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:13896",
+              "name": "Size=Regular, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:13901",
+              "name": "Size=Regular, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:13906",
+              "name": "Size=Regular, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:13911",
+              "name": "Size=Small, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:13916",
+              "name": "Size=Small, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:13921",
+              "name": "Size=Small, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:13926",
+              "name": "Size=Small, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:13931",
+              "name": "Size=Small, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:13936",
+              "name": "Size=Small, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:13944",
+              "name": "Size=Small, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:13952",
+              "name": "Size=Small, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:13960",
+              "name": "Size=Small, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:13968",
+              "name": "Size=Small, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:13976",
+              "name": "Size=Small, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:13984",
+              "name": "Size=Small, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:13992",
+              "name": "Size=Small, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:14000",
+              "name": "Size=Small, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:14008",
+              "name": "Size=Small, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:14016",
+              "name": "Size=Small, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:14021",
+              "name": "Size=Small, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:14026",
+              "name": "Size=Small, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:14031",
+              "name": "Size=Small, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:14036",
+              "name": "Size=Small, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:14041",
+              "name": "Size=Mini, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:14046",
+              "name": "Size=Mini, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:14051",
+              "name": "Size=Mini, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:14056",
+              "name": "Size=Mini, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:14061",
+              "name": "Size=Mini, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:14066",
+              "name": "Size=Mini, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:14074",
+              "name": "Size=Mini, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:14082",
+              "name": "Size=Mini, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:14090",
+              "name": "Size=Mini, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:14098",
+              "name": "Size=Mini, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:14106",
+              "name": "Size=Mini, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:14114",
+              "name": "Size=Mini, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:14122",
+              "name": "Size=Mini, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:14130",
+              "name": "Size=Mini, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:14138",
+              "name": "Size=Mini, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:14146",
+              "name": "Size=Mini, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:14151",
+              "name": "Size=Mini, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:14156",
+              "name": "Size=Mini, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:14161",
+              "name": "Size=Mini, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:14166",
+              "name": "Size=Mini, Value=0%, State=Idle"
+            }
+          ]
+        },
+        {
+          "id": "487:14171",
+          "name": "Slider - Default",
+          "variants": [
+            {
+              "id": "487:14172",
+              "name": "Size=Large, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:14175",
+              "name": "Size=Large, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:14178",
+              "name": "Size=Large, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:14181",
+              "name": "Size=Large, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:14184",
+              "name": "Size=Large, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:14187",
+              "name": "Size=Large, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:14194",
+              "name": "Size=Large, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:14200",
+              "name": "Size=Large, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:14206",
+              "name": "Size=Large, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:14212",
+              "name": "Size=Large, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:14218",
+              "name": "Size=Large, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:14224",
+              "name": "Size=Large, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:14230",
+              "name": "Size=Large, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:14236",
+              "name": "Size=Large, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:14242",
+              "name": "Size=Large, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:14248",
+              "name": "Size=Large, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:14251",
+              "name": "Size=Large, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:14254",
+              "name": "Size=Large, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:14257",
+              "name": "Size=Large, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:14260",
+              "name": "Size=Large, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:14263",
+              "name": "Size=Regular, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:14266",
+              "name": "Size=Regular, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:14269",
+              "name": "Size=Regular, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:14272",
+              "name": "Size=Regular, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:14275",
+              "name": "Size=Regular, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:14278",
+              "name": "Size=Regular, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:14284",
+              "name": "Size=Regular, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:14290",
+              "name": "Size=Regular, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:14296",
+              "name": "Size=Regular, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:14302",
+              "name": "Size=Regular, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:14308",
+              "name": "Size=Regular, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:14314",
+              "name": "Size=Regular, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:14320",
+              "name": "Size=Regular, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:14326",
+              "name": "Size=Regular, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:14332",
+              "name": "Size=Regular, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:14338",
+              "name": "Size=Regular, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:14341",
+              "name": "Size=Regular, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:14344",
+              "name": "Size=Regular, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:14347",
+              "name": "Size=Regular, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:14350",
+              "name": "Size=Regular, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:14353",
+              "name": "Size=Small, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:14355",
+              "name": "Size=Small, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:14357",
+              "name": "Size=Small, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:14359",
+              "name": "Size=Small, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:14361",
+              "name": "Size=Small, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:14363",
+              "name": "Size=Small, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:14368",
+              "name": "Size=Small, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:14373",
+              "name": "Size=Small, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:14378",
+              "name": "Size=Small, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:14383",
+              "name": "Size=Small, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:14388",
+              "name": "Size=Small, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:14393",
+              "name": "Size=Small, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:14398",
+              "name": "Size=Small, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:14403",
+              "name": "Size=Small, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:14408",
+              "name": "Size=Small, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:14413",
+              "name": "Size=Small, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:14415",
+              "name": "Size=Small, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:14417",
+              "name": "Size=Small, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:14419",
+              "name": "Size=Small, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:14421",
+              "name": "Size=Small, Value=0%, State=Idle"
+            },
+            {
+              "id": "487:14423",
+              "name": "Size=Mini, Value=100%, State=Disabled"
+            },
+            {
+              "id": "487:14425",
+              "name": "Size=Mini, Value=75%, State=Disabled"
+            },
+            {
+              "id": "487:14427",
+              "name": "Size=Mini, Value=50%, State=Disabled"
+            },
+            {
+              "id": "487:14429",
+              "name": "Size=Mini, Value=25%, State=Disabled"
+            },
+            {
+              "id": "487:14431",
+              "name": "Size=Mini, Value=0%, State=Disabled"
+            },
+            {
+              "id": "487:14433",
+              "name": "Size=Mini, Value=100%, State=Pinch"
+            },
+            {
+              "id": "487:14438",
+              "name": "Size=Mini, Value=75%, State=Pinch"
+            },
+            {
+              "id": "487:14443",
+              "name": "Size=Mini, Value=50%, State=Pinch"
+            },
+            {
+              "id": "487:14448",
+              "name": "Size=Mini, Value=25%, State=Pinch"
+            },
+            {
+              "id": "487:14453",
+              "name": "Size=Mini, Value=0%, State=Pinch"
+            },
+            {
+              "id": "487:14458",
+              "name": "Size=Mini, Value=100%, State=Hover"
+            },
+            {
+              "id": "487:14463",
+              "name": "Size=Mini, Value=75%, State=Hover"
+            },
+            {
+              "id": "487:14468",
+              "name": "Size=Mini, Value=50%, State=Hover"
+            },
+            {
+              "id": "487:14473",
+              "name": "Size=Mini, Value=25%, State=Hover"
+            },
+            {
+              "id": "487:14478",
+              "name": "Size=Mini, Value=0%, State=Hover"
+            },
+            {
+              "id": "487:14483",
+              "name": "Size=Mini, Value=100%, State=Idle"
+            },
+            {
+              "id": "487:14485",
+              "name": "Size=Mini, Value=75%, State=Idle"
+            },
+            {
+              "id": "487:14487",
+              "name": "Size=Mini, Value=50%, State=Idle"
+            },
+            {
+              "id": "487:14489",
+              "name": "Size=Mini, Value=25%, State=Idle"
+            },
+            {
+              "id": "487:14491",
+              "name": "Size=Mini, Value=0%, State=Idle"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Text Fields": {
+      "page": "Text Fields",
+      "groups": [
+        {
+          "id": "487:10783",
+          "name": "Secure Field",
+          "variants": [
+            {
+              "id": "487:10784",
+              "name": "State=Disabled, Shape=Pill"
+            },
+            {
+              "id": "487:10787",
+              "name": "State=Typing, Shape=Pill"
+            },
+            {
+              "id": "487:10794",
+              "name": "State=Hover, Shape=Pill"
+            },
+            {
+              "id": "487:10799",
+              "name": "State=Idle, Shape=Pill"
+            },
+            {
+              "id": "487:10802",
+              "name": "State=Disabled, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10805",
+              "name": "State=Typing, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10812",
+              "name": "State=Hover, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10817",
+              "name": "State=Idle, Shape=Rounded Rect"
+            }
+          ]
+        },
+        {
+          "id": "487:10718",
+          "name": "Search Field",
+          "variants": [
+            {
+              "id": "487:10719",
+              "name": "State=Disabled, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10723",
+              "name": "State=Quicktation, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10727",
+              "name": "State=Hover+Dwell, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10733",
+              "name": "State=Typing, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10741",
+              "name": "State=Hover, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10747",
+              "name": "State=Idle, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10751",
+              "name": "State=Disabled, Shape=Pill"
+            },
+            {
+              "id": "487:10755",
+              "name": "State=Quicktation, Shape=Pill"
+            },
+            {
+              "id": "487:10759",
+              "name": "State=Hover+Dwell, Shape=Pill"
+            },
+            {
+              "id": "487:10765",
+              "name": "State=Typing, Shape=Pill"
+            },
+            {
+              "id": "487:10773",
+              "name": "State=Hover, Shape=Pill"
+            },
+            {
+              "id": "487:10779",
+              "name": "State=Idle, Shape=Pill"
+            }
+          ]
+        },
+        {
+          "id": "487:10689",
+          "name": "Text Field",
+          "variants": [
+            {
+              "id": "487:10690",
+              "name": "State=Disabled, Shape=Pill"
+            },
+            {
+              "id": "487:10692",
+              "name": "State=Typing, Shape=Pill"
+            },
+            {
+              "id": "487:10698",
+              "name": "State=Hover, Shape=Pill"
+            },
+            {
+              "id": "487:10702",
+              "name": "State=Idle, Shape=Pill"
+            },
+            {
+              "id": "487:10704",
+              "name": "State=Disabled, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10706",
+              "name": "State=Typing, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10712",
+              "name": "State=Hover, Shape=Rounded Rect"
+            },
+            {
+              "id": "487:10716",
+              "name": "State=Idle, Shape=Rounded Rect"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Toggles and Checkboxes": {
+      "page": "Toggles and Checkboxes",
+      "groups": [
+        {
+          "id": "487:10602",
+          "name": "Checkbox",
+          "variants": [
+            {
+              "id": "487:10603",
+              "name": "State=Hover, Selected=True"
+            },
+            {
+              "id": "487:10605",
+              "name": "State=Idle, Selected=True"
+            },
+            {
+              "id": "487:10607",
+              "name": "State=Hover, Selected=False"
+            },
+            {
+              "id": "487:10608",
+              "name": "State=Idle, Selected=False"
+            }
+          ]
+        },
+        {
+          "id": "501:4274",
+          "name": "Toggle",
+          "variants": [
+            {
+              "id": "501:4275",
+              "name": "On=False, State=Disabled"
+            },
+            {
+              "id": "501:4277",
+              "name": "On=True, State=Disabled"
+            },
+            {
+              "id": "501:4279",
+              "name": "On=False, State=Idle"
+            },
+            {
+              "id": "501:4281",
+              "name": "On=False, State=Hover"
+            },
+            {
+              "id": "501:4283",
+              "name": "On=False, State=Pinch"
+            },
+            {
+              "id": "501:4285",
+              "name": "On=True, State=Idle"
+            },
+            {
+              "id": "501:4287",
+              "name": "On=True, State=Hover"
+            },
+            {
+              "id": "501:4289",
+              "name": "On=True, State=Pinch"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Keyboards": {
+      "page": "Keyboards",
+      "groups": [],
+      "standalone": [
+        {
+          "id": "548:12400",
+          "name": "Keyboard"
+        }
+      ]
+    },
+    "SharePlay": {
+      "page": "SharePlay",
+      "groups": [
+        {
+          "id": "487:17809",
+          "name": "System Activities",
+          "variants": [
+            {
+              "id": "487:17810",
+              "name": "Type=App Icon + Button"
+            },
+            {
+              "id": "487:17819",
+              "name": "Type=Icon + Button"
+            },
+            {
+              "id": "487:17828",
+              "name": "Type=Session UI"
+            }
+          ]
+        },
+        {
+          "id": "501:4206",
+          "name": "Requests",
+          "variants": [
+            {
+              "id": "501:4207",
+              "name": "Type=Text Only"
+            },
+            {
+              "id": "501:4223",
+              "name": "Type=FaceTime Invite"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    },
+    "Gestures": {
+      "page": "Gestures",
+      "groups": [
+        {
+          "id": "518:1041",
+          "name": "Gesture-One-Hand",
+          "variants": [
+            {
+              "id": "546:2186",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2189",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2192",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2195",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2197",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2199",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2201",
+              "name": "Person=5, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2204",
+              "name": "Person=5, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2207",
+              "name": "Person=5, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2210",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2213",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2216",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2219",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2221",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2223",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2225",
+              "name": "Person=4, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2228",
+              "name": "Person=4, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2231",
+              "name": "Person=4, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2234",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2237",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2240",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2243",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2245",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2247",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2249",
+              "name": "Person=3, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2252",
+              "name": "Person=3, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2255",
+              "name": "Person=3, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2258",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2261",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2264",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2267",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2269",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2271",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2273",
+              "name": "Person=2, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2276",
+              "name": "Person=2, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2279",
+              "name": "Person=2, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2282",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2285",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2288",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2291",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2293",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2295",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2297",
+              "name": "Person=1, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2300",
+              "name": "Person=1, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "546:2303",
+              "name": "Person=1, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Right"
+            },
+            {
+              "id": "518:4881",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4878",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4875",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4872",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4869",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4866",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4860",
+              "name": "Person=5, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4857",
+              "name": "Person=5, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4863",
+              "name": "Person=5, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4908",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4905",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4902",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4899",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4896",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4893",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4887",
+              "name": "Person=4, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "546:1570",
+              "name": "Person=4, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4890",
+              "name": "Person=4, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4935",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4932",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4929",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4926",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4923",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4920",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4914",
+              "name": "Person=3, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4911",
+              "name": "Person=3, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4917",
+              "name": "Person=3, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4962",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4959",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4956",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4953",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4950",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4947",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4941",
+              "name": "Person=2, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4938",
+              "name": "Person=2, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4944",
+              "name": "Person=2, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4989",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4986",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4983",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4980",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4977",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4974",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4968",
+              "name": "Person=1, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4965",
+              "name": "Person=1, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "518:4971",
+              "name": "Person=1, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Right"
+            },
+            {
+              "id": "546:2636",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2639",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2642",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2645",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2647",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2649",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2651",
+              "name": "Person=5, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2654",
+              "name": "Person=5, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2657",
+              "name": "Person=5, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2660",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2663",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2666",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2669",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2671",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2673",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2675",
+              "name": "Person=4, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2678",
+              "name": "Person=4, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2681",
+              "name": "Person=4, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2684",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2687",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2690",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2693",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2695",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2697",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2699",
+              "name": "Person=3, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2702",
+              "name": "Person=3, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2705",
+              "name": "Person=3, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2708",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2711",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2714",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2717",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2719",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2721",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2723",
+              "name": "Person=2, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2726",
+              "name": "Person=2, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2729",
+              "name": "Person=2, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2732",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2735",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2738",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2741",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2743",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2745",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2747",
+              "name": "Person=1, Gesture=Point, Arm Roll=Outwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2750",
+              "name": "Person=1, Gesture=Point, Arm Roll=Inwards, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2753",
+              "name": "Person=1, Gesture=Point, Arm Roll=Neutral, Opacity=Semi, Hand=Left"
+            },
+            {
+              "id": "546:2756",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2759",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2762",
+              "name": "Person=5, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2765",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2767",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2769",
+              "name": "Person=5, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2771",
+              "name": "Person=5, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2774",
+              "name": "Person=5, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2777",
+              "name": "Person=5, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2780",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2783",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2786",
+              "name": "Person=4, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2789",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2791",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2793",
+              "name": "Person=4, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2795",
+              "name": "Person=4, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2798",
+              "name": "Person=4, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2801",
+              "name": "Person=4, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2804",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2807",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2810",
+              "name": "Person=3, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2813",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2815",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2817",
+              "name": "Person=3, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2819",
+              "name": "Person=3, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2822",
+              "name": "Person=3, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2825",
+              "name": "Person=3, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2828",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2831",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2834",
+              "name": "Person=2, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2837",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2839",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2841",
+              "name": "Person=2, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2843",
+              "name": "Person=2, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2846",
+              "name": "Person=2, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2849",
+              "name": "Person=2, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2852",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2855",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2858",
+              "name": "Person=1, Gesture=Pinch, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2861",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2863",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2865",
+              "name": "Person=1, Gesture=Pinch - Halfway, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2867",
+              "name": "Person=1, Gesture=Point, Arm Roll=Outwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2870",
+              "name": "Person=1, Gesture=Point, Arm Roll=Inwards, Opacity=Full, Hand=Left"
+            },
+            {
+              "id": "546:2873",
+              "name": "Person=1, Gesture=Point, Arm Roll=Neutral, Opacity=Full, Hand=Left"
+            }
+          ]
+        },
+        {
+          "id": "518:2267",
+          "name": "Gesture-Two-Hands",
+          "variants": [
+            {
+              "id": "518:3272",
+              "name": "Person=5, Arm Roll=Outwards, Opacity=Full"
+            },
+            {
+              "id": "548:1538",
+              "name": "Person=5, Arm Roll=Outwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3275",
+              "name": "Person=5, Arm Roll=Inwards, Opacity=Full"
+            },
+            {
+              "id": "548:1545",
+              "name": "Person=5, Arm Roll=Inwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3278",
+              "name": "Person=5, Arm Roll=Neutral, Opacity=Full"
+            },
+            {
+              "id": "548:1552",
+              "name": "Person=5, Arm Roll=Neutral, Opacity=Semi"
+            },
+            {
+              "id": "518:3281",
+              "name": "Person=4, Arm Roll=Outwards, Opacity=Full"
+            },
+            {
+              "id": "548:1559",
+              "name": "Person=4, Arm Roll=Outwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3284",
+              "name": "Person=4, Arm Roll=Inwards, Opacity=Full"
+            },
+            {
+              "id": "548:1566",
+              "name": "Person=4, Arm Roll=Inwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3287",
+              "name": "Person=4, Arm Roll=Neutral, Opacity=Full"
+            },
+            {
+              "id": "548:1573",
+              "name": "Person=4, Arm Roll=Neutral, Opacity=Semi"
+            },
+            {
+              "id": "518:3290",
+              "name": "Person=3, Arm Roll=Outwards, Opacity=Full"
+            },
+            {
+              "id": "548:1580",
+              "name": "Person=3, Arm Roll=Outwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3293",
+              "name": "Person=3, Arm Roll=Inwards, Opacity=Full"
+            },
+            {
+              "id": "548:1587",
+              "name": "Person=3, Arm Roll=Inwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3296",
+              "name": "Person=3, Arm Roll=Neutral, Opacity=Full"
+            },
+            {
+              "id": "548:1594",
+              "name": "Person=3, Arm Roll=Neutral, Opacity=Semi"
+            },
+            {
+              "id": "518:3299",
+              "name": "Person=2, Arm Roll=Outwards, Opacity=Full"
+            },
+            {
+              "id": "548:1601",
+              "name": "Person=2, Arm Roll=Outwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3302",
+              "name": "Person=2, Arm Roll=Inwards, Opacity=Full"
+            },
+            {
+              "id": "548:1608",
+              "name": "Person=2, Arm Roll=Inwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3305",
+              "name": "Person=2, Arm Roll=Neutral, Opacity=Full"
+            },
+            {
+              "id": "548:1615",
+              "name": "Person=2, Arm Roll=Neutral, Opacity=Semi"
+            },
+            {
+              "id": "518:3308",
+              "name": "Person=1, Arm Roll=Outwards, Opacity=Full"
+            },
+            {
+              "id": "548:1622",
+              "name": "Person=1, Arm Roll=Outwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3311",
+              "name": "Person=1, Arm Roll=Inwards, Opacity=Full"
+            },
+            {
+              "id": "548:1629",
+              "name": "Person=1, Arm Roll=Inwards, Opacity=Semi"
+            },
+            {
+              "id": "518:3314",
+              "name": "Person=1, Arm Roll=Neutral, Opacity=Full"
+            },
+            {
+              "id": "548:1636",
+              "name": "Person=1, Arm Roll=Neutral, Opacity=Semi"
+            }
+          ]
+        },
+        {
+          "id": "527:51670",
+          "name": "Gesture-Graphic",
+          "variants": [
+            {
+              "id": "526:51509",
+              "name": "Gesture=Tap"
+            },
+            {
+              "id": "527:51671",
+              "name": "Gesture=Double Tap"
+            },
+            {
+              "id": "527:51689",
+              "name": "Gesture=Triple Tap"
+            }
+          ]
+        }
+      ],
+      "standalone": []
+    }
+  }
+}

@@ -70,4 +70,15 @@ describe("SegmentedControl", () => {
       "true",
     );
   });
+
+  it("disables the entire group while retaining its selected value", async () => {
+    const onValueChange = vi.fn();
+    render(<SegmentedControl label="View" options={views} defaultValue="planning" disabled onValueChange={onValueChange} />);
+
+    // Base UI uses aria-disabled so tabs remain discoverable to assistive tech.
+    for (const option of screen.getAllByRole("tab")) expect(option).toHaveAttribute("aria-disabled", "true");
+    await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+    expect(screen.getByRole("tab", { name: "Planning" })).toHaveAttribute("aria-selected", "true");
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
 });

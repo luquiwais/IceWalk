@@ -22,8 +22,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
-      <body className="mars-backdrop min-h-full">{children}</body>
+    <html lang="en" data-theme="dark" className={`dark ${inter.variable} h-full`}>
+      <body className="min-h-full bg-black">{children}</body>
     </html>
   );
 }

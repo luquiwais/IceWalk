@@ -10,7 +10,8 @@ describe("Metric", () => {
     const term = screen.getByText("Distance");
     const value = screen.getByText("7.2");
 
-    expect(term.tagName).toBe("DT");
+    // Decorative vibrancy spans must preserve the definition-list semantics.
+    expect(term.closest("dt")).toHaveTextContent("Distance");
     expect(value.closest("dd")).toHaveTextContent("7.2 km");
   });
 

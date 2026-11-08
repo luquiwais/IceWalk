@@ -1,17 +1,19 @@
 import type * as React from "react";
 
 import { MaterialLayers } from "./material";
+import { LargeTitle } from "./text";
 import { cn } from "./utils";
 
 /*
- * visionOS window (Figma: Examples > Window): glass with a 1px edge and a
- * 46 pt corner radius. The HIG asks to keep the glass (no opaque backgrounds).
+ * visionOS window (Figma: Examples > Window): glass with a 1px edge and a 46pt
+ * corner radius. Default size in the kit is 1280x720pt. The HIG asks to keep
+ * the glass (no opaque backgrounds).
  */
 function Window({ className, children, ...props }: React.ComponentProps<"section">) {
   return (
     <section
       data-slot="window"
-      className={cn("vision-surface relative flex min-w-0 flex-col rounded-window text-label", className)}
+      className={cn("vision-surface relative flex min-w-0 overflow-clip rounded-window text-label", className)}
       {...props}
     >
       <MaterialLayers kind="glass" />
@@ -20,54 +22,76 @@ function Window({ className, children, ...props }: React.ComponentProps<"section
   );
 }
 
-type WindowHeaderProps = Omit<React.ComponentProps<"header">, "title"> & {
+type NavigationBarProps = Omit<React.ComponentProps<"header">, "title"> & {
   title: React.ReactNode;
-  subtitle?: React.ReactNode;
-  /** Trailing controls, e.g. icon buttons. */
-  actions?: React.ReactNode;
+  /** Centered title (default) or leading title. */
+  titleAlign?: "center" | "leading";
+  leading?: React.ReactNode;
+  trailing?: React.ReactNode;
   level?: 1 | 2 | 3;
-  /** Id for the heading, so the window can reference it with aria-labelledby. */
+  /** Id for the heading, so a region can reference it with aria-labelledby. */
   id?: string;
 };
 
-/** Navigation bar (Figma: Navigation Bars): 92 pt tall, Large Title, 24 pt margins. */
-function WindowHeader({
+/*
+ * Navigation bar (Figma: Navigation Bars): 92pt tall, 24pt side margins,
+ * items spread to both ends. Centered title: Large Title (29 bold) in a 562pt
+ * box centered on the bar. Symbol buttons of 44 with 16 between them.
+ */
+function NavigationBar({
   title,
-  subtitle,
-  actions,
+  titleAlign = "center",
+  leading,
+  trailing,
   level = 2,
   id,
   className,
   ...props
-}: WindowHeaderProps) {
-  const Heading = `h${level}` as const;
-
+}: NavigationBarProps) {
   return (
     <header
-      data-slot="window-header"
-      className={cn("flex min-h-23 items-center gap-4 px-6 py-4", className)}
+      data-slot="navigation-bar"
+      className={cn("relative flex h-23 shrink-0 items-center justify-between gap-4 px-6", className)}
       {...props}
     >
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Heading id={id} className="truncate text-large-title text-balance">
-          {title}
-        </Heading>
-        {subtitle ? <p className="vibrant-secondary truncate text-footnote">{subtitle}</p> : null}
-      </div>
-      {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+      {leading ? <div className="flex shrink-0 items-center gap-4">{leading}</div> : null}
+      <LargeTitle
+        as={`h${level}`}
+        id={id}
+        className={cn(
+          "min-w-0 truncate leading-normal",
+          titleAlign === "center"
+            ? "pointer-events-none absolute inset-x-0 mx-auto w-[min(35.125rem,100%-12rem)] text-center"
+            : "flex-1",
+        )}
+      >
+        {title}
+      </LargeTitle>
+      {titleAlign === "center" && !leading ? <span aria-hidden /> : null}
+      {trailing ? <div className="flex shrink-0 items-center gap-4">{trailing}</div> : null}
     </header>
   );
 }
 
-function WindowBody({ className, ...props }: React.ComponentProps<"div">) {
+/*
+ * Window controls (Figma: Window Controls): a 37pt strip right below the
+ * window; 22pt from its top, the window bar (136x10pt, white 30% over a 10px
+ * blur) between the close and share buttons (14pt, only visible on hover in
+ * visionOS, so transparent here). Decorative on the web.
+ */
+function WindowControls({ className }: { className?: string }) {
   return (
     <div
-      data-slot="window-body"
-      className={cn("flex min-h-0 flex-col gap-6 px-6 pb-6", className)}
-      {...props}
-    />
+      aria-hidden
+      data-slot="window-controls"
+      className={cn("flex h-[2.3125rem] items-center justify-center gap-6 pt-[1.375rem] pb-px", className)}
+    >
+      <span className="size-3.5 rounded-full" />
+      <span className="h-2.5 w-34 rounded-full bg-white/30 backdrop-blur-[10px]" />
+      <span className="size-3.5 rounded-full" />
+    </div>
   );
 }
 
-export { Window, WindowBody, WindowHeader };
-export type { WindowHeaderProps };
+export { NavigationBar, Window, WindowControls };
+export type { NavigationBarProps };
