@@ -1,0 +1,37 @@
+# Proyecto planner (FastAPI): https://moonrepo.dev/docs/config/project
+# Requiere el entorno de Python instalado: pip install -e ".[dev]" (o uv sync).
+language: "python"
+layer: "application"
+
+project:
+  title: "IceWalk planner"
+  description: "API de plan y re-planificación (FastAPI)."
+
+fileGroups:
+  sources:
+    - "app/**/*"
+    - "scripts/**/*"
+  tests:
+    - "tests/**/*"
+  configs:
+    - "pyproject.toml"
+
+tasks:
+  dev:
+    command: "uvicorn app.main:app --reload"
+    preset: "server"
+
+  lint:
+    command: "ruff check ."
+    inputs:
+      - "@group(sources)"
+      - "@group(tests)"
+      - "@group(configs)"
+
+  test:
+    command: "pytest -q"
+    inputs:
+      - "@group(sources)"
+      - "@group(tests)"
+      - "@group(configs)"
+      - "/packages/contracts/**/*"

@@ -211,3 +211,43 @@ Código en el repo: `model/gp/craters.py`, `covariates.py` y `covariate_test.py`
 | `contracts/validate.py` | No se corrió: no se tocó ningún contrato |
 
 Los tests del GP usan datos sintéticos. Los datos reales se analizaron en las secciones anteriores, con scripts que todavía no están en el repo ni tienen tests.
+
+## 2026-11-08: referencia visionOS, disabled, scroll y Safari (Codex)
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Referencia Figma `420:4149` vs navegador a 1920×1080 | Ventana (320,180), 1280×720; tab bar (224,394), 68×292; se corrigieron sección +4pt y grabber −2pt | Geometría medida; no prueba de identidad de todos los componentes |
+| Leer propiedades reales del borde | Degradados con cuatro paradas y transformaciones diferentes para ventana y tab bar | Se reemplazó el borde estimado; valores en `research/visionos-reference.md` |
+| OS light frente a dark, web fijada en dark | Capturas byte a byte idénticas; color-scheme `dark only` | El tema no depende del sistema |
+| Disabled de botones, toggles seleccionados, toolbar, tabs y segmentos | Se quitaron brillo activo, bordes/rellenos indebidos y se respetaron colores específicos | 39 tests UI + 6 web y lint/types/build pasaron en ese punto |
+| Scroll de la sidebar anterior | material.top pasó de 159.8 a −60.2 al desplazar 220px | Fallo reproducido: material dentro del contenedor de scroll |
+| `SurfaceScroll` con capas exteriores | material en (320,180,320,720), sin cambios tras scrollTop=250 | Aplicado a sidebar, ornament y Material scrolleable |
+| Safari 27.0.1 real | Sidebar gris clara; Chromium correcto | Regresión de composición reproducida mediante la UI de Safari |
+| Quitar overflow, añadir alpha mínimo al blur o forzar transform | No corrigió Safari | No repetir estas aproximaciones |
+| `brightness(1)` en ambas capas Regular | Fondo negro incorrecto | No aplicar el filtro a todas las capas |
+| `backdrop-filter: brightness(1)` solo en luminosidad | Safari recuperó el material oscuro; recarga y scroll verificados. Delta medio Chromium <0.00002/255 por canal | Filtro identidad para capturar el backdrop; no se cambian colores/opacidades de Figma |
+| WebKit 27.2 headless temporal | No reprodujo la misma composición GPU; backdrop blur no equivalente | No sustituye la evidencia de Safari real |
+| Campos/switch/checkbox: red → green | 4 fallos de comportamiento reproducidos con stubs; implementación final: 43 tests UI, tipos y lint pasan | Incluye búsqueda/limpieza, password disabled, Space en switch y envío de checkbox en formulario |
+| Estado actual de build | Último build pasó antes de los últimos cambios de scroll, vibrancy, campos y corrección Safari | Repetir build al cerrar la siguiente unidad |
+
+Los íconos SVG exportados sirvieron para medir. Eitan pidió después usar Lucide en
+todos los casos y revisar sus tamaños. La auditoría de todo el kit y el playbook
+completo todavía están pendientes.
+
+### Playbook: cobertura, interacción y compatibilidad
+
+| Prueba | Resultado |
+| --- | --- |
+| Navegar 30 familias en Chromium, desktop y móvil | 30/30 con ejemplos, sin overflow horizontal; se detectó y corrigió precedencia de utilidades Tailwind sobre el CSS responsive del playbook |
+| Navegar 30 familias en WebKit aislado | 30/30, cero errores JS; cierre de alerta con Escape y material fijo al scroll; móvil sin overflow |
+| Volver a conectar Safari real para el playbook nuevo | CUA falló dos veces al iniciar el pipe nativo; no se declara esta pasada verificada en Safari real |
+| Comparar OS light/dark en Chromium | Capturas idénticas de Materials; SHA1 0ecf3afc706e5a5165804304e23b8a4a91cf1daa |
+| Medir botones e iconos en 1920×1080 | Targets 28/32/44/52/64 y SVG Lucide 14/16/20/26/32; corregidos Large y Extra Large usando glyph bounds de Figma |
+| Consultar Colors/* de Figma | La paleta heredada tenía valores distintos; tokens corregidos a paint styles actuales del archivo, conservando fills específicos de componentes |
+| Tests de integración del playbook | Búsqueda, navegación, disabled e índice de 30 fuentes pasan; corrección del test: Base UI checkbox usa aria-disabled sobre span |
+| Verificación final | 53 UI + 8 web tests; lint/tipos/build pasan; git diff --check limpio |
+
+Evidencia temporal en `/tmp/icewalk-playbook-*.png` y
+`/tmp/icewalk-playbook-webkit-report.json`. Los IDs fuente y conclusiones se
+conservan en el repo y Brain para no depender de `/tmp`. La cobertura por familia
+no prueba paridad visual de todas las variantes.

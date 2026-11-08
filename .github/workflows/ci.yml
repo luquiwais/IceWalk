@@ -6,41 +6,33 @@ on:
     branches: [main]
 
 jobs:
-  contracts:
+  ci:
+    name: moon ci
     runs-on: ubuntu-latest
     steps:
+      # moon necesita el historial completo para saber qué cambió.
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: pip install jsonschema pyyaml
-      - name: Validar ejemplos contra esquemas
-        run: python contracts/validate.py
+          fetch-depth: 0
+          filter: blob:none
 
-  model:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: model
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # La versión de Bun sale de `packageManager` en package.json.
+      - uses: oven-sh/setup-bun@v2
         with:
-          python-version: "3.12"
-      - run: pip install -e ".[dev]"
-      - run: ruff check .
-      - run: pytest -q
+          bun-version-file: package.json
 
-  planner:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: planner
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -e ".[dev]"
-      - run: ruff check .
-      - run: pytest -q
+
+      - name: Entorno de Python (contracts, planner, model)
+        run: |
+          pip install jsonschema pyyaml
+          pip install -e "./apps/planner[dev]" -e "./packages/model[dev]"
+
+      # Instala moon y los workspaces de Bun (apps/web, packages/ui).
+      - run: bun install --frozen-lockfile
+
+      # Corre solo las tareas afectadas por los cambios (lint, typecheck, test,
+      # build, validate). Los servidores de desarrollo no corren en CI.
+      - run: bun run moon ci

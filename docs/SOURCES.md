@@ -86,3 +86,31 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | numpy, scipy | BSD |
 | PyTorch | BSD |
 | timm y pesos `vit_small_patch14_dinov2.lvd142m` (DINOv2, Oquab et al. 2023) | Apache 2.0 |
+
+## Sistema de diseño visionOS
+
+| Uso | Fuente |
+| --- | --- |
+| Colores, materiales, tipografía, componentes y estados; referencia Sidebar and Tab Bar `420:4149` | [visionOS 26 (Community), kit de Apple](https://www.figma.com/design/TE1ta1HNhtbwSZn3LztSL5?node-id=420-4149). Valores leídos con Figma MCP; mediciones en `research/visionos-reference.md` |
+| Iconos de la web, adaptados a tamaños/slots del kit | [Lucide](https://lucide.dev), paquete `lucide-react` ya instalado; pedido explícito de Eitan |
+| Comportamiento accesible de controles compuestos | [Base UI](https://base-ui.com/react), paquete `@base-ui/react` ya instalado; tipos y código de la versión local consultados |
+| Patrones web de teclado, estados y composición | [Vercel Web Interface Guidelines](https://github.com/vercel-labs/web-interface-guidelines) y documentación local de Next.js 16.4.5 |
+
+El fondo de Apple y exports de referencia siguen en `apps/web/public/reference/`,
+fuera de Git según el acuerdo previo. Ninguna URL temporal de assets Figma se usa
+en el código de ejecución.
+
+Playbook (`/design`): cada familia tiene un enlace directo a su página Figma en
+`apps/web/components/design/playbook-data.ts`. Recursos originales locales:
+Paris Room Day `487:18087`, Night `487:18089`, Pinch `546:2192`, Point `546:2207`,
+Two Hands `518:3272`; exports en `apps/web/public/reference/` (ignorados por el
+acuerdo de mantener assets de referencia locales). No hay URLs temporales en runtime.
+Paint styles Colors/* consultados directamente el 2026-11-08. Tamaños de botones
+symbol contrastados con `104:31764`, `104:31747`, `104:31696`, `104:31679`, `104:31561`.
+Comportamiento de overlays basado en las primitivas de [Menu](https://base-ui.com/react/components/menu),
+[Popover](https://base-ui.com/react/components/popover) y [Dialog](https://base-ui.com/react/components/dialog).
+
+Interacción del time wheel: [Apple HIG Pickers](https://developer.apple.com/design/human-interface-guidelines/pickers)
+y [WWDC20 — Design with iOS pickers, menus and actions](https://developer.apple.com/videos/play/wwdc2020/10205/).
+Las ruedas admiten desplazamiento y entrada por teclado; la implementación web
+agrega pointer capture, snap/inercia y edición directa. No usa un select nativo.
