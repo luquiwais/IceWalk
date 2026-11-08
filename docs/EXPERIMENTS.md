@@ -251,3 +251,24 @@ Evidencia temporal en `/tmp/icewalk-playbook-*.png` y
 `/tmp/icewalk-playbook-webkit-report.json`. Los IDs fuente y conclusiones se
 conservan en el repo y Brain para no depender de `/tmp`. La cobertura por familia
 no prueba paridad visual de todas las variantes.
+
+## 2026-11-08: planificador, transitabilidad sobre el DTM
+
+DTM `DTEEC_073578_2155_073077_2155_A01`, copia COG controlada de USGS (radio 3396190 m), llevada a la grilla con `vision.grid` y reducida a 10 m (`app/traverse/terrain.py`, 14 s).
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Alineación DTM–grilla | El punto más bajo cerca del centro cae en (5, 15) m | La copia controlada coincide con el centro del cráter de `grid.json` (error ~15 m) |
+| Cobertura | 78.1 % de las celdas con dato; elevación −3960 a −3927 m | Las esquinas de la caja quedan sin dato, como se esperaba |
+| Pendiente máxima por celda, base 2 m (lo que pedía el PRD) | Mediana 19.9°; **49.6 % de las celdas > 20°** | Domina el ruido: un sitio casi plano no puede estar medio prohibido |
+| Llanura de 1 km², pendiente por píxel según base | > 20°: 2.6 % (2 m), 1.1 % (4 m), 0.3 % (6 m), 0.1 % (10 m), 0.05 % (20 m) | El ruido cae con la base, como √2·σz/base |
+| Sobre el cráter, igual | > 20°: 3.5 % (2 m), 0.9 % (10 m), 0.8 % (20 m) | El relieve real se mantiene: el cráter sigue excluido |
+| Pendiente máxima por celda, base 10 m | Mediana 9.6°, p99 18.9°; **0.53 % de celdas > 20°**: el cráter (136 celdas a < 100 m), otros cráteres (grupos de 41-140 celdas) y manchas sueltas de 1-3 celdas en la unidad rugosa del SE | Adoptado. Las manchas sueltas pueden ser artefactos: cuestión 40 |
+| Rugosidad (desvío de un plano en 10 m) | Mediana 0.18 m, p99 0.45 m | Del orden de la precisión del DTM: no entra al costo todavía |
+| Grafo de 8 vecinos sobre la grilla entera | 4.7 M aristas; carga + grafo 0.3 s; Dijkstra uno a todos 0.12 s; tramos siguientes desde el mismo punto ~3 ms | No hace falta A* ni recortar la grilla |
+| Hábitat mock (−1200, −900) a las 6 estaciones mock | Rutas 1.01-1.08 × la recta, pendiente máxima en ruta 3.9-8.8°, ~2 km/h | El factor 1.3 del mock sobreestimaba |
+| Ruta de borde a borde del cráter, (−200, 0) → (200, 0) | 450 m, rodea por el sur | La exclusión funciona |
+| `/plan` y `/replan` con rutas reales | 1.07 s la primera vez (carga), 0.16 s `/replan`; 135 puntos de ruta; valida contra `plan.schema.json` | Dentro del umbral de 2 s propuesto |
+| Sin capas del terreno (CI) | Vuelve a recta × 1.3, `routing: straight_line`; 19 tests pasan | El contrato no depende de los datos |
+
+No verificado: el mapa FOM del DTM (calidad de correlación por píxel) y el relieve sombreado para buscar cajas o costuras; los coeficientes del costo metabólico para Marte.

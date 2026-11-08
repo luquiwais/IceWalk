@@ -1,0 +1,47 @@
+# Parámetros de transitabilidad del planificador. Cada valor lleva su fuente; lo que no tiene
+# respaldo de NASA o revisado por pares va con assumption: true (y en docs/SOURCES.md).
+# La STM de la misión pisa max_slope_deg y walking_speed_kmh (packages/contracts/schemas/stm).
+
+max_slope_deg:
+  value: 20
+  source: "ICES-2025-129: no-go zone for slopes > 20° or < -20°, 'per flight rules and requirements' (lunar)"
+  assumption: true
+  notes: >-
+    Valor lunar; usarlo en Marte es supuesto (PRD). Fuera de la huella del DTM no hay pendiente
+    medida: esas celdas se excluyen (criterio conservador).
+
+slope_baseline_m:
+  value: 10
+  source: >-
+    Propagación del error del DTM: precisión vertical de decenas de cm para DTM de HiRISE de 1 m
+    (HiRISE DTM about; Sutton et al. 2022), error de pendiente ≈ √2·σz/base. A 2 m, ~8°; a 10 m, ~1.6°.
+  assumption: true
+  notes: Se fija al construir las capas (app/traverse/terrain.py). Ver EXPERIMENTS 2026-11-08.
+
+min_corridor_width_m:
+  value: 1.02
+  source: "ICES-2025-294: hatch de 1.02 m para un astronauta con traje"
+  assumption: true
+  notes: >-
+    Llevar el ancho del hatch a terreno natural es supuesto nuestro (DECISIONS 2026-11-04, regla
+    del pasillo). Solo se aplica si existe la capa clear_path_width_m de visión.
+
+walking_speed_kmh:
+  value: 2.0
+  source: "xEVA System Con Ops: ~2 km/h caminando (lunar)"
+  assumption: true
+  notes: Velocidad en llano. Pisada por constraints.walking_speed_kmh de la STM.
+
+speed_slope_coeff_mps_per_deg:
+  value: 0.01
+  source: "ICES-2025-129, ec. 2: V = -0.01·θ + 0.75 m/s, de Apollo 12 y 14 (EVA 2)"
+  assumption: true
+  notes: >-
+    Se toma solo la caída con la pendiente; la velocidad en llano sale de walking_speed_kmh. Se usa
+    |θ| (más lento también en bajada): el paper no dice si θ lleva signo, y así es conservador.
+
+min_speed_mps:
+  value: 0.1
+  source: Piso numérico para que el tiempo de una arista sea finito
+  assumption: true
+

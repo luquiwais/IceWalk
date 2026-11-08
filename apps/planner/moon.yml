@@ -10,6 +10,7 @@ project:
 fileGroups:
   sources:
     - "app/**/*"
+    - "config/**/*"
     - "scripts/**/*"
   tests:
     - "tests/**/*"
@@ -35,3 +36,6 @@ tasks:
       - "@group(tests)"
       - "@group(configs)"
       - "/packages/contracts/**/*"
+      # Usa la grilla compartida y el GP de packages/model.
+      - "/packages/model/vision/**/*"
+      - "/packages/model/gp/**/*"

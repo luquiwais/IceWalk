@@ -61,6 +61,62 @@ layers:
     notes: Copia COG de USGS (CC0), la que usa model/gp/covariates.py - https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.tif
     status: scripted (data/download.py)
 
+  # Capas derivadas del DTM por el planificador (apps/planner/app/traverse/terrain.py).
+  # Pendientes con base de 10 m: a 2 m domina el ruido del DTM (ver docs/EXPERIMENTS.md, 2026-11-08).
+  - id: terrain_elevation_m
+    name: Mean elevation per 10 m cell
+    role: cost
+    resolution_m: 10
+    units: m (areoid)
+    source: HiRISE DTM DTEEC_073578_2155_073077_2155_A01 (USGS COG copy)
+    url: data/processed/s1094b/terrain_elevation_m.tif
+    citation: NASA/JPL-Caltech/UArizona
+    notes: Pendiente entre celdas para el costo de caminar. Sin dato fuera de la huella del DTM.
+    status: derived (python -m app.traverse.terrain, en apps/planner)
+
+  - id: terrain_slope_max_deg
+    name: Maximum slope per 10 m cell (10 m baseline)
+    role: cost
+    resolution_m: 10
+    units: degrees
+    source: HiRISE DTM DTEEC_073578_2155_073077_2155_A01 (USGS COG copy)
+    url: data/processed/s1094b/terrain_slope_max_deg.tif
+    citation: NASA/JPL-Caltech/UArizona
+    notes: Decide la exclusion (max_slope_deg de la STM, 20 por defecto; ICES-2025-129).
+    status: derived (python -m app.traverse.terrain, en apps/planner)
+
+  - id: terrain_slope_mean_deg
+    name: Mean slope per 10 m cell (10 m baseline)
+    role: cost
+    resolution_m: 10
+    units: degrees
+    source: HiRISE DTM DTEEC_073578_2155_073077_2155_A01 (USGS COG copy)
+    url: data/processed/s1094b/terrain_slope_mean_deg.tif
+    citation: NASA/JPL-Caltech/UArizona
+    status: derived (python -m app.traverse.terrain, en apps/planner)
+
+  - id: terrain_roughness_m
+    name: Roughness per 10 m cell (std from a fitted plane, 1 m posts)
+    role: cost
+    resolution_m: 10
+    units: m
+    source: HiRISE DTM DTEEC_073578_2155_073077_2155_A01 (USGS COG copy)
+    url: data/processed/s1094b/terrain_roughness_m.tif
+    citation: NASA/JPL-Caltech/UArizona
+    notes: Todavia no entra al costo; mediana 0.18 m, del orden de la precision vertical del DTM.
+    status: derived (python -m app.traverse.terrain, en apps/planner)
+
+  - id: terrain_valid_fraction
+    name: Fraction of 1 m DTM posts with data per 10 m cell
+    role: visual
+    resolution_m: 10
+    units: fraction [0, 1]
+    source: HiRISE DTM DTEEC_073578_2155_073077_2155_A01 (USGS COG copy)
+    url: data/processed/s1094b/terrain_valid_fraction.tif
+    citation: NASA/JPL-Caltech/UArizona
+    notes: Celdas con menos de 0.9 quedan sin dato en las demas capas del terreno.
+    status: derived (python -m app.traverse.terrain, en apps/planner)
+
   - id: hirise_ortho_1m
     name: HiRISE ortho ESP_073578_2155 RED 1 m
     role: evidence
