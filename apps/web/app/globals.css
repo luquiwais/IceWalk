@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@import "@icewalk/ui/theme.css";
+
+/* Tailwind scans the design system sources for class names. */
+@source "../../../packages/ui/src";
+
+/* Placeholder for the 3D scene until Cesium is wired in. */
+@utility mars-backdrop {
+  background-color: var(--color-mars-950);
+  background-image:
+    radial-gradient(
+      ellipse 70% 55% at 62% 58%,
+      oklch(0.5 0.12 46 / 0.75),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 45% 35% at 30% 30%,
+      oklch(0.66 0.11 58 / 0.45),
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at 75% 20%,
+      oklch(0.3 0.07 40 / 0.9),
+      transparent 55%
+    ),
+    linear-gradient(180deg, var(--color-mars-900), var(--color-mars-950));
+}
+
+@layer base {
+  html {
+    color-scheme: only dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-weight: var(--text-body--font-weight);
+    color: var(--color-label);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  button {
+    touch-action: manipulation;
+  }
+}
+
+  .playbook {
+    background-size: cover;
+    background-position: center;
+    background-color: #252420;
+  }
+  .playbook-specimen {
+    padding: 1.5rem;
+    border: .5px solid rgb(255 255 255 / .12);
+    border-radius: 2rem;
+  }
+  .playbook-content { scrollbar-gutter: stable; }
+  .playbook-content, .playbook-sidebar [data-slot="surface-scroll"] {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / .2) transparent;
+  }
+  .playbook-sidebar [data-slot="surface-scroll"] { scrollbar-gutter: stable; }
+  @media (min-width: 1900px) {
+    .playbook { padding-top: 2rem; padding-bottom: 1.5rem; }
+  }
+  @media (max-width: 1050px) {
+    .playbook { padding: 1rem 1rem .5rem; }
+    .playbook-topline { margin-bottom: 1rem; }
+    .playbook-sidebar { width: 16.5rem; }
+    .playbook-content { padding-inline: 1.5rem; }
+    .playbook-heading { padding-inline: 1.5rem; }
+  }
+  @media (max-width: 760px) {
+    .playbook { padding: .75rem .5rem .5rem; }
+    .playbook-window { border-radius: 2rem; }
+    .playbook-sidebar { display: none; }
+    .playbook-sidebar.is-open { display: flex; position: absolute; inset: 0 auto 0 0; width: min(21rem, 90%); z-index: 20; background: rgb(35 35 34 / .94); border-radius: 2rem; }
+    .playbook-nav-open, .playbook-nav-close { display: inline-flex; }
+    .playbook-heading { height: 5.5rem; gap: .5rem; padding-inline: 1rem; }
+    .playbook-heading h1 { font-size: 1.25rem; }
+    .playbook-heading>div { gap: .5rem; }
+    .playbook-disabled { flex-direction: column; gap: 0; font-size: .625rem; }
+    .playbook-disabled [data-slot="switch"] { scale: .8; }
+    .playbook-content { padding-inline: 1.25rem; }
+    .playbook-specimen { padding: 1.25rem; }
+    .playbook [data-text-style="xl-title-1"] { font-size: 2.625rem; line-height: 3rem; }
+  }
+@media (max-width: 760px) {
+  .playbook-window[data-nav-open] > div { visibility: hidden; }
+}

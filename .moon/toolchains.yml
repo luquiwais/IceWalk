@@ -1,0 +1,15 @@
+# Toolchains de moon: https://moonrepo.dev/docs/config/toolchain
+# Sin `version`: moon usa el bun que está en el PATH y no descarga nada fuera
+# del repo. La versión acordada es la de `packageManager` en package.json
+# (bun 1.4.2), la misma que usa CI.
+
+javascript:
+  packageManager: "bun"
+  # Workspaces de Bun en la raíz (apps/web, packages/ui), con un solo bun.lock.
+  inferTasksFromScripts: false
+
+bun: {}
+
+# Python sigue con el python del sistema: el soporte de Python en moon es
+# todavía `unstable_python`. Las tareas de planner/ y model/ corren como
+# comandos del sistema.

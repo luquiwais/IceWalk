@@ -9,6 +9,7 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 23 | ¿Planificador acepta las ramas como puntos de decisión con opciones ordenadas? Incluye qué `result` lleva un radar que ve hielo a 1.5 m | Luqui aprobó llevarlo como propuesta: opción C recortada de `research/decisiones-nasa.md`. Falta persona en el rol | Planificador | 05/11 |
 | 27 | ¿Se mantiene el objetivo de hielo a ≤ 1 m? Con `0.2 × D` sería raro en el sitio: `P` ≈ 0.06, y ≈ 0.67 a ≤ 3 m | Mantener el umbral configurable y revisar la STM con el catálogo: el radar gana peso y el taladro de 1 m pierde | Luqui + Planificador | 05/11 |
 | 28 | Un dato informa unos 100-200 m. ¿Cambia el mensaje de la demo y el valor de medir? | Sí: mostrar el alcance real, y que el mapa fuera de ese radio sea el prior | Luqui | 05/11 |
+| 29 | El PRD dice React + Vite y la estructura vieja (`web/`, `planner/`, `model/`, `contracts/` en la raíz); ahora es Next.js + Bun y `apps/` + `packages/`. ¿Se actualiza el PRD (doc de claude.ai y copia del repo)? | Sí, en stack, arquitectura y repositorio | Luqui | 08/11 |
 | 25 | ¿Se corrigen las 4 afirmaciones del PRD que no respalda la investigación de NASA? | Sí. Ver `research/decisiones-nasa.md` | Producto | 05/11 |
 | 2 | ¿Un mapa solo para la tabla de hielo, o también para la capa masiva? | Tabla primero; masiva si hay tiempo. El núcleo ya arrancó solo con la tabla | Luqui | 04/11 |
 | 3 | ¿Quién toma cada rol, y cuántas personas tiene cada uno? | Ver `docs/ROLES.md` | Equipo | 04/11 |

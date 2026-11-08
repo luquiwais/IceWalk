@@ -1,6 +1,6 @@
 # Plan del GP: el mapa de calor de hielo
 
-**Dueño:** Luqui. **Código:** `model/gp/`. **Estado:** diseño adoptado el 2026-11-04. Paso 1 hecho el 2026-11-05, con datos sintéticos.
+**Dueño:** Luqui. **Código:** `packages/model/gp/`. **Estado:** diseño adoptado el 2026-11-04. Paso 1 hecho el 2026-11-05, con datos sintéticos.
 
 ## Qué hace
 
@@ -127,7 +127,7 @@ Visión entrega un catálogo de cráteres (`resistant_layer_depth_m` o cota infe
 ## Pasos
 
 1. **Núcleo sintético (hecho):** `posterior` con datos censurados y prior constante; tests del "sí" y el "no". Primero esto: define la demo.
-2. **Catálogo de cráteres (hecho como análisis):** la tabla de Dundas 2023 trae 349 cráteres, ya llevados a la grilla y comprobados contra la imagen. Falta pasar el código a `model/gp/`, con tests.
+2. **Catálogo de cráteres (hecho como análisis):** la tabla de Dundas 2023 trae 349 cráteres, ya llevados a la grilla y comprobados contra la imagen. Falta pasar el código a `packages/model/gp/`, con tests.
 3. **Estructura espacial (hecho como análisis):** no hay estructura fuerte a escala del sitio; un dato informa a lo sumo unos 100-200 m a su alrededor (ver `EXPERIMENTS.md`). **El diseño se ajusta, no se descarta:** el kriging vale de cerca, y lejos de los datos manda el prior. Por eso el prior del paso 4 pasa a ser lo que más pesa en la mayor parte del mapa.
 4. **Prior simple:** SWIM + Daubar, con validación por bloques, contra SWIM solo.
 5. **Modelo de instrumentos y capas locales.**

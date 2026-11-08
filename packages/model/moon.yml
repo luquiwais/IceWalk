@@ -1,0 +1,33 @@
+# Proyecto model (GP y visión): https://moonrepo.dev/docs/config/project
+# Requiere el entorno de Python instalado: pip install -e ".[dev]" (o uv sync).
+language: "python"
+layer: "library"
+
+project:
+  title: "IceWalk model"
+  description: "Modelo de hielo (GP) y visión sobre imágenes HiRISE."
+
+fileGroups:
+  sources:
+    - "gp/**/*"
+    - "vision/**/*"
+  tests:
+    - "tests/**/*"
+  configs:
+    - "pyproject.toml"
+
+tasks:
+  lint:
+    command: "ruff check ."
+    inputs:
+      - "@group(sources)"
+      - "@group(tests)"
+      - "@group(configs)"
+
+  test:
+    command: "pytest -q"
+    inputs:
+      - "@group(sources)"
+      - "@group(tests)"
+      - "@group(configs)"
+      - "/packages/contracts/**/*"

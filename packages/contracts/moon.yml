@@ -1,0 +1,16 @@
+# Contratos compartidos: https://moonrepo.dev/docs/config/project
+# Requiere jsonschema y pyyaml en el Python del sistema.
+language: "python"
+layer: "configuration"
+
+project:
+  title: "IceWalk contracts"
+  description: "Esquemas JSON, ejemplos y validación de los contratos entre roles."
+
+tasks:
+  validate:
+    command: "python validate.py"
+    inputs:
+      - "**/*"
+      - "/apps/web/mock/*.json"
+      - "/data/layers.yaml"
