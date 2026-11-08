@@ -1,6 +1,6 @@
 # Plan del planificador y backend
 
-**Dueño:** Planificador (mercho40). **Código:** `apps/planner/`. **Estado:** transitabilidad hecha el 2026-11-08; estaciones todavía mock.
+**Dueño:** Planificador (mercho40). **Código:** `apps/planner/`. **Estado:** transitabilidad y planificador real hechos el 2026-11-08 (`app/eva_planner.py`); falta el catálogo de cráteres para que el mapa informe.
 
 ## Qué hace
 
@@ -14,19 +14,22 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 | Exclusión: pendiente > `max_slope_deg`, fuera del DTM, pasillo < 1.02 m (si hay capa de visión) | Hecho | `app/traverse/route.py` |
 | Costo de caminar: tiempo con velocidad que cae con la pendiente | Hecho | `app/traverse/route.py`, `config/traverse.yaml` |
 | Rutas y tiempo de regreso desde cada celda (Dijkstra uno a todos) | Hecho | `TraverseMap.route`, `TraverseMap.time_from` |
-| Tramos reales en `/plan` y `/replan` | Hecho (estaciones mock) | `app/mock_planner.py` |
+| Tramos reales en `/plan` y `/replan` | Hecho | `app/eva_planner.py`; `app/mock_planner.py` de respaldo |
 | Costo metabólico (Pandolf con gravedad) | Pendiente, cuestión 39 | — |
-| Elegir estaciones con el GP: potencial + incertidumbre, por minuto, dentro del presupuesto | Siguiente | con `packages/model/gp` |
-| Timeline, tareas EV1/EV2, equipo con masa | Mock | `app/mock_planner.py` |
-| Ramas como puntos de decisión | Abierto, cuestión 23 | — |
+| Herramientas desde la STM; mínimo por rango; objetivos fijos; tareas en el mejor sitio; Get Aheads | Hecho | `app/eva_planner.py` |
+| Elegir estaciones con el GP (potencial + incertidumbre, kriging believer) | Hecho | `app/eva_planner.py`, `app/ice.py` |
+| `/replan` con las mediciones acumuladas en el GP | Hecho | `app/main.py` |
+| Timeline, tareas EV1/EV2, equipo con masa | Hecho (masas del catálogo, casi todas null) | `app/eva_planner.py` |
+| Ramas | Sobre la primera estación de hielo, re-planificando con el resultado simulado; forma final abierta (cuestión 23) | `app/eva_planner.py` |
 | Ventana de EVA y DONKI en vivo | Pendiente | `app/main.py` |
 
 ## Próximos pasos
 
-1. Selección codiciosa de estaciones sobre la subgrilla de 100 m: puntaje del GP (`scores(..., "potential_uncertainty")` o la función que acordemos con Luqui), factible si `t + tramo + estación + regreso + ingreso ≤ presupuesto`, con los tiempos de `time_from`.
-2. `/replan` con el posterior actualizado por la medición (`gp.observations.from_measurement`).
-3. Costo metabólico en el resumen del plan (cuestión 39).
-4. Capas en GitHub Releases y carga al arrancar la API en el deploy.
+1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui.
+2. Fijar `uncertainty`, `value` y los campos nuevos en el esquema (cuestión 41).
+3. Reordenar la ruta al final para caminar menos (2-opt), sin perder factibilidad.
+4. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
+5. Capas en GitHub Releases y carga al arrancar la API en el deploy.
 
 ## Cómo se corre
 

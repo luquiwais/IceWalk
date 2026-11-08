@@ -272,3 +272,15 @@ DTM `DTEEC_073578_2155_073077_2155_A01`, copia COG controlada de USGS (radio 339
 | Sin capas del terreno (CI) | Vuelve a recta × 1.3, `routing: straight_line`; 19 tests pasan | El contrato no depende de los datos |
 
 No verificado: el mapa FOM del DTM (calidad de correlación por píxel) y el relieve sombreado para buscar cajas o costuras; los coeficientes del costo metabólico para Marte.
+
+## 2026-11-08: planificador real (GP + transitabilidad)
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| STM de S1094b, terreno real, sin catálogo de cráteres (solo prior) | 5 estaciones de taladro; P(hielo ≤ 1 m) = 0.058 en todas; la primera cae en el hábitat (empate: la más cercana); objetivo 3 (blancos en el cráter) no entra; margen mínimo 5.5 min; valida contra el esquema | Sin cráteres el plan es estructuralmente correcto pero casi no informa (cuestión 42) |
+| Ramas con solo prior | `ice` sigue a 100 m (delimitar); `no_ice` se aleja | Un sí y un no cambian el plan, como pide el criterio de aceptación del GP |
+| Reducción esperada de ambigüedad en toda la zona alcanzable | ~0 % | Coincide con Luqui: una EVA no cambia el mapa del sitio entero (alcance 100-200 m) |
+| Terreno sintético con un grupo de cráteres de fondo plano a 0.3 m | Primera estación de hielo a < 200 m del grupo, P > 0.5; estaciones separadas ≥ 50 m; objetivos 2 y 4 en la estación más confiable | La selección hace lo esperado |
+| Tiempo con 349 cráteres sintéticos en el terreno real | Plan con ramas 1.1 s; re-plan 0.9 s; el 65 % es el reajuste del GP en cada believer | Dentro del umbral de 2 s propuesto |
+
+No verificado: el plan con el catálogo real de cráteres, que no está en este equipo.
