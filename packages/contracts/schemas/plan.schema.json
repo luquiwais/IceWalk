@@ -30,11 +30,14 @@
           },
           "duration_min": { "type": "number", "minimum": 0 },
           "hypothesis": { "type": "string" },
-          "p_ice": { "type": "number", "minimum": 0, "maximum": 1 },
-          "uncertainty": { "type": "number", "minimum": 0 },
-          "value": { "type": "number", "minimum": 0 },
+          "p_ice": { "type": "number", "minimum": 0, "maximum": 1, "description": "P(profundidad del hielo ≤ umbral de la STM), del GP" },
+          "uncertainty": { "type": "number", "minimum": 0, "maximum": 1, "description": "Entropía en bits de P(hielo ≤ umbral): 0 = se sabe, 1 = máxima ambigüedad" },
+          "value": { "type": "number", "minimum": 0, "maximum": 1, "description": "Valor de medir de gp.planning.rank_candidates; ordena igual que 'potencial + incertidumbre'" },
           "planetary_protection": { "enum": ["none", "sensitive"] },
-          "terrain_unit": { "type": "integer" }
+          "terrain_unit": { "type": "integer" },
+          "kind": { "enum": ["survey", "target"], "description": "survey: elegida por el mapa de hielo; target: posición fija de la STM" },
+          "depth_median_m": { "type": "number", "minimum": 0, "description": "Mediana de la profundidad del hielo según el GP" },
+          "depth_shallow_m": { "type": "number", "minimum": 0, "description": "Profundidad optimista: un desvío más somera que la media de log d" }
         }
       }
     },
@@ -58,16 +61,49 @@
         }
       }
     },
-    "branches": {
+    "decision_points": {
       "type": "array",
+      "description": "Qué hacer tras medir en las primeras estaciones de hielo (cuestión 23, opción C). Recomendación con justificación: decide la tripulación",
       "items": {
         "type": "object",
-        "required": ["station_id", "if_result", "next_station_ids"],
+        "required": ["station_id", "decide_by_min", "default_option", "options"],
+        "additionalProperties": false,
         "properties": {
           "station_id": { "type": "string" },
-          "if_result": { "enum": ["ice", "no_ice"] },
-          "next_station_ids": { "type": "array", "items": { "type": "string" } },
-          "note": { "type": "string" }
+          "decide_by_min": { "type": "number", "minimum": 0, "description": "Bingo time: hora más tarde (min desde el inicio de la EVA) para dejar la estación con margen de regreso ≥ 0" },
+          "hard_stop": { "type": "string", "description": "Condiciones que cortan la EVA sin importar el resultado" },
+          "default_option": { "type": "integer", "minimum": 1, "description": "Rango de la opción a seguir si no hay decisión a tiempo" },
+          "options": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "required": ["rank", "if_result", "next_station_ids", "rationale"],
+              "additionalProperties": false,
+              "properties": {
+                "rank": { "type": "integer", "minimum": 1 },
+                "if_result": { "enum": ["ice", "no_ice", "inconclusive", "any"], "description": "any: el resultado no cambia las estaciones siguientes" },
+                "probability": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "Chance del resultado según el GP; null si no se estima" },
+                "next_station_ids": { "type": "array", "items": { "type": "string" } },
+                "next_stations": {
+                  "type": "array",
+                  "description": "Estaciones de esta opción que no están en el plan nominal",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "position"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "position": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                      "lonlat": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                      "p_ice": { "type": "number", "minimum": 0, "maximum": 1 }
+                    }
+                  }
+                },
+                "rationale": { "type": "string" }
+              }
+            }
+          }
         }
       }
     },
@@ -93,7 +129,9 @@
         "max_distance_from_habitat_km": { "type": "number" },
         "min_walkback_margin_min": { "type": "number" },
         "dose_estimate_msv": { "type": "number" },
-        "expected_uncertainty_reduction": { "type": "number", "minimum": 0, "maximum": 1 },
+        "expected_uncertainty_reduction": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fracción de la ambigüedad total (entropía) de la zona alcanzable que se espera reducir" },
+        "ice_threshold_m": { "type": "number", "exclusiveMinimum": 0, "description": "Umbral de profundidad de la STM para P(hielo)" },
+        "craters_in_model": { "type": "integer", "minimum": 0, "description": "Cráteres del catálogo en el GP; 0 = solo el prior" },
         "crew": { "type": "integer" },
         "is_mock": { "type": "boolean" }
       }

@@ -463,7 +463,7 @@ def build(
     elapsed_min: float = 0.0,
     completed: list[dict] | None = None,
     replanned_from: str | None = None,
-    branches: bool = True,
+    decisions: bool = True,
     config: EvaConfig | None = None,
 ) -> dict:
     """Plan completo en el formato de `plan.schema.json`."""
@@ -586,7 +586,7 @@ def build(
                           "geometry": {"type": "LineString", "coordinates": coords}}],
         },
         "timeline": timeline,
-        "branches": [],
+        "decision_points": [],
         "equipment": equipment,
         "summary": {
             "duration_min": round(sched.end_min, 1),
@@ -604,8 +604,9 @@ def build(
         },
         "alerts": alerts,
     }
-    if branches and stations:
-        plan["branches"] = _branches(stm, tmap, model, planner, stations, sched, config)
+    if decisions and stations:
+        plan["decision_points"] = _decision_points(stm, tmap, model, planner, stations, sched,
+                                                   config)
     return plan
 
 
@@ -614,29 +615,93 @@ def _ice_tool(tools: list[str], catalog: dict[str, dict]) -> dict | None:
                  if set(catalog[t].get("measures", [])) & ICE_VARIABLES), None)
 
 
-def _branches(stm, tmap, model, planner, stations, sched: Schedule, config) -> list[dict]:
-    """Qué sigue tras la primera estación que mide hielo, si da hielo o no (cuestión 23)."""
-    from gp.observations import from_measurement
+HARD_STOP = (
+    "Return to the habitat if the walkback margin reaches 0, on a solar particle event warning "
+    "(DONKI), or at the decide-by time."
+)
+MAX_DECISION_POINTS = 2  # cuestión 23: las dos primeras estaciones de hielo, hasta 3 opciones
 
-    i = next((k for k, st in enumerate(stations) if _ice_tool(st["tools"], planner.catalog)), None)
-    if i is None:
-        return []
-    first = stations[i]
-    tool = _ice_tool(first["tools"], planner.catalog)
-    out = []
-    for result in ("ice", "no_ice"):
-        meas = {"station_id": first["id"], "tool": tool["id"], "result": result,
-                "depth_m": None, "position": first["position"]}
-        obs = from_measurement(meas, tool)
-        branch_model = model.with_observations([obs] if obs else [])
-        sub = EvaPlanner(stm, tmap, branch_model, start_xy=tuple(first["position"]),
-                         elapsed_min=sched.visits[i].end_min, completed=stations[: i + 1],
-                         config=config)
-        stops = sub.plan_stops()
-        out.append({
-            "station_id": first["id"],
-            "if_result": result,
-            "next_station_ids": [station_id(s.x, s.y) for s in stops],
-            "note": "Replanned with the simulated result; ice model updated",
+
+def _decision_points(stm, tmap, model, planner, stations, sched: Schedule, config) -> list[dict]:
+    """Puntos de decisión en las primeras estaciones que miden hielo (cuestión 23, opción C).
+
+    Para cada resultado (`ice`, `no_ice`) se re-planifica con el resultado simulado; las opciones
+    se ordenan por su chance según el GP, y `inconclusive` sigue el plan nominal. La opción por
+    defecto es la que sigue el plan nominal: sin decisión a tiempo, se sigue la prioridad propia
+    (Stevens et al. 2019). Si todos los resultados llevan a las mismas estaciones, queda una sola
+    opción `any`: medir ahí no cambia hacia dónde seguir. `decide_by_min` es el bingo time: la hora
+    más tarde para dejar la estación con margen de regreso ≥ 0.
+    """
+    from gp.observations import from_measurement
+    from scipy.special import ndtr
+
+    nominal = [st["id"] for st in stations]
+    points = []
+    ice_stations = [k for k, st in enumerate(stations) if _ice_tool(st["tools"], planner.catalog)]
+    for i in ice_stations[:MAX_DECISION_POINTS]:
+        st, visit = stations[i], sched.visits[i]
+        tool = _ice_tool(st["tools"], planner.catalog)
+        x, y = st["position"]
+        mean, var = model.post.predict(np.array([x]), np.array([y]))
+        sd = math.sqrt(float(var[0]) + model.prior.nugget)
+        p_hit = float(ndtr((math.log(tool["depth_m"]) - float(mean[0])) / sd))
+        nominal_next = nominal[i + 1 :]
+        outcomes = []
+        for result, prob in (("ice", p_hit), ("no_ice", 1.0 - p_hit)):
+            meas = {"station_id": st["id"], "tool": tool["id"], "result": result,
+                    "depth_m": None, "position": st["position"]}
+            obs = from_measurement(meas, tool)
+            sub_model = model.with_observations([obs] if obs else [])
+            sub = EvaPlanner(stm, tmap, sub_model, start_xy=(x, y), elapsed_min=visit.end_min,
+                             completed=stations[: i + 1], config=config)
+            stops = sub.plan_stops()
+            ids = [station_id(s.x, s.y) for s in stops]
+            extra = []
+            if stops:
+                ev = sub_model.evaluate([s.x for s in stops], [s.y for s in stops])
+                extra = [{"id": sid, "position": [s.x, s.y], "lonlat": list(xy_to_lonlat(s.x, s.y)),
+                          "p_ice": round(float(ev["p_ice"][k]), 3)}
+                         for k, (sid, s) in enumerate(zip(ids, stops, strict=True))
+                         if sid not in nominal]
+            step = math.dist((x, y), (stops[0].x, stops[0].y)) if stops else None
+            outcomes.append((result, prob, ids, extra, step))
+
+        reach = f"{tool['depth_m']:g} m"
+        if all(o[2] == outcomes[0][2] for o in outcomes):
+            ids = outcomes[0][2]
+            options = [{
+                "rank": 1, "if_result": "any", "probability": None, "next_station_ids": ids,
+                "rationale": f"Any {tool['name']} result to {reach} leads to the same next "
+                             "stations: this measurement barely moves the ice map where they are.",
+            }]
+            if outcomes[0][3]:
+                options[0]["next_stations"] = outcomes[0][3]
+            default = 1
+        else:
+            options = []
+            for rank, (result, prob, ids, extra, step) in enumerate(
+                sorted(outcomes, key=lambda o: -o[1]), start=1
+            ):
+                found = "Ice" if result == "ice" else "No ice"
+                where = (f"next station {step:.0f} m away" if step is not None
+                         else "return to the habitat")
+                change = "raises" if result == "ice" else "lowers"
+                option = {"rank": rank, "if_result": result, "probability": round(prob, 3),
+                          "next_station_ids": ids,
+                          "rationale": f"{found} within {reach} {change} P(ice) around "
+                                       f"{st['id']}; {where}."}
+                if extra:
+                    option["next_stations"] = extra
+                options.append(option)
+            options.append({"rank": 3, "if_result": "inconclusive", "probability": None,
+                            "next_station_ids": nominal_next,
+                            "rationale": "No update to the ice map: continue the nominal plan."})
+            default = next((o["rank"] for o in options if o["next_station_ids"] == nominal_next), 3)
+        points.append({
+            "station_id": st["id"],
+            "decide_by_min": round(visit.end_min + visit.margin_min, 1),
+            "hard_stop": HARD_STOP,
+            "default_option": default,
+            "options": options,
         })
-    return out
+    return points

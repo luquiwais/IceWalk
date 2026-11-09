@@ -21,11 +21,18 @@ export type Station = {
   tasks: { EV1?: string[]; EV2?: string[] };
   duration_min: number;
   hypothesis: string;
+  /** P(ice depth ≤ the STM threshold), from the GP. */
   p_ice: number;
+  /** Entropy of p_ice in bits: 0 = known, 1 = most ambiguous. */
   uncertainty: number;
+  /** Value of measuring here, in [0, 1] (gp.planning.rank_candidates). */
   value: number;
   planetary_protection?: "none" | "sensitive";
   terrain_unit?: number;
+  /** survey: chosen by the ice map; target: fixed position from the STM. */
+  kind?: "survey" | "target";
+  depth_median_m?: number;
+  depth_shallow_m?: number;
 };
 
 export type TimelineItem = {
@@ -46,12 +53,34 @@ export type PlanSummary = {
   expected_uncertainty_reduction: number;
   crew?: number;
   is_mock?: boolean;
+  ice_threshold_m?: number;
+  craters_in_model?: number;
 };
 
 export type PlanAlert = {
   level: AlertLevel;
   message: string;
   source?: string;
+};
+
+export type DecisionOption = {
+  rank: number;
+  if_result: "ice" | "no_ice" | "inconclusive" | "any";
+  probability?: number | null;
+  next_station_ids: string[];
+  /** Stations of this option that are not in the nominal plan. */
+  next_stations?: { id: string; position: [number, number]; lonlat?: [number, number]; p_ice?: number }[];
+  rationale: string;
+};
+
+/** What to do after measuring at a station (contract: decision_points). The crew decides. */
+export type DecisionPoint = {
+  station_id: string;
+  /** Bingo time: latest minute to leave the station with walkback margin ≥ 0. */
+  decide_by_min: number;
+  hard_stop?: string;
+  default_option: number;
+  options: DecisionOption[];
 };
 
 export type Plan = {
@@ -61,7 +90,7 @@ export type Plan = {
   stations: Station[];
   route: { type: "FeatureCollection"; features: unknown[] };
   timeline: TimelineItem[];
-  branches?: unknown[];
+  decision_points?: DecisionPoint[];
   equipment?: { tool: string; count: number; mass_kg?: number | null; justification?: string }[];
   summary: PlanSummary;
   alerts?: PlanAlert[];

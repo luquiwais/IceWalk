@@ -99,11 +99,12 @@ En el sitio real, con el hábitat por defecto: espectrómetro ~165 estaciones po
 
 | Cuestión | Qué | Estado |
 | --- | --- | --- |
-| 23 | Ramas como puntos de decisión con opciones ordenadas | Propuesta aprobada por Luqui; falta tu acuerdo. Cambia `plan.schema.json` |
-| 30 | Observaciones blandas para espectrómetro y radar | Lo hace el GP |
-| 33 | Corregir el catálogo de herramientas: `measures`, análogos NSS y ALSD, masas, resolución del radar | PR de contrato |
-| - | STM de ejemplo: umbral 3 m y radar en el objetivo 1 | Hecho en esta rama |
+| 23 | Ramas como puntos de decisión con opciones ordenadas | **Hecho** (PR de contrato `planner/contrato-plan`): `decision_points` |
+| 41 | Qué son `uncertainty`, `value` y los campos nuevos de estación | **Hecho** en el mismo PR |
+| 33 | Catálogo: `evidence`, análogos NSS, RIMFAX y ALSD, masas, fuente de la resolución del radar | **Hecho** en el mismo PR |
+| 30 | Observaciones blandas para espectrómetro y radar | Hecho por el GP |
 | 15 | Licencia de Mars Climate Database | Sin averiguar |
+| - | `habitat_xy` en la STM | Pendiente: próximo cambio de la STM |
 
 Un cambio de contrato es un solo PR que actualiza esquema, ejemplos, mocks y usos, y `python packages/contracts/validate.py` tiene que pasar.
 

@@ -47,7 +47,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Reserva 20 % (Apollo 15) | https://www.nasa.gov/wp-content/uploads/static/history/alsj/19790073512_1979073512.pdf |
 | AxEMU: EVA de 8 h | Axiom Space / NASA |
 | DAN (~60 cm) | NASA photojournal PIA17762 |
-| RIMFAX (≤ 10 m, 15-30 cm) | Hamran et al. (2020) Space Science Reviews |
+| RIMFAX (≥ 10 m; 10-20 cm somero, 20-40 cm profundo; 1.245 + 2.21 kg) | Hamran et al. (2020) Space Science Reviews, https://link.springer.com/content/pdf/10.1007/s11214-020-00740-4.pdf |
 | Dosis RAD 0.67 mSv/día | Hassler et al. (2014) Science |
 | Regiones especiales | Kminek et al. (2010) Advances in Space Research (COSPAR) |
 | Playbook, SUITS, NASA-STD-3001 | Ver sección Interfaz del PRD |
@@ -124,3 +124,7 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 | README y artefactos conocidos del DTM de S1094b (RMS, FOM, cajas, costuras) | https://hirise.lpl.arizona.edu/PDS/EXTRAS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/README_DTEEC_073578_2155_073077_2155_A01.TXT |
 | Velocidad de caminata Apollo `V = -0.01θ + 0.75 m/s` y exclusión ±20° (flight rules) | ICES-2025-129 (Kim et al. 2025), ecs. 2 y figura 5 |
 | Kriging believer: elegir varios puntos suponiendo medido el valor esperado | Ginsbourger, Le Riche y Carraro (2010), Kriging is well-suited to parallelize optimization, en Computational Intelligence in Expensive Optimization Problems, Springer |
+| NSS, espectrómetro de neutrones pasivo (1.6 kg, 1.5 W) | NTRS 20170010372, https://ntrs.nasa.gov/api/citations/20170010372/downloads/20170010372.pdf; NTRS 20160005014, https://ntrs.nasa.gov/api/citations/20160005014/downloads/20160005014.pdf |
+| Taladro de Apollo (ALSD): motorizado, < 13.6 kg, dos personas | Manual MCR-69-300, https://ntrs.nasa.gov/api/citations/19710014920/downloads/19710014920.pdf |
+| Vis-NIR y XRF de mano, ~2.5 kg (BASALT) | Sehlke et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442242/ |
+| Bingo times y "sin respuesta a tiempo, sigue la prioridad propia" | Stevens et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282/ |

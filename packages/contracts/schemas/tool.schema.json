@@ -10,8 +10,9 @@
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
       "name": { "type": "string" },
-      "detects": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
-      "measures": { "type": "array", "items": { "type": "string" } },
+      "detects": { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Lo que el instrumento sensa físicamente (hidrógeno, capas del subsuelo, hielo)" },
+      "measures": { "type": "array", "items": { "type": "string" }, "description": "Variables de la STM sobre las que aporta evidencia; si es directa o inferida lo dice `evidence`" },
+      "evidence": { "enum": ["direct", "indirect"], "description": "direct: ve el hielo o la superficie; indirect: lo infiere (hidrógeno, reflector de radar)" },
       "depth_m": { "type": "number", "minimum": 0 },
       "vertical_resolution_m": { "type": "number", "minimum": 0 },
       "time_min": { "type": "number", "minimum": 0, "description": "En estación; para mode=traverse, overhead de encendido" },
