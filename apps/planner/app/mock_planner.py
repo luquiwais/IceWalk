@@ -190,17 +190,24 @@ def build_plan(
                   "justification": f"Required by stations using {catalog[tl]['name']}"}
                  for tl, n in used.items()]
 
-    branches = []
+    decision_points = []
     if len(kept) >= 2:
         first = kept[0]["id"]
         rest = [s["id"] for s in kept[1:]]
-        branches = [
-            {"station_id": first, "if_result": "ice", "next_station_ids": rest,
-             "note": "Continue nominal plan"},
-            {"station_id": first, "if_result": "no_ice",
-             "next_station_ids": _alternative_after_negative(first, rest, cands),
-             "note": "Drop nearby stations of the same unit; add the next most valuable one"},
-        ]
+        at = next(e for e in timeline if e["kind"] == "station" and e["station_id"] == first)
+        decision_points = [{
+            "station_id": first,
+            "decide_by_min": round(at["t_end_min"] + at["walkback_margin_min"], 1),
+            "hard_stop": "Return to the habitat if the walkback margin reaches 0.",
+            "default_option": 1,
+            "options": [
+                {"rank": 1, "if_result": "ice", "probability": None, "next_station_ids": rest,
+                 "rationale": "MOCK: continue the nominal plan"},
+                {"rank": 2, "if_result": "no_ice", "probability": None,
+                 "next_station_ids": _alternative_after_negative(first, rest, cands),
+                 "rationale": "MOCK: drop nearby stations of the same unit; add the next one"},
+            ],
+        }]
 
     u0 = sum(cc[4] for cc in cands.values())
     u_red = sum(s["uncertainty"] * 0.7 for s in kept) / u0 if u0 else 0.0
@@ -218,7 +225,7 @@ def build_plan(
                           "geometry": {"type": "LineString", "coordinates": coords}}],
         },
         "timeline": timeline,
-        "branches": branches,
+        "decision_points": decision_points,
         "equipment": equipment,
         "summary": {
             "duration_min": round(t, 1),

@@ -343,3 +343,14 @@ No verificado: el mapa FOM del DTM (calidad de correlación por píxel) y el rel
 No verificado: el plan con el catálogo real de cráteres, que no está en este equipo.
 | Reordenar la ruta (2-opt + mover una estación), 4 juegos de 349 cráteres sintéticos en el terreno real | 1 de 4 mejora: −0.45 km, −14 min, margen mínimo de 5 a 19 min; en los otros 3 el orden codicioso ya era el mejor (3-4 estaciones de taladro). Sin costo de tiempo | Se mantiene: protege el margen cuando la elección zigzaguea |
 | Ramas con un grupo de 12 cráteres someros cerca | `ice` y `no_ice` dan la misma secuencia | Un dato más casi no mueve el mapa donde ya hay cráteres; las ramas solo difieren cuando la medición es la información nueva |
+
+## 2026-11-08: puntos de decisión y velocidad del plan
+
+Terreno real, 349 cráteres sintéticos, STM con umbral de 3 m.
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Plan con 2 puntos de decisión (4 sub-planes), believer con reajuste de EP | 4.3-4.7 s (1.3-1.4 s sin puntos) | Demasiado lento para la demo |
+| Believer con actualización gaussiana local, comparado con el reajuste completo | P(hielo) difiere ≤ 0.0001; `value` igual; misma mejor candidata | Equivalente |
+| Lo anterior más predicciones guardadas por punto | Plan con puntos de decisión: 1.4-1.8 s; mismas estaciones que antes | Dentro del umbral de 2 s |
+| Opciones de los puntos de decisión | Primer punto: `no_ice` 0.94, `ice` 0.06, `inconclusive`; el segundo suele quedar en `any` | Con alcance de ~100 m, una medición cambia poco las estaciones siguientes si ya hay una al lado |

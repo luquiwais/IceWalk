@@ -340,28 +340,26 @@
       "station_id": null
     }
   ],
-  "branches": [
+  "decision_points": [
     {
       "station_id": "E04S22",
-      "if_result": "ice",
-      "next_station_ids": [
-        "E04S23",
-        "E03S23",
-        "E02S23",
-        "E02S22"
-      ],
-      "note": "Replanned with the simulated result; ice model updated"
-    },
-    {
-      "station_id": "E04S22",
-      "if_result": "no_ice",
-      "next_station_ids": [
-        "E04S23",
-        "E03S23",
-        "E02S23",
-        "E02S22"
-      ],
-      "note": "Replanned with the simulated result; ice model updated"
+      "decide_by_min": 350.9,
+      "hard_stop": "Return to the habitat if the walkback margin reaches 0, on a solar particle event warning (DONKI), or at the decide-by time.",
+      "default_option": 1,
+      "options": [
+        {
+          "rank": 1,
+          "if_result": "any",
+          "probability": null,
+          "next_station_ids": [
+            "E04S23",
+            "E03S23",
+            "E02S23",
+            "E02S22"
+          ],
+          "rationale": "Any Hand core drill result to 1 m leads to the same next stations: this measurement barely moves the ice map where they are."
+        }
+      ]
     }
   ],
   "equipment": [

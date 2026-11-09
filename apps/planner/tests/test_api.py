@@ -32,7 +32,7 @@ def test_plan_matches_contract_and_limits():
     assert s["duration_min"] <= 8 * 60
     assert s["min_walkback_margin_min"] >= 0
     assert len(plan["stations"]) >= 3
-    assert plan["branches"]
+    assert plan["decision_points"]
 
 
 def test_replan_after_negative_measurement():
