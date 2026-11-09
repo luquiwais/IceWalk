@@ -80,7 +80,7 @@ function ListRow({ children, trailing, onClick, disabled, className }: ListRowPr
           <MaterialLayers kind="platter" />
           {content}
           <span className="flex size-11 shrink-0 items-center justify-center">
-            <Vibrancy><ChevronRight aria-hidden className="size-[18px]" strokeWidth={2.5} /></Vibrancy>
+            <Vibrancy><ChevronRight aria-hidden className="size-5" strokeWidth={2.25} /></Vibrancy>
           </span>
         </ButtonPrimitive>
       ) : (

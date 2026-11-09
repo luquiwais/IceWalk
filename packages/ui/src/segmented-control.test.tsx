@@ -81,4 +81,17 @@ describe("SegmentedControl", () => {
     expect(screen.getByRole("tab", { name: "Planning" })).toHaveAttribute("aria-selected", "true");
     expect(onValueChange).not.toHaveBeenCalled();
   });
+
+  it("shows an optional symbol before the label without changing the accessible name", () => {
+    render(
+      <SegmentedControl
+        label="View"
+        options={[{ value: "a", label: "Planning", icon: <svg data-testid="icon" /> }, { value: "b", label: "EV" }]}
+        defaultValue="a"
+      />,
+    );
+    const tab = screen.getByRole("tab", { name: "Planning" });
+    expect(tab.querySelector("[data-testid='icon']")).not.toBeNull();
+    expect(screen.getByRole("tab", { name: "EV" }).querySelector("svg")).toBeNull();
+  });
 });

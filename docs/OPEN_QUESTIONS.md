@@ -43,6 +43,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 20 | Revisión de un experto externo (Space Apps Connect) | Producto |
 | 40 | ¿Las manchas de pendiente > 20° sueltas en el SE del sitio son relieve o artefactos del DTM (cajas, costuras)? Revisar el mapa FOM (`DTF...JP2`) y el relieve sombreado | Planificador |
 | 42 | Catálogo de cráteres (`data/processed/s1094b/craters_dundas2023.csv`) para el planificador: sin él, el mapa es solo el prior y la elección de estaciones casi no informa. ¿Luqui lo comparte por fuera de Git (licencia, cuestión 26)? | Planificador + Luqui |
+| 45 | Textura del globo y del sitio: hoy el respaldo es Viking MDIM 2.1 (232 m/px, imágenes de los 70) y a escala del sitio se ve borroso. ¿Qué sirve el backend como teselas (mosaico CTX de Murray Lab ~5 m/px para el globo/región, ortoimagen HiRISE para el sitio) y con qué URL/formato las consume `MarsGlobe`? | Datos + backend (Frontend solo consume) |
+| 46 | En los mocks, el re-plan tras "sin hielo" en E03S22 baja el margen mínimo de regreso de 33 a 2.2 min y suma 31 min; y `expected_uncertainty_reduction` es 0 en los dos planes. ¿Es lo esperado o un problema del planificador? | Planificador |
 
 ## Riesgo aceptado
 

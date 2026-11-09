@@ -57,6 +57,7 @@ import {
   Play,
   Plus,
   Printer,
+  Scissors,
   Share2,
   SlidersHorizontal,
   Sparkles,
@@ -183,6 +184,7 @@ export function FamilySpecimens({
     {
       id: "sort",
       label: "Sort by",
+      section: "Organize",
       items: ["Name", "Date", "Size"].map((name) => ({
         id: name,
         label: name,
@@ -439,6 +441,23 @@ export function FamilySpecimens({
             </>,
           )}
           {title(
+            "Text with symbol",
+            "32 / 44 / 52 pt · symbol 18 / 20 / 24",
+            <>
+              {(["small", "regular", "large"] as const).map((size) => (
+                <Button
+                  key={size}
+                  size={size}
+                  disabled={disabled}
+                  onClick={click(`${size} with symbol`)}
+                >
+                  <Plus aria-hidden />
+                  Add
+                </Button>
+              ))}
+            </>,
+          )}
+          {title(
             "Symbol buttons",
             "28 / 32 / 44 / 52 / 64 pt",
             <>
@@ -672,6 +691,21 @@ export function FamilySpecimens({
               options={options}
               value={selected}
               onValueChange={setSelected}
+              disabled={disabled}
+              className="w-full"
+            />,
+          )}
+          {title(
+            "With symbols",
+            "Symbol 16 · gap 3 · 15 pt Semibold",
+            <SegmentedControl
+              label="Layout"
+              options={[
+                { value: "grid", label: "Grid", icon: <Grid2X2 /> },
+                { value: "favorites", label: "Favorites", icon: <Heart /> },
+                { value: "shared", label: "Shared", icon: <Users /> },
+              ]}
+              defaultValue="grid"
               disabled={disabled}
               className="w-full"
             />,
@@ -1017,6 +1051,12 @@ export function FamilySpecimens({
             <DropdownMenu
               label="Library"
               header="Library actions"
+              accessories={[
+                { id: "cut", label: "Cut", icon: <Scissors />, onSelect: () => notify("Cut selected") },
+                { id: "copy", label: "Copy", icon: <Copy />, onSelect: () => notify("Copy selected") },
+                { id: "share", label: "Share", icon: <Share2 />, onSelect: () => notify("Share selected") },
+                { id: "delete", label: "Delete", icon: <Trash2 />, onSelect: () => notify("Delete selected") },
+              ]}
               items={actions}
               disabled={disabled}
             />,
@@ -1162,14 +1202,23 @@ export function FamilySpecimens({
       );
     case "tabs":
       return (
-        <Specimen title="Vertical tab bar" detail="68 pt · 44 pt targets">
+        <Specimen title="Vertical tab bar" detail="Collapsed 68 pt · expanded 150 pt · 44 pt targets">
           <div className="flex w-full items-center gap-8">
-            <TabBar
-              label="Example tabs"
-              tabs={tabs}
-              value={tab}
-              onValueChange={setTab}
-            />
+            <div className="flex items-start gap-4">
+              <TabBar
+                label="Example tabs"
+                tabs={tabs}
+                value={tab}
+                onValueChange={setTab}
+              />
+              <TabBar
+                label="Example tabs, expanded"
+                tabs={tabs}
+                value={tab}
+                onValueChange={setTab}
+                expanded
+              />
+            </div>
             <Material
               kind="regular"
               className="flex min-h-72 flex-1 flex-col justify-center gap-3 rounded-[2rem] p-8"

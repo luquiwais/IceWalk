@@ -182,7 +182,7 @@ function Notification({
     <article
       aria-label={`${app} notification`}
       className={cn(
-        "vision-surface relative flex w-[27.25rem] max-w-full flex-col gap-4 rounded-[2.875rem] px-6 py-5 text-label",
+        "vision-surface relative flex w-[27.25rem] max-w-full flex-col gap-4 rounded-[2.875rem] px-6 py-5 text-label [--glass-stroke-width:1.4px] [--glass-stroke-angle:147.397deg]",
         className,
       )}
     >

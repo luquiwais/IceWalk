@@ -36,8 +36,8 @@ function TextField({ label, disabled, className, id, value, defaultValue = "", o
       <input {...props} id={inputId} ref={input} disabled={disabled} value={current} placeholder={placeholder}
         type={kind === "secure" ? "password" : kind === "search" ? "search" : props.type ?? "text"}
         onChange={event => { change(event.target.value); onChange?.(event); }}
-        className="vision-input relative h-full min-w-0 flex-1 bg-transparent text-body text-label outline-none placeholder:text-white/60 disabled:text-label-disabled [&::-webkit-search-cancel-button]:appearance-none" />
-      {kind === "search" && current ? <IconButton label={`Clear ${label}`} disabled={disabled} size="mini" variant="plain" showTooltip={false} onClick={() => { change(""); input.current?.focus(); }}><X className="size-3.5" /></IconButton> : null}
+        className="vision-input relative h-full min-w-0 flex-1 bg-transparent text-body text-label caret-accent outline-none placeholder:text-white/60 disabled:text-label-disabled [&::-webkit-search-cancel-button]:appearance-none" />
+      {kind === "search" && current ? <IconButton label={`Clear ${label}`} disabled={disabled} size="mini" variant="plain" showTooltip={false} onClick={() => { change(""); input.current?.focus(); }}><X className="size-[1.0625rem]!" strokeWidth={2.5} /></IconButton> : null}
     </div>
   </div>;
 }

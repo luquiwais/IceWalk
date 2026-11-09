@@ -15,6 +15,8 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Catálogo de cráteres nuevos | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets |
 | Exposiciones de hielo | https://doi.org/10.5066/P9Y8FR1R | Dundas et al. (2021) USGS |
 | Clima espacial | https://ccmc.gsfc.nasa.gov/tools/DONKI | NASA CCMC DONKI (acreditar a CCMC) |
+| Mosaico Viking MDIM 2.1 colorizado, 232 m/px (fondo del globo sin token) | https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml | NASA/USGS Astrogeology Science Center, vía NASA Trek |
+| Cesium Mars (con token de ion; asset 3644333) | https://cesium.com/platform/cesium-ion/content/cesium-mars/ | NASA/USGS Astrogeology (Viking MDIM 2.1 y MOLA-HRSC 200 m); Cesium |
 
 ## Ciencia y operación
 
@@ -86,7 +88,7 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | Librería | Licencia |
 | --- | --- |
 | FastAPI, pydantic, uvicorn | MIT / BSD |
-| CesiumJS | Apache 2.0 (Cesium ion: términos aparte si se usa Cesium Mars) |
+| CesiumJS 1.147 (https://cesium.com/learn/cesiumjs/ref-doc/) | Apache 2.0 (Cesium ion: términos aparte si se usa Cesium Mars) |
 | GDAL, rasterio | MIT / BSD |
 | numpy, scipy | BSD |
 | PyTorch | BSD |

@@ -22,17 +22,23 @@ function PickerPopover({
   trigger,
   label,
   children,
+  focusPopup = false,
 }: {
   trigger: ReactElement;
   label: string;
   children: ReactNode;
+  /** Focus the popup itself on open instead of its first tabbable field (time wheels). */
+  focusPopup?: boolean;
 }) {
+  const popup = useRef<HTMLDivElement>(null);
   return (
     <Popover.Root>
       <Popover.Trigger render={trigger} />
       <Popover.Portal>
         <Popover.Positioner sideOffset={12} className="z-50">
           <Popover.Popup
+            ref={popup}
+            initialFocus={focusPopup ? popup : true}
             data-slot="picker-popover"
             className="max-w-[calc(100vw-2rem)] text-label outline-none"
           >
@@ -141,7 +147,7 @@ function Calendar({
               )
             }
           >
-            <ChevronLeft aria-hidden />
+            <ChevronLeft aria-hidden className="size-7!" />
           </IconButton>
           <IconButton
             label="Next month"
@@ -153,7 +159,7 @@ function Calendar({
               )
             }
           >
-            <ChevronRight aria-hidden />
+            <ChevronRight aria-hidden className="size-7!" />
           </IconButton>
         </div>
       </div>
@@ -305,6 +311,7 @@ function TimePicker({
   ) : (
     <PickerPopover
       label={label}
+      focusPopup
       trigger={
         <Button disabled={disabled} aria-label={label}>
           {hour}:{String(m).padStart(2, "0")} {period}

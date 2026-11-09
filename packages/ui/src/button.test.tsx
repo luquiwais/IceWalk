@@ -51,4 +51,17 @@ describe("IconButton", () => {
       screen.getByRole("button", { name: "Center on habitat" }),
     ).toBeInTheDocument();
   });
+
+  it("marks a text-and-symbol label so its symbol uses the 17/19/22pt slots", () => {
+    render(
+      <>
+        <Button size="small"><svg data-testid="s" />Add</Button>
+        <Button size="small">Only text</Button>
+        <IconButton label="Icon only"><svg data-testid="i" /></IconButton>
+      </>,
+    );
+    expect(screen.getByTestId("s").closest("[data-slot='button']")).toHaveAttribute("data-with-symbol");
+    expect(screen.getByRole("button", { name: "Only text" })).not.toHaveAttribute("data-with-symbol");
+    expect(screen.getByRole("button", { name: "Icon only" })).not.toHaveAttribute("data-with-symbol");
+  });
 });

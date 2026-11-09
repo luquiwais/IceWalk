@@ -222,10 +222,10 @@
     padding: var(--glass-stroke-width, 1px);
     background: linear-gradient(
       var(--glass-stroke-angle, 166.2696deg),
-      rgb(255 255 255 / 0.4) var(--glass-stroke-start, 2.1215%),
+      rgb(255 255 255 / var(--glass-stroke-alpha-start, 0.4)) var(--glass-stroke-start, 2.1215%),
       rgb(255 255 255 / 0.0001) var(--glass-stroke-fade, 38.9967%),
       rgb(255 255 255 / 0.0001) var(--glass-stroke-rise, 54.3295%),
-      rgb(255 255 255 / 0.1) var(--glass-stroke-end, 93.0172%)
+      rgb(255 255 255 / var(--glass-stroke-alpha-end, 0.1)) var(--glass-stroke-end, 93.0172%)
     );
     mask-image:
       linear-gradient(#000 0 0),
@@ -233,6 +233,11 @@
     mask-clip: content-box, border-box;
     mask-composite: exclude;
   }
+
+  /* Tooltip bezel (548:2239). */
+  .vision-tooltip-blur { backdrop-filter: blur(4.25rem); }
+  .vision-tooltip-luminosity { background-color: rgb(255 255 255 / 0.03); mix-blend-mode: luminosity; }
+  .vision-tooltip-dodge { background-color: rgb(128 128 128 / 0.15); mix-blend-mode: color-dodge; }
 
   /* Views/Recessed Material View: segmented control tracks, search fields. */
   .vision-recessed-luminosity {
@@ -268,13 +273,13 @@
     backdrop-filter: brightness(1);
   }
 
-  /* Views/Thick: a darker element on top of a regular area (estimated). */
+  /* Views/Thick (104:31555): #DADADA 92% color-burn + black 10% luminosity. */
   .vision-thick-burn {
-    background-color: rgb(218 218 218 / 0.65);
+    background-color: rgb(218 218 218 / 0.92);
     mix-blend-mode: color-burn;
   }
   .vision-thick-luminosity {
-    background-color: rgb(0 0 0 / 0.22);
+    background-color: rgb(0 0 0 / 0.1);
     mix-blend-mode: luminosity;
     backdrop-filter: brightness(1);
   }
@@ -332,10 +337,18 @@
     }
   }
 
-  /* Pinch (pressed): estimated. */
+  /* Text + symbol buttons (106:92793): the symbol is 17/19/22pt (not the 15/19/24pt
+     of symbol-only buttons) and small buttons keep only 2pt between symbol and
+     label. Lucide canvas = 1.09 x the SF size: 18 / 20 / 24. */
+  .vision-control[data-with-symbol][data-control-size="small"] { --symbol: 1.125rem; }
+  .vision-control[data-with-symbol][data-control-size="regular"] { --symbol: 1.25rem; }
+  .vision-control[data-with-symbol][data-control-size="large"] { --symbol: 1.5rem; }
+
+  /* Pinch (pressed): Materials > Controls - Fills > Pinch (104:31495): white
+     16% lighten + #5E5E5E 36% color-dodge. */
   .vision-control:active:not([data-disabled]) {
-    --fill-lighten: rgb(255 255 255 / 0.14);
-    --fill-dodge: rgb(94 94 94 / 0.4);
+    --fill-lighten: rgb(255 255 255 / 0.16);
+    --fill-dodge: rgb(94 94 94 / 0.36);
   }
 
   /* Disabled */
@@ -491,6 +504,24 @@
     backdrop-filter: blur(34px) saturate(1.18);
   }
   .vision-notification-blur { backdrop-filter: none; }
+  /* Menu Item (Figma 487:11249 / 11261 / 11273). Idle has no platter. Hover and
+     keyboard highlight: white 4% lighten + #5E5E5E 6% dodge. Pinch/selected:
+     white 8% plus-lighter. Disabled: title, checkmark and symbol at 20%; the
+     subtitle keeps its own vibrancy paints. */
+  [data-slot="menu-item"][data-highlighted]:not([data-disabled]) {
+    --fill-lighten: rgb(255 255 255 / .04);
+    --fill-dodge: rgb(94 94 94 / .06);
+  }
+  [data-slot="menu-item"]:active:not([data-disabled]),
+  [data-slot="menu-item"][data-popup-open]:not([data-disabled]) {
+    --fill-lighten: rgb(255 255 255 / .08);
+    --fill-dodge: transparent;
+    --fill-glow: none;
+    --fill-glow-dodge: none;
+  }
+  [data-slot="menu-item"][data-disabled] { color: var(--color-label); }
+  [data-slot="menu-item"][data-disabled] .menu-item-main { opacity: .2; }
+  [data-slot="menu-item"][data-disabled] .menu-item-main .vision-vibrancy { opacity: 1; }
   [data-slot="time-wheel"] { cursor: grab; }
   [data-slot="time-wheel"][data-dragging] { cursor: grabbing; }
   [data-slot="time-wheel"][data-disabled] { cursor: not-allowed; }

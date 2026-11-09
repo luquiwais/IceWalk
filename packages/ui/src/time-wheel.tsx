@@ -261,7 +261,7 @@ function TimeWheel({
           }
         }}
         className={cn(
-          "absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 rounded-lg bg-transparent text-center text-large-title font-semibold outline-none focus:bg-white/10 focus:ring-1 focus:ring-white/35",
+          "absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 rounded-lg bg-transparent text-center text-large-title font-semibold outline-none focus:bg-white/10 focus:ring-2 focus:ring-inset focus:ring-white/40",
           !editing && "opacity-0",
         )}
       />

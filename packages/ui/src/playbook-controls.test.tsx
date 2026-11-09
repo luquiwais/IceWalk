@@ -219,4 +219,22 @@ describe("playbook controls", () => {
     expect(change).toHaveBeenCalledWith(75);
     expect(slider).toHaveAttribute("step", "25");
   });
+
+  it("opening the collapsible time picker does not focus the hour field", async () => {
+    render(<TimePicker label="Start" value="09:41" onValueChange={vi.fn()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Start" }));
+    const hour = await screen.findByRole("spinbutton", { name: "Start hour" });
+    await waitFor(() => expect(screen.getByRole("dialog")).toBeInTheDocument());
+    // Let Base UI finish its open-time focus management before asserting.
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(hour).not.toHaveFocus();
+    expect(document.activeElement?.getAttribute("role")).not.toBe("spinbutton");
+  });
+
+  it("draws the wheel focus ring inside the field so overflow-hidden cannot clip it", () => {
+    render(<TimePicker label="Start" value="09:41" onValueChange={vi.fn()} expanded />);
+    const field = screen.getByRole("spinbutton", { name: "Start hour" });
+    expect(field.className).toContain("focus:ring-inset");
+    expect(field.className).not.toMatch(/focus:ring-offset/);
+  });
 });

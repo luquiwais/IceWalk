@@ -3,6 +3,7 @@
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import type * as React from "react";
 
+import { MaterialLayers } from "./material";
 import { cn } from "./utils";
 
 type TooltipProps = {
@@ -16,7 +17,8 @@ type TooltipProps = {
 
 /*
  * visionOS tooltip (Figma: Tooltips): a bezel 8 pt below the control, with a
- * 0.75px edge, padding 4/12 and Caption 1 text. Appears after a short dwell.
+ * 0.75px specular edge (gradient 159.2deg at the kit's 64x24 bezel: white 45%
+ * -> 0 -> 15%), padding 4/12 and Caption 1 text. Appears after a short dwell.
  */
 function Tooltip({ label, children, side = "bottom", className }: TooltipProps) {
   return (
@@ -26,14 +28,15 @@ function Tooltip({ label, children, side = "bottom", className }: TooltipProps) 
         <TooltipPrimitive.Positioner side={side} sideOffset={8}>
           <TooltipPrimitive.Popup
             className={cn(
-              "relative overflow-hidden rounded-full border-[0.75px] border-white/45 px-3 py-1 text-caption-1 whitespace-nowrap text-label",
-              "bg-[rgb(128_128_128/0.15)] backdrop-blur-[68px]",
+              "vision-surface relative rounded-full px-3 py-1 text-caption-1 whitespace-nowrap text-label",
+              "[--glass-stroke-width:0.75px] [--glass-stroke-angle:159.2deg] [--glass-stroke-alpha-start:0.45] [--glass-stroke-alpha-end:0.15] [--glass-stroke-start:8.56%] [--glass-stroke-fade:37.9%] [--glass-stroke-rise:50.2%] [--glass-stroke-end:80.1%]",
               "origin-(--transform-origin) transition-[opacity,scale] duration-150 ease-(--ease-spring)",
               "data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0",
               className,
             )}
           >
-            {label}
+            <MaterialLayers kind="tooltip" />
+            <span>{label}</span>
           </TooltipPrimitive.Popup>
         </TooltipPrimitive.Positioner>
       </TooltipPrimitive.Portal>

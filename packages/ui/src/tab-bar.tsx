@@ -1,6 +1,7 @@
 "use client";
 
 import { Tabs } from "@base-ui/react/tabs";
+import { Fragment } from "react";
 import type * as React from "react";
 
 import { MaterialLayers } from "./material";
@@ -22,6 +23,8 @@ type TabBarProps = {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
+  /** Figma "Expanded=True": 150pt wide, 126x44 tabs with the label (19 Medium) after the symbol. */
+  expanded?: boolean;
   className?: string;
 };
 
@@ -32,9 +35,11 @@ type TabBarProps = {
  *   Unselected idle: no fill, secondary symbol.
  *   Unselected hover: white 7% + #5E5E5E 18% color-dodge, glow, primary symbol.
  *   Selected: white 7% + #5E5E5E 18% color-dodge, primary symbol (+ glow on hover).
- * The label shows as a tooltip, like the expanded tab bar.
+ * Collapsed, the label shows as a tooltip. Expanded (Figma Tabs=N, Expanded=True):
+ * 150pt wide, tabs 126x44 (symbol slot 44, gap 4, trailing padding 28), label
+ * 19pt Medium in the same vibrancy as the symbol. Height is 56N+12 either way.
  */
-function TabBar({ label, tabs, value, defaultValue, onValueChange, className }: TabBarProps) {
+function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = false, className }: TabBarProps) {
   return (
     <Tabs.Root
       orientation="vertical"
@@ -45,18 +50,20 @@ function TabBar({ label, tabs, value, defaultValue, onValueChange, className }: 
     >
       <Tabs.List
         aria-label={label}
-        className="vision-surface relative flex w-[4.25rem] flex-col items-center gap-3 rounded-tab-bar p-3 [--glass-stroke-width:1.4px] [--glass-stroke-angle:155.104deg] [--glass-stroke-start:4.8235%] [--glass-stroke-fade:38.0778%] [--glass-stroke-rise:56.677%] [--glass-stroke-end:95.1021%]"
+        data-expanded={expanded ? "" : undefined}
+        className={cn("vision-surface relative flex flex-col gap-3 rounded-tab-bar p-3", expanded ? "min-w-[9.375rem] items-stretch" : "w-[4.25rem] items-center", "[--glass-stroke-width:1.4px] [--glass-stroke-angle:155.104deg] [--glass-stroke-start:4.8235%] [--glass-stroke-fade:38.0778%] [--glass-stroke-rise:56.677%] [--glass-stroke-end:95.1021%]")}
       >
         <MaterialLayers kind="glass" />
-        {tabs.map((tab) => (
-          <Tooltip key={tab.value} label={tab.label} side="right">
+        {tabs.map((tab) => {
+          const item = (
             <Tabs.Tab
               value={tab.value}
               disabled={tab.disabled}
               aria-label={tab.label}
               data-platter="false"
               className={cn(
-                "vision-control vision-surface group relative flex size-11 items-center justify-center rounded-full outline-none",
+                "vision-control vision-surface group relative flex h-11 items-center rounded-full outline-none",
+                expanded ? "min-w-[7.875rem] justify-start gap-1 pr-7" : "w-11 justify-center",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label",
                 "data-active:not-data-disabled:vision-selected hover:not-data-disabled:vision-selected",
                 "hover:not-data-disabled:[--fill-glow:radial-gradient(50%_50%_at_50%_100%,rgb(255_255_255/0.06),transparent)]",
@@ -64,12 +71,26 @@ function TabBar({ label, tabs, value, defaultValue, onValueChange, className }: 
               )}
             >
               <MaterialLayers kind="platter" />
-              <Vibrancy className="[&_svg]:size-5">
-                {tab.icon}
-              </Vibrancy>
+              {expanded ? (
+                <>
+                  <Vibrancy className="size-11 shrink-0 place-items-center [&_svg]:size-5">{tab.icon}</Vibrancy>
+                  <Vibrancy className="text-left text-[1.1875rem] leading-6 font-medium whitespace-nowrap">
+                    {tab.label}
+                  </Vibrancy>
+                </>
+              ) : (
+                <Vibrancy className="[&_svg]:size-5">{tab.icon}</Vibrancy>
+              )}
             </Tabs.Tab>
-          </Tooltip>
-        ))}
+          );
+          return expanded ? (
+            <Fragment key={tab.value}>{item}</Fragment>
+          ) : (
+            <Tooltip key={tab.value} label={tab.label} side="right">
+              {item}
+            </Tooltip>
+          );
+        })}
       </Tabs.List>
     </Tabs.Root>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { Tabs } from "@base-ui/react/tabs";
+import type * as React from "react";
 
 import { MaterialLayers } from "./material";
 import { cn } from "./utils";
@@ -9,6 +10,8 @@ import { Vibrancy } from "./vibrancy";
 type SegmentedOption = {
   value: string;
   label: string;
+  /** Optional symbol before the label (Figma segment with symbol: gap 3, 15pt Semibold). */
+  icon?: React.ReactNode;
   disabled?: boolean;
 };
 
@@ -65,9 +68,15 @@ function SegmentedControl({
               "hover:not-data-active:not-data-disabled:[--fill-glow-dodge:radial-gradient(100%_100%_at_50%_100%,rgb(94_94_94/0.32),transparent_73.8%)]",
               "data-active:not-data-disabled:rounded-segment data-active:not-data-disabled:border-[0.5px] data-active:not-data-disabled:border-white/40 data-active:not-data-disabled:shadow-[0_2px_4px_0_rgb(0_0_0/0.1)]",
               "data-disabled:[--fill-lighten:transparent] data-disabled:[--fill-dodge:transparent]",
+              "data-disabled:data-active:shadow-[0_1px_4px_0_rgb(0_0_0/0.1)]",
             )}
           >
             <MaterialLayers kind="platter" />
+            {option.icon ? (
+              <Vibrancy className="mr-[0.1875rem] [&_svg]:size-4" >
+                {option.icon}
+              </Vibrancy>
+            ) : null}
             <Vibrancy>
               {option.label}
             </Vibrancy>

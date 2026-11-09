@@ -2,6 +2,7 @@
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Children, isValidElement } from "react";
 import type * as React from "react";
 
 import { MaterialLayers } from "./material";
@@ -21,7 +22,7 @@ const buttonVariants = cva(
     "vision-control vision-surface relative inline-flex shrink-0 items-center justify-center font-semibold whitespace-nowrap select-none",
     "outline-none transition-[background-color,color] duration-150 ease-(--ease-spring)",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label",
-    "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&[data-with-symbol]_svg]:size-(--symbol)",
   ],
   {
     variants: {
@@ -67,9 +68,9 @@ type ButtonProps = ButtonPrimitive.Props &
     variant?: ButtonVariant;
   };
 
-function ButtonContent({ children }: { children: React.ReactNode }) {
+function ButtonContent({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span data-vision-content className="inline-flex min-w-0 items-center justify-center gap-1.5">
+    <span data-vision-content className={cn("inline-flex min-w-0 items-center justify-center gap-1.5", className)}>
       {children}
     </span>
   );
@@ -83,16 +84,21 @@ function Button({
   children,
   ...props
 }: ButtonProps) {
+  const nodes = Children.toArray(children);
+  const withSymbol =
+    nodes.some((node) => typeof node === "string" || typeof node === "number") &&
+    nodes.some((node) => isValidElement(node));
   return (
     <ButtonPrimitive
       data-slot="button"
       data-control-size={size ?? "regular"}
+      data-with-symbol={withSymbol ? "" : undefined}
       data-platter={variant === "plain" ? "false" : undefined}
       className={cn(buttonVariants({ shape, size }), className)}
       {...props}
     >
       <MaterialLayers kind={variant === "glass" ? "glass" : "platter"} />
-      <ButtonContent>{children as React.ReactNode}</ButtonContent>
+      <ButtonContent className={withSymbol && (size ?? "regular") === "small" ? "gap-0.5" : undefined}>{children as React.ReactNode}</ButtonContent>
     </ButtonPrimitive>
   );
 }

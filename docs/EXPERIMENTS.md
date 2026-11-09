@@ -354,3 +354,22 @@ Terreno real, 349 cráteres sintéticos, STM con umbral de 3 m.
 | Believer con actualización gaussiana local, comparado con el reajuste completo | P(hielo) difiere ≤ 0.0001; `value` igual; misma mejor candidata | Equivalente |
 | Lo anterior más predicciones guardadas por punto | Plan con puntos de decisión: 1.4-1.8 s; mismas estaciones que antes | Dentro del umbral de 2 s |
 | Opciones de los puntos de decisión | Primer punto: `no_ice` 0.94, `ice` 0.06, `inconclusive`; el segundo suele quedar en `any` | Con alcance de ~100 m, una medición cambia poco las estaciones siguientes si ya hay una al lado |
+
+## 2026-11-09: web, vista Planning, globo Cesium y QA del kit
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Vista Planning con `plan.json`/`replan.json`/`measurement.json` (vitest + Chromium) | 29 tests web verdes; ficha, punto de decisión y re-plan visibles; build OK | Contrato del plan conectado |
+| Texto secundario con `Vibrancy` en tests | Cada texto aparece dos veces (capa `aria-hidden` de lavado) | Los tests consultan con `ignore: "[aria-hidden] ..."` |
+| Scroll al cambiar de sección o estación | Quedaba la posición anterior | El contenedor lleva `key` por vista |
+| `MarsGlobe` sin token: Trek WMTS (niveles 0-7, CORS `*`) | Carga, estaciones y ruta visibles, sin errores de consola | OK. A 1.5 km se ve borroso (232 m/px): cuestión 45 |
+| `MarsGlobe` con token de ion | **No probado** (no hay token) | Pendiente al configurar el token |
+| Créditos de Cesium y ESLint | Los créditos colapsaban a 0×0; ESLint daba 15 errores sobre `public/cesium` | Créditos en contenedor propio; `public/cesium` ignorado |
+| Zoom brusco con rueda en `/globe` | Pantalla negra una vez, no se repitió | Sin causa confirmada (¿vuelo en curso?) |
+| Safari real: `safaridriver` y `do JavaScript` | Fallan ("Allow remote automation" apagado) | Sirvió `screencapture -l <windowId>` + clicks; un click de System Events cayó en otra ventana |
+| Recessed [burn, luminosity] en Safari | Campo de búsqueda, pista del switch y tarjetas como losa clara | Refutado: orden [luminosity, burn] |
+| Tooltip con gris 15% normal | 77 102 136 contra 84 118 161 del kit | Refutado: capas del kit, 85 117 158 |
+| Pinch .14/.40 con [dodge, lighten] | 124 150 185 contra 132 157 193 del kit | Refutado: white 16% + dodge 36% |
+| Regla CSS en `@layer components` contra utilidades de Tailwind | No gana (tamaño de svg, gap de `ButtonContent`) | Pasarlas a clases |
+| Fórmula del gradiente especular (ángulo `atan2(a/W, -b/H)`, posiciones desde las esquinas) | Reproduce ventana y tab bar | Verificado con medición |
+| Test del time picker antes del test del menú | Rompía el del menú (pasaba solo) | Queda al final del archivo |

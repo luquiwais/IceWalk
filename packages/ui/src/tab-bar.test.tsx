@@ -52,4 +52,20 @@ describe("TabBar", () => {
     await userEvent.keyboard("{ArrowDown}");
     expect(screen.getByRole("tab", { name: "Science" })).toHaveFocus();
   });
+
+  it("expanded shows each label next to its symbol and keeps names and selection", async () => {
+    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" expanded />);
+
+    const tab = screen.getByRole("tab", { name: "EV" });
+    expect(tab).toHaveAttribute("aria-selected", "true");
+    expect(tab).toHaveTextContent("EV");
+    expect(screen.getByRole("tab", { name: "Planning" })).toHaveTextContent("Planning");
+    expect(screen.getByRole("tablist", { name: "Views" })).toHaveAttribute("data-expanded");
+  });
+
+  it("collapsed hides the labels (they live in tooltips)", () => {
+    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" />);
+    expect(screen.getByRole("tab", { name: "EV" })).not.toHaveTextContent("EV");
+    expect(screen.getByRole("tablist", { name: "Views" })).not.toHaveAttribute("data-expanded");
+  });
 });

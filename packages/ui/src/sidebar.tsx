@@ -78,8 +78,8 @@ function SidebarSection({ heading, children, defaultOpen = true, disclosureIcon 
           <span className="flex size-8 shrink-0 items-center justify-center text-label transition-transform duration-200 ease-(--ease-spring) group-not-data-panel-open:-rotate-90">
             {disclosureIcon ?? <ChevronDown
               aria-hidden
-              strokeWidth={2.5}
-              className="size-[1.0625rem]"
+              strokeWidth={2.25}
+              className="size-5"
             />}
           </span>
         </Collapsible.Trigger>
@@ -135,7 +135,7 @@ function SidebarItem({ children, icon, counter, current = false, disabled = fals
         >
           <MaterialLayers kind="platter" />
           {icon ? (
-            <span className="flex h-14 w-8 shrink-0 items-center justify-center text-accent group-data-disabled:text-label-disabled [&_svg]:size-[1.375rem]">
+            <span className="flex h-14 w-8 shrink-0 items-center justify-center text-accent group-data-disabled:text-label-disabled [&_svg]:size-6">
               {icon}
             </span>
           ) : null}

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // CesiumJS runtime assets copied by scripts/copy-cesium.mjs (gitignored).
+    "public/cesium/**",
   ]),
 ]);
 

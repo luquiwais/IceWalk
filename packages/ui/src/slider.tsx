@@ -21,6 +21,14 @@ type SliderProps = {
   className?: string;
 };
 
+/** Endpoint symbol canvas per slider size: SF 13/15/19/24pt Medium (ink 11.9/13.7/17.3/21.9). */
+const ENDPOINT_ICON = {
+  mini: "[&_svg]:size-3.5",
+  small: "[&_svg]:size-4",
+  regular: "[&_svg]:size-5",
+  large: "[&_svg]:size-[1.625rem]",
+} as const;
+
 /** Figma Sliders: 288pt track, 16/20/28/44pt heights. Native range behavior. */
 function Slider({
   label,
@@ -62,7 +70,7 @@ function Slider({
       {leading ? (
         <span
           aria-hidden
-          className="range-endpoint flex size-7 shrink-0 items-center justify-center [&_svg]:size-5"
+          className={cn("range-endpoint flex size-7 shrink-0 items-center justify-center", ENDPOINT_ICON[size])}
         >
           {leading}
         </span>
@@ -115,7 +123,7 @@ function Slider({
       {trailing ? (
         <span
           aria-hidden
-          className="range-endpoint flex size-7 shrink-0 items-center justify-center [&_svg]:size-5"
+          className={cn("range-endpoint flex size-7 shrink-0 items-center justify-center", ENDPOINT_ICON[size])}
         >
           {trailing}
         </span>
