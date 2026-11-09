@@ -373,3 +373,9 @@ Terreno real, 349 cráteres sintéticos, STM con umbral de 3 m.
 | Regla CSS en `@layer components` contra utilidades de Tailwind | No gana (tamaño de svg, gap de `ButtonContent`) | Pasarlas a clases |
 | Fórmula del gradiente especular (ángulo `atan2(a/W, -b/H)`, posiciones desde las esquinas) | Reproduce ventana y tab bar | Verificado con medición |
 | Test del time picker antes del test del menú | Rompía el del menú (pasaba solo) | Queda al final del archivo |
+| Reproducir el hover pegado / capa clara sin radio / parpadeo del buscador: Chromium headless, Chromium con GPU (barridos, scroll con puntero quieto, píxeles por `scrollTop`) y Safari 27.0.1 real (24 cuadros de scroll+hover) | No reprodujo: nunca más de un ítem en hover. Eitan lo ve en Safari a simple vista pero no en capturas ni grabaciones | Composición de WebKit en pantalla; diferido |
+| Auditoría de hover y capas | Sin hover por JS; 119 capas con tamaño y radio del anfitrión; sin contextos de apilamiento en los ancestros | El DOM está bien |
+| Arnés de píxeles con GPU frente a raster por software | Regular `65 86 117` frente a `61 86 121`; Platter `109 129 163` frente a `103 128 164` | Las calibraciones contra el kit se hicieron por software: recalibrar |
+| Clicks por System Events para Safari | Caen en la ventana activa (Finder, Ghostty) | Usar CGEvent y `screencapture -l` |
+| Escaneo de contornos de foco recortados en `/design` (antes/después del arreglo de `Alert`) | Antes: campo y última acción de la alerta recortados; después: ninguno | Arreglado |
+

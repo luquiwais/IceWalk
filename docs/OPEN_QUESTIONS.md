@@ -26,6 +26,15 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 7 | ¿Se suma PDF del plan de EVA? | Sí, si el ciclo ya anda | Producto | 04/11 |
 | 8 | ¿Se recortan vista Science, segundo sitio, radar en marcha y voz? | Sí. Ojo: si el radar sube de importancia, revisar ese recorte | Producto | 04/11 |
 | 9 | ¿Premio objetivo? | Best Use of Science | Producto | 04/11 |
+| 47 | ¿Ventana de Planning anclada a la izquierda, cámara centrada en el área libre y modo Map focus? | Sí (`research/diseno-interfaz.md` §2.1) | Frontend | 09/11 |
+| 48 | ¿Barra de estado arriba, igual en Planning, EV y Science (PET, walkback, bingo, alerta tope, mini-timeline)? | Sí (§2.2; NASA-STD-3001 V2 10005) | Frontend + Producto | 09/11 |
+| 49 | ¿Mapa por defecto con supresión de valor por incertidumbre (VSUP), en un tono sin significado de alerta? | Sí; probar índigo o violeta contra HiRISE (§5.1) | Diseño + GP | 09/11 |
+| 50 | ¿El antes/después de la demo pasa a ser local (~200 m alrededor de la medición) + puntos confirmados? | Sí: la incertidumbre del sitio entero casi no baja (§7) | Luqui + GP | 09/11 |
+| 51 | ¿`tool_assessment` (rendimiento por herramienta) en el plan o como endpoint aparte? | Bloque aditivo o endpoint, sin tocar `/replan` (§3.2) | Planificador + GP | 09/11 |
+| 52 | ¿Quién sirve los rasters de `/maps` (hoy `pending`) y cuándo? | Antes del congelamiento del 12/11 | GP + Planificador | 09/11 |
+| 53 | ¿La vista EV usa paneles sólidos aunque el estilo sea visionOS? | Sí, por legibilidad con luz extrema (§4.3) | Frontend | 09/11 |
+| 54 | ¿El radar va en la ruta y en «Which tool?», o como herramienta de estación? En los mocks todas las estaciones usan el taladro | En la ruta, coherente con DECISIONS | Planificador | 09/11 |
+| 55 | ¿Qué umbrales de walkback margin disparan caution y warning? (el re-plan deja 2.2 min sin alerta) | Declararlos como supuestos en la STM | Planificador + Producto | 09/11 |
 
 ## A averiguar
 

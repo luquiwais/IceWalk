@@ -94,7 +94,8 @@ function Alert({
             className="vision-surface vision-popup-glass relative flex max-h-[calc(100dvh-2rem)] w-80 max-w-full flex-col overflow-clip rounded-[2rem] p-5 text-center text-label outline-none"
           >
             <MaterialLayers kind="glass" />
-            <SurfaceScroll className="relative flex flex-col items-center gap-2">
+            {/* -m/p 1.5: room for the 4pt focus outline of full-width fields and the last action, which the scroller would clip. */}
+            <SurfaceScroll className="relative -m-1.5 flex flex-col items-center gap-2 p-1.5">
               {icon ? (
                 <span
                   aria-hidden

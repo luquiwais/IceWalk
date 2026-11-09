@@ -101,3 +101,6 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 | 2026-11-09 | Iconos Lucide con lienzo ≈ 1.09× el tamaño SF, igualando la tinta medida con `absoluteRenderBounds`; tabla en `research/visionos-reference.md` | Pedido de Eitan: todos los iconos Lucide con tamaños del kit |
 | 2026-11-09 | `TimePicker` colapsado: al abrir, el foco va al popup y no a la hora; anillo de foco de las ruedas inset | Bugs reportados por Eitan: foco automático y anillo recortado por `overflow-hidden` |
 | 2026-11-09 | Rama `web/planning` desde `main`; `web/base` borrada (mergeada en el PR #1) | Pedido de Eitan: rama nueva y borrar la vieja |
+| 2026-11-09 | Los controles con capas de material recortan a su caja redondeada (`.vision-control.vision-surface { overflow: clip }`) | Endurecimiento contra capas claras sin radio, pixel-neutro en Chromium. No confirma la causa del bug de hover |
+| 2026-11-09 | Bug de hover en Safari (capa más clara sin radio, varios ítems en hover, buscador que titila al scrollear) diferido hasta después del diseño real | Eitan: se ve a simple vista en Safari, no en capturas; no bloquea el diseño |
+| 2026-11-09 | `Alert` deja margen interno para el contorno de foco de campos y acciones a todo el ancho | Bug de Eitan: el input de las alertas se veía cortado |

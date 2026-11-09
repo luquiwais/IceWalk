@@ -89,3 +89,51 @@ Events), "-" = no verificado. Nada se declara 1:1.
 Selector de hora (bugs reportados 2026-11-09): al abrir el TimePicker colapsado el
 foco ya no entra en la hora (`initialFocus` en el popup) y el anillo de foco de
 las ruedas es inset para que `overflow-hidden` no lo recorte.
+
+
+## Hover pegado / capa clara sin radio (2026-11-09, segunda pasada)
+
+Reportado: items del sidebar mas claros, sin bordes redondeados, varios en hover a
+la vez; parpadeo del buscador al hacer scroll; lo mismo en otros componentes.
+
+**No se pudo reproducir** (ver EXPERIMENTS): Chromium headless, Chromium headed con
+GPU Metal (barridos de mouse, scroll con el puntero quieto, 10 pasos de scroll con
+captura) y Safari 27.0.1 real (barridos con CGEvent, 24 cuadros de scroll+hover,
+scroll bajo el puntero): en ningun cuadro hubo mas de un item en hover ademas del
+seleccionado y el hover siempre siguio al puntero.
+
+Auditoria del codigo (sin defectos): no hay hover por JS (`onPointerEnter`,
+`data-hover`) en `packages/ui` ni en `apps/web`; el hover es `:hover` en CSS;
+ningun ancestro de las capas crea un contexto de apilamiento (opacity, transform,
+filter, isolation, will-change, contain); las 119 capas del playbook miden lo
+mismo que su anfitrion y heredan su radio; todo anfitrion de capas es un
+`vision-surface` (posicionado).
+
+Cambios (endurecimiento, no causa confirmada):
+- `.vision-control.vision-surface { overflow: clip }`: las capas de un control no
+  pueden pintar fuera de su caja redondeada aunque el motor ignore el radio de la
+  capa. Pixel-neutro en Chromium (mismo color mezclado con y sin clip).
+- `material-hosts.test.tsx`: guarda de regresion (toda capa vive en un
+  `vision-surface`; el hover del sidebar es declarativo y solo hay un `aria-current`).
+
+Hallazgo relacionado: el mismo arnes de pixeles da otros colores con GPU que con
+raster por software (Regular `65 86 117` frente a `61 86 121`, Platter
+`109 129 163` frente a `103 128 164`). Las calibraciones contra el kit de este
+documento se hicieron con el Chromium headless (software); en navegadores con GPU
+el resultado difiere unos 3 a 6 niveles. Pendiente: recalibrar con captura de
+GPU/Safari y revisar si ahi esta el "mas claro de lo debido".
+
+**Diferido por Eitan (2026-11-09).** Pasa en Safari, en `/design`, al toque, y lo ve a
+simple vista pero no aparece en capturas ni grabaciones: apunta a la composicion en
+pantalla de WebKit (capas con `mix-blend-mode`/`backdrop-filter` recompuestas en el
+hover o el scroll), no a la geometria del DOM. Se retoma despues del diseno real.
+Pista para entonces: probar en Safari quitando por partes las capas de mezcla del
+sidebar y del buscador, mirando la pantalla (no capturas).
+
+## Alertas con campos (2026-11-09)
+
+El contorno de foco de los campos (2pt + 2pt de offset) y de la ultima accion quedaba
+recortado por el `SurfaceScroll` de `Alert`, que tiene `overflow-x: hidden`. Se le dio
+margen interno compensado (`-m-1.5 p-1.5`), sin cambiar el ancho visible. Verificado en
+Chromium con un escaneo de contornos recortados en `/design` (ninguno) y captura.
+

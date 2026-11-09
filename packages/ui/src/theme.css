@@ -310,6 +310,14 @@
     color: var(--color-label);
   }
 
+  /* Hardening: a control's material layers (blend modes, glow gradients) can
+     never paint outside the control's own rounded box. Measured pixel-neutral
+     in Chromium (same blended colors with and without the clip). It only clips
+     children; the control's own outline and shadow are unaffected. */
+  .vision-control.vision-surface {
+    overflow: clip;
+  }
+
   /* Idle (No Platter) */
   .vision-control[data-platter="false"] {
     --fill-lighten: transparent;
