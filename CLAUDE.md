@@ -12,7 +12,7 @@ El modelo dice qué sabemos y qué no: probabilidad de hielo hasta la profundida
 - **Contratos primero.** `packages/contracts/` (grilla, esquemas de STM, catálogo, medición y plan) es lo que conecta a los 6 roles. Cambiar un contrato = un solo PR que actualiza esquema, ejemplos, mocks y usos, y `python contracts/validate.py` pasa.
 - **Capas intercambiables.** Una capa nueva entra con un adaptador + una línea en `data/layers.yaml`. Si obliga a tocar código fuera de su adaptador, el diseño está mal.
 - **Sin aprendizaje por refuerzo para rutas.** Planificador clásico (valor de medir + A*), explicable.
-- **Interfaz en inglés y con terminología NASA** (EV1/EV2, IV, station, traverse, egress/ingress, walkback, STM). Usuarios técnicos: números reales visibles, color solo para alertas (advisory / caution / warning).
+- **Interfaz en inglés y con terminología NASA** (EV1/EV2, IV, station, traverse, egress/ingress, walkback, STM). Usuarios técnicos: números reales visibles, color solo para alertas (advisory / caution / warning), salvo los mapas de hielo, que van en tonos de azul.
 - **Citar toda fuente** (las reglas de Space Apps lo exigen) en `docs/SOURCES.md`. Créditos HiRISE: NASA/JPL-Caltech/UArizona.
 
 ## Estructura y dueños

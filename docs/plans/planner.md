@@ -81,8 +81,29 @@ Lo que ya existe en `packages/model/gp/`:
 | `add_measurement(post, medicion, herramienta)` | `(posterior nuevo, observación o None)`. Usa los contratos tal cual |
 | `simulate_outcome(post, x, y, threshold_m, "ice"/"no_ice")` | Posterior para cada rama |
 | `tool_yield(post, x, y, herramientas)` | Por herramienta: P por estación, mejor estación y estaciones esperadas hasta un hallazgo. Es el número de "con qué herramienta ir" |
+| `MapGrid`, `ice_maps(post, grid, threshold_m)`, `update_window(maps, post, puntos)` | Probabilidad e incertidumbre sobre una grilla, y su actualización alrededor de mediciones nuevas |
+| `map_payload(maps, site_id=..., bounds_lonlat=..., ...)` | La respuesta de `GET /maps` según `map.schema.json` |
 
 En el sitio real, con el hábitat por defecto: espectrómetro ~165 estaciones por hallazgo, taladro ~17 y radar ~1. El radar es optimista hasta la cuestión 30. Ver `EXPERIMENTS.md`.
+
+## Mapas de hielo (`GET /maps`), cuestiones 49 y 52 cerradas
+
+El GP ya da todo lo del mapa (`gp/maps.py`, re-exportado en `gp.planning`); falta servirlo y dibujarlo. Contrato: `packages/contracts/schemas/map.schema.json`, con ejemplo en `examples/map.example.json` (regenerar con `python packages/model/scripts/export_map_example.py`). **Se manda la grilla de valores, no una imagen:** el front pinta.
+
+**API (Planificador):**
+
+1. Al arrancar, armar el mapa base de la zona de la EVA y cachearlo por umbral: `MapGrid.around(*habitat_xy, half_m, 10)` con `ice_maps(post, grid, threshold_m)`. Con 3 × 3.5 km a 10 m tarda ~1.7 s, una vez.
+2. `GET /maps?plan_id=...` devuelve todas las capas en una respuesta (hoy existe `GET /maps/{kind}` en `pending`: reemplazarlo). Con `plan_id`, aplicar al mapa base `update_window(maps, post_del_plan, posiciones_de_las_mediciones)` (~0.04 s) y cachear por plan. Sin `plan_id`, el mapa base.
+3. Respuesta: `map_payload(maps, site_id=..., bounds_lonlat=..., plan_id=..., craters_in_model=..., measurements_in_model=...)`. `bounds_lonlat` sale de `xy_to_lonlat` en las esquinas de `payload["bounds_xy_m"]`.
+4. No aceptar tamaños de grilla del cliente sin tope: `MapGrid` ya rechaza más de 2 millones de celdas. La zona de la EVA pesa ~275 kB; conviene comprimir la respuesta (`GZipMiddleware` de FastAPI).
+
+**Web (Frontend):**
+
+1. Decodificar cada capa: base64 a bytes, `valor = min + q / 254 × (max − min)`, `q = 255` sin dato. Fila 0 al norte, columna 0 al oeste.
+2. Pintar en un `canvas` (`ImageData`, un píxel por celda) con las paradas de `palettes[capa].stops`, interpolando en RGB, y apoyarlo en Cesium con `SingleTileImageryProvider` y `Rectangle.fromDegrees(west, south, east, north)` (longitud este de 0 a 360).
+3. Capas: **"Ice potential"** por defecto (`palettes.potential`: color de la probabilidad mezclado con `fog_color` en proporción a `uncertainty`), "Ice probability", "Uncertainty" y "Change vs. prior" (`probability − prior_probability`). Las dos últimas se calculan en el navegador: cambiar de capa no pide nada al back.
+4. Leyenda desde `palettes` y valor de la celda al pasar el mouse (por ejemplo "P(ice ≤ 3 m) 67 % · uncertainty 0.95"). Sin contornos duros (`research/diseno-interfaz.md` §5.1).
+5. Colores en tonos de azul (DECISIONS 2026-11-10); `gp.maps.to_rgba` y `potential_rgba` son la referencia para comparar.
 
 ## Datos y despliegue
 

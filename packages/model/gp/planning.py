@@ -22,6 +22,9 @@ import numpy as np
 from scipy.special import entr, ndtr
 
 from gp.craters import DEFAULT_CATALOG, load_catalog, to_observations
+
+# Mapas para la web (`GET /maps` y `map.schema.json`): detalle en `gp/maps.py`.
+from gp.maps import IceMaps, MapGrid, ice_maps, map_payload, update_window  # noqa: F401
 from gp.observations import (
     NEUTRON_SIGMA_LOG,
     RADAR_FALSE_REFLECTOR_P,

@@ -8,11 +8,11 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | --- | --- | --- |
 | HiRISE DTM y ortoimágenes de S1094b | https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155 | NASA/JPL-Caltech/UArizona |
 | HiRISE DTM, copia COG controlada (CC0), la que lee el planificador | https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.tif | NASA/JPL-Caltech/UArizona; USGS Astrogeology |
-| Mapas de consistencia de hielo SWIM | https://swim.psi.edu/SWIM4MIMProducts.php | Morgan et al. (2021) Nature Astronomy; SWIM (PSI/JPL) |
+| Mapas de consistencia de hielo SWIM (Ci 0-1 m y 1-5 m, GeoTIFF del 2025-08-04; licencia no declarada, cuestión 56) | https://swim.psi.edu/SWIM4MIMProducts.php | Morgan et al. (2021) Nature Astronomy; SWIM (PSI/JPL) |
 | Mosaico global CTX | https://murray-lab.caltech.edu/CTX/ | Dickson et al. (2024) Earth and Space Science; NASA/JPL/MSSS/The Murray Lab |
 | Inercia térmica THEMIS | https://astrogeology.usgs.gov | Fergason et al. (2006) JGR; USGS / ASU |
 | MOLA-HRSC 200 m | https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m | Fergason, Hare & Laura (2018) USGS |
-| Catálogo de cráteres nuevos | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets |
+| Catálogo de cráteres nuevos (tabla S1, CC BY 4.0; los encabezados de latitud y longitud están cruzados en el original) | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets |
 | Exposiciones de hielo | https://doi.org/10.5066/P9Y8FR1R | Dundas et al. (2021) USGS |
 | Clima espacial | https://ccmc.gsfc.nasa.gov/tools/DONKI | NASA CCMC DONKI (acreditar a CCMC) |
 | Mosaico Viking MDIM 2.1 colorizado, 232 m/px (fondo del globo sin token) | https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml | NASA/USGS Astrogeology Science Center, vía NASA Trek |
@@ -82,6 +82,8 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | `RADAR_NO_REFLECTOR_SIGMA_LOG = 0.5` | "Sin reflector" como cota débil | Atenuación o poco contraste; P(no detecta) ~0.30 en hielo poroso, sin tasa publicada |
 | `NEUTRON_SIGMA_LOG = 0.3` | Alcance gradual del espectrómetro | ~0.4-1 m alrededor de 0.6 m (`research/viabilidad-expediciones.md`) |
 | `CRATER_ERROR_M = 0.15`, usado en un taladro | Error de un taladro que no informa el suyo | Se reutiliza el valor de cráteres: 1 px en Dundas et al. (2023). Para taladro, sin fuente |
+| Profundidad excavada = 0.1 × diámetro (prior regional) | Hasta dónde "ve" un cráter nuevo de Daubar 2022: con hielo, d < 0.1·D; sin hielo, d > 0.1·D | Sin fuente directa. Byrne et al. 2009 describe cráteres con hielo de pocos metros y decímetros de profundidad (~0.1; resumen en [Dundas et al. 2014, USGS](https://pubs.usgs.gov/publication/70073409)); el DTM de S1094b da ~0.14 ([HiRISE](https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155)). Con 0.2 el regional no coincide con el sitio (`EXPERIMENTS.md`, 2026-11-10). Fuente posible: cuestión 57 |
+| Alcance de 100 m fuera de S1094b | Alcance del kernel en un sitio sin catálogo | Se toma el ajustado en S1094b; sin fuente para otros sitios |
 
 ## Software
 

@@ -379,3 +379,27 @@ Terreno real, 349 cráteres sintéticos, STM con umbral de 3 m.
 | Clicks por System Events para Safari | Caen en la ventana activa (Finder, Ghostty) | Usar CGEvent y `screencapture -l` |
 | Escaneo de contornos de foco recortados en `/design` (antes/después del arreglo de `Alert`) | Antes: campo y última acción de la alerta recortados; después: ninguno | Arreglado |
 
+
+## 2026-11-10: prior regional con Daubar 2022 y mapa de calor (GP)
+
+Datos: tabla S1 de Daubar et al. 2022 (1203 cráteres nuevos, CC BY 4.0, checksum de Zenodo comprobado) y SWIM 4 MIM Ci 0-1 m y 1-5 m (GeoTIFF del 2025-08-04). Todo en `data/raw/` y `data/processed/daubar2022/`, fuera de Git; scripts en `data/processed/daubar2022/analysis/`. **En la tabla original, los encabezados de latitud y longitud están cruzados**: "Latitude (deg E)" trae valores de -82 a 75 (es la latitud) y "Longitude (deg N)" de 0 a 360 (es la longitud este).
+
+Modelo: `log d` normal con media lineal en las variables; un cráter con hielo dice d < r·D y uno sin hielo, d > r·D (r = profundidad excavada / diámetro). Es una regresión probit con `log(r·D)` como offset, la misma lógica censurada del GP. Validación: dejar afuera cada sector de 60° de longitud.
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Hielo por latitud (norte) | 30-35°: 0 de 44; 35-40°: 2 de 43; 40-45°: 7 de 32; 45-50°: 7 de 21; 50-60°: 10 de 20; > 60°: 11 de 15 | La latitud domina |
+| SWIM 0-1 m en el norte (> 20°N) | Ci < 0: 0 de 141; 0-0.3: 2 de 135; 0.3-0.6: 14 de 77; > 0.6: 10 de 30 | SWIM también separa |
+| Variantes, r = 0.1, sin "posibles" | Log-loss en validación: constante 0.258, latitud 0.101, SWIM 0-1 m 0.136, SWIM 1-5 m 0.217, latitud + SWIM 0.151 | **Gana la latitud sola**; latitud + SWIM se sobreajusta (26 cráteres con hielo) |
+| Franja 30-50°N, validación | Latitud: 13.0 esperados por 16 observados, log-loss 0.213; SWIM 0-1 m: 16.1 esperados, 0.248; tasa fija 0.371 | La latitud predice mejor; SWIM calibra mejor el conteo |
+| S1094b (35.11°N), latitud, r = 0.1 | Mediana 2.89 m (IC 90 % bootstrap 1.96-4.47), desvío de `log d` 0.62 residual y 0.67 total; P(d ≤ 1 m) 0.056, P(d ≤ 3 m) 0.52 | **Coincide con el prior del sitio** (2.36 m, 0.55; ajustado con 349 cráteres que el regional no usa) |
+| S1094b, SWIM 0-1 m solo (Ci 0.22) | Mediana 3.04 m, desvío 0.77 | Igual orden que la latitud |
+| Sensibilidad a r | Con r = 0.2, la mediana en S1094b pasa a ~6 m | **El sitio favorece r = 0.1**. La estimación del sitio también descansa en supuestos (k = 0.86 y 0.2 × D) |
+| "Posibles" como hielo | Mediana 3.3 m, desvío 0.95 | Más incertidumbre, mismo orden |
+| Hemisferio sur | 30 cráteres al sur de 40°S, 11 con hielo; mezclado con el norte, el ajuste se vuelve inestable (IC de miles de metros) | Solo hemisferio norte; en el sur, aviso "sin datos regionales" |
+| Mapa de calor, sitio entero a 20 m (190 568 celdas) | 3.2 s; fondo parejo P = 0.67 y 0.92 bits; manchas de ~100 m en cada cráter | Sin zonas grandes "calientes": los datos no las tienen |
+| Mapa de la zona de la EVA, 3 × 3.5 km a 10 m (105 000 celdas) | 1.6 s una vez; reflector de radar simulado a 1.2 m: P local de 0.67 a 0.82; EP con un dato más 0.09 s y recálculo de ±300 m (2828 celdas) 0.04 s | Mapa base cacheado y actualización por ventana: entra en el presupuesto de `/replan` |
+| Incertidumbre como desvío relativo de la parte espacial | Junto a un cráter de fondo plano a 0.5 m queda en ~0.85: en S1094b la mitad de la varianza es nugget y ni una medición exacta la baja de 0.71 | Se normaliza entre lo que deja una medición exacta en la celda (0) y el prior (1). Con eso, solo el 1.4 % de la zona de la EVA queda por debajo de 0.9 |
+| Formato de datos para la web, zona de la EVA (300 × 350 celdas) | JSON con dos capas de 8 bits, paletas y bordes: 275 kB; mapa 1.7 s, actualización tras un reflector de radar 0.04 s | Entra en el presupuesto; el potencial se ve como neblina gris con manchas azules donde hay cráteres |
+
+Límites: r sin fuente directa (Byrne 2009 describe cráteres de pocos metros y decímetros de profundidad, ~0.1; el DTM de S1094b da 0.14); un "no hielo" puede ser hielo ya sublimado o no visible; solo 2 cráteres con hielo entre 30 y 40°N, así que S1094b es una extrapolación.

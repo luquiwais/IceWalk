@@ -28,10 +28,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 9 | ¿Premio objetivo? | Best Use of Science | Producto | 04/11 |
 | 47 | ¿Ventana de Planning anclada a la izquierda, cámara centrada en el área libre y modo Map focus? | Sí (`research/diseno-interfaz.md` §2.1) | Frontend | 09/11 |
 | 48 | ¿Barra de estado arriba, igual en Planning, EV y Science (PET, walkback, bingo, alerta tope, mini-timeline)? | Sí (§2.2; NASA-STD-3001 V2 10005) | Frontend + Producto | 09/11 |
-| 49 | ¿Mapa por defecto con supresión de valor por incertidumbre (VSUP), en un tono sin significado de alerta? | Sí; probar índigo o violeta contra HiRISE (§5.1) | Diseño + GP | 09/11 |
 | 50 | ¿El antes/después de la demo pasa a ser local (~200 m alrededor de la medición) + puntos confirmados? | Sí: la incertidumbre del sitio entero casi no baja (§7) | Luqui + GP | 09/11 |
 | 51 | ¿`tool_assessment` (rendimiento por herramienta) en el plan o como endpoint aparte? | Bloque aditivo o endpoint, sin tocar `/replan` (§3.2) | Planificador + GP | 09/11 |
-| 52 | ¿Quién sirve los rasters de `/maps` (hoy `pending`) y cuándo? | Antes del congelamiento del 12/11 | GP + Planificador | 09/11 |
 | 53 | ¿La vista EV usa paneles sólidos aunque el estilo sea visionOS? | Sí, por legibilidad con luz extrema (§4.3) | Frontend | 09/11 |
 | 54 | ¿El radar va en la ruta y en «Which tool?», o como herramienta de estación? En los mocks todas las estaciones usan el taladro | En la ruta, coherente con DECISIONS | Planificador | 09/11 |
 | 55 | ¿Qué umbrales de walkback margin disparan caution y warning? (el re-plan deja 2.2 min sin alerta) | Declararlos como supuestos en la STM | Planificador + Producto | 09/11 |
@@ -41,6 +39,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | # | Cuestión | Quién |
 | --- | --- | --- |
 | 26 | ¿Qué licencia tiene la tabla de Dundas 2023? Hasta saberlo, no se sube a Git | GP |
+| 56 | ¿Qué licencia tiene SWIM? La página no la declara. Hasta saberlo, no se redistribuyen los rasters ni los valores leídos (están en `data/raw/swim4mim/` y `data/processed/daubar2022/`, fuera de Git) | GP |
+| 57 | El dataset de Dundas 2021 (USGS, CC0, [DOI 10.5066/P9Y8FR1R](https://doi.org/10.5066/P9Y8FR1R)) puede traer la profundidad del hielo por cráter, que daría fuente a la relación 0.1 del prior regional. ScienceBase pide una verificación anti-bots: bajarlo a mano desde el navegador | Luqui |
 | 12 | ¿Tusberti comparte los polígonos de bloques y hielo? | Visión |
 | 13 | VRAM, CUDA y uso prolongado del servidor con GPU | Luqui |
 | 14 | ¿Hay imágenes HiRISE posteriores a feb 2023 con el cráter cubierto? | Visión |
