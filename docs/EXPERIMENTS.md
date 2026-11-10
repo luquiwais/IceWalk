@@ -379,3 +379,15 @@ Terreno real, 349 cráteres sintéticos, STM con umbral de 3 m.
 | Clicks por System Events para Safari | Caen en la ventana activa (Finder, Ghostty) | Usar CGEvent y `screencapture -l` |
 | Escaneo de contornos de foco recortados en `/design` (antes/después del arreglo de `Alert`) | Antes: campo y última acción de la alerta recortados; después: ninguno | Arreglado |
 
+
+## 2026-11-09: composición inmersiva y movimiento (Codex)
+
+Ver `research/diseno-inmersivo-y-motion.md` y `research/motion-audit-2026-11-09.json`.
+
+- Dos composiciones previas (panel lateral / workspace dividido) rechazadas por Eitan: densidad, espacios y componentes inconsistentes. La actual usa escena completa y ventanas contextuales.
+- Red→green en selección/disclosure de listas, hit area de campos, orientación compacta de tabs y presencia con salida/interrupción/Reduce Motion. UI 74 y web 38 tests; lint/tipos pasan.
+- Auditoría anterior a motion: 35 estados, 680 observaciones de controles, 320/390/1024/1440 px. Detectó y corrigió dock recortado, nav cubierta por panel, zoom sin fondo, Targets sin representación y estaciones que saltaban al replan.
+- Primera implementación motion con blur animado y geometría por cuadro: Eitan reportó lag y poco parecido con Apple. Retirada. Se detectó selección duplicada y portal que desaparecía antes de terminar: corregidos.
+- 36 acciones en producción con animaciones observadas; p95 habitual 16.7–16.8 ms, sin long tasks. Picos fríos de hasta 100 ms; repetir menú y time picker dio 16.7–16.8 ms. No equivale a garantizar 60 fps ni a validar Safari.
+- Alerta real retiene salida y recupera foco. Último cambio de rueda pasó checks, aún sin QA visual final.
+- Una última captura se atascó en agent-browser al cambiar viewport; no se confirmó defecto de aplicación. `web:test` simultáneo con `web:build` falló por recopia de Cesium; ejecutados secuencialmente pasan.

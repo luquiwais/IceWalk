@@ -104,3 +104,7 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 | 2026-11-09 | Los controles con capas de material recortan a su caja redondeada (`.vision-control.vision-surface { overflow: clip }`) | Endurecimiento contra capas claras sin radio, pixel-neutro en Chromium. No confirma la causa del bug de hover |
 | 2026-11-09 | Bug de hover en Safari (capa más clara sin radio, varios ítems en hover, buscador que titila al scrollear) diferido hasta después del diseño real | Eitan: se ve a simple vista en Safari, no en capturas; no bloquea el diseño |
 | 2026-11-09 | `Alert` deja margen interno para el contorno de foco de campos y acciones a todo el ancho | Bug de Eitan: el input de las alertas se veía cortado |
+
+| 2026-11-09 | Demo inmersiva con mocks locales, ventanas contextuales y datos secundarios desplegables; sin grabber decorativo en app/playbook. Sustituye la propuesta frontend de ventana fija izquierda (#47) y paneles EV sólidos (#53) por pedido explícito de Eitan | Diseño solicitado; no altera contratos, rasters ni reglas del planificador |
+| 2026-11-09 | Movimiento compartido con presencia interrumpible, salida retenida, lente de selección y deformación de pintura independiente; blur constante y Reduce Motion | Apple HIG/WWDC y reporte de lag de Eitan; no transformar ancestros del vidrio |
+| 2026-11-09 | Inputs nuevos del playbook, incluidos números, después de terminar motion; publicar ahora como avance sin aprobación estética | Orden explícito de Eitan al cerrar la sesión |

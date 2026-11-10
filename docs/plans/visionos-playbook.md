@@ -137,3 +137,9 @@ recortado por el `SurfaceScroll` de `Alert`, que tiene `overflow-x: hidden`. Se 
 margen interno compensado (`-m-1.5 p-1.5`), sin cambiar el ancho visible. Verificado en
 Chromium con un escaneo de contornos recortados en `/design` (ninguno) y captura.
 
+
+## Avance guardado: motion e inputs (2026-11-09)
+
+Implementados en el kit: presencia con salida/interrupción, collapse medido, selección deslizante/deformación, estados de controles y page control, menús/submenús/pickers/alertas/tooltip/share sheet, toolbar, notificaciones/avisos, calendario, teclado, títulos, métricas y rueda. `ListRow` distingue selección, disclosure real y acción; field hit area completa; tab bar compacta horizontal web; cursores semánticos.
+
+**No dar motion por cerrado.** Primero revisar picos fríos, Safari, Reduce Motion y rueda final; contrastar demos Apple con Eitan y completar estados faltantes. Evidencia y límites: `../research/diseno-inmersivo-y-motion.md`. Después, por pedido explícito de Eitan, ampliar inputs numéricos y demás tipos faltantes. No comenzar ese inventario en lugar de cerrar motion.

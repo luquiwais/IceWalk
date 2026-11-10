@@ -1,0 +1,502 @@
+{
+  "environment": "Chromium headless, local production :3001, 1440x900 and 390x844; before final wheel change",
+  "states": [
+    {
+      "state": "segmented",
+      "frames": 23,
+      "p95": 16.799999999999955,
+      "max": 16.800000000000068,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "borderBottomColor",
+        "borderLeftColor",
+        "borderRightColor",
+        "borderTopColor",
+        "left",
+        "scale",
+        "width"
+      ]
+    },
+    {
+      "state": "tabbar",
+      "frames": 25,
+      "p95": 16.700000000000045,
+      "max": 16.799999999999955,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "opacity",
+        "scale",
+        "top",
+        "translate"
+      ]
+    },
+    {
+      "state": "tabbar-collapse",
+      "frames": 24,
+      "p95": 16.700000000000045,
+      "max": 16.700000000000045,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "left",
+        "scale",
+        "width"
+      ]
+    },
+    {
+      "state": "tabbar-expand",
+      "frames": 24,
+      "p95": 16.800000000000182,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "left",
+        "opacity",
+        "scale",
+        "translate",
+        "width"
+      ]
+    },
+    {
+      "state": "menu-open",
+      "frames": 24,
+      "p95": 16.800000000000182,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "backgroundColor",
+        "borderBottomLeftRadius",
+        "borderBottomRightRadius",
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "color",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "submenu-open",
+      "frames": 24,
+      "p95": 16.799999999999727,
+      "max": 16.799999999999727,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "backgroundColor",
+        "borderBottomLeftRadius",
+        "borderBottomRightRadius",
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "menu-close",
+      "frames": 24,
+      "p95": 16.700000000000273,
+      "max": 16.799999999999272,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "backgroundColor",
+        "borderBottomLeftRadius",
+        "borderBottomRightRadius",
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "color",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "sidebar-collapse",
+      "frames": 25,
+      "p95": 16.800000000000182,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "height",
+        "opacity",
+        "rotate"
+      ]
+    },
+    {
+      "state": "sidebar-expand",
+      "frames": 24,
+      "p95": 16.800000000000182,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "height",
+        "opacity",
+        "rotate"
+      ]
+    },
+    {
+      "state": "page-control",
+      "frames": 24,
+      "p95": 16.700000000000728,
+      "max": 16.700000000000728,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "opacity",
+        "translate",
+        "width"
+      ]
+    },
+    {
+      "state": "switch",
+      "frames": 24,
+      "p95": 16.800000000000182,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "backgroundColor",
+        "boxShadow",
+        "marginLeft"
+      ]
+    },
+    {
+      "state": "checkbox",
+      "frames": 24,
+      "p95": 16.700000000000728,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "backgroundColor",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "search-clear",
+      "frames": 24,
+      "p95": 16.799999999999272,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "opacity",
+        "width"
+      ]
+    },
+    {
+      "state": "calendar-month",
+      "frames": 24,
+      "p95": 16.799999999999272,
+      "max": 33.23999999999978,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "opacity",
+        "translate"
+      ]
+    },
+    {
+      "state": "date-open",
+      "frames": 23,
+      "p95": 16.700000000000728,
+      "max": 16.700000000000728,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "backgroundColor",
+        "color",
+        "opacity",
+        "translate"
+      ]
+    },
+    {
+      "state": "time-open",
+      "frames": 19,
+      "p95": 100,
+      "max": 100,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "backgroundColor",
+        "color",
+        "opacity"
+      ]
+    },
+    {
+      "state": "color-tab",
+      "frames": 24,
+      "p95": 16.799999999999272,
+      "max": 16.799999999999272,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "borderBottomColor",
+        "borderLeftColor",
+        "borderRightColor",
+        "borderTopColor",
+        "left",
+        "scale",
+        "width"
+      ]
+    },
+    {
+      "state": "alert-open",
+      "frames": 24,
+      "p95": 16.799999999999272,
+      "max": 16.80000000000109,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "alert-close",
+      "frames": 25,
+      "p95": 16.799999999999272,
+      "max": 16.80000000000109,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "dialog-open",
+      "frames": 24,
+      "p95": 16.799999999999272,
+      "max": 16.80000000000109,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "dialog-close",
+      "frames": 23,
+      "p95": 16.700000000000728,
+      "max": 16.700000000000728,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "notification-dismiss",
+      "frames": 25,
+      "p95": 16.700000000000728,
+      "max": 16.700000000000728,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity"
+      ]
+    },
+    {
+      "state": "notification-restore",
+      "frames": 23,
+      "p95": 16.799999999999272,
+      "max": 16.80000000000109,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity"
+      ]
+    },
+    {
+      "state": "notice-dismiss",
+      "frames": 24,
+      "p95": 16.700000000000728,
+      "max": 16.799999999999272,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity"
+      ]
+    },
+    {
+      "state": "notice-restore",
+      "frames": 24,
+      "p95": 16.799999999999272,
+      "max": 16.799999999999272,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity"
+      ]
+    },
+    {
+      "state": "share-open",
+      "frames": 22,
+      "p95": 16.700000000000728,
+      "max": 50.100000000000364,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "keyboard-shift",
+      "frames": 25,
+      "p95": 16.799999999999272,
+      "max": 16.80000000000291,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "opacity",
+        "translate"
+      ]
+    },
+    {
+      "state": "keyboard-numeric",
+      "frames": 23,
+      "p95": 16.80000000000291,
+      "max": 16.80000000000291,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "opacity",
+        "translate"
+      ]
+    },
+    {
+      "state": "panel-open",
+      "frames": 25,
+      "p95": 16.700000000000045,
+      "max": 16.799999999999955,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale",
+        "translate"
+      ]
+    },
+    {
+      "state": "disclosure-open",
+      "frames": 25,
+      "p95": 16.700000000000045,
+      "max": 16.799999999999955,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "height",
+        "opacity",
+        "rotate"
+      ]
+    },
+    {
+      "state": "disclosure-close",
+      "frames": 24,
+      "p95": 16.700000000000045,
+      "max": 16.700000000000045,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "height",
+        "opacity",
+        "rotate"
+      ]
+    },
+    {
+      "state": "view-switch",
+      "frames": 25,
+      "p95": 16.700000000000045,
+      "max": 16.799999999999955,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale",
+        "top",
+        "translate",
+        "width"
+      ]
+    },
+    {
+      "state": "panel-close",
+      "frames": 21,
+      "p95": 16.700000000000273,
+      "max": 66.69999999999982,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale",
+        "translate"
+      ]
+    },
+    {
+      "state": "focus-dock",
+      "frames": 24,
+      "p95": 16.800000000000182,
+      "max": 16.800000000000182,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "visibility"
+      ]
+    },
+    {
+      "state": "mobile-sidebar-open",
+      "frames": 17,
+      "p95": 83.29999999999995,
+      "max": 83.29999999999995,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale"
+      ]
+    },
+    {
+      "state": "mobile-sidebar-close",
+      "frames": 23,
+      "p95": 16.700000000000045,
+      "max": 16.700000000000045,
+      "longTasks": [],
+      "overflow": false,
+      "animated_properties": [
+        "--vision-lifetime",
+        "opacity",
+        "scale",
+        "visibility"
+      ]
+    }
+  ]
+}

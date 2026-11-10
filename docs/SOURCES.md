@@ -130,3 +130,9 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 | Taladro de Apollo (ALSD): motorizado, < 13.6 kg, dos personas | Manual MCR-69-300, https://ntrs.nasa.gov/api/citations/19710014920/downloads/19710014920.pdf |
 | Vis-NIR y XRF de mano, ~2.5 kg (BASALT) | Sehlke et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442242/ |
 | Bingo times y "sin respuesta a tiempo, sigue la prioridad propia" | Stevens et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282/ |
+
+### Movimiento y composición inmersiva (2026-11-09)
+
+- Apple HIG: [Motion](https://developer.apple.com/design/human-interface-guidelines/motion), [Spatial layout](https://developer.apple.com/design/human-interface-guidelines/spatial-layout), [Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars), [Materials](https://developer.apple.com/design/human-interface-guidelines/materials), [Pointing devices](https://developer.apple.com/design/human-interface-guidelines/pointing-devices).
+- Apple [Applying Liquid Glass to custom views](https://developer.apple.com/documentation/swiftui/applying-liquid-glass-to-custom-views), [Meet Liquid Glass WWDC25/219](https://developer.apple.com/videos/play/wwdc2025/219/), [SwiftUI WWDC25/323](https://developer.apple.com/videos/play/wwdc2025/323/), [UIKit WWDC25/284](https://developer.apple.com/videos/play/wwdc2025/284/).
+- [MDN cursor](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/cursor). Fuentes y calibraciones propias diferenciadas en `research/diseno-inmersivo-y-motion.md`.
