@@ -33,6 +33,11 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 52 | ¿Quién sirve los rasters de `/maps` (hoy `pending`) y cuándo? | Antes del congelamiento del 12/11 | GP + Planificador | 09/11 |
 | 54 | ¿El radar va en la ruta y en «Which tool?», o como herramienta de estación? En los mocks todas las estaciones usan el taladro | En la ruta, coherente con DECISIONS | Planificador | 09/11 |
 | 55 | ¿Qué umbrales de walkback margin disparan caution y warning? (el re-plan deja 2.2 min sin alerta) | Declararlos como supuestos en la STM | Planificador + Producto | 09/11 |
+| 56 | La web dice «S1094b · Arcadia Planitia» y el PRD ubica S1094b en Amazonis Planitia (Arcadia es el plan B, Erebus Montes). ¿Cuál es? | Verificar con la fuente del catálogo; mientras tanto la web muestra solo el id y las coordenadas | Luqui | 10/11 |
+| 57 | El hábitat por defecto (300, −2200) coincide con la estación 1 (E03S22), con traverse de 0 min. ¿Es lo esperado? | Revisar con Planificador; la web desplaza el marcador para que se vean los dos | Planificador | 10/11 |
+| 58 | Web + API: si se carga otra medición antes de que conteste `/replan`, el segundo pedido parte del mismo `plan_id` y el modelo pierde la primera. ¿Se bloquea el botón mientras carga o se encolan? | Bloquear mientras carga | Frontend + Planificador | 10/11 |
+| 59 | ¿El planificador real puede devolver un plan sin estaciones? Hoy el cliente web lo rechaza como respuesta inválida | Si puede, la web necesita un estado vacío | Planificador | 10/11 |
+| 60 | La web manda en la medición el `timestamp` fijo del mock (2040) y `tool: core_drill` aunque la estación tenga otras herramientas. ¿Qué espera `/replan`? | Hora real y la herramienta elegida en la estación | Frontend + Planificador | 10/11 |
 
 ## A averiguar
 
@@ -59,6 +64,7 @@ La FAQ prohíbe empezar antes del evento; el equipo decidió seguir. No se retoc
 
 ## Frontend: pendientes de esta iteración (2026-11-09)
 
+- **2026-11-10:** P0 hecho (PR #4, borrador). En curso: capa de datos de la API, revisión de código del bloque de motion y Etapa 1 del diseño nuevo (`plans/web-design.md`). El inventario de inputs del kit está en `log/2026-11-10.md`.
 - Terminar revisión de animaciones con Eitan: aún reporta lag, parecido insuficiente con Apple y estados faltantes. Revisar picos fríos, Safari real, Reduce Motion y rueda final. Ver `research/diseno-inmersivo-y-motion.md`.
 - Después de motion: ampliar el playbook con inputs numéricos y todos los demás tipos faltantes, por pedido de Eitan.
 - #47 y #53 resueltos solo para la composición frontend de la demo por instrucciones de Eitan; registrados en DECISIONS. #48–55 restantes siguen siendo decisiones del equipo; los mocks no fijan reglas operacionales.

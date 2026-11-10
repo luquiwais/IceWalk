@@ -391,3 +391,11 @@ Ver `research/diseno-inmersivo-y-motion.md` y `research/motion-audit-2026-11-09.
 - 36 acciones en producción con animaciones observadas; p95 habitual 16.7–16.8 ms, sin long tasks. Picos fríos de hasta 100 ms; repetir menú y time picker dio 16.7–16.8 ms. No equivale a garantizar 60 fps ni a validar Safari.
 - Alerta real retiene salida y recupera foco. Último cambio de rueda pasó checks, aún sin QA visual final.
 - Una última captura se atascó en agent-browser al cambiar viewport; no se confirmó defecto de aplicación. `web:test` simultáneo con `web:build` falló por recopia de Cesium; ejecutados secuencialmente pasan.
+
+
+## 2026-11-10: imágenes reales del sitio para la web
+
+- Lectura por ventanas de los ortos HiRISE en la copia COG de USGS (`/vsicurl/` con `rasterio`, vía `uv run --with rasterio`), sin bajar los `.tif` (50 a 700 MB): funciona y tarda segundos. `RED_C` (1.06 m/px) para el contexto y `RED_A` (0.27 m/px) para el detalle.
+- Los ortos están en equirectangular con `lat_ts=0` y `R=3396190`; la grilla usa `lat_ts=35.1105` y `R=3389574.349`. Un recorte sin reproyectar deja el píxel estirado ~22 % en x y el cráter corrido ~150 m en x respecto de (0, 0). Hay que reproyectar a la grilla. El registro final (≤ 20 m) lo mide el script `apps/web/scripts/build-site-imagery.py`.
+- La zona de las estaciones (x 100…400, y −2300…−2200) es terreno picado sin rasgos grandes; el cráter queda a 2.2 km al norte. Las dos líneas oscuras del orto son artefactos del sensor.
+- `gdal` no está instalado en la máquina de Eitan; `rasterio` por `uv` alcanza.

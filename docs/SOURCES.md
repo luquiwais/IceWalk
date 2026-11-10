@@ -136,3 +136,7 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 - Apple HIG: [Motion](https://developer.apple.com/design/human-interface-guidelines/motion), [Spatial layout](https://developer.apple.com/design/human-interface-guidelines/spatial-layout), [Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars), [Materials](https://developer.apple.com/design/human-interface-guidelines/materials), [Pointing devices](https://developer.apple.com/design/human-interface-guidelines/pointing-devices).
 - Apple [Applying Liquid Glass to custom views](https://developer.apple.com/documentation/swiftui/applying-liquid-glass-to-custom-views), [Meet Liquid Glass WWDC25/219](https://developer.apple.com/videos/play/wwdc2025/219/), [SwiftUI WWDC25/323](https://developer.apple.com/videos/play/wwdc2025/323/), [UIKit WWDC25/284](https://developer.apple.com/videos/play/wwdc2025/284/).
 - [MDN cursor](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/cursor). Fuentes y calibraciones propias diferenciadas en `research/diseno-inmersivo-y-motion.md`.
+
+### Imágenes del sitio en la web (2026-11-10)
+
+- Ortoimágenes HiRISE `ESP_073578_2155_RED_A_01_ORTHO` y `ESP_073578_2155_RED_C_01_ORTHO`. Crédito: NASA/JPL-Caltech/UArizona. Copia COG de USGS Astrogeology (CC0): https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/ (ver `provenance.txt` en esa carpeta). Capas `hirise_ortho_1m` y `hirise_ortho_25cm` de `data/layers.yaml`.
