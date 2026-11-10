@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 import { cn } from "./utils";
 
 type TimeWheelProps = {
@@ -21,6 +21,8 @@ function TimeWheel({
 }: TimeWheelProps) {
   const root = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const reel = useRef<HTMLDivElement>(null);
+  const motion = useRef<Animation | null>(null);
   const drag = useRef<{
     y: number;
     index: number;
@@ -36,6 +38,25 @@ function TimeWheel({
   const [draft, setDraft] = useState(value);
   const numeric = values.every((item) => /^\d+$/.test(item));
   const current = Math.max(0, values.indexOf(value));
+  const previous = useRef(current);
+  useLayoutEffect(() => {
+    let delta = current - previous.current;
+    previous.current = current;
+    const node = reel.current;
+    if (!node || !delta || drag.current?.moved || editing || typeof node.animate !== "function") return;
+    if (numeric && Math.abs(delta) > values.length / 2) delta -= Math.sign(delta) * values.length;
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const transform = getComputedStyle(node).transform;
+    const y = transform === "none" ? 0 : Number(transform.split(",")[5]?.replace(")", "")) || 0;
+    motion.current?.cancel();
+    if (reduced) return;
+    const height = ((root.current?.getBoundingClientRect().height || 204) * 32) / 204;
+    motion.current = node.animate([
+      { transform: `translateY(${y + Math.sign(delta) * height}px)` },
+      { transform: "translateY(0px)" },
+    ], { duration: 160, easing: "cubic-bezier(.2,.8,.2,1)" });
+  }, [current, editing, numeric, values.length]);
+  useEffect(() => () => motion.current?.cancel(), []);
   const indexRef = useRef(current);
   useEffect(() => {
     indexRef.current = current;
@@ -108,6 +129,7 @@ function TimeWheel({
     )
       return;
     event.preventDefault();
+    motion.current?.cancel();
     event.currentTarget.setPointerCapture?.(event.pointerId);
     input.current?.blur();
     drag.current = {
@@ -175,6 +197,7 @@ function TimeWheel({
       }}
     >
       <div
+        ref={reel}
         aria-hidden
         className={cn(
           "absolute inset-0 flex flex-col items-center justify-center",

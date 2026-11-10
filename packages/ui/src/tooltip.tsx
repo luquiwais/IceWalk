@@ -28,15 +28,13 @@ function Tooltip({ label, children, side = "bottom", className }: TooltipProps) 
         <TooltipPrimitive.Positioner side={side} sideOffset={8}>
           <TooltipPrimitive.Popup
             className={cn(
-              "vision-surface relative rounded-full px-3 py-1 text-caption-1 whitespace-nowrap text-label",
+              "vision-surface vision-motion-popup relative rounded-full px-3 py-1 text-caption-1 whitespace-nowrap text-label",
               "[--glass-stroke-width:0.75px] [--glass-stroke-angle:159.2deg] [--glass-stroke-alpha-start:0.45] [--glass-stroke-alpha-end:0.15] [--glass-stroke-start:8.56%] [--glass-stroke-fade:37.9%] [--glass-stroke-rise:50.2%] [--glass-stroke-end:80.1%]",
-              "origin-(--transform-origin) transition-[opacity,scale] duration-150 ease-(--ease-spring)",
-              "data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0",
               className,
             )}
           >
             <MaterialLayers kind="tooltip" />
-            <span>{label}</span>
+            <span data-motion-ink>{label}</span>
           </TooltipPrimitive.Popup>
         </TooltipPrimitive.Positioner>
       </TooltipPrimitive.Portal>

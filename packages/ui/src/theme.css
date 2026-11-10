@@ -1,3 +1,5 @@
+@import "./motion.css";
+
 /*
  * IceWalk design tokens: a 1:1 port of Apple's visionOS 26 Figma kit
  * (Community, file TE1ta1HNhtbwSZn3LztSL5): Colors, Materials, Text Styles,
@@ -400,6 +402,22 @@
 }
 
 @layer base {
+  /* Desktop/web pointing-device semantics. Native visionOS uses gaze, while
+     this web port needs honest cursors for the operations it actually supports. */
+  :where(button, [role="button"], [role="tab"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="checkbox"], [role="radio"], [role="switch"], summary, a[href]) {
+    cursor: pointer;
+  }
+  :where([data-text-style], [data-slot="text-field"], input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"]), textarea, [contenteditable="true"]) {
+    cursor: text;
+  }
+  /* Typography and material layers inside a control retain its cursor. */
+  :where(button, [role="button"], [role="tab"], [role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="checkbox"], [role="radio"], [role="switch"], summary, a[href]) * {
+    cursor: inherit;
+  }
+  :where(:disabled, [aria-disabled="true"], [data-disabled]) {
+    cursor: not-allowed;
+  }
+
   /*
    * Scale. visionOS sizes are points, and the kit composes every screen in a
    * 1920x1080 frame (the field of view). The viewport plays that frame:

@@ -111,14 +111,14 @@ function PageControl({
         >
           <span
             aria-hidden
+            data-slot="page-dot"
+            data-current={i === value}
             className={cn(
               "relative h-2 rounded-full bg-white/30",
               i === value ? "w-4" : "w-2 group-hover:bg-white/60",
             )}
           >
-            {i === value ? (
-              <span className="absolute right-0 size-2 rounded-full bg-white" />
-            ) : null}
+            <span className="absolute right-0 size-2 rounded-full bg-white" />
           </span>
         </button>
       ))}

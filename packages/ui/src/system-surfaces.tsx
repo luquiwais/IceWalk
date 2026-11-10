@@ -5,6 +5,8 @@ import { X } from "lucide-react";
 import type { ReactElement, ReactNode } from "react";
 import { Button, IconButton } from "./button";
 import { MaterialLayers, SurfaceScroll } from "./material";
+import { MotionPresence } from "./motion";
+import { useState } from "react";
 import { Text } from "./text";
 import { cn } from "./utils";
 
@@ -36,17 +38,19 @@ function SystemDialog({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger render={trigger} />
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[3px]" />
+        <Dialog.Backdrop className="vision-motion-backdrop fixed inset-0 z-40 bg-black/25 backdrop-blur-[3px]" />
         <Dialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <Dialog.Popup
             className={cn(
-              "vision-surface vision-popup-glass relative flex max-h-[calc(100dvh-2rem)] w-[27.25rem] max-w-full flex-col overflow-clip rounded-[2.875rem] text-label outline-none",
+              "vision-surface vision-popup-glass vision-motion-dialog relative flex max-h-[calc(100dvh-2rem)] w-[27.25rem] max-w-full flex-col overflow-clip rounded-[2.875rem] text-label outline-none",
               className,
             )}
           >
             <MaterialLayers kind="glass" />
             <div className="relative flex shrink-0 items-center justify-between gap-4 px-6 pt-5 pb-4">
-              <Dialog.Title className="text-title-3">{title}</Dialog.Title>
+              <Dialog.Title data-motion-ink className="text-title-3">
+                {title}
+              </Dialog.Title>
               <Dialog.Close
                 render={<IconButton label="Close" showTooltip={false} />}
               >
@@ -87,11 +91,11 @@ function Alert({
     <Dialog.Root>
       <Dialog.Trigger render={trigger} />
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[3px]" />
+        <Dialog.Backdrop className="vision-motion-backdrop fixed inset-0 z-40 bg-black/25 backdrop-blur-[3px]" />
         <Dialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <Dialog.Popup
             role="alertdialog"
-            className="vision-surface vision-popup-glass relative flex max-h-[calc(100dvh-2rem)] w-80 max-w-full flex-col overflow-clip rounded-[2rem] p-5 text-center text-label outline-none"
+            className="vision-surface vision-popup-glass vision-motion-dialog relative flex max-h-[calc(100dvh-2rem)] w-80 max-w-full flex-col overflow-clip rounded-[2rem] p-5 text-center text-label outline-none"
           >
             <MaterialLayers kind="glass" />
             {/* -m/p 1.5: room for the 4pt focus outline of full-width fields and the last action, which the scroller would clip. */}
@@ -105,7 +109,9 @@ function Alert({
                 </span>
               ) : null}
               <div className="w-full px-4 py-2">
-                <Dialog.Title className="text-title-3">{title}</Dialog.Title>
+                <Dialog.Title data-motion-ink className="text-title-3">
+                  {title}
+                </Dialog.Title>
                 <Dialog.Description
                   render={
                     <Text
@@ -179,58 +185,61 @@ function Notification({
   onDismiss?: () => void;
   className?: string;
 }) {
+  const [dismissed, setDismissed] = useState(false);
   return (
-    <article
-      aria-label={`${app} notification`}
-      className={cn(
-        "vision-surface relative flex w-[27.25rem] max-w-full flex-col gap-4 rounded-[2.875rem] px-6 py-5 text-label [--glass-stroke-width:1.4px] [--glass-stroke-angle:147.397deg]",
-        className,
-      )}
-    >
-      <NotificationMaterial />
-      <header className="relative flex items-center gap-4">
-        {icon ? (
-          <span
-            aria-hidden
-            className="flex size-13 shrink-0 items-center justify-center rounded-full [&_svg]:size-7"
-          >
-            {icon}
+    <MotionPresence present={!dismissed} onExitComplete={onDismiss}>
+      <article
+        aria-label={`${app} notification`}
+        className={cn(
+          "vision-surface relative flex w-[27.25rem] max-w-full flex-col gap-4 rounded-[2.875rem] px-6 py-5 text-label [--glass-stroke-width:1.4px] [--glass-stroke-angle:147.397deg]",
+          className,
+        )}
+      >
+        <NotificationMaterial />
+        <header className="relative flex items-center gap-4">
+          {icon ? (
+            <span
+              aria-hidden
+              className="flex size-13 shrink-0 items-center justify-center rounded-full [&_svg]:size-7"
+            >
+              {icon}
+            </span>
+          ) : null}
+          <span className="min-w-0 flex-1">
+            <Text variant="headline">{app}</Text>
+            <Text variant="footnote" tone="secondary">
+              {time}
+            </Text>
           </span>
+          {onDismiss ? (
+            <IconButton
+              label="Dismiss notification"
+              showTooltip={false}
+              onClick={() => setDismissed(true)}
+            >
+              <X aria-hidden />
+            </IconButton>
+          ) : null}
+        </header>
+        <div className="relative">
+          <Text variant="headline">{title}</Text>
+          <Text variant="subheadline">{message}</Text>
+        </div>
+        {preview ? (
+          <div className="relative overflow-clip rounded-2xl">{preview}</div>
         ) : null}
-        <span className="min-w-0 flex-1">
-          <Text variant="headline">{app}</Text>
-          <Text variant="footnote" tone="secondary">
-            {time}
-          </Text>
-        </span>
-        {onDismiss ? (
-          <IconButton
-            label="Dismiss notification"
-            showTooltip={false}
-            onClick={onDismiss}
+        {actions.map((action) => (
+          <Button
+            key={action.label}
+            disabled={action.disabled}
+            onClick={action.onClick}
+            className="w-full"
           >
-            <X aria-hidden />
-          </IconButton>
-        ) : null}
-      </header>
-      <div className="relative">
-        <Text variant="headline">{title}</Text>
-        <Text variant="subheadline">{message}</Text>
-      </div>
-      {preview ? (
-        <div className="relative overflow-clip rounded-2xl">{preview}</div>
-      ) : null}
-      {actions.map((action) => (
-        <Button
-          key={action.label}
-          disabled={action.disabled}
-          onClick={action.onClick}
-          className="w-full"
-        >
-          {action.label}
-        </Button>
-      ))}
-    </article>
+            {action.label}
+          </Button>
+        ))}
+      </article>
+    </MotionPresence>
   );
 }
 
@@ -247,49 +256,52 @@ function TemporaryNotice({
   action?: SystemAction;
   onDismiss: () => void;
 }) {
+  const [dismissed, setDismissed] = useState(false);
   return (
-    <div
-      role="status"
-      className="vision-surface relative flex max-w-full flex-wrap items-center gap-3 rounded-[3rem] p-4 text-label [--glass-stroke-width:0.75px]"
-    >
-      <NotificationMaterial />
-      <IconButton
-        label="Dismiss notice"
-        size="small"
-        variant="plain"
-        showTooltip={false}
-        onClick={onDismiss}
+    <MotionPresence present={!dismissed} onExitComplete={onDismiss}>
+      <div
+        role="status"
+        className="vision-surface relative flex max-w-full flex-wrap items-center gap-3 rounded-[3rem] p-4 text-label [--glass-stroke-width:0.75px]"
       >
-        <X aria-hidden />
-      </IconButton>
-      {icon ? (
-        <span
-          aria-hidden
-          className="flex size-11 items-center justify-center [&_svg]:size-6"
+        <NotificationMaterial />
+        <IconButton
+          label="Dismiss notice"
+          size="small"
+          variant="plain"
+          showTooltip={false}
+          onClick={() => setDismissed(true)}
         >
-          {icon}
-        </span>
-      ) : null}
-      <div className="relative min-w-0 flex-1">
-        <Text variant="headline" className="leading-6">
-          {title}
-        </Text>
-        {subtitle ? (
-          <Text
-            variant="subheadline"
-            tone="secondary"
-            className="-mt-1 leading-6"
+          <X aria-hidden />
+        </IconButton>
+        {icon ? (
+          <span
+            aria-hidden
+            className="flex size-11 items-center justify-center [&_svg]:size-6"
           >
-            {subtitle}
+            {icon}
+          </span>
+        ) : null}
+        <div className="relative min-w-0 flex-1">
+          <Text variant="headline" className="leading-6">
+            {title}
           </Text>
+          {subtitle ? (
+            <Text
+              variant="subheadline"
+              tone="secondary"
+              className="-mt-1 leading-6"
+            >
+              {subtitle}
+            </Text>
+          ) : null}
+        </div>
+        {action ? (
+          <Button disabled={action.disabled} onClick={action.onClick}>
+            {action.label}
+          </Button>
         ) : null}
       </div>
-      {action ? (
-        <Button disabled={action.disabled} onClick={action.onClick}>
-          {action.label}
-        </Button>
-      ) : null}
-    </div>
+    </MotionPresence>
   );
 }
 

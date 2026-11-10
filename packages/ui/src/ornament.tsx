@@ -1,6 +1,7 @@
 "use client";
 
 import { Toolbar } from "@base-ui/react/toolbar";
+import { useLayoutEffect, useRef } from "react";
 
 import { MaterialLayers, SurfaceScroll } from "./material";
 import { cn } from "./utils";
@@ -12,19 +13,52 @@ import { cn } from "./utils";
  * Keyboard: Tab enters the toolbar, arrow keys move between items.
  */
 function Ornament({ className, children, ...props }: Toolbar.Root.Props) {
+  const content = useRef<HTMLDivElement>(null);
+  const host = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const node = content.current;
+    const root = host.current;
+    if (!node || !root) return;
+    const measure = () => {
+      const style = getComputedStyle(root);
+      root.style.setProperty(
+        "--ornament-width",
+        `${node.getBoundingClientRect().width + parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)}px`,
+      );
+      root.style.setProperty(
+        "--ornament-height",
+        `${node.getBoundingClientRect().height + parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)}px`,
+      );
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
   return (
     <Toolbar.Root
+      ref={host}
       data-slot="ornament"
       className={cn(
-        "vision-surface relative flex items-center overflow-clip rounded-full p-3 text-label [--glass-stroke-width:1.4px]",
+        "vision-surface vision-auto-toolbar relative flex items-center overflow-clip rounded-full p-3 text-label [--glass-stroke-width:1.4px]",
         "data-[orientation=vertical]:flex-col",
         className,
       )}
       {...props}
     >
       <MaterialLayers kind="glass" />
-      <SurfaceScroll direction={props.orientation === "vertical" ? "vertical" : "horizontal"} data-orientation={props.orientation} className="flex flex-1 items-center gap-2 [scrollbar-width:none] data-[orientation=vertical]:flex-col">
-        {children}
+      <SurfaceScroll
+        direction={props.orientation === "vertical" ? "vertical" : "horizontal"}
+        className="flex flex-1 [scrollbar-width:none]"
+      >
+        <div
+          ref={content}
+          data-orientation={props.orientation}
+          className="flex w-max shrink-0 items-center gap-2 data-[orientation=vertical]:flex-col"
+        >
+          {children}
+        </div>
       </SurfaceScroll>
     </Toolbar.Root>
   );
@@ -38,7 +72,10 @@ function OrnamentItem(props: Toolbar.Button.Props) {
 function OrnamentGroup({ className, ...props }: Toolbar.Group.Props) {
   return (
     <Toolbar.Group
-      className={cn("flex items-center gap-2 data-[orientation=vertical]:flex-col", className)}
+      className={cn(
+        "flex items-center gap-2 data-[orientation=vertical]:flex-col",
+        className,
+      )}
       {...props}
     />
   );

@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import type * as React from "react";
 
 import { MaterialLayers } from "./material";
+import { LiquidIndicator } from "./motion";
 import { Tooltip } from "./tooltip";
 import { cn } from "./utils";
 import { Vibrancy } from "./vibrancy";
@@ -25,6 +26,8 @@ type TabBarProps = {
   onValueChange?: (value: string) => void;
   /** Figma "Expanded=True": 150pt wide, 126x44 tabs with the label (19 Medium) after the symbol. */
   expanded?: boolean;
+  /** Horizontal is only for compact web layouts; the visionOS default stays vertical. */
+  orientation?: "vertical" | "horizontal";
   className?: string;
 };
 
@@ -39,10 +42,19 @@ type TabBarProps = {
  * 150pt wide, tabs 126x44 (symbol slot 44, gap 4, trailing padding 28), label
  * 19pt Medium in the same vibrancy as the symbol. Height is 56N+12 either way.
  */
-function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = false, className }: TabBarProps) {
+function TabBar({
+  label,
+  tabs,
+  value,
+  defaultValue,
+  onValueChange,
+  expanded = false,
+  orientation = "vertical",
+  className,
+}: TabBarProps) {
   return (
     <Tabs.Root
-      orientation="vertical"
+      orientation={orientation}
       value={value}
       defaultValue={defaultValue}
       onValueChange={(next) => onValueChange?.(String(next))}
@@ -50,10 +62,21 @@ function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = fa
     >
       <Tabs.List
         aria-label={label}
+        data-motion-tabs="tabs"
         data-expanded={expanded ? "" : undefined}
-        className={cn("vision-surface relative flex flex-col gap-3 rounded-tab-bar p-3", expanded ? "min-w-[9.375rem] items-stretch" : "w-[4.25rem] items-center", "[--glass-stroke-width:1.4px] [--glass-stroke-angle:155.104deg] [--glass-stroke-start:4.8235%] [--glass-stroke-fade:38.0778%] [--glass-stroke-rise:56.677%] [--glass-stroke-end:95.1021%]")}
+        className={cn(
+          "vision-surface relative flex gap-3 overflow-clip rounded-tab-bar p-3 transition-[width] duration-[260ms] ease-(--ease-liquid)",
+          orientation === "vertical" ? "flex-col" : "flex-row",
+          expanded
+            ? "w-[9.375rem] items-stretch"
+            : orientation === "vertical"
+              ? "w-[4.25rem] items-center"
+              : "items-center",
+          "[--glass-stroke-width:1.4px] [--glass-stroke-angle:155.104deg] [--glass-stroke-start:4.8235%] [--glass-stroke-fade:38.0778%] [--glass-stroke-rise:56.677%] [--glass-stroke-end:95.1021%]",
+        )}
       >
         <MaterialLayers kind="glass" />
+        <LiquidIndicator />
         {tabs.map((tab) => {
           const item = (
             <Tabs.Tab
@@ -63,9 +86,11 @@ function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = fa
               data-platter="false"
               className={cn(
                 "vision-control vision-surface group relative flex h-11 items-center rounded-full outline-none",
-                expanded ? "min-w-[7.875rem] justify-start gap-1 pr-7" : "w-11 justify-center",
+                expanded
+                  ? "min-w-[7.875rem] justify-start gap-1 pr-7"
+                  : "w-11 justify-center",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label",
-                "data-active:not-data-disabled:vision-selected hover:not-data-disabled:vision-selected",
+                "hover:not-data-active:not-data-disabled:vision-selected",
                 "hover:not-data-disabled:[--fill-glow:radial-gradient(50%_50%_at_50%_100%,rgb(255_255_255/0.06),transparent)]",
                 "hover:not-data-disabled:[--fill-glow-dodge:radial-gradient(50%_50%_at_50%_100%,rgb(94_94_94/0.16),transparent)]",
               )}
@@ -73,8 +98,10 @@ function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = fa
               <MaterialLayers kind="platter" />
               {expanded ? (
                 <>
-                  <Vibrancy className="size-11 shrink-0 place-items-center [&_svg]:size-5">{tab.icon}</Vibrancy>
-                  <Vibrancy className="text-left text-[1.1875rem] leading-6 font-medium whitespace-nowrap">
+                  <Vibrancy className="size-11 shrink-0 place-items-center [&_svg]:size-5">
+                    {tab.icon}
+                  </Vibrancy>
+                  <Vibrancy className="vision-tab-label text-left text-[1.1875rem] leading-6 font-medium whitespace-nowrap">
                     {tab.label}
                   </Vibrancy>
                 </>

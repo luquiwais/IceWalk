@@ -32,7 +32,7 @@ function StatusBadge({ level, children, className }: StatusBadgeProps) {
       role={level === "warning" ? "alert" : "status"}
       data-level={level}
       className={cn(
-        "vision-surface vision-platter relative inline-flex min-h-8 max-w-full items-center gap-2 self-start rounded-full py-1.5 pr-3.5 pl-3",
+        "vision-surface vision-platter vision-motion-enter relative inline-flex min-h-8 max-w-full items-center gap-2 self-start rounded-full py-1.5 pr-3.5 pl-3",
         className,
       )}
     >

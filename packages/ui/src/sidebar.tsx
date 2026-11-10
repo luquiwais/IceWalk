@@ -19,6 +19,8 @@ type SidebarProps = {
   action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  inert?: boolean;
+  "aria-hidden"?: boolean;
 };
 
 /*
@@ -27,9 +29,10 @@ type SidebarProps = {
  * Header (Figma: Header): 92pt, 28/20 side margins, Large Title in white.
  * Items: 56pt with 4pt between them.
  */
-function Sidebar({ label, title, titleId, action, children, className }: SidebarProps) {
+function Sidebar({ label, title, titleId, action, children, className, ...props }: SidebarProps) {
   return (
     <nav
+      {...props}
       aria-label={label}
       data-slot="sidebar"
       className={cn(
@@ -83,7 +86,7 @@ function SidebarSection({ heading, children, defaultOpen = true, disclosureIcon 
             />}
           </span>
         </Collapsible.Trigger>
-        <Collapsible.Panel render={<ul />} className="flex flex-col gap-1">
+        <Collapsible.Panel render={<ul />} className="vision-collapse flex flex-col gap-1">
           {children}
         </Collapsible.Panel>
       </Collapsible.Root>

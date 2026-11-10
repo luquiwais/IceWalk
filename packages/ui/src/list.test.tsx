@@ -39,4 +39,33 @@ describe("ListSection", () => {
 
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
+
+  it("uses a checkmark for selection without offering disclosure", async () => {
+    const choose = vi.fn();
+    render(
+      <ListSection>
+        <ListRow accessory="selection" selected onClick={choose}>
+          Surface
+        </ListRow>
+      </ListSection>,
+    );
+    const row = screen.getByRole("button", { name: "Surface", pressed: true });
+    expect(row).not.toHaveAttribute("aria-expanded");
+    expect(row.querySelector("[data-slot=list-disclosure]")).toBeNull();
+    await userEvent.click(row);
+    expect(choose).toHaveBeenCalledOnce();
+  });
+
+  it("announces a real disclosure's expanded state and target", () => {
+    render(
+      <ListSection>
+        <ListRow expanded={false} controls="tool-details" onClick={() => {}}>
+          Tools
+        </ListRow>
+      </ListSection>,
+    );
+    expect(
+      screen.getByRole("button", { name: "Tools", expanded: false }),
+    ).toHaveAttribute("aria-controls", "tool-details");
+  });
 });

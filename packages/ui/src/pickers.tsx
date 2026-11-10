@@ -40,7 +40,7 @@ function PickerPopover({
             ref={popup}
             initialFocus={focusPopup ? popup : true}
             data-slot="picker-popover"
-            className="max-w-[calc(100vw-2rem)] text-label outline-none"
+            className="vision-motion-popup relative max-w-[calc(100vw-2rem)] text-label outline-none"
           >
             <Popover.Title className="sr-only">{label}</Popover.Title>
             {children}
@@ -163,7 +163,7 @@ function Calendar({
           </IconButton>
         </div>
       </div>
-      <div role="grid" aria-label={label} className="relative mt-4">
+      <div key={month.toISOString()} role="grid" aria-label={label} className="vision-content-change relative mt-4">
         <div role="row" className="grid grid-cols-7">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
             <Text
@@ -417,7 +417,7 @@ function ColorPicker({
           { value: "sliders", label: "Sliders" },
         ]}
       />
-      <div className="relative mt-4">
+      <div key={tab} className="vision-motion-enter relative mt-4">
         {tab === "grid" ? (
           <div
             aria-label="Color grid"

@@ -56,10 +56,11 @@ function NavigationBar({
     >
       {leading ? <div className="flex shrink-0 items-center gap-4">{leading}</div> : null}
       <LargeTitle
+        key={typeof title === "string" ? title : undefined}
         as={`h${level}`}
         id={id}
         className={cn(
-          "min-w-0 truncate leading-normal",
+          "vision-content-change min-w-0 truncate leading-normal",
           titleAlign === "center"
             ? "pointer-events-none absolute inset-x-0 mx-auto w-[min(35.125rem,100%-12rem)] text-center"
             : "flex-1",

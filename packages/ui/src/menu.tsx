@@ -5,13 +5,14 @@ import { Check, ChevronDown, ChevronRight } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 import { Button } from "./button";
 import { MaterialLayers } from "./material";
+import { PopupContent } from "./motion";
 import { cn } from "./utils";
 import { Text } from "./text";
 import { Vibrancy } from "./vibrancy";
 
 /** Figma Context Menu: 280 wide, radius 28, 12 pt padding, 8 pt between rows. */
 const POPUP =
-  "vision-surface vision-popup-glass relative flex w-70 flex-col gap-2 rounded-[1.75rem] p-3 text-label outline-none [--glass-stroke-width:1.4px] [--glass-stroke-angle:150.286deg] [--glass-stroke-start:0%] [--glass-stroke-fade:40.569%] [--glass-stroke-rise:57.437%] [--glass-stroke-end:100%]";
+  "vision-surface vision-popup-glass vision-motion-popup vision-motion-menu relative flex flex-col gap-2 p-3 text-label outline-none [--glass-stroke-width:1.4px] [--glass-stroke-angle:150.286deg] [--glass-stroke-start:0%] [--glass-stroke-fade:40.569%] [--glass-stroke-rise:57.437%] [--glass-stroke-end:100%]";
 
 type MenuAction = {
   id: string;
@@ -44,11 +45,20 @@ type MenuAccessory = {
 const ITEM =
   "vision-control vision-surface relative flex min-h-14 w-full items-center rounded-2xl pr-3 text-body outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label";
 
-function ActionContent({ item, selectable }: { item: MenuAction; selectable: boolean }) {
+function ActionContent({
+  item,
+  selectable,
+}: {
+  item: MenuAction;
+  selectable: boolean;
+}) {
   return (
     <>
       {selectable ? (
-        <span data-slot="menu-check" className="menu-item-main flex w-[1.4375rem] shrink-0 items-center">
+        <span
+          data-slot="menu-check"
+          className="menu-item-main flex w-[1.4375rem] shrink-0 items-center"
+        >
           {item.checked ? (
             <Check aria-hidden strokeWidth={2.5} className="size-[1.0625rem]" />
           ) : null}
@@ -76,8 +86,13 @@ function ActionContent({ item, selectable }: { item: MenuAction; selectable: boo
         </span>
       ) : null}
       {item.items ? (
-        <span aria-hidden className="flex w-3 shrink-0 items-center justify-center">
-          <Vibrancy tone="tertiary"><ChevronRight strokeWidth={2.25} className="size-[1.1875rem]" /></Vibrancy>
+        <span
+          aria-hidden
+          className="flex w-3 shrink-0 items-center justify-center"
+        >
+          <Vibrancy tone="tertiary">
+            <ChevronRight strokeWidth={2.25} className="size-[1.1875rem]" />
+          </Vibrancy>
         </span>
       ) : null}
     </>
@@ -87,8 +102,17 @@ function ActionContent({ item, selectable }: { item: MenuAction; selectable: boo
 /** The kit's Section Header: a hairline, then a 13 pt bold secondary label. */
 function SectionHeader({ children }: { children: ReactNode }) {
   return (
-    <div role="presentation" data-slot="menu-section" className="flex h-[2.9375rem] shrink-0 px-2 pt-2">
-      <Text variant="footnote" weight="bold" tone="secondary" className="w-full border-t border-separator px-3 pt-[1.25rem]">
+    <div
+      role="presentation"
+      data-slot="menu-section"
+      className="flex h-[2.9375rem] shrink-0 px-2 pt-2"
+    >
+      <Text
+        variant="footnote"
+        weight="bold"
+        tone="secondary"
+        className="w-full border-t border-separator px-3 pt-[1.25rem]"
+      >
         {children}
       </Text>
     </div>
@@ -118,7 +142,9 @@ function MenuActions({ items }: { items: MenuAction[] }) {
             <Menu.Positioner sideOffset={8} className="z-50">
               <Menu.Popup className={POPUP}>
                 <MaterialLayers kind="glass" />
-                <MenuActions items={item.items} />
+                <PopupContent>
+                  <MenuActions items={item.items} />
+                </PopupContent>
               </Menu.Popup>
             </Menu.Positioner>
           </Menu.Portal>
@@ -129,7 +155,11 @@ function MenuActions({ items }: { items: MenuAction[] }) {
           data-platter="false"
           disabled={item.disabled}
           onClick={item.onSelect}
-          className={cn(ITEM, selectable ? "pl-3" : "pl-5", item.destructive && "text-red-400")}
+          className={cn(
+            ITEM,
+            selectable ? "pl-3" : "pl-5",
+            item.destructive && "text-red-400",
+          )}
         >
           <ItemSurface />
           <ActionContent item={item} selectable={selectable} />
@@ -157,7 +187,9 @@ function AccessoryBar({ accessories }: { accessories: MenuAccessory[] }) {
           className="vision-control vision-surface relative flex size-11 items-center justify-center rounded-full outline-none focus-visible:outline-2 focus-visible:outline-label [&_svg]:size-5"
         >
           <ItemSurface />
-          <span aria-hidden className="menu-item-main">{accessory.icon}</span>
+          <span aria-hidden className="menu-item-main">
+            {accessory.icon}
+          </span>
         </Menu.Item>
       ))}
     </div>
@@ -207,19 +239,25 @@ function DropdownMenu({
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={8} align="start" className="z-50">
-          <Menu.Popup className={cn(POPUP, "max-w-[calc(100vw-2rem)] shadow-2xl")}>
+          <Menu.Popup
+            className={cn(POPUP, "max-w-[calc(100vw-2rem)] shadow-2xl")}
+          >
             <MaterialLayers kind="glass" />
-            {accessories?.length ? <AccessoryBar accessories={accessories} /> : null}
-            {header ? (
-              <Text
-                variant="footnote"
-                tone="secondary"
-                className="mx-5 flex h-[3.125rem] items-center justify-center border-b border-separator"
-              >
-                {header}
-              </Text>
-            ) : null}
-            <MenuActions items={items} />
+            <PopupContent>
+              {accessories?.length ? (
+                <AccessoryBar accessories={accessories} />
+              ) : null}
+              {header ? (
+                <Text
+                  variant="footnote"
+                  tone="secondary"
+                  className="mx-5 flex h-[3.125rem] items-center justify-center border-b border-separator"
+                >
+                  {header}
+                </Text>
+              ) : null}
+              <MenuActions items={items} />
+            </PopupContent>
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>

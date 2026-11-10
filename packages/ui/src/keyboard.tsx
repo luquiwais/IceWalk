@@ -75,7 +75,7 @@ function Keyboard({
         <span className="size-8" />
       </header>
       <SurfaceScroll direction="horizontal" className="relative">
-        <div className="flex w-[34rem] flex-col gap-2 p-4">
+        <div key={`${numeric}-${shift}`} className="vision-content-change flex w-[34rem] flex-col gap-2 p-4">
           <div className="mb-1 flex gap-3">
             {["Hello", "the", "to"].map((word) =>
               key(
