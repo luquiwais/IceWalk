@@ -1,0 +1,78 @@
+/* Development page for SiteScene. Chrome only; the scene styles live with the component. */
+
+.site-page {
+  position: relative;
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-mars-950);
+}
+
+.site-page-title {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  pointer-events: none;
+  text-shadow: 0 0 4px rgb(0 0 0 / 0.6);
+}
+
+.site-page-subtitle {
+  color: rgb(255 255 255 / 0.74);
+  font-variant-numeric: tabular-nums;
+}
+
+.site-page-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 1.5rem;
+  max-width: calc(100% - 1.5rem);
+  transform: translateX(-50%);
+}
+
+.site-page-separator {
+  width: 1px;
+  height: 1.5rem;
+  background: var(--color-separator);
+}
+
+/* Outlines of the area the stage 2 Planning chrome will cover. */
+.site-page-chrome span {
+  position: absolute;
+  border: 1px dashed rgb(255 255 255 / 0.25);
+  border-radius: 1rem;
+  pointer-events: none;
+}
+
+.site-page-chrome [data-zone="left"] {
+  left: 1rem;
+  top: 6rem;
+  width: calc(var(--chrome-left) - 2rem);
+  height: 13rem;
+}
+
+.site-page-chrome [data-zone="right"] {
+  right: 1.25rem;
+  top: 6rem;
+  bottom: calc(var(--chrome-bottom) + 0.5rem);
+  width: calc(var(--chrome-right) - 2.5rem);
+}
+
+.site-page-chrome [data-zone="bottom"] {
+  left: 1rem;
+  right: 1rem;
+  bottom: 6.5rem;
+  height: 6rem;
+}
+
+@media (max-width: 640px) {
+  .site-page-title {
+    top: 1rem;
+    left: 1rem;
+  }
+  .site-page-controls {
+    bottom: 0.75rem;
+  }
+}
