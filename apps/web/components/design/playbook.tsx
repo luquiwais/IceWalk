@@ -4,9 +4,10 @@ import { Button, IconButton } from "@icewalk/ui/button";
 import { TextField } from "@icewalk/ui/fields";
 import { Material, SurfaceScroll } from "@icewalk/ui/material";
 import { Switch } from "@icewalk/ui/selection-controls";
+import { MotionPresence } from "@icewalk/ui/motion";
 import { Sidebar, SidebarItem, SidebarSection } from "@icewalk/ui/sidebar";
 import { Text } from "@icewalk/ui/text";
-import { NavigationBar, Window, WindowControls } from "@icewalk/ui/window";
+import { NavigationBar, Window } from "@icewalk/ui/window";
 import {
   ArrowDownRight,
   ArrowUpRight,
@@ -37,9 +38,20 @@ function selection() {
     ? id
     : "overview";
 }
+function subscribeCompact(callback: () => void) {
+  if (!window.matchMedia) return () => {};
+  const media = window.matchMedia("(max-width: 760px)");
+  media.addEventListener("change", callback);
+  return () => media.removeEventListener("change", callback);
+}
 
 export function Playbook() {
   const selected = useSyncExternalStore(subscribe, selection, () => "overview");
+  const compact = useSyncExternalStore(
+    subscribeCompact,
+    () => window.matchMedia?.("(max-width: 760px)").matches ?? false,
+    () => false,
+  );
   const [query, setQuery] = useState("");
   const [disabled, setDisabled] = useState(false);
   const [scene, setScene] = useState("night");
@@ -136,6 +148,8 @@ export function Playbook() {
         className="playbook-window h-full min-h-0 w-full max-w-[100rem] flex-1"
       >
         <Sidebar
+          inert={compact && !mobileNav}
+          aria-hidden={compact && !mobileNav}
           label="Component library"
           title="Playbook"
           titleId="library-nav-title"
@@ -214,7 +228,10 @@ export function Playbook() {
             </Text>
           </li>
         </Sidebar>
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <div
+          inert={compact && mobileNav}
+          className="flex min-h-0 min-w-0 flex-1 flex-col"
+        >
           <div ref={heading} tabIndex={-1} className="outline-none">
             <NavigationBar
               title={name}
@@ -264,9 +281,10 @@ export function Playbook() {
             />
           </div>
           <SurfaceScroll
+            key={selected}
             id="playbook-content"
             ref={content}
-            className="playbook-content relative flex-1 px-9 pb-10"
+            className="playbook-content vision-motion-enter relative flex-1 px-9 pb-10"
             tabIndex={-1}
           >
             {selected === "overview" ? (
@@ -503,13 +521,12 @@ export function Playbook() {
           </SurfaceScroll>
         </div>
       </Window>
-      <WindowControls className="shrink-0" />
       <div
         role="status"
         aria-live="polite"
         className="pointer-events-none absolute right-10 bottom-14 z-30 max-w-[calc(100vw-3rem)]"
       >
-        {feedback ? (
+        <MotionPresence present={Boolean(feedback)}>
           <Material
             kind="glass"
             className="pointer-events-auto flex items-center gap-5 rounded-full py-3 pr-2 pl-5"
@@ -525,7 +542,7 @@ export function Playbook() {
               <X aria-hidden />
             </IconButton>
           </Material>
-        ) : null}
+        </MotionPresence>
       </div>
     </main>
   );

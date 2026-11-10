@@ -1,0 +1,391 @@
+/* Scene composition only. @icewalk/ui owns control geometry, type and materials.
+   Spacing is in visionOS points through the existing root scale: 8 / 12 / 16 / 24 / 32. */
+.immersive-app {
+  --scene-inset: 2rem;
+  position: relative;
+  height: 100dvh;
+  min-height: 35rem;
+  overflow: hidden;
+  background: #302b26;
+}
+.immersive-heading {
+  position: absolute;
+  left: var(--scene-inset);
+  top: var(--scene-inset);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  pointer-events: none;
+}
+.immersive-view-tabs {
+  position: absolute;
+  left: var(--scene-inset);
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.immersive-view-tabs > * {
+  pointer-events: auto;
+}
+.immersive-safety {
+  position: absolute;
+  top: var(--scene-inset);
+  right: var(--scene-inset);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  max-width: 28rem;
+}
+.immersive-demo-tag {
+  padding-inline: 1.5rem;
+}
+.immersive-dock {
+  position: absolute;
+  bottom: var(--scene-inset);
+  left: var(--scene-inset);
+  right: var(--scene-inset);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.immersive-dock > * {
+  max-width: 100%;
+  pointer-events: auto;
+}
+.immersive-image-credit {
+  position: absolute;
+  left: var(--scene-inset);
+  bottom: var(--scene-inset);
+  pointer-events: none;
+}
+.immersive-panel {
+  position: absolute;
+  right: var(--scene-inset);
+  top: calc(var(--scene-inset) + 7rem);
+  width: 28rem;
+  max-width: calc(100% - var(--scene-inset) * 2);
+}
+.immersive-panel-window {
+  flex-direction: column;
+  width: 100%;
+  max-height: calc(100dvh - 17rem);
+}
+.immersive-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 1.5rem 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.2) transparent;
+  overscroll-behavior: contain;
+}
+.immersive-panel-content:focus {
+  outline: none;
+}
+.immersive-panel-content > * {
+  flex-shrink: 0;
+}
+.mission-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.mission-disclosures {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mission-disclosure-content:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem 0;
+}
+.immersive-camera {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.site-map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.site-map-image {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(0 0 0 / 0.28),
+      transparent 35%,
+      transparent 65%,
+      rgb(0 0 0 / 0.2)
+    ),
+    url(/demo/mars-surface.png) center/cover;
+}
+.site-map > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.site-map-hit-layer {
+  position: absolute;
+  inset: 0;
+}
+.site-map-marker {
+  position: absolute;
+  margin: -1.375rem;
+}
+.site-map-station-label {
+  position: absolute;
+  bottom: calc(100% + 0.75rem);
+  left: 50%;
+  translate: -50% 0;
+  white-space: nowrap;
+  visibility: hidden;
+}
+.site-map-marker:hover .site-map-station-label,
+.site-map-marker[aria-pressed="true"] .site-map-station-label {
+  visibility: visible;
+}
+.ev-scene {
+  position: absolute;
+  inset: 0;
+}
+.ev-scene-image {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(0 0 0 / 0.28),
+      transparent 40%,
+      rgb(0 0 0 / 0.12)
+    ),
+    url(/demo/mars-surface-view.png) center/cover;
+}
+.ev-destination {
+  position: absolute;
+  left: 55%;
+  top: 44%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+.mission-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.mission-result-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.station-crew-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+.mission-timeline-track {
+  position: relative;
+  height: 2rem;
+  margin-top: 1.5rem;
+}
+.mission-timeline-segment,
+.mission-timeline-station {
+  position: absolute;
+  top: 0;
+  border-inline: 2px solid transparent;
+  background-clip: padding-box;
+}
+.mission-timeline-segment {
+  height: 2rem;
+  background-color: rgb(255 255 255 / 0.09);
+  border-radius: 0.5rem;
+}
+.mission-timeline-segment[data-kind="reserve"] {
+  background-image: repeating-linear-gradient(
+    115deg,
+    transparent 0 5px,
+    rgb(255 255 255 / 0.08) 5px 6px
+  );
+}
+.mission-timeline-station[aria-pressed="true"] {
+  outline: 1px solid var(--color-label);
+  outline-offset: -2px;
+}
+.mission-now {
+  position: absolute;
+  top: -0.5rem;
+  bottom: -0.25rem;
+  width: 1px;
+  background: var(--color-label);
+  pointer-events: none;
+}
+.mission-now > span {
+  position: absolute;
+  bottom: calc(100% + 0.25rem);
+  left: 0.25rem;
+  white-space: nowrap;
+}
+.mission-timeline-scale {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+@media (max-width: 759px) {
+  .immersive-app {
+    --scene-inset: 1.5rem;
+  }
+  .immersive-clock {
+    display: none;
+  }
+  .immersive-safety {
+    max-width: 14rem;
+  }
+  .immersive-demo-tag {
+    max-width: 14rem;
+    text-align: right;
+    padding-inline: 0;
+  }
+  .immersive-panel {
+    top: auto;
+    bottom: calc(var(--scene-inset) + 6rem);
+    left: var(--scene-inset);
+    width: auto;
+    max-width: none;
+  }
+  .immersive-panel-window {
+    max-height: calc(100dvh - 18rem);
+  }
+  .immersive-timeline-panel {
+    margin: 0;
+  }
+  .immersive-image-credit {
+    bottom: 0.25rem;
+  }
+  .site-map-image {
+    background-position: 60% center;
+  }
+}
+/* Keep timeline targets usable at narrow widths; the plot scrolls, not the page. */
+.mission-timeline {
+  overflow-x: auto;
+  padding-block: 0.5rem;
+}
+.mission-timeline-track,
+.mission-timeline-scale {
+  min-width: 40rem;
+}
+@media (max-width: 759px) {
+  /* Keep navigation outside every contextual panel's hit area. */
+  .immersive-view-tabs {
+    top: 6rem;
+    bottom: auto;
+    right: var(--scene-inset);
+    justify-content: center;
+  }
+  .immersive-panel-window {
+    max-height: calc(100dvh - 21rem);
+  }
+}
+.immersive-compact-status-label {
+  display: none;
+}
+@media (max-width: 759px) {
+  .immersive-site-region,
+  .immersive-wide-status-label,
+  .immersive-demo-tag {
+    display: none;
+  }
+  .immersive-compact-status-label {
+    display: block;
+  }
+  .immersive-status-value {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .immersive-view-tabs {
+    top: 7rem;
+  }
+}
+.immersive-app[data-focused="true"] .immersive-heading,
+.immersive-app[data-focused="true"] .immersive-view-tabs,
+.immersive-app[data-focused="true"] .immersive-image-credit {
+  visibility: hidden;
+  --vision-presence: 0;
+  transition: visibility 0s 160ms;
+}
+
+/* Keep the environment stationary; only contextual glass arrives or departs. */
+
+.site-map-image {
+  transition: transform 360ms var(--ease-liquid);
+}
+.site-map > svg {
+  transition: opacity 180ms var(--ease-settle);
+}
+.site-map-hit-layer > * {
+  transition:
+    left 320ms var(--ease-liquid),
+    top 320ms var(--ease-liquid);
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-map-image,
+  .site-map > svg,
+  .site-map-hit-layer > * {
+    transition: none;
+  }
+}
+
+.immersive-scene-motion {
+  position: absolute;
+  inset: 0;
+}
+.immersive-scene-motion
+  :where(.site-map-image, .ev-scene-image, canvas, .site-map > svg) {
+  opacity: var(--vision-presence);
+  transition: opacity 180ms var(--ease-settle);
+}
+@starting-style {
+  .immersive-scene-motion
+    :where(.site-map-image, .ev-scene-image, canvas, .site-map > svg) {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .immersive-scene-motion * {
+    transition: none !important;
+  }
+}
+
+.immersive-heading,
+.immersive-view-tabs,
+.immersive-image-credit {
+  transition: visibility 0s;
+}
+.immersive-heading [data-text-style],
+.immersive-image-credit,
+.immersive-view-tabs .vision-vibrancy {
+  opacity: var(--vision-presence);
+  transition: opacity 160ms var(--ease-settle);
+}
+.mission-dock-secondary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  --surface-duration: 100ms;
+}

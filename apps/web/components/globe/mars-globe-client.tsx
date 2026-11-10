@@ -109,6 +109,7 @@ export default function MarsGlobe({
     let cancelled = false;
     let viewer: CesiumNS.Viewer | undefined;
     let handler: CesiumNS.ScreenSpaceEventHandler | undefined;
+    let dragging = false;
 
     async function init() {
       const root = rootRef.current;
@@ -189,6 +190,15 @@ export default function MarsGlobe({
       routeSourceRef.current = routeSource;
 
       handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      viewer.scene.canvas.style.cursor = "grab";
+      handler.setInputAction(() => {
+        dragging = true;
+        viewer!.scene.canvas.style.cursor = "grabbing";
+      }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+      handler.setInputAction(() => {
+        dragging = false;
+        viewer!.scene.canvas.style.cursor = "grab";
+      }, Cesium.ScreenSpaceEventType.LEFT_UP);
       handler.setInputAction((click: { position: CesiumNS.Cartesian2 }) => {
         const picked = viewer!.scene.pick(click.position);
         const id: unknown = picked?.id?.id;
@@ -198,8 +208,8 @@ export default function MarsGlobe({
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
       handler.setInputAction((move: { endPosition: CesiumNS.Cartesian2 }) => {
         const id: unknown = viewer!.scene.pick(move.endPosition)?.id?.id;
-        viewer!.scene.canvas.style.cursor =
-          typeof id === "string" && id.startsWith("station:") ? "pointer" : "";
+        viewer!.scene.canvas.style.cursor = dragging ? "grabbing" :
+          typeof id === "string" && id.startsWith("station:") ? "pointer" : "grab";
       }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
       viewerRef.current = viewer;

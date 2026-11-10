@@ -19,6 +19,7 @@ import {
   DatePicker,
   TimePicker,
 } from "@icewalk/ui/pickers";
+import { MotionPresence } from "@icewalk/ui/motion";
 import { SearchToken } from "@icewalk/ui/search-token";
 import { Checkbox, Switch } from "@icewalk/ui/selection-controls";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
@@ -155,6 +156,7 @@ export function FamilySpecimens({
   const [text, setText] = useState("Hello");
   const [tokens, setTokens] = useState(["Design", "Favorites", "This week"]);
   const [notice, setNotice] = useState(true);
+  const [expandedTabs, setExpandedTabs] = useState(true);
   const [notification, setNotification] = useState(true);
   const [playing, setPlaying] = useState(false);
   const [tab, setTab] = useState("library");
@@ -777,7 +779,7 @@ export function FamilySpecimens({
                 value={time}
                 onValueChange={setTime}
                 disabled={disabled}
-                expanded
+                expanded={expandedTabs}
               />,
             )}
             {title(
@@ -885,17 +887,24 @@ export function FamilySpecimens({
             "Search tokens",
             "32 pt · filter actions",
             <>
-              {tokens.map((token) => (
-                <SearchToken
+              {["Design", "Favorites", "This week"].map((token) => (
+                <MotionPresence
                   key={token}
-                  selected={token === "Favorites"}
-                  disabled={disabled}
-                  category={token === "Design" ? "Type" : undefined}
-                  onClick={click(token)}
-                  onRemove={() => setTokens(tokens.filter((t) => t !== token))}
+                  present={tokens.includes(token)}
+                  className="inline-flex"
                 >
-                  {token}
-                </SearchToken>
+                  <SearchToken
+                    selected={token === "Favorites"}
+                    disabled={disabled}
+                    category={token === "Design" ? "Type" : undefined}
+                    onClick={click(token)}
+                    onRemove={() =>
+                      setTokens(tokens.filter((t) => t !== token))
+                    }
+                  >
+                    {token}
+                  </SearchToken>
+                </MotionPresence>
               ))}
               <Button
                 size="small"
@@ -927,7 +936,13 @@ export function FamilySpecimens({
                 kind="regular"
                 className="flex h-56 items-center justify-center rounded-[2rem]"
               >
-                <Text variant="xl-title-2">A new perspective. {page + 1}</Text>
+                <Text
+                  key={page}
+                  className="vision-content-change"
+                  variant="xl-title-2"
+                >
+                  A new perspective. {page + 1}
+                </Text>
               </Material>
               <PageControl
                 label="Preview pages"
@@ -1052,10 +1067,30 @@ export function FamilySpecimens({
               label="Library"
               header="Library actions"
               accessories={[
-                { id: "cut", label: "Cut", icon: <Scissors />, onSelect: () => notify("Cut selected") },
-                { id: "copy", label: "Copy", icon: <Copy />, onSelect: () => notify("Copy selected") },
-                { id: "share", label: "Share", icon: <Share2 />, onSelect: () => notify("Share selected") },
-                { id: "delete", label: "Delete", icon: <Trash2 />, onSelect: () => notify("Delete selected") },
+                {
+                  id: "cut",
+                  label: "Cut",
+                  icon: <Scissors />,
+                  onSelect: () => notify("Cut selected"),
+                },
+                {
+                  id: "copy",
+                  label: "Copy",
+                  icon: <Copy />,
+                  onSelect: () => notify("Copy selected"),
+                },
+                {
+                  id: "share",
+                  label: "Share",
+                  icon: <Share2 />,
+                  onSelect: () => notify("Share selected"),
+                },
+                {
+                  id: "delete",
+                  label: "Delete",
+                  icon: <Trash2 />,
+                  onSelect: () => notify("Delete selected"),
+                },
               ]}
               items={actions}
               disabled={disabled}
@@ -1202,7 +1237,10 @@ export function FamilySpecimens({
       );
     case "tabs":
       return (
-        <Specimen title="Vertical tab bar" detail="Collapsed 68 pt · expanded 150 pt · 44 pt targets">
+        <Specimen
+          title="Vertical tab bar"
+          detail="Collapsed 68 pt · expanded 150 pt · 44 pt targets"
+        >
           <div className="flex w-full items-center gap-8">
             <div className="flex items-start gap-4">
               <TabBar
@@ -1216,17 +1254,29 @@ export function FamilySpecimens({
                 tabs={tabs}
                 value={tab}
                 onValueChange={setTab}
-                expanded
+                expanded={expandedTabs}
               />
             </div>
             <Material
               kind="regular"
               className="flex min-h-72 flex-1 flex-col justify-center gap-3 rounded-[2rem] p-8"
             >
-              <Text variant="title-1" className="capitalize">
+              <Text
+                key={tab}
+                variant="title-1"
+                className="vision-content-change capitalize"
+              >
                 {tab}
               </Text>
               <Text tone="secondary">Select a tab or use the arrow keys.</Text>
+              <Button
+                size="small"
+                disabled={disabled}
+                aria-expanded={expandedTabs}
+                onClick={() => setExpandedTabs((value) => !value)}
+              >
+                {expandedTabs ? "Collapse tab bar" : "Expand tab bar"}
+              </Button>
             </Material>
           </div>
         </Specimen>
