@@ -1,6 +1,6 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 // Cesium needs WebGL; the globe is checked in the browser, not in jsdom.
 vi.mock("./site-map", () => ({
@@ -302,6 +302,16 @@ describe("Planning view", () => {
       ).toBeInTheDocument();
   });
 
+  it("labels the bundled mock as such when no planner API is configured", async () => {
+    render(<PlanningView />);
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mission brief" }),
+    );
+    expect(
+      screen.getByText(`${demoPlan.plan_id} · Bundled mock data`, visible),
+    ).toBeInTheDocument();
+  });
+
   it("logs the demo measurement and shows what the replan changed", async () => {
     render(<PlanningView />);
 
@@ -344,5 +354,98 @@ describe("Planning view", () => {
     expect(
       screen.queryByRole("region", { name: "Replan" }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("Planning view against the planner API", () => {
+  const BASE = "http://planner.test";
+  const apiPlan = { ...demoPlan, plan_id: "plan-api0001" };
+  const apiReplan = {
+    ...demoReplan,
+    plan_id: "plan-api0002",
+    replanned_from: "plan-api0001",
+  };
+
+  function respond(body: unknown, status = 200) {
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { "content-type": "application/json" },
+    });
+  }
+
+  function planner(up = true) {
+    const fetch = vi.fn<typeof globalThis.fetch>(async (input) => {
+      const path = String(input).slice(BASE.length);
+      if (!up) throw new TypeError("Failed to fetch");
+      if (path === "/health") return respond({ status: "ok", planner: "real" });
+      if (path === "/plan") return respond(apiPlan);
+      if (path === "/replan") return respond(apiReplan);
+      return respond({ detail: "Not Found" }, 404);
+    });
+    vi.stubEnv("NEXT_PUBLIC_PLANNER_API_URL", BASE);
+    vi.stubGlobal("fetch", fetch);
+    return fetch;
+  }
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  it("shows the planner's plan and sends a logged measurement to /replan", async () => {
+    const fetch = planner();
+    render(<PlanningView />);
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mission brief" }),
+    );
+    expect(
+      await screen.findByText(
+        `${apiPlan.plan_id} · Planner API · real planner`,
+        visible,
+      ),
+    ).toBeInTheDocument();
+
+    // Every result replans with the API, not only a negative one.
+    await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+    await userEvent.click(screen.getByRole("button", { name: "Ice" }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole("status", { name: "Session update" }),
+      ).toHaveTextContent("Replanned traverse ready for review"),
+    );
+
+    const replan = fetch.mock.calls.find(([url]) =>
+      String(url).endsWith("/replan"),
+    )!;
+    expect(JSON.parse(replan[1]!.body as string)).toMatchObject(
+      {
+        plan_id: apiPlan.plan_id,
+        measurement: { station_id: first.id, result: "ice" },
+      },
+    );
+    await userEvent.click(screen.getByRole("tab", { name: "Planning" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mission brief" }),
+    );
+    expect(
+      within(screen.getByRole("region", { name: "Replan" })).getByText(
+        new RegExp(apiPlan.plan_id),
+        visible,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("falls back to the bundled mock and says so when the planner is down", async () => {
+    planner(false);
+    render(<PlanningView />);
+    await userEvent.click(
+      screen.getByRole("button", { name: "Mission brief" }),
+    );
+    expect(
+      await screen.findByText(
+        `${demoPlan.plan_id} · Planner API unavailable · bundled mock data`,
+        visible,
+      ),
+    ).toBeInTheDocument();
   });
 });

@@ -40,6 +40,7 @@ import {
   type Plan,
   type Measurement,
 } from "@/lib/plan";
+import { describeSource, usePlanSession } from "@/lib/use-plan-session";
 import {
   designLayers,
   designReplan,
@@ -79,7 +80,6 @@ export function PlanningView() {
   );
   const [view, setView] = useState<View>("planning");
   const [stationId, setStationId] = useState<string | null>(null);
-  const [replanned, setReplanned] = useState(false);
   const [mapFocus, setMapFocus] = useState(false);
   const [focusSite, setFocusSite] = useState(true);
   const [zoom, setZoom] = useState(0);
@@ -99,7 +99,13 @@ export function PlanningView() {
   >(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
-  const plan: Plan = replanned ? designReplan : demoPlan;
+  // Planner API when configured and reachable; otherwise the bundled mocks.
+  const session = usePlanSession({
+    fallback: { plan: demoPlan, replan: designReplan },
+  });
+  const plan: Plan = session.plan;
+  const replanned = session.previous !== null;
+  const nextStation = orderedStations(plan)[0];
   const station = stationId ? stationById(plan, stationId) : undefined;
 
   useEffect(() => {
@@ -138,23 +144,34 @@ export function PlanningView() {
     depth = 1,
     crew: "EV1" | "EV2" = "EV1",
   ) {
-    const logged = {
+    const logged: Measurement = {
       ...demoMeasurement,
+      station_id: nextStation.id,
+      position: nextStation.position,
       result,
       depth_m: depth,
       crew_member: crew,
     };
     setMeasurement(logged);
-    setReplanned(result === "no_ice");
     setApproved(false);
     setStationId(null);
     if (view === "planning") setPanel("brief");
+    const recorded = `${RESULT_LABEL[result]} recorded at ${logged.station_id}.`;
+    const live = session.source === "api";
+    const pending = session.logMeasurement(logged, designSession.elapsedMin);
     setAnnouncement(
-      `${RESULT_LABEL[result]} recorded at ${logged.station_id}. ${result === "no_ice" ? "Replanned traverse ready for review." : "Nominal traverse retained."} Simulated result.`,
+      `${recorded} ${live ? "Sending it to the planner." : result === "no_ice" ? "Replanned traverse ready for review." : "Nominal traverse retained."} Simulated result.`,
     );
+    if (live)
+      void pending.then((outcome) => {
+        if (outcome === "replanned")
+          setAnnouncement(`${recorded} Replanned traverse ready for review.`);
+        else if (outcome === "failed")
+          setAnnouncement(`${recorded} Replan failed. The last plan is still shown.`);
+      });
   }
   function reset() {
-    setReplanned(false);
+    session.reset();
     setMeasurement(null);
     setApproved(false);
     setStationId(null);
@@ -318,7 +335,7 @@ export function PlanningView() {
                 <>
                   {replanned ? (
                     <ReplanSummary
-                      before={demoPlan}
+                      before={session.previous ?? plan}
                       after={plan}
                       measurement={measurement ?? demoMeasurement}
                       onRevert={reset}
@@ -337,7 +354,9 @@ export function PlanningView() {
                         unit="km"
                       />
                     </MetricList>
-                    <Caption1 tone="secondary">{plan.plan_id}</Caption1>
+                    <Caption1 tone="secondary">
+                      {plan.plan_id} · {describeSource(session)}
+                    </Caption1>
                   </section>
                   <div className="mission-disclosures">
                     <Disclosure title="Which tool?">
@@ -386,7 +405,7 @@ export function PlanningView() {
                   <Disclosure title="Station details">
                     <StationDetail plan={plan} station={station} />
                   </Disclosure>
-                  {!measurement && station.id === demoMeasurement.station_id ? (
+                  {!measurement && station.id === nextStation.id ? (
                     <Button onClick={() => logMeasurement("no_ice")}>
                       Log measurement
                     </Button>
