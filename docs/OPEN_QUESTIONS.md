@@ -6,7 +6,6 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 
 | # | Cuestión | Recomendación | Quién | Desde |
 | --- | --- | --- | --- | --- |
-| 29 | ¿Cambia la pregunta del producto a "¿vale la caminata, con qué herramienta y adónde primero?", y el rol de la tripulación a delimitar el hielo y elegir dónde perforar? | Sí. Ver `research/viabilidad-expediciones.md` | Luqui + Producto | 08/11 |
 | 36 | ¿Se corrige `layers.yaml` con lo de `research/recursos-y-ml.md`? SWIM se puede bajar por script, la URL de THEMIS es exacta, y los productos individuales de SWIM no aparecen en la página citada | Sí, en un solo cambio | Luqui | 08/11 |
 | 37 | ¿Hay imágenes HiRISE posteriores a feb 2023 con el cráter cubierto? El STAC de USGS lista 13 más; falta mirar cuáles tienen píxeles | Revisarlas: sirven para visión | Visión | 08/11 |
 | 38 | El PRD pide la pendiente máxima "desde el DTM de 1 m". ¿Se actualiza a base de 10 m? | Sí: a 1-2 m domina el ruido del DTM. Ver `EXPERIMENTS.md`, 2026-11-08 (planificador) | Luqui + Planificador | 08/11 |
