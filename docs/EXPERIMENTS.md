@@ -405,3 +405,18 @@ Modelo: `log d` normal con media lineal en las variables; un cráter con hielo d
 | Tarjeta de sitio en S1094b, `min_p` = 0.5 de prueba (no es una regla) | Taladro de 1 m: P = 0.06, `NO_GO`; 3 m: P = 0.52 con intervalo que cruza 0.5, `CONDITIONAL`; radar de 10 m: `GO` | El veredicto depende de la herramienta, no solo del sitio |
 
 Límites: r sin fuente directa (Byrne 2009 describe cráteres de pocos metros y decímetros de profundidad, ~0.1; el DTM de S1094b da 0.14); un "no hielo" puede ser hielo ya sublimado o no visible; solo 2 cráteres con hielo entre 30 y 40°N, así que S1094b es una extrapolación.
+
+## 2026-11-11: `GET /maps` en la API (planificador)
+
+Terreno real, 349 cráteres sintéticos repartidos en el sitio, umbral de 3 m, hábitat (300, −2200).
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Zona alcanzable a pie (ida y vuelta ≤ 309 min de caminata) | 462 380 celdas; caja x −2960..3300, y −6630..2720: casi todo el sitio | Mandarla entera no sirve: ~6.5 s y ~1.5 MB |
+| `ice_maps` por tamaño de ventana | 3 × 3 km (90 000 celdas): 1.0 s; 5 × 5 km: 2.6 s; sitio entero (763 000): 8.4 s | Ventana de 3 × 3 km alrededor del hábitat |
+| Respuesta de la ventana base | 241 kB en JSON, 21 kB con gzip (el fondo parejo comprime mucho) | Muy por debajo de los 275 kB estimados |
+| Mapa de un plan con una medición (incluye reajuste de EP) | 0.11 s; en caché, 0.003 s | Se puede pedir después de cada `/replan` |
+| Ventana ampliada por una estación a 2.3 km (EVA 2) | 380 × 350 celdas, 1.4 s la primera vez | Aceptable; queda en caché |
+| Plan sin catálogo de cráteres | Estaciones a ≤ 224 m del hábitat; EVA 2 llega a 2.3 km por su objetivo fijo | La ventana base cubre el plan de la EVA 1 |
+| Taladro sin hielo hasta 1 m en la estación | Incertidumbre 1.0 → 0.90 en la celda; P(≤ 3 m) baja; a más de 400 m, el mapa queda idéntico | Un "no" censurado informa poco: el mapa casi no cambia (coincide con la cuestión 50) |
+
