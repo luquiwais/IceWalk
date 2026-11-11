@@ -85,6 +85,15 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | Profundidad excavada = 0.1 × diámetro (prior regional) | Hasta dónde "ve" un cráter nuevo de Daubar 2022: con hielo, d < 0.1·D; sin hielo, d > 0.1·D | Sin fuente directa. Byrne et al. 2009 describe cráteres con hielo de pocos metros y decímetros de profundidad (~0.1; resumen en [Dundas et al. 2014, USGS](https://pubs.usgs.gov/publication/70073409)); el DTM de S1094b da ~0.14 ([HiRISE](https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155)). Con 0.2 el regional no coincide con el sitio (`EXPERIMENTS.md`, 2026-11-10). Fuente posible: cuestión 57 |
 | Alcance de 100 m y reparto 50/50 fuera de S1094b | Alcance del kernel y parte espacial de la varianza en un sitio sin catálogo (`gp.planning.regional_prior`) | Se toman los ajustados en S1094b; sin fuente para otros sitios |
 
+## Supuestos del planificador
+
+Valores sin fuente en `apps/planner/config/eva.yaml`, marcados `assumption: true`.
+
+| Valor | Qué es | Por qué ese valor |
+| --- | --- | --- |
+| `map_half_m = 1500` | Medio lado del mapa de hielo (`GET /maps`) alrededor del hábitat | 3 × 3 km a 10 m: ~1 s una vez y ~21 kB comprimido. Lo alcanzable en 8 h es casi todo el sitio (~6.5 s); la ventana crece si el plan va más lejos |
+| `map_margin_m = 300` | Borde del mapa alrededor de estaciones, opciones y mediciones | 3 alcances del GP (100 m): más allá una medición no cambia el mapa (`gp.maps.UPDATE_REACH_RANGES`) |
+
 ## Software
 
 | Librería | Licencia |

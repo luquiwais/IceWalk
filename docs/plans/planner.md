@@ -21,13 +21,14 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 | `/replan` con las mediciones acumuladas en el GP | Hecho | `app/main.py` |
 | Reordenar la ruta para caminar menos (2-opt, mover una estación) | Hecho | `EvaPlanner.improve` |
 | Timeline, tareas EV1/EV2, equipo con masa | Hecho (masas del catálogo, casi todas null) | `app/eva_planner.py` |
-| Ramas | Sobre la primera estación de hielo, re-planificando con el resultado simulado; forma final abierta (cuestión 23) | `app/eva_planner.py` |
+| Puntos de decisión (`decision_points`) en las dos primeras estaciones de hielo | Hecho (cuestión 23 cerrada) | `app/eva_planner.py` |
+| Mapa de hielo `GET /maps?plan_id=` (`map.schema.json`), con caché y gzip | Hecho el 2026-11-11 | `app/maps.py`, `app/main.py` |
 | Ventana de EVA y DONKI en vivo | Pendiente | `app/main.py` |
 
 ## Próximos pasos
 
-1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui.
-2. Fijar `uncertainty`, `value` y los campos nuevos en el esquema (cuestión 41).
+1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui; regenerar `apps/web/mock/` (ahora con `map.json`).
+2. Cuestiones 46 y 55: margen de regreso en el re-plan y sus alertas.
 3. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
 4. Capas en GitHub Releases y carga al arrancar la API en el deploy.
 
@@ -87,6 +88,8 @@ Lo que ya existe en `packages/model/gp/`:
 En el sitio real, con el hábitat por defecto: espectrómetro ~165 estaciones por hallazgo, taladro ~17 y radar ~1. El radar es optimista hasta la cuestión 30. Ver `EXPERIMENTS.md`.
 
 ## Mapas de hielo (`GET /maps`), cuestiones 49 y 52 cerradas
+
+**API hecha el 2026-11-11** (`app/maps.py`). `GET /maps` sin parámetros: cráteres y prior en el hábitat ± `map_half_m` (1.5 km). `GET /maps?plan_id=...`: además las mediciones de ese plan, y la ventana se amplía hasta `map_margin_m` (300 m) alrededor de cada estación, opción de decisión y medición; 404 si el plan no existe. Después de `/replan`, pedirlo con el `plan_id` nuevo. El mapa base se arma al arrancar (~1 s) y queda en caché; el de un plan tarda ~0.11 s y queda guardado con el plan. Respuesta comprimida: ~21 kB. `scripts/export_mocks.py` escribe `apps/web/mock/map.json` (el del re-plan de la demo). Las celdas coinciden con las de 10 m del terreno. Lo que sigue es la guía original:
 
 El GP ya da todo lo del mapa (`gp/maps.py`, re-exportado en `gp.planning`); falta servirlo y dibujarlo. Contrato: `packages/contracts/schemas/map.schema.json`, con ejemplo en `examples/map.example.json` (regenerar con `python packages/model/scripts/export_map_example.py`). **Se manda la grilla de valores, no una imagen:** el front pinta.
 
