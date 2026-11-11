@@ -87,12 +87,13 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 
 ## Supuestos del planificador
 
-Valores sin fuente en `apps/planner/config/eva.yaml`, marcados `assumption: true`.
+Valores sin fuente en `apps/planner/config/eva.yaml` (marcados `assumption: true`) y en las STM de ejemplo.
 
 | Valor | Qué es | Por qué ese valor |
 | --- | --- | --- |
 | `map_half_m = 1500` | Medio lado del mapa de hielo (`GET /maps`) alrededor del hábitat | 3 × 3 km a 10 m: ~1 s una vez y ~21 kB comprimido. Lo alcanzable en 8 h es casi todo el sitio (~6.5 s); la ventana crece si el plan va más lejos |
 | `map_margin_m = 300` | Borde del mapa alrededor de estaciones, opciones y mediciones | 3 alcances del GP (100 m): más allá una medición no cambia el mapa (`gp.maps.UPDATE_REACH_RANGES`) |
+| `walkback_caution_min = 15` (STM de ejemplo) | Margen de regreso bajo el cual el plan avisa (caution) y no suma Get Aheads | Sin valor publicado: Apollo usó el walkback como límite duro (ALSJ, Apollo 17, Estación 4, https://apollojournals.org/alsj/a17/a17.sta4.html). 15 min es el ejemplo de `research/diseno-interfaz.md` y ~500 m de caminata a 2 km/h |
 
 ## Software
 

@@ -148,6 +148,18 @@ class IceModel:
             "score": ranked["value"],  # mismo orden que "potencial + incertidumbre"
         }
 
+    def spatial_uncertainty(self, x_m, y_m) -> np.ndarray:
+        """Duda espacial que queda en cada punto, como la capa `uncertainty` del mapa (`gp.maps`).
+
+        1 = sin datos cerca (el prior), 0 = como medido justo ahí: el desvío de la parte espacial
+        del GP entre lo que deja una medición exacta (sill·nugget / (sill + nugget)) y el prior.
+        Incluye las estaciones supuestas medidas (`believe`).
+        """
+        sill, nugget = self.prior.kernel.sill, self.prior.nugget
+        floor = sill * nugget / (sill + nugget)
+        _, var = self.planning_post.predict(np.asarray(x_m, float), np.asarray(y_m, float))
+        return np.sqrt(np.clip((var - floor) / (sill - floor), 0.0, 1.0))
+
     def believe(self, x_m: float, y_m: float, error_m: float) -> IceModel:
         """Supone medida la profundidad esperada en (x, y): baja la incertidumbre alrededor."""
         mean, _ = self.planning_post.predict(np.array([x_m]), np.array([y_m]))

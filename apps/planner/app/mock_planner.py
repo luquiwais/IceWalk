@@ -167,6 +167,17 @@ def build_plan(
         kept.append(st)
 
     back_min, back, back_xy = _leg(pos, HABITAT_XY, speed, tmap)
+    if not kept:  # sin estaciones: el margen de salir ya de regreso
+        min_margin = budget - (t + back_min + INGRESS_MIN)
+    caution = float(c.get("walkback_caution_min", 0.0))
+    if min_margin < 0:
+        alerts.append({"level": "warning", "source": "planner",
+                       "message": f"Walkback margin is {min_margin:.0f} min: return to the "
+                                  "habitat now. No stations planned."})
+    elif min_margin < caution:
+        alerts.append({"level": "caution", "source": "planner",
+                       "message": f"Walkback margin {min_margin:.1f} min, below the "
+                                  f"{caution:g} min caution limit."})
     timeline.append({"t_start_min": round(t, 1), "t_end_min": round(t + back_min, 1),
                      "kind": "traverse", "label": "Return to habitat", "station_id": None})
     t += back_min
@@ -231,11 +242,12 @@ def build_plan(
             "duration_min": round(t, 1),
             "distance_km": round(total_km, 2),
             "max_distance_from_habitat_km": round(max_from_hab, 2),
-            "min_walkback_margin_min": round(min_margin, 1) if kept else 0,
+            "min_walkback_margin_min": round(min_margin, 1),
             "dose_estimate_msv": round(BASE_DOSE_MSV_PER_DAY * t / 1440, 3),
             "expected_uncertainty_reduction": round(min(u_red, 1.0), 2),
             "crew": c["crew"],
             "is_mock": True,
+            **({"walkback_caution_min": caution} if "walkback_caution_min" in c else {}),
         },
         "alerts": alerts,
     }

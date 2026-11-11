@@ -31,7 +31,6 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 51 | ¿`tool_assessment` (rendimiento por herramienta) en el plan o como endpoint aparte? | Bloque aditivo o endpoint, sin tocar `/replan` (§3.2) | Planificador + GP | 09/11 |
 | 53 | ¿La vista EV usa paneles sólidos aunque el estilo sea visionOS? | Sí, por legibilidad con luz extrema (§4.3) | Frontend | 09/11 |
 | 54 | ¿El radar va en la ruta y en «Which tool?», o como herramienta de estación? En los mocks todas las estaciones usan el taladro | En la ruta, coherente con DECISIONS | Planificador | 09/11 |
-| 55 | ¿Qué umbrales de walkback margin disparan caution y warning? (el re-plan deja 2.2 min sin alerta) | Declararlos como supuestos en la STM | Planificador + Producto | 09/11 |
 | 58 | Tarjeta de sitio: ¿qué `min_p` (probabilidad mínima de hielo al alcance para ir) declara la STM, y por dónde llega a la web: un campo nuevo en la respuesta del plan o `GET /site`? Cambiar el contrato va en un solo PR | Un campo opcional en la STM, marcado como supuesto, y la tarjeta dentro de la respuesta del plan | Producto + Planificador | 10/11 |
 
 ## A averiguar
@@ -53,7 +52,6 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 40 | ¿Las manchas de pendiente > 20° sueltas en el SE del sitio son relieve o artefactos del DTM (cajas, costuras)? Revisar el mapa FOM (`DTF...JP2`) y el relieve sombreado | Planificador |
 | 42 | Catálogo de cráteres (`data/processed/s1094b/craters_dundas2023.csv`) para el planificador: sin él, el mapa es solo el prior y la elección de estaciones casi no informa. ¿Luqui lo comparte por fuera de Git (licencia, cuestión 26)? | Planificador + Luqui |
 | 45 | Textura del globo y del sitio: hoy el respaldo es Viking MDIM 2.1 (232 m/px, imágenes de los 70) y a escala del sitio se ve borroso. ¿Qué sirve el backend como teselas (mosaico CTX de Murray Lab ~5 m/px para el globo/región, ortoimagen HiRISE para el sitio) y con qué URL/formato las consume `MarsGlobe`? | Datos + backend (Frontend solo consume) |
-| 46 | En los mocks, el re-plan tras "sin hielo" en E03S22 baja el margen mínimo de regreso de 33 a 2.2 min y suma 31 min; y `expected_uncertainty_reduction` es 0 en los dos planes. ¿Es lo esperado o un problema del planificador? | Planificador |
 
 ## Riesgo aceptado
 

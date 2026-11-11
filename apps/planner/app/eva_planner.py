@@ -204,6 +204,9 @@ class EvaPlanner:
         self.catalog = catalog or tools_by_id()
         c = stm["constraints"]
         self.budget_min = c["eva_max_h"] * 60 * (1 - c["reserve"])
+        # Margen de regreso bajo el cual se avisa (caution) y no se suman Get Aheads. Lo declara
+        # la STM como supuesto; sin él, solo cuenta el límite duro (margen >= 0).
+        self.caution_min = float(c.get("walkback_caution_min", 0.0))
         self.crew = int(c.get("crew", 2))
         self.habitat_xy = self.cfg.habitat_xy
         self.hab_cell = tmap.snap(*self.habitat_xy)
@@ -273,6 +276,17 @@ class EvaPlanner:
             return None
         return Schedule(visits, t, t + back, end_min)
 
+    def return_now(self) -> Schedule:
+        """Volver directo desde donde está la tripulación, aunque ya no alcance el tiempo."""
+        back = self.leg_min(self.start_cell, self.hab_cell)
+        return Schedule([], self.t0, self.t0 + back, self.t0 + back + self.cfg.ingress_min)
+
+    def min_margin(self, sched: Schedule) -> float:
+        """Margen de regreso más chico del plan; sin estaciones, el de salir ya de regreso."""
+        if sched.visits:
+            return min(v.margin_min for v in sched.visits)
+        return self.budget_min - sched.end_min
+
     # --- elección de estaciones ----------------------------------------------------------------
 
     def _taken(self, stops: list[Stop]) -> np.ndarray:
@@ -281,8 +295,13 @@ class EvaPlanner:
             taken |= self._near(s.x, s.y)
         return taken
 
-    def next_survey(self, stops: list[Stop], model: IceModel, req: Requirement) -> Stop | None:
-        """Mejor candidata por valor por minuto que entra al final del recorrido con regreso."""
+    def next_survey(
+        self, stops: list[Stop], model: IceModel, req: Requirement, floor_min: float = 0.0
+    ) -> Stop | None:
+        """Mejor candidata por valor por minuto que entra al final del recorrido con regreso.
+
+        `floor_min`: margen de regreso que tiene que quedar al terminarla (0 = el límite duro).
+        """
         sched = self.schedule(stops)
         if sched is None:
             return None
@@ -291,7 +310,8 @@ class EvaPlanner:
         dur = sum(self.catalog[t]["time_min"] for t in req.tools)
         leg = self.tmap.field(last)[0][self.ccell] / 60.0
         total = t_end + leg + dur + self.hab_min[self.ccell] + self.cfg.ingress_min
-        feasible = np.isfinite(leg) & (total <= self.budget_min) & ~self._taken(stops)
+        feasible = np.isfinite(leg) & (total <= self.budget_min - floor_min)
+        feasible &= ~self._taken(stops)
         idx = np.flatnonzero(feasible)
         if idx.size == 0:
             return None
@@ -358,9 +378,9 @@ class EvaPlanner:
         model = self.model
         survey_reqs = [r for r in self.reqs if r.is_survey]
 
-        def add_survey(req: Requirement) -> bool:
+        def add_survey(req: Requirement, floor_min: float = 0.0) -> bool:
             nonlocal model
-            stop = self.next_survey(stops, model, req)
+            stop = self.next_survey(stops, model, req, floor_min)
             if stop is None:
                 return False
             stops.append(stop)
@@ -394,13 +414,14 @@ class EvaPlanner:
                 self.alerts.append(
                     _alert("advisory", f"Objective {req.rank} does not fit the EVA.")
                 )
-        # 3. Get Aheads: más estaciones de hielo con el tiempo que sobra. Reordenar la ruta
-        #    libera tiempo, que se vuelve a ofrecer hasta que no entre ninguna más.
+        # 3. Get Aheads: más estaciones de hielo con el tiempo que sobra, sin bajar el margen de
+        #    regreso del umbral de caution. Reordenar la ruta libera tiempo, que se vuelve a
+        #    ofrecer hasta que no entre ninguna más.
         stops[:] = self.improve(stops)
         while True:
             added = False
             for req in survey_reqs:
-                while add_survey(req):
+                while add_survey(req, self.caution_min):
                     added = True
             if not added:
                 break
@@ -471,6 +492,10 @@ def build(
                          completed=completed, config=config)
     stops = planner.plan_stops()
     sched = planner.schedule(stops)
+    planned_model = planner.planned_model
+    if sched is None:
+        # Solo pasa si ya desde el punto de partida no alcanza el tiempo para volver.
+        stops, sched, planned_model = [], planner.return_now(), model
     catalog, cfg = planner.catalog, planner.cfg
     alerts = planner.alerts
     if model.craters == 0:
@@ -511,6 +536,8 @@ def build(
             "depth_median_m": round(float(ev["depth_median_m"][i]), 2),
             "depth_shallow_m": round(float(ev["depth_shallow_m"][i]), 2),
         })
+
+    alerts.extend(_margin_alerts(planner, sched, ids))
 
     # Timeline y ruta.
     timeline: list[dict] = []
@@ -567,9 +594,11 @@ def build(
                                       "justification": f"Objective {r.rank}: measures "
                                                        f"{r.variable} while walking"})
 
-    # Reducción esperada de ambigüedad (entropía de P(hielo)) en la zona alcanzable.
-    before = model.evaluate(planner.cx, planner.cy)["entropy"].sum()
-    after = planner.planned_model.evaluate(planner.cx, planner.cy)["entropy"].sum()
+    # Reducción esperada de la incertidumbre espacial (la capa `uncertainty` del mapa) en la zona
+    # alcanzable, con cada estación supuesta medida en su valor esperado. La entropía de P(hielo)
+    # no sirve: es función de la probabilidad sola, y suponer el valor esperado no la mueve.
+    before = model.spatial_uncertainty(planner.cx, planner.cy).sum()
+    after = planned_model.spatial_uncertainty(planner.cx, planner.cy).sum()
     reduction = float((before - after) / before) if before > 0 else 0.0
 
     hab = planner.habitat_xy
@@ -593,8 +622,7 @@ def build(
             "distance_km": round(distance_m / 1000, 2),
             "max_distance_from_habitat_km": round(max((math.dist((s["position"]), hab)
                                                        for s in stations), default=0) / 1000, 2),
-            "min_walkback_margin_min": round(min((v.margin_min for v in sched.visits),
-                                                 default=0.0), 1),
+            "min_walkback_margin_min": round(planner.min_margin(sched), 1),
             "dose_estimate_msv": round(BASE_DOSE_MSV_PER_DAY * sched.end_min / 1440, 3),
             "expected_uncertainty_reduction": round(min(max(reduction, 0.0), 1.0), 4),
             "crew": planner.crew,
@@ -604,10 +632,27 @@ def build(
         },
         "alerts": alerts,
     }
+    if "walkback_caution_min" in stm["constraints"]:
+        plan["summary"]["walkback_caution_min"] = planner.caution_min
     if decisions and stations:
         plan["decision_points"] = _decision_points(stm, tmap, model, planner, stations, sched,
                                                    config)
     return plan
+
+
+def _margin_alerts(planner: EvaPlanner, sched: Schedule, ids: list[str]) -> list[dict]:
+    """Warning si el margen de regreso es negativo; caution si queda bajo el umbral de la STM."""
+    margin = planner.min_margin(sched)
+    if margin < 0:
+        return [_alert("warning", f"Walkback margin is {margin:.0f} min: return to the habitat "
+                                  "now. No stations planned.")]
+    if margin >= planner.caution_min:
+        return []
+    where = next((sid for sid, v in zip(ids, sched.visits, strict=True)
+                  if v.margin_min == margin), None)
+    at = f" at {where}" if where else ""
+    return [_alert("caution", f"Walkback margin {margin:.1f} min{at}, below the "
+                              f"{planner.caution_min:g} min caution limit.")]
 
 
 def _ice_tool(tools: list[str], catalog: dict[str, dict]) -> dict | None:

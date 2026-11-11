@@ -276,3 +276,77 @@ def test_fast_believer_matches_a_full_refit(model):
     # Lejos de los puntos supuestos, nada cambia.
     far = model.evaluate([-1200.0], [-1200.0])["p_ice"][0]
     assert fast.evaluate([-1200.0], [-1200.0])["p_ice"][0] == pytest.approx(far)
+
+
+# --- margen de regreso (cuestiones 46 y 55) ------------------------------------------------
+
+
+def _late_replan(tmap, model, plan, late_min, stm=STM):
+    first = plan["stations"][0]
+    end = next(e["t_end_min"] for e in plan["timeline"]
+               if e["kind"] == "station" and e["station_id"] == first["id"])
+    return build(tmap, model, stm=stm, start_xy=tuple(first["position"]),
+                 elapsed_min=end + late_min, completed=[first], decisions=False)
+
+
+def test_get_aheads_keep_the_caution_margin(tmap, model):
+    """Con retraso, el re-plan saca un Get Ahead antes de bajar del umbral de caution."""
+    caution = STM["constraints"]["walkback_caution_min"]
+    plan = build(tmap, model, decisions=False)
+    assert plan["summary"]["walkback_caution_min"] == caution
+    need = STM["objectives"][0]["measurement"]["min_stations"] - 1  # la primera ya está hecha
+    for late in range(0, 80, 5):
+        new = _late_replan(tmap, model, plan, late)
+        margin = new["summary"]["min_walkback_margin_min"]
+        if len(new["stations"]) > need:  # hay Get Aheads: no pueden dejar el margen bajo
+            assert margin >= caution
+        cautions = [a for a in new["alerts"] if "caution limit" in a["message"]]
+        assert bool(cautions) == (margin < caution)  # solo las requeridas lo bajan, y avisa
+        assert not any(a["level"] == "warning" for a in new["alerts"])
+    jsonschema.validate(new, PLAN_SCHEMA)
+
+    # Sin umbral en la STM, los Get Aheads llenan hasta el límite duro (el caso de la cuestión 46).
+    loose = copy.deepcopy(STM)
+    del loose["constraints"]["walkback_caution_min"]
+    full = _late_replan(tmap, model, build(tmap, model, stm=loose, decisions=False), 0, loose)
+    kept = _late_replan(tmap, model, plan, 0)
+    assert "walkback_caution_min" not in full["summary"]
+    assert len(full["stations"]) > len(kept["stations"])
+    assert full["summary"]["min_walkback_margin_min"] < caution
+    assert kept["summary"]["min_walkback_margin_min"] >= caution
+
+
+def test_required_stations_below_caution_raise_an_alert(tmap, model):
+    stm = copy.deepcopy(STM)
+    stm["constraints"]["walkback_caution_min"] = 1000  # más que toda la EVA
+    plan = build(tmap, model, stm=stm, decisions=False)
+    assert len(plan["stations"]) >= 4  # el mínimo de la STM se planifica igual
+    margin = plan["summary"]["min_walkback_margin_min"]
+    assert margin < 1000
+    msg = [a["message"] for a in plan["alerts"] if a["level"] == "caution"]
+    assert any(f"Walkback margin {margin:.1f} min" in m and "1000 min caution" in m for m in msg)
+
+
+def test_replan_too_late_returns_now_with_a_warning(tmap, model):
+    plan = build(tmap, model, decisions=False)
+    new = _late_replan(tmap, model, plan, 400)  # ya no alcanza ni para volver
+    jsonschema.validate(new, PLAN_SCHEMA)
+    assert new["stations"] == [] and not new["decision_points"]
+    s = new["summary"]
+    budget = STM["constraints"]["eva_max_h"] * 60 * (1 - STM["constraints"]["reserve"])
+    assert s["min_walkback_margin_min"] == pytest.approx(budget - s["duration_min"], abs=0.1)
+    assert s["min_walkback_margin_min"] < 0
+    assert any(a["level"] == "warning" and "return to the habitat now" in a["message"]
+               for a in new["alerts"])
+    assert [e["kind"] for e in new["timeline"]] == ["traverse", "ingress", "reserve"]
+
+
+def test_expected_uncertainty_reduction_counts_the_stations(tmap, model):
+    plan = build(tmap, model, decisions=False)
+    r = plan["summary"]["expected_uncertainty_reduction"]
+    assert 0 < r < 0.1  # una estación informa ~100 m de una zona de kilómetros
+    u = model.spatial_uncertainty(np.array([0.0, 1400.0]), np.array([0.0, -1400.0]))
+    assert ((0 <= u) & (u <= 1)).all()
+    s = plan["stations"][0]
+    believed = model.believe(*s["position"], 0.15)
+    assert believed.spatial_uncertainty([s["position"][0]], [s["position"][1]])[0] < 0.2
