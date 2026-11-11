@@ -420,3 +420,17 @@ Terreno real, 349 cráteres sintéticos repartidos en el sitio, umbral de 3 m, h
 | Plan sin catálogo de cráteres | Estaciones a ≤ 224 m del hábitat; EVA 2 llega a 2.3 km por su objetivo fijo | La ventana base cubre el plan de la EVA 1 |
 | Taladro sin hielo hasta 1 m en la estación | Incertidumbre 1.0 → 0.90 en la celda; P(≤ 3 m) baja; a más de 400 m, el mapa queda idéntico | Un "no" censurado informa poco: el mapa casi no cambia (coincide con la cuestión 50) |
 
+## 2026-11-11: margen de regreso y reducción de incertidumbre (cuestiones 46 y 55)
+
+Terreno real con 349 cráteres sintéticos, y el terreno sintético de los tests.
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Mocks de Luqui: re-plan tras "sin hielo" en E03S22 | Medición en el minuto 120; la estación terminaba en el 85. El re-plan mantiene 5 estaciones y deja 2.2 min de margen | El retraso venía del script de mocks; los Get Aheads se comían el resto |
+| `expected_uncertainty_reduction` con entropía de P(hielo) | 4606.03 → 4605.87 bits en 5031 candidatas (3.4e-5); cambian 22 celdas, la que más 0.026 bits | Siempre redondea a 0: el believer no mueve la probabilidad |
+| Lo mismo con la incertidumbre espacial del mapa | 0.0011 (0.11 %) | Refleja lo que se mide; chico porque una estación informa ~100 m |
+| Re-plan con retraso, terreno de los tests, sin umbral | A tiempo: 5 estaciones, margen 2.3 min | Reproduce el caso de la cuestión 46 |
+| Lo mismo con umbral de 15 min | A tiempo: 4 estaciones, 42.3 min. 30-40 min tarde: 3 estaciones (las requeridas) y 42-52 min, contra 4 y 2-12 min sin umbral. 70-75 min tarde: las 3 requeridas con 7-12 min y alerta caution | Los Get Aheads respetan el umbral; las requeridas avisan |
+| Re-plan con 5 h de retraso | Antes: error. Ahora: regreso directo, margen −31 min, warning | Arreglado |
+| Plan con puntos de decisión, terreno real | 0.95 s | Sin costo extra |
+

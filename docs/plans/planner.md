@@ -23,13 +23,14 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 | Timeline, tareas EV1/EV2, equipo con masa | Hecho (masas del catálogo, casi todas null) | `app/eva_planner.py` |
 | Puntos de decisión (`decision_points`) en las dos primeras estaciones de hielo | Hecho (cuestión 23 cerrada) | `app/eva_planner.py` |
 | Mapa de hielo `GET /maps?plan_id=` (`map.schema.json`), con caché y gzip | Hecho el 2026-11-11 | `app/maps.py`, `app/main.py` |
+| Margen de regreso: umbral de caution de la STM, Get Aheads que lo respetan, alertas caution/warning, re-plan tarde sin estaciones | Hecho el 2026-11-11 (cuestiones 46 y 55) | `app/eva_planner.py`, `app/mock_planner.py` |
 | Ventana de EVA y DONKI en vivo | Pendiente | `app/main.py` |
 
 ## Próximos pasos
 
 1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui; regenerar `apps/web/mock/` (ahora con `map.json`).
-2. Cuestiones 46 y 55: margen de regreso en el re-plan y sus alertas.
-3. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
+2. Ventana de EVA (clima y DONKI en vivo).
+3. Costo metabólico en el resumen (cuestión 39).
 4. Capas en GitHub Releases y carga al arrancar la API en el deploy.
 
 ## Cómo se corre

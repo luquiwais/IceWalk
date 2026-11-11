@@ -31,6 +31,7 @@ def test_plan_matches_contract_and_limits():
     s = plan["summary"]
     assert s["duration_min"] <= 8 * 60
     assert s["min_walkback_margin_min"] >= 0
+    assert s["walkback_caution_min"] == 15  # de la STM, en el real y en el mock
     assert len(plan["stations"]) >= 3
     assert plan["decision_points"]
 
