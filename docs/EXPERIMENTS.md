@@ -434,3 +434,17 @@ Terreno real con 349 cráteres sintéticos, y el terreno sintético de los tests
 | Re-plan con 5 h de retraso | Antes: error. Ahora: regreso directo, margen −31 min, warning | Arreglado |
 | Plan con puntos de decisión, terreno real | 0.95 s | Sin costo extra |
 
+## 2026-11-11: ventana de EVA (planificador)
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Mars24 contra el ejemplo resuelto (2000-01-06, 0°W 0°N) | Ls, MST, LTST, declinación, cenit y azimut iguales a 1e-5 | Implementación correcta |
+| S1094b en el hackathon (14/11/2026) | Ls ≈ 22° (primavera del norte); Sol a 64° al mediodía | — |
+| Climatología del VL2 (21 561 temperaturas y 23 207 vientos válidos, sols 1-1050) | Aire a mediodía: 236 K en verano del norte (Ls 90-120), 167 K en invierno; mínimo a las 5-8 h, máximo a las 15-16 h. Viento p95 horario: 6-7 m/s en primavera y verano, 15-17 m/s en la temporada de polvo (Ls 210-360). Nunca llega a 25 m/s | Con estos umbrales, el viento solo da advisory; el frío manda en otoño e invierno |
+| MCD como fuente | Uso moderado en la web; la versión completa prohíbe pasarla a terceros | Descartada (cuestión 15) |
+| DONKI en vivo (11/11/2026) | Sin SEP desde octubre; WSA-Enlil prevé un roce de CME en Marte el 13/11 12:00 UTC | Funciona sin key; ~1.5 s la primera consulta, después caché de 15 min |
+| DONKI de agosto de 2023 (demo) | 12 registros SEP de 2 fulguraciones (varios instrumentos); 4 corridas de Enlil con Marte, 1 publicada antes del 8/8 | Se agrupan por fulguración y se filtra lo publicado después |
+| Ventana demo (8/8/2023, plan del mock) | Sol 0 y casi todo el 1 en warning por el SEP del 7/8 22:09; salida recomendada: sol 2 a las 06:00 hora local, sin alertas | La historia de la demo: hoy no, en dos soles sí |
+| Ventana en vivo (14/11/2026 12:00 UTC, 6.4 h) | Hoy ya no entra (terminaría con Sol bajo); sol 1 a las 11:01, sin alertas. Con tau 2.5, misma hora con caution; con tau 5, no-go | El desempate por carga de alertas evita salir de madrugada cuando el polvo pone caution a todo |
+| Primer intento de desempate (cantidad de momentos en el peor nivel) | Con polvo en caution todo el sol, elegía las 05:45 (Sol a 2°, −98 °C) | Reemplazado por la carga por factor |
+| Tiempo | Demo 0.02 s; en vivo 1.5 s la primera vez (DONKI) | — |
