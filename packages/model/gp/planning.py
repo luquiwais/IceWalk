@@ -37,6 +37,9 @@ from gp.observations import (
 )
 from gp.posterior import Posterior, Prior, posterior
 
+# Prior regional y tarjeta de sitio (paso 4): detalle en `gp/regional.py`.
+from gp.regional import NoRegionalData, regional_estimate, site_assessment  # noqa: F401
+
 # Ajuste de la prueba de estructura con d > 0.2 D (docs/EXPERIMENTS.md, 2026-11-05).
 FITTED = {"mean": 0.86, "variance": 0.299, "rho": 0.5, "range_m": 100.0}
 OUTCOME_SIGMA_LOG = 0.05
@@ -52,6 +55,25 @@ def fitted_prior(
     from gp.kernel import Matern32
 
     return Prior(mean, Matern32(rho * variance, range_m), nugget=(1 - rho) * variance)
+
+
+def regional_prior(
+    lat_deg: float, rho: float = FITTED["rho"], range_m: float = FITTED["range_m"]
+) -> Prior:
+    """Prior para un sitio sin cráteres propios, a partir de la latitud (`gp/regional.py`).
+
+    Media y varianza total salen del ajuste con Daubar 2022 (desvío residual más el de los
+    coeficientes). El reparto espacial/nugget y el alcance de 100 m se copian de S1094b: son un
+    supuesto fuera de ese sitio (`docs/SOURCES.md`). Lanza `NoRegionalData` en el hemisferio sur
+    o debajo de 20°N. En S1094b usar `fitted_prior`, que sale de sus 349 cráteres.
+    """
+    from gp.kernel import Matern32
+
+    if not 0 < rho <= 1:
+        raise ValueError(f"rho debe estar en (0, 1]: {rho}")
+    est = regional_estimate(lat_deg)
+    variance = est.sd_total**2
+    return Prior(est.mean_log_depth, Matern32(rho * variance, range_m), nugget=(1 - rho) * variance)
 
 
 def site_posterior(catalog_path: Path = DEFAULT_CATALOG, prior: Prior | None = None) -> Posterior:

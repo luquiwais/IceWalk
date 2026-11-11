@@ -83,7 +83,7 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | `NEUTRON_SIGMA_LOG = 0.3` | Alcance gradual del espectrómetro | ~0.4-1 m alrededor de 0.6 m (`research/viabilidad-expediciones.md`) |
 | `CRATER_ERROR_M = 0.15`, usado en un taladro | Error de un taladro que no informa el suyo | Se reutiliza el valor de cráteres: 1 px en Dundas et al. (2023). Para taladro, sin fuente |
 | Profundidad excavada = 0.1 × diámetro (prior regional) | Hasta dónde "ve" un cráter nuevo de Daubar 2022: con hielo, d < 0.1·D; sin hielo, d > 0.1·D | Sin fuente directa. Byrne et al. 2009 describe cráteres con hielo de pocos metros y decímetros de profundidad (~0.1; resumen en [Dundas et al. 2014, USGS](https://pubs.usgs.gov/publication/70073409)); el DTM de S1094b da ~0.14 ([HiRISE](https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155)). Con 0.2 el regional no coincide con el sitio (`EXPERIMENTS.md`, 2026-11-10). Fuente posible: cuestión 57 |
-| Alcance de 100 m fuera de S1094b | Alcance del kernel en un sitio sin catálogo | Se toma el ajustado en S1094b; sin fuente para otros sitios |
+| Alcance de 100 m y reparto 50/50 fuera de S1094b | Alcance del kernel y parte espacial de la varianza en un sitio sin catálogo (`gp.planning.regional_prior`) | Se toman los ajustados en S1094b; sin fuente para otros sitios |
 
 ## Software
 

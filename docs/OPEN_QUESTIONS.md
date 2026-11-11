@@ -33,6 +33,7 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 53 | ¿La vista EV usa paneles sólidos aunque el estilo sea visionOS? | Sí, por legibilidad con luz extrema (§4.3) | Frontend | 09/11 |
 | 54 | ¿El radar va en la ruta y en «Which tool?», o como herramienta de estación? En los mocks todas las estaciones usan el taladro | En la ruta, coherente con DECISIONS | Planificador | 09/11 |
 | 55 | ¿Qué umbrales de walkback margin disparan caution y warning? (el re-plan deja 2.2 min sin alerta) | Declararlos como supuestos en la STM | Planificador + Producto | 09/11 |
+| 58 | Tarjeta de sitio: ¿qué `min_p` (probabilidad mínima de hielo al alcance para ir) declara la STM, y por dónde llega a la web: un campo nuevo en la respuesta del plan o `GET /site`? Cambiar el contrato va en un solo PR | Un campo opcional en la STM, marcado como supuesto, y la tarjeta dentro de la respuesta del plan | Producto + Planificador | 10/11 |
 
 ## A averiguar
 
