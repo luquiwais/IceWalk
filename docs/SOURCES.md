@@ -87,12 +87,15 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 
 ## Supuestos del planificador
 
-Valores sin fuente en `apps/planner/config/eva.yaml`, marcados `assumption: true`.
+Valores sin fuente en `apps/planner/config/eva.yaml` (marcados `assumption: true`) y en las STM de ejemplo.
 
 | Valor | Qué es | Por qué ese valor |
 | --- | --- | --- |
 | `map_half_m = 1500` | Medio lado del mapa de hielo (`GET /maps`) alrededor del hábitat | 3 × 3 km a 10 m: ~1 s una vez y ~21 kB comprimido. Lo alcanzable en 8 h es casi todo el sitio (~6.5 s); la ventana crece si el plan va más lejos |
+| Umbrales de la ventana de EVA (`config/eva_window.yaml`): Sol bajo 0° y 10°; aire p10 bajo 203 K y 173 K; viento 15 y 25 m/s; polvo tau 1, 2 y 4 (0.5 sin reporte); 48 h tras un SEP; ±12 h de una CME | Cuándo dan advisory, caution o warning | No hay umbrales oficiales para una EVA en Marte (`research/factibilidad.md`). Solo el de viento tiene apoyo: saltación a 25-30 m/s (Ryan et al. 1981). Cuestión 59 |
+| Temperatura y viento del Viking Lander 2 como análogo de S1094b | Climatología por estación y hora | El VL2 está a 48°N y −3.6 km; S1094b a 35°N y −3.9 km: más cálido. Cuestión 60 |
 | `map_margin_m = 300` | Borde del mapa alrededor de estaciones, opciones y mediciones | 3 alcances del GP (100 m): más allá una medición no cambia el mapa (`gp.maps.UPDATE_REACH_RANGES`) |
+| `walkback_caution_min = 15` (STM de ejemplo) | Margen de regreso bajo el cual el plan avisa (caution) y no suma Get Aheads | Sin valor publicado: Apollo usó el walkback como límite duro (ALSJ, Apollo 17, Estación 4, https://apollojournals.org/alsj/a17/a17.sta4.html). 15 min es el ejemplo de `research/diseno-interfaz.md` y ~500 m de caminata a 2 km/h |
 
 ## Software
 
@@ -141,3 +144,8 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 | Taladro de Apollo (ALSD): motorizado, < 13.6 kg, dos personas | Manual MCR-69-300, https://ntrs.nasa.gov/api/citations/19710014920/downloads/19710014920.pdf |
 | Vis-NIR y XRF de mano, ~2.5 kg (BASALT) | Sehlke et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442242/ |
 | Bingo times y "sin respuesta a tiempo, sigue la prioridad propia" | Stevens et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282/ |
+| Hora solar en Marte y posición del Sol (Mars24) | Allison y McEwen (2000), Planetary and Space Science 48, 215-235; algoritmo y ejemplos: https://www.giss.nasa.gov/tools/mars24/help/algorithm.html |
+| Meteorología del Viking Lander 2: presión, temperatura y viento en 25 bins por sol (sols 1-1050) | NASA PDS Atmospheres, VL1/VL2-M-MET-4-BINNED-P-T-V-V1.0 (Tillman et al.), https://atmos.nmsu.edu/PDS/data/vl_1001/data/vl_tbin.dat |
+| Umbral de saltación en Marte: 25-30 m/s a la altura de los sensores del Viking | Ryan, Sharman y Lucich (1981), Local Mars dust storm generation mechanism, GRL 8(8), 899-901, doi:10.1029/GL008i008p00899 |
+| DONKI: eventos SEP y simulaciones WSA-Enlil con llegada a Marte | NASA CCMC, https://ccmc.gsfc.nasa.gov/DONKI-API/get/SEP y /WSAEnlilSimulations |
+| Mars Climate Database: uso de la web "moderado"; la versión completa no se puede pasar a terceros | https://www-mars.lmd.jussieu.fr/mars/access.html |

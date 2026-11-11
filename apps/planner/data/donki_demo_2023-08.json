@@ -1,0 +1,320 @@
+{
+ "source": "NASA CCMC DONKI, https://ccmc.gsfc.nasa.gov/DONKI-API/get/ (SEP 2023-08-01..12, WSAEnlilSimulations 2023-08-01..12, solo impactos en Marte)",
+ "retrieved": "2026-11-11",
+ "demo_utc": "2023-08-08T12:00:00Z",
+ "sep": [
+  {
+   "sepID": "2023-08-05T10:00:00-SEP-001",
+   "eventTime": "2023-08-05T10:00Z",
+   "instruments": [
+    {
+     "displayName": "STEREO A: IMPACT 13-100 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-05T06:18:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T07:12:00-CME-001"
+    },
+    {
+     "activityID": "2023-08-05T21:45:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T22:24:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26338/-1"
+  },
+  {
+   "sepID": "2023-08-05T10:19:00-SEP-001",
+   "eventTime": "2023-08-05T10:19Z",
+   "instruments": [
+    {
+     "displayName": "SOHO: COSTEP 15.8-39.8 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-05T06:18:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T07:12:00-CME-001"
+    },
+    {
+     "activityID": "2023-08-05T21:45:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T22:24:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26349/-1"
+  },
+  {
+   "sepID": "2023-08-05T10:47:00-SEP-001",
+   "eventTime": "2023-08-05T10:47Z",
+   "instruments": [
+    {
+     "displayName": "SOHO: COSTEP 28.2-50.1 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-05T06:18:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T07:12:00-CME-001"
+    },
+    {
+     "activityID": "2023-08-05T21:45:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T22:24:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26350/-1"
+  },
+  {
+   "sepID": "2023-08-05T10:59:00-SEP-001",
+   "eventTime": "2023-08-05T10:59Z",
+   "instruments": [
+    {
+     "displayName": "MODEL: REleASE:ACE/EPAM 15.8-39.8 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-05T06:18:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T07:12:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26348/-1"
+  },
+  {
+   "sepID": "2023-08-05T11:15:00-SEP-001",
+   "eventTime": "2023-08-05T11:15Z",
+   "instruments": [
+    {
+     "displayName": "GOES-P: SEISS >10 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-05T06:18:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T07:12:00-CME-001"
+    },
+    {
+     "activityID": "2023-08-05T21:45:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T22:24:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26340/-1"
+  },
+  {
+   "sepID": "2023-08-05T12:33:00-SEP-001",
+   "eventTime": "2023-08-05T12:33Z",
+   "instruments": [
+    {
+     "displayName": "MODEL: REleASE:SOHO/EPHIN 15.8-39.8 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-05T06:18:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-05T07:12:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26347/-1"
+  },
+  {
+   "sepID": "2023-08-07T22:09:00-SEP-001",
+   "eventTime": "2023-08-07T22:09Z",
+   "instruments": [
+    {
+     "displayName": "SOHO: COSTEP 15.8-39.8 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-07T20:30:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-07T20:48:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26406/-1"
+  },
+  {
+   "sepID": "2023-08-07T22:19:00-SEP-001",
+   "eventTime": "2023-08-07T22:19Z",
+   "instruments": [
+    {
+     "displayName": "SOHO: COSTEP 28.2-50.1 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-07T20:30:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-07T20:48:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26407/-1"
+  },
+  {
+   "sepID": "2023-08-08T01:00:00-SEP-001",
+   "eventTime": "2023-08-08T01:00Z",
+   "instruments": [
+    {
+     "displayName": "GOES-P: SEISS >10 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-07T20:30:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-07T20:48:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26416/-1"
+  },
+  {
+   "sepID": "2023-08-08T01:48:00-SEP-001",
+   "eventTime": "2023-08-08T01:48Z",
+   "instruments": [
+    {
+     "displayName": "MODEL: REleASE:SOHO/EPHIN 15.8-39.8 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-07T20:30:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-07T20:48:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26415/-1"
+  },
+  {
+   "sepID": "2023-08-08T01:59:00-SEP-001",
+   "eventTime": "2023-08-08T01:59Z",
+   "instruments": [
+    {
+     "displayName": "MODEL: REleASE:ACE/EPAM 15.8-39.8 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-07T20:30:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-07T20:48:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26422/-1"
+  },
+  {
+   "sepID": "2023-08-08T04:26:00-SEP-001",
+   "eventTime": "2023-08-08T04:26Z",
+   "instruments": [
+    {
+     "displayName": "STEREO A: IMPACT 13-100 MeV"
+    }
+   ],
+   "linkedEvents": [
+    {
+     "activityID": "2023-08-07T20:30:00-FLR-001"
+    },
+    {
+     "activityID": "2023-08-07T20:48:00-CME-001"
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/SEP/26419/-1"
+  }
+ ],
+ "enlil": [
+  {
+   "simulationID": "WSA-ENLIL/26319/1",
+   "modelCompletionTime": "2023-08-03T19:30Z",
+   "cmeInputs": [
+    {
+     "cmeStartTime": "2023-08-02T18:48Z",
+     "speed": 410.0
+    }
+   ],
+   "impactList": [
+    {
+     "location": "Mars",
+     "arrivalTime": "2023-08-09T02:00Z",
+     "isGlancingBlow": false,
+     "isMinorImpact": true
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/26319/-1"
+  },
+  {
+   "simulationID": "WSA-ENLIL/26427/1",
+   "modelCompletionTime": "2023-08-08T17:03Z",
+   "cmeInputs": [
+    {
+     "cmeStartTime": "2023-08-08T09:12Z",
+     "speed": 478.0
+    }
+   ],
+   "impactList": [
+    {
+     "location": "Mars",
+     "arrivalTime": "2023-08-14T00:00Z",
+     "isGlancingBlow": true,
+     "isMinorImpact": false
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/26427/-1"
+  },
+  {
+   "simulationID": "WSA-ENLIL/26470/1",
+   "modelCompletionTime": "2023-08-11T13:08Z",
+   "cmeInputs": [],
+   "impactList": [
+    {
+     "location": "Mars",
+     "arrivalTime": "2023-08-17T02:00Z",
+     "isGlancingBlow": true,
+     "isMinorImpact": false
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/26470/-1"
+  },
+  {
+   "simulationID": "WSA-ENLIL/26477/1",
+   "modelCompletionTime": "2023-08-11T15:31Z",
+   "cmeInputs": [
+    {
+     "cmeStartTime": "2023-08-10T16:00Z",
+     "speed": 537.0
+    }
+   ],
+   "impactList": [
+    {
+     "location": "Mars",
+     "arrivalTime": "2023-08-16T06:45Z",
+     "isGlancingBlow": false,
+     "isMinorImpact": false
+    }
+   ],
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/WSA-ENLIL/26477/-1"
+  }
+ ]
+}

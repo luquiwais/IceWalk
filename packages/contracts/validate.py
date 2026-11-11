@@ -20,6 +20,8 @@ PAIRS = [
     ("schemas/measurement.schema.json", C / "examples/measurement.example.json"),
     ("schemas/boulders.schema.json", C / "examples/boulders.example.json"),
     ("schemas/map.schema.json", C / "examples/map.example.json"),
+    ("schemas/eva_window.schema.json", C / "examples/eva_window.example.json"),
+    ("schemas/eva_window.schema.json", ROOT / "apps/web/mock/eva-window.json"),
     ("schemas/plan.schema.json", ROOT / "apps/web/mock/plan.json"),
     ("schemas/plan.schema.json", ROOT / "apps/web/mock/replan.json"),
 ]

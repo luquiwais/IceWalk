@@ -395,6 +395,7 @@
     "min_walkback_margin_min": 2.2,
     "dose_estimate_msv": 0.178,
     "expected_uncertainty_reduction": 0.0,
+    "walkback_caution_min": 15.0,
     "crew": 2,
     "is_mock": false,
     "ice_threshold_m": 3.0,
@@ -410,6 +411,11 @@
       "level": "advisory",
       "message": "Objective 1: terrain units not available yet; stations chosen by ice potential.",
       "source": "planner"
+    },
+    {
+      "level": "caution",
+      "source": "planner",
+      "message": "Walkback margin 2.2 min at E02S22, below the 15 min caution limit."
     }
   ]
 }

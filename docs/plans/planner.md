@@ -23,13 +23,14 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 | Timeline, tareas EV1/EV2, equipo con masa | Hecho (masas del catálogo, casi todas null) | `app/eva_planner.py` |
 | Puntos de decisión (`decision_points`) en las dos primeras estaciones de hielo | Hecho (cuestión 23 cerrada) | `app/eva_planner.py` |
 | Mapa de hielo `GET /maps?plan_id=` (`map.schema.json`), con caché y gzip | Hecho el 2026-11-11 | `app/maps.py`, `app/main.py` |
-| Ventana de EVA y DONKI en vivo | Pendiente | `app/main.py` |
+| Margen de regreso: umbral de caution de la STM, Get Aheads que lo respetan, alertas caution/warning, re-plan tarde sin estaciones | Hecho el 2026-11-11 (cuestiones 46 y 55) | `app/eva_planner.py`, `app/mock_planner.py` |
+| Ventana de EVA (`GET /eva-window`) y DONKI en vivo (`GET /spaceweather`) | Hecho el 2026-11-11 | `app/eva_window.py`, `app/marstime.py`, `app/donki.py` |
 
 ## Próximos pasos
 
 1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui; regenerar `apps/web/mock/` (ahora con `map.json`).
-2. Cuestiones 46 y 55: margen de regreso en el re-plan y sus alertas.
-3. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
+2. Ventana de EVA: umbrales con un experto (cuestión 59) y clima en el sitio (cuestión 60).
+3. Costo metabólico en el resumen (cuestión 39).
 4. Capas en GitHub Releases y carga al arrancar la API en el deploy.
 
 ## Cómo se corre
@@ -108,6 +109,18 @@ El GP ya da todo lo del mapa (`gp/maps.py`, re-exportado en `gp.planning`); falt
 4. Leyenda desde `palettes` y valor de la celda al pasar el mouse (por ejemplo "P(ice ≤ 3 m) 67 % · uncertainty 0.95"). Sin contornos duros (`research/diseno-interfaz.md` §5.1).
 5. Colores en tonos de azul (DECISIONS 2026-11-10); `gp.maps.to_rgba` y `potential_rgba` son la referencia para comparar.
 
+## Ventana de EVA (`GET /eva-window`)
+
+Decide cuándo salir. `GET /eva-window?plan_id=&date=&dust_tau=&demo=` devuelve `eva_window.schema.json`: una fila por hora local en 3 soles (luz, temperatura, viento, polvo y clima espacial, cada uno con nivel y motivo), la salida recomendada (`go: false` si toda salida tiene un warning) y, con `plan_id`, las condiciones en cada estación. Sin `date`, ahora; con `demo=true`, el 8 de agosto de 2023 con el evento de partículas real (sin red).
+
+- Luz: `app/marstime.py` (Mars24).
+- Temperatura y viento: `data/vl2_climatology.json`, armado con `scripts/build_climatology.py` desde el PDS.
+- Clima espacial: `app/donki.py`; demo en `data/donki_demo_2023-08.json`. `GET /spaceweather?demo=false` usa DONKI en vivo.
+- Umbrales: `config/eva_window.yaml`, todos supuestos (cuestión 59).
+- Ejemplo del contrato y mock de la web: `scripts/export_window.py`.
+
+Para Frontend: barra de estado y Brief pueden mostrar `recommended` (hora local y UTC, nivel, motivos); la timeline del día puede pintar `hours[].level`; la ficha de estación, `stations[]`.
+
 ## Datos y despliegue
 
 - El catálogo de cráteres (`data/processed/s1094b/craters_dundas2023.csv`) y el DTM están **fuera de Git**.
@@ -127,7 +140,7 @@ El GP ya da todo lo del mapa (`gp/maps.py`, re-exportado en `gp.planning`); falt
 | 41 | Qué son `uncertainty`, `value` y los campos nuevos de estación | **Hecho** en el mismo PR |
 | 33 | Catálogo: `evidence`, análogos NSS, RIMFAX y ALSD, masas, fuente de la resolución del radar | **Hecho** en el mismo PR |
 | 30 | Observaciones blandas para espectrómetro y radar | Hecho por el GP |
-| 15 | Licencia de Mars Climate Database | Sin averiguar |
+| 15 | Licencia de Mars Climate Database | Cerrada: no se usa (DECISIONS 2026-11-11). Contrato nuevo `eva_window.schema.json` |
 | - | `habitat_xy` en la STM | Pendiente: próximo cambio de la STM |
 
 Un cambio de contrato es un solo PR que actualiza esquema, ejemplos, mocks y usos, y `python packages/contracts/validate.py` tiene que pasar.

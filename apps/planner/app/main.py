@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import threading
 from contextlib import asynccontextmanager
+from datetime import timedelta
 from functools import lru_cache
 
 from fastapi import FastAPI, HTTPException
@@ -18,9 +19,10 @@ from fastapi.middleware.gzip import GZipMiddleware
 from gp.observations import Observation, from_measurement
 from pydantic import BaseModel
 
-from . import eva_planner, maps, mock_planner
+from . import donki, eva_planner, eva_window, maps, mock_planner
 from .contracts import CONTRACTS, ROOT, tool_catalog, tools_by_id
 from .ice import IceModel
+from .marstime import utc
 from .traverse.params import default_params
 from .traverse.route import TraverseMap, cached_map
 
@@ -38,14 +40,6 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title="IceWalk API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 app.add_middleware(GZipMiddleware, minimum_size=1000)  # el mapa: ~250 kB, comprime bien
-
-# Evento histórico de partículas solares (DONKI) para el modo demo.
-DEMO_SEP_EVENT = {
-    "activityID": "2023-08-07T22:19:00-SEP-001",
-    "eventTime": "2023-08-07T22:19Z",
-    "linked": ["2023-08-07T20:30:00-FLR-001 (X1.5)", "2023-08-07T20:48:00-CME-001"],
-    "source": "NASA CCMC DONKI",
-}
 
 
 class PlanRequest(BaseModel):
@@ -196,12 +190,56 @@ def replan(req: ReplanRequest) -> dict:
     return _store(p, stm, measurements, completed)
 
 
+@app.get("/eva-window")
+def eva_window_endpoint(
+    plan_id: str | None = None,
+    date: str | None = None,
+    dust_tau: float | None = None,
+    demo: bool = False,
+) -> dict:
+    """Cuándo salir (`eva_window.schema.json`): condiciones por hora y mejor hora de salida.
+
+    `date`: momento desde el que se puede salir (ISO 8601, UTC; por defecto ahora; en demo, el
+    evento de agosto de 2023). `dust_tau`: opacidad que reporta la tripulación. Con `plan_id`,
+    la duración es la del plan y se dan las condiciones en cada estación.
+    """
+    if dust_tau is not None and not 0 <= dust_tau <= 20:
+        raise HTTPException(422, "dust_tau must be between 0 and 20")
+    plan_doc = None
+    if plan_id is not None:
+        entry = _PLANS.get(plan_id)
+        if entry is None:
+            raise HTTPException(404, "Unknown plan_id")
+        plan_doc = entry["plan"]
+        duration = plan_doc["summary"]["duration_min"]
+    else:
+        c = DEFAULT_STM["constraints"]
+        duration = c["eva_max_h"] * 60 * (1 - c["reserve"])
+    try:
+        t0 = donki.demo_time() if demo and date is None else utc(date)
+    except ValueError as exc:
+        raise HTTPException(422, f"date must be ISO 8601: {exc}") from exc
+    return eva_window.eva_window(t0, duration, dust_tau=dust_tau, demo=demo, plan=plan_doc)
+
+
 @app.get("/spaceweather")
 def spaceweather(demo: bool = True) -> dict:
-    if demo:
-        return {"mode": "demo", "event": DEMO_SEP_EVENT,
-                "alert": {"level": "warning",
-                          "message": "Solar energetic particle event. Return to habitat.",
-                          "source": "DONKI"}}
-    return {"mode": "live", "endpoint": "https://ccmc.gsfc.nasa.gov/DONKI-API/get/SEP",
-            "note": "Live fetch not implemented yet"}
+    """Eventos de DONKI de los últimos días y el nivel de alerta ahora (o en la demo)."""
+    t0 = donki.demo_time() if demo else utc(None)
+    sw = donki.space_weather(t0, timedelta(0), demo=demo)
+    moment = eva_window.assess(t0, 0.0, sw)
+    level = moment.levels["space_weather"]
+    reasons = [r for r in moment.reasons if "DONKI" in r]
+    message = {"warning": "Solar energetic particle event. Return to habitat.",
+               "caution": "CME arriving at Mars. Monitor and keep the walkback margin.",
+               "advisory": reasons[0] if reasons else "Check space weather."}.get(level)
+    return {
+        "mode": sw.mode,
+        "status": sw.status,
+        "time_utc": t0.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "events": [{"kind": e.kind, "id": e.id, "time_utc": e.time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "detail": e.detail, "link": e.link} for e in sw.events],
+        "alert": {"level": level, "message": message, "source": "DONKI",
+                  "reasons": reasons} if message else None,
+        **({"note": sw.note} if sw.note else {}),
+    }
