@@ -17,6 +17,7 @@
         "reserve": { "type": "number", "minimum": 0, "maximum": 1 },
         "max_slope_deg": { "type": "number", "minimum": 0, "maximum": 90 },
         "walkback_max_km": { "type": "number", "exclusiveMinimum": 0 },
+        "walkback_caution_min": { "type": "number", "minimum": 0, "description": "Margen de regreso (minutos, aparte de la reserva) bajo el cual el plan avisa con caution y no suma estaciones Get Ahead. Supuesto de la misión: no hay valor publicado (docs/SOURCES.md)" },
         "crew": { "type": "integer", "minimum": 1 },
         "mass_budget_kg": { "type": ["number", "null"], "minimum": 0 },
         "walking_speed_kmh": { "type": "number", "exclusiveMinimum": 0 }
