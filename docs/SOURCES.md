@@ -140,3 +140,13 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 ### Imágenes del sitio en la web (2026-11-10)
 
 - Ortoimágenes HiRISE `ESP_073578_2155_RED_A_01_ORTHO` y `ESP_073578_2155_RED_C_01_ORTHO`. Crédito: NASA/JPL-Caltech/UArizona. Copia COG de USGS Astrogeology (CC0): https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/ (ver `provenance.txt` en esa carpeta). Capas `hirise_ortho_1m` y `hirise_ortho_25cm` de `data/layers.yaml`.
+
+### Fidelidad de movimiento visionOS (2026-11-11)
+
+- Apple [Design hover interactions for visionOS, WWDC25/303](https://developer.apple.com/videos/play/wwdc2025/303/): referencias de tab bar, Back y slider desde 2:08; efectos de hover y rampas desde 5:01. Los tiempos observados se distinguen de parámetros publicados en `research/visionos-motion-fidelity-2026-11-11.md`.
+- Apple [Create custom hover effects in visionOS, WWDC24/10152](https://developer.apple.com/videos/play/wwdc2024/10152/): coordinación de escala, opacidad y forma de clip; el ejemplo de escala es 1.05. No prescribe deformación líquida para todos los componentes.
+- Apple [Animate with springs, WWDC23/10158](https://developer.apple.com/videos/play/wwdc2023/10158/): modelo de springs y continuidad de velocidad. Los presets públicos se conservan separados de la calibración web en `packages/ui/src/spring.ts`.
+- Figma `TE1ta1HNhtbwSZn3LztSL5`, Context Menu `487:11347`: geometría y materiales recuperados con `get_design_context`; `get_motion_context` recursivo devolvió `nodes: []`. Ese componente estático no demuestra las transiciones nativas.
+- Apple [Design for spatial user interfaces, WWDC23/10076](https://developer.apple.com/videos/play/wwdc2023/10076/), [Design for spatial input, WWDC23/10073](https://developer.apple.com/videos/play/wwdc2023/10073/) y [Elevate your windowed app for spatial computing, WWDC23/10110](https://developer.apple.com/videos/play/wwdc2023/10110/): materiales, modales, activación y ornamentos.
+- Motion [spring generator](https://motion.dev/docs/spring), [animate](https://motion.dev/docs/animate), [springValue](https://motion.dev/docs/spring-value), [styleEffect](https://motion.dev/docs/style-effect) y [SVG morphing](https://motion.dev/docs/react-svg-animation): comparación de integración y física con velocidad. Versiones, licencias y pesos medidos de alternativas en la investigación del 11/11.
+- [CSSWG Filter Effects Level 2](https://drafts.csswg.org/filter-effects-2/) y [MDN backdrop-filter](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/backdrop-filter): semántica del backdrop y filtros SVG; se comprobó ejecución real por motor antes de afirmar soporte.

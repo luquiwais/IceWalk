@@ -181,7 +181,32 @@ describe("plan session against the API", () => {
     expect(session.getSnapshot().error?.kind).toBe("timeout");
   });
 
-  it("ignores a replan that arrives after a newer action", async () => {
+  it("rejects a second submission while a replan is pending without losing the first measurement", async () => {
+    const pending = deferred();
+    const fetch = routes({ ...healthy, "/plan": () => json(apiPlan), "/replan": pending.route });
+    const session = await started(fetch);
+    const firstMeasurement = measurement("ice");
+
+    const first = session.logMeasurement(firstMeasurement, 60);
+    const second = session.logMeasurement(measurement("no_ice"), 65);
+    expect(fetch.mock.calls.filter(([url]) => String(url).endsWith("/replan"))).toHaveLength(1);
+    await expect(second).resolves.toBe("busy");
+    expect(session.getSnapshot().status).toBe("loading");
+
+    pending.release(json(apiReplan));
+    await expect(first).resolves.toBe("replanned");
+    expect(session.getSnapshot().measurements).toEqual([firstMeasurement]);
+    expect(session.getSnapshot().plan).toEqual(apiReplan);
+
+    const next = { ...apiReplan, plan_id: "plan-api0003" };
+    fetch.mockImplementationOnce(async () => json(next));
+    await expect(session.logMeasurement(measurement("no_ice"), 70)).resolves.toBe("replanned");
+    const [, init] = fetch.mock.calls.at(-1)!;
+    expect(JSON.parse(init!.body as string).plan_id).toBe(apiReplan.plan_id);
+    expect(session.getSnapshot().measurements).toHaveLength(2);
+  });
+
+  it("ignores a replan that arrives after a reset and a newer submission", async () => {
     const first = deferred();
     const second = deferred();
     const queue = [first.route, second.route];
@@ -190,6 +215,7 @@ describe("plan session against the API", () => {
     );
 
     const older = session.logMeasurement(measurement("ice"), 60);
+    session.reset();
     const newer = session.logMeasurement(measurement("no_ice"), 65);
     second.release(json(apiReplan));
     await expect(newer).resolves.toBe("replanned");

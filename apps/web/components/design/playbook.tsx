@@ -27,6 +27,8 @@ import { useRef, useState, useSyncExternalStore } from "react";
 import { cn } from "@icewalk/ui/utils";
 import { FAMILIES, figmaLink } from "./playbook-data";
 import { FamilySpecimens, OverviewSpecimens } from "./playbook-specimens";
+import { InputSpecimens } from "./playbook-input-specimens";
+import { WindowTransitions } from "./window-transitions";
 
 function subscribe(callback: () => void) {
   window.addEventListener("hashchange", callback);
@@ -130,7 +132,7 @@ export function Playbook() {
         <div className="flex items-center gap-4">
           <span className="hidden items-center gap-2 text-footnote text-white/65 sm:flex">
             <span className="size-[0.3125rem] rounded-full bg-green-400" />
-            30 families to explore
+            {FAMILIES.length} sections to explore
           </span>
           <a
             href={figmaLink("420:4149")}
@@ -186,7 +188,7 @@ export function Playbook() {
           <SidebarItem
             icon={<ListChecks />}
             current={selected === "coverage"}
-            counter={30}
+            counter={FAMILIES.length}
             onSelect={() => go("coverage")}
           >
             Component index
@@ -334,7 +336,7 @@ export function Playbook() {
                       A place for everything.
                     </Text>
                     <Text tone="secondary" className="mt-1">
-                      30 families, from the foundation to the finishing touch.
+                      30 source families and live component extensions.
                     </Text>
                   </div>
                   <Button
@@ -401,10 +403,10 @@ export function Playbook() {
               <>
                 <div className="pt-5 pb-8">
                   <Text as="h2" variant="title-1">
-                    All 30 source families.
+                    Source families and extensions.
                   </Text>
                   <Text tone="secondary" className="mt-2 max-w-[43rem]">
-                    Every family has a live example or an original platform
+                    Every section has a live example or an original platform
                     resource. The states below describe what is demonstrated;
                     they are not a claim of pixel parity for every Figma
                     variant.
@@ -413,7 +415,7 @@ export function Playbook() {
                 <div className="space-y-3">
                   {FAMILIES.map(
                     (
-                      { id, name, icon: Icon, group, components, states, node },
+                      { id, name, icon: Icon, group, components, states, node, extension },
                       index,
                     ) => (
                       <Material
@@ -458,7 +460,7 @@ export function Playbook() {
                           href={figmaLink(node)}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={`Figma source: ${name}`}
+                          aria-label={`${extension ? "Figma materials reference" : "Figma source"}: ${name}`}
                           className="relative rounded-full p-3 text-white/50 outline-none hover:text-white focus-visible:outline-2 focus-visible:outline-white"
                         >
                           <ArrowUpRight aria-hidden className="size-4" />
@@ -498,18 +500,18 @@ export function Playbook() {
                     rel="noreferrer"
                     className="flex shrink-0 items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-footnote text-white/65 outline-none hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-white"
                   >
-                    Source
+                    {family.extension ? "Materials reference" : "Source"}
                     <ArrowUpRight aria-hidden className="size-3.5" />
                   </a>
                 </div>
-                <FamilySpecimens
+                {family.id === "input-controls" ? <InputSpecimens disabled={disabled} /> : family.id === "window-transitions" ? <WindowTransitions /> : <FamilySpecimens
                   key={family.id}
                   family={family.id}
                   disabled={disabled}
                   notify={setFeedback}
                   scene={scene}
                   onSceneChange={setScene}
-                />
+                />}
                 <div className="mt-10 border-t border-white/10 pt-5">
                   <Text variant="caption-1" tone="tertiary">
                     {family.components} · Use pointer or keyboard to inspect

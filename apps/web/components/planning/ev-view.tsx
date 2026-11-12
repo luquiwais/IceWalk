@@ -1,184 +1,63 @@
 "use client";
-
 import { Button } from "@icewalk/ui/button";
 import { TextField } from "@icewalk/ui/fields";
 import { ListRow, ListSection } from "@icewalk/ui/list";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
 import { Checkbox } from "@icewalk/ui/selection-controls";
 import { Body, Footnote, Title3 } from "@icewalk/ui/text";
-import { Navigation } from "lucide-react";
 import { useState } from "react";
-import {
-  orderedStations,
-  toolName,
-  type Measurement,
-  type Plan,
-  type Station,
-} from "@/lib/plan";
-import { designSession } from "@/mock/design-session";
-import { Disclosure } from "./disclosure";
-import { clock, RESULT_LABEL, RowLabel, Value } from "./parts";
+import { bearing, measurementSummary, measuringTool, nextStation, toolName, toolReachM, type Measurement, type Plan, type Station } from "@/lib/plan";
+import { HABITAT_XY } from "@/components/site/site-data";
+import { RESULT_LABEL, RowLabel, Value } from "./parts";
 
-export function EVScene({
-  station,
-  onSelect,
-}: {
-  station: Station;
-  onSelect: () => void;
+export function MeasurementForm({ station, pending, onLog, compact = false }: {
+  station: Station; pending: boolean; compact?: boolean;
+  onLog: (station: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") => void;
 }) {
-  return (
-    <div className="ev-scene">
-      <div className="ev-scene-image" />
-      <div className="ev-destination">
-        <Button variant="glass" onClick={onSelect}>
-          <Navigation />
-          {station.id}
-        </Button>
-        <Footnote tone="secondary">
-          {designSession.distanceToStationM} m · simulated
-        </Footnote>
-      </div>
-    </div>
-  );
-}
-
-export function EVView({
-  plan,
-  measurement,
-  onLog,
-  onReview,
-}: {
-  plan: Plan;
-  measurement: Measurement | null;
-  onLog: (
-    result: Measurement["result"],
-    depth: number,
-    crew: "EV1" | "EV2",
-  ) => void;
-  onReview: () => void;
-}) {
+  const tool = measuringTool(station);
+  const reach = toolReachM(tool);
   const [crew, setCrew] = useState<"EV1" | "EV2">("EV1");
   const [checked, setChecked] = useState<string[]>([]);
-  const [depth, setDepth] = useState("1");
+  const [depth, setDepth] = useState(String(Math.min(1, reach ?? 1)));
+  const [result, setResult] = useState<Measurement["result"]>("no_ice");
   const [error, setError] = useState("");
-  const stations = orderedStations(plan);
-  const station = stations[0];
-  const tasks = station.tasks[crew] ?? [];
-  function submit(result: Measurement["result"]) {
+  function submit(value: Measurement["result"]) {
+    if (pending) return;
     const n = Number(depth);
-    if (!depth.trim() || !Number.isFinite(n) || n < 0 || n > 1) {
-      setError("Enter a depth from 0 to 1 m for the demo drill.");
+    if (!depth.trim() || !Number.isFinite(n) || n < 0 || (reach !== undefined && n > reach)) {
+      setError(`Enter a depth from 0 to ${reach ?? "the instrument reach"} m for ${toolName(tool)}.`);
       return;
     }
-    setError("");
-    onLog(result, n, crew);
+    setError(""); onLog(station, value, n, crew);
   }
-  return (
-    <div className="mission-stack">
-      <ListSection
-        header={measurement ? "Next station" : "Current station"}
-        headerId="ev-station"
-      >
-        <ListRow trailing={<Value>{formatStationOrder(station.order)}</Value>}>
-          <RowLabel
-            title={station.id}
-            detail={station.tools.map(toolName).join(" · ")}
-          />
-        </ListRow>
-        <ListRow trailing={<Value>{designSession.distanceToStationM} m</Value>}>
-          040° NE
-        </ListRow>
-      </ListSection>
-      <Disclosure title="Suit consumables">
-        <ListSection footer="Simulated suit values.">
-          <ListRow
-            trailing={<Value>{clock(designSession.oxygenRemainingMin)}</Value>}
-          >
-            Oxygen remaining
-          </ListRow>
-          <ListRow trailing={<Value>{designSession.batteryPercent}%</Value>}>
-            Battery
-          </ListRow>
-        </ListSection>
-      </Disclosure>
-      <section aria-labelledby="ev-procedure-title" className="mission-stack">
-        <Title3 as="h3" id="ev-procedure-title">
-          {measurement ? "Measurement recorded" : "Station procedure"}
-        </Title3>
-        {measurement ? (
-          <>
-            <Body>
-              {RESULT_LABEL[measurement.result]} at {measurement.station_id} ·{" "}
-              {measurement.depth_m} m
-            </Body>
-            <Footnote tone="secondary">
-              {measurement.result === "no_ice"
-                ? "Traverse replanned. Review the change with IV before continuing."
-                : "Nominal traverse retained. Continue with the next station."}
-            </Footnote>
-            <Button onClick={onReview}>Review in Science</Button>
-          </>
-        ) : (
-          <>
-            <SegmentedControl
-              label="Crew member"
-              value={crew}
-              options={[
-                { value: "EV1", label: "EV1 · Operations" },
-                { value: "EV2", label: "EV2 · Science" },
-              ]}
-              onValueChange={(value) => {
-                setCrew(value as "EV1" | "EV2");
-                setChecked([]);
-              }}
-            />
-            <div className="mission-checklist">
-              {tasks.map((task) => (
-                <Checkbox
-                  key={task}
-                  label={task}
-                  checked={checked.includes(task)}
-                  onCheckedChange={(value) =>
-                    setChecked((old) =>
-                      value ? [...old, task] : old.filter((t) => t !== task),
-                    )
-                  }
-                />
-              ))}
-            </div>
-            <TextField
-              showLabel
-              label="Measurement depth (m)"
-              value={depth}
-              onValueChange={setDepth}
-              type="number"
-              min={0}
-              max={1}
-              step={0.1}
-              aria-invalid={!!error}
-              aria-describedby={error ? "depth-error" : undefined}
-            />
-            {error ? (
-              <Body id="depth-error" role="alert">
-                {error}
-              </Body>
-            ) : null}
-            <div className="mission-result-buttons">
-              {(["ice", "no_ice", "inconclusive"] as const).map((result) => (
-                <Button key={result} onClick={() => submit(result)}>
-                  {RESULT_LABEL[result]}
-                </Button>
-              ))}
-            </div>
-            <Footnote tone="secondary">
-              Record a simulated result to preview replanning.
-            </Footnote>
-          </>
-        )}
-      </section>
-    </div>
-  );
+  return <section aria-label="Station procedure" className="mission-stack">
+    <Title3 as="h3">{compact ? "Record a measurement" : "Station procedure"}</Title3>
+    <Footnote tone="secondary">{toolName(tool)}{reach !== undefined ? ` · reach ${reach} m` : ""}</Footnote>
+    {!compact ? <><SegmentedControl label="Crew member" value={crew} options={[{ value: "EV1", label: "EV1 · Operations" }, { value: "EV2", label: "EV2 · Science" }]} onValueChange={(v) => { setCrew(v as "EV1" | "EV2"); setChecked([]); }} />
+    <div className="mission-checklist">{(station.tasks[crew] ?? []).map((task) => <Checkbox key={task} label={task} checked={checked.includes(task)} onCheckedChange={(value) => setChecked((old) => value ? [...old, task] : old.filter((t) => t !== task))} />)}</div></> : null}
+    <TextField showLabel label="Measurement depth (m)" type="number" value={depth} onValueChange={setDepth} min={0} max={reach} step={0.1} disabled={pending} aria-invalid={!!error} aria-describedby={error ? "depth-error" : undefined} />
+    {error ? <Body id="depth-error" role="alert">{error}</Body> : null}
+    {compact ? <><SegmentedControl label="Measurement result" value={result} options={(["ice", "no_ice", "inconclusive"] as const).map((value) => ({ value, label: RESULT_LABEL[value] }))} onValueChange={(value) => setResult(value as Measurement["result"])} /><Button disabled={pending || !tool} onClick={() => submit(result)}>{pending ? "Saving measurement…" : "Log measurement"}</Button></>
+      : <div className="mission-result-buttons">{(["ice", "no_ice", "inconclusive"] as const).map((value) => <Button key={value} disabled={pending || !tool} onClick={() => submit(value)}>{RESULT_LABEL[value]}</Button>)}</div>}
+    <Footnote tone="secondary">Execution is simulated. Results update this session.</Footnote>
+  </section>;
 }
-function formatStationOrder(order: number) {
-  return String(order).padStart(2, "0");
+
+export function EVView({ plan, measurements, pending, onLog, onReview }: {
+  plan: Plan; measurements: Measurement[]; pending: boolean;
+  onLog: (station: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") => void; onReview: () => void;
+}) {
+  const station = nextStation(plan, measurements);
+  const last = measurements.at(-1);
+  const origin = last?.position ?? HABITAT_XY;
+  const direction = station ? bearing(origin, station.position) : undefined;
+  return <div className="mission-stack">
+    <Footnote tone="secondary">Simulated position · heading-up oblique of the flat HiRISE ortho.</Footnote>
+    {station ? <ListSection header={last ? "Next station" : "Current station"} headerId="ev-station">
+      <ListRow trailing={<Value>{String(station.order).padStart(2, "0")}</Value>}><RowLabel title={station.id} detail={station.tools.map(toolName).join(" · ")} /></ListRow>
+      <ListRow trailing={<Value>{Math.round(direction!.distanceM)} m</Value>}><RowLabel title={direction!.distanceM ? direction!.label : "At habitat"} detail="Straight-line grid distance · simulated position" /></ListRow>
+    </ListSection> : <Body>All planned stations measured. Return to habitat.</Body>}
+    {last ? <section className="mission-last-result" aria-label="Last measurement"><Footnote>Measured {last.station_id} · {measurementSummary(last)}</Footnote><Button size="small" variant="plain" onClick={onReview}>Review in Science</Button></section> : null}
+    {station ? <MeasurementForm key={station.id} station={station} pending={pending} onLog={onLog} /> : null}
+  </div>;
 }

@@ -1,391 +1,245 @@
-/* Scene composition only. @icewalk/ui owns control geometry, type and materials.
-   Spacing is in visionOS points through the existing root scale: 8 / 12 / 16 / 24 / 32. */
-.immersive-app {
-  --scene-inset: 2rem;
-  position: relative;
-  height: 100dvh;
-  min-height: 35rem;
-  overflow: hidden;
-  background: #302b26;
-}
-.immersive-heading {
-  position: absolute;
-  left: var(--scene-inset);
-  top: var(--scene-inset);
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  pointer-events: none;
-}
-.immersive-view-tabs {
-  position: absolute;
-  left: var(--scene-inset);
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  pointer-events: none;
-}
-.immersive-view-tabs > * {
-  pointer-events: auto;
-}
-.immersive-safety {
-  position: absolute;
-  top: var(--scene-inset);
-  right: var(--scene-inset);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.75rem;
-  max-width: 28rem;
-}
-.immersive-demo-tag {
-  padding-inline: 1.5rem;
-}
-.immersive-dock {
-  position: absolute;
-  bottom: var(--scene-inset);
-  left: var(--scene-inset);
-  right: var(--scene-inset);
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-}
-.immersive-dock > * {
-  max-width: 100%;
-  pointer-events: auto;
-}
-.immersive-image-credit {
-  position: absolute;
-  left: var(--scene-inset);
-  bottom: var(--scene-inset);
-  pointer-events: none;
-}
-.immersive-panel {
-  position: absolute;
-  right: var(--scene-inset);
-  top: calc(var(--scene-inset) + 7rem);
-  width: 28rem;
-  max-width: calc(100% - var(--scene-inset) * 2);
-}
-.immersive-panel-window {
-  flex-direction: column;
-  width: 100%;
-  max-height: calc(100dvh - 17rem);
-}
-.immersive-panel-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 0 1.5rem 1.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgb(255 255 255 / 0.2) transparent;
-  overscroll-behavior: contain;
-}
-.immersive-panel-content:focus {
-  outline: none;
-}
-.immersive-panel-content > * {
-  flex-shrink: 0;
-}
-.mission-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-.mission-disclosures {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.mission-disclosure-content:not([hidden]) {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.5rem 0;
-}
-.immersive-camera {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.site-map {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.site-map-image {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgb(0 0 0 / 0.28),
-      transparent 35%,
-      transparent 65%,
-      rgb(0 0 0 / 0.2)
-    ),
-    url(/demo/mars-surface.png) center/cover;
-}
-.site-map > svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.site-map-hit-layer {
-  position: absolute;
-  inset: 0;
-}
-.site-map-marker {
-  position: absolute;
-  margin: -1.375rem;
-}
-.site-map-station-label {
-  position: absolute;
-  bottom: calc(100% + 0.75rem);
-  left: 50%;
-  translate: -50% 0;
-  white-space: nowrap;
-  visibility: hidden;
-}
-.site-map-marker:hover .site-map-station-label,
-.site-map-marker[aria-pressed="true"] .site-map-station-label {
-  visibility: visible;
-}
-.ev-scene {
-  position: absolute;
-  inset: 0;
-}
-.ev-scene-image {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgb(0 0 0 / 0.28),
-      transparent 40%,
-      rgb(0 0 0 / 0.12)
-    ),
-    url(/demo/mars-surface-view.png) center/cover;
-}
-.ev-destination {
-  position: absolute;
-  left: 55%;
-  top: 44%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-.mission-checklist {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.mission-result-buttons {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-.station-crew-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-.mission-timeline-track {
-  position: relative;
-  height: 2rem;
-  margin-top: 1.5rem;
-}
-.mission-timeline-segment,
-.mission-timeline-station {
-  position: absolute;
-  top: 0;
-  border-inline: 2px solid transparent;
-  background-clip: padding-box;
-}
-.mission-timeline-segment {
-  height: 2rem;
-  background-color: rgb(255 255 255 / 0.09);
-  border-radius: 0.5rem;
-}
-.mission-timeline-segment[data-kind="reserve"] {
-  background-image: repeating-linear-gradient(
-    115deg,
-    transparent 0 5px,
-    rgb(255 255 255 / 0.08) 5px 6px
-  );
-}
-.mission-timeline-station[aria-pressed="true"] {
-  outline: 1px solid var(--color-label);
-  outline-offset: -2px;
-}
-.mission-now {
-  position: absolute;
-  top: -0.5rem;
-  bottom: -0.25rem;
-  width: 1px;
-  background: var(--color-label);
-  pointer-events: none;
-}
-.mission-now > span {
-  position: absolute;
-  bottom: calc(100% + 0.25rem);
-  left: 0.25rem;
-  white-space: nowrap;
-}
-.mission-timeline-scale {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+/* Composition in the existing visionOS point scale. Glass is owned by @icewalk/ui.
+   No transform, opacity, filter or stacking context on ancestors of its materials. */
+.mission-app { --mission-edge: 1.5rem; position: relative; height: 100dvh; min-height: 36rem; overflow: hidden; background: #141311; font-variant-numeric: tabular-nums; }
+.mission-heading { position: absolute; top: var(--mission-edge); left: var(--mission-edge); display: flex; flex-direction: column; gap: .25rem; pointer-events: none; text-shadow: 0 1px 5px #000; }
+.mission-heading > [data-text-style] { color: #fff; }
+.mission-heading [data-text-style=footnote] { font-size: .8125rem; }
+.mission-status-position { position: absolute; top: var(--mission-edge); right: var(--mission-edge); width: min(57rem, calc(100% - 22rem)); }
+.mission-status-window { border-radius: 1.75rem; }
+.mission-status { padding: 1rem 1.5rem; width: 100%; display: flex; flex-direction: column; gap: .5rem; }
+.mission-status-values { display: grid; grid-template-columns: .8fr 1fr 1.2fr; gap: 1.5rem; }
+.mission-status-values > div { display: flex; flex-direction: column; gap: .2rem; }
+.mission-status-values span { font-size: .75rem; color: rgb(255 255 255 / .82); }
+.mission-status-values strong { font-size: 1rem; font-weight: 600; white-space: nowrap; }
+.mission-status-source { display: flex; align-items: center; gap: .5rem 1rem; flex-wrap: wrap; }
+.mission-status-source [data-slot=status-badge] { font-size: .6875rem; }
+.mission-tabs { position: absolute; left: var(--mission-edge); top: 38%; }
+.mission-panel-presence { position: absolute; top: 10rem; right: var(--mission-edge); bottom: 14rem; width: 25rem; pointer-events: none; }
+.mission-panel { width: 100%; max-height: 100%; display: flex; pointer-events: auto; }
+.mission-panel-window { width: 100%; max-height: 100%; display: flex; flex-direction: column; border-radius: 2.25rem; }
+.mission-panel-heading { display: flex; align-items: center; flex-shrink: 0; gap: .5rem; padding: 1.25rem 1.5rem .75rem; }
+.mission-panel-heading h2 { flex: 1; min-width: 0; }
+.mission-panel-scroll { min-height: 0; padding: .25rem 1.5rem 1.5rem; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / .3) transparent; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 1.5rem; outline: none; }
+.mission-stack { display: flex; flex-direction: column; gap: 1.25rem; }
+.mission-stack > * { flex-shrink: 0; }
+.mission-objective { display: flex; flex-direction: column; gap: .375rem; }
+.mission-objective [data-text-style=body] { text-wrap: balance; font-weight: 500; }
+.mission-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem .75rem; }
+.mission-metrics dd { font-size: 1.375rem; }
+.mission-metrics dt { font-size: .75rem; }
+.mission-stations { display: flex; flex-direction: column; gap: .125rem; }
+.mission-station-header { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; padding: .25rem 0 .625rem; }
+.mission-station-header h3 { font-size: 1.0625rem; }
+.mission-station-header > :last-child { font-size: .75rem; }
+.mission-station-row { width: calc(100% + 1rem); margin-inline: -.5rem; padding: .625rem .5rem; height: auto; min-height: 3.5rem; font-size: .875rem; }
+.mission-station-row > [data-vision-content] { width: 100%; justify-content: start; gap: .75rem; }
+.mission-station-row[data-hovered=true] { background: rgb(255 255 255 / .12); }
+.mission-order { width: 1.625rem; height: 1.625rem; border-radius: 50%; border: 1px solid rgb(255 255 255 / .45); display: grid; place-items: center; font-size: .8125rem; }
+.mission-station-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: start; gap: .2rem; }
+.mission-station-copy strong { font-weight: 600; }
+.mission-station-copy > span { font-size: .6875rem; font-weight: 400; width: 100%; overflow: hidden; text-overflow: ellipsis; text-align: start; color: rgb(255 255 255 / .82); }
+.mission-station-probability { display: flex; flex-direction: column; gap: .2rem; align-items: end; }
+.mission-station-probability > strong { font-size: 1rem; }
+.mission-station-probability > span { font-size: .625rem; font-weight: 400; color: rgb(255 255 255 / .82); }
+.mission-disclosures { display: flex; flex-direction: column; gap: .5rem; }
+.mission-disclosure-content:not([hidden]) { display: flex; flex-direction: column; gap: 1rem; padding: 1rem 0; }
+.mission-source { overflow-wrap: anywhere; }
+.mission-checklist { display: flex; flex-direction: column; gap: .75rem; }
+.mission-result-buttons { display: flex; gap: .5rem; flex-wrap: wrap; }
+.mission-result-buttons button { flex: 1; }
+.mission-last-result { display: flex; flex-direction: column; gap: .5rem; }
+.station-crew-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.mission-layer-window { padding: .375rem; border-radius: 1.25rem; flex-wrap: wrap; justify-content: start; }
+.mission-layer-window [aria-pressed=true] { background: rgb(255 255 255 / .15); }
+.mission-layer-window button { font-size: .75rem; }
+.mission-timeline-position { position: absolute; bottom: var(--mission-edge); left: var(--mission-edge); right: var(--mission-edge); }
+.mission-timeline-window { width: 100%; border-radius: 1.75rem; }
+.mission-time { width: 100%; padding: .75rem 1.25rem .875rem; }
+.mission-time header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.mission-time header [data-text-style] { font-size: .75rem; }
+.mission-time-scroll { overflow-x: auto; scrollbar-width: thin; }
+.mission-time-inner { position: relative; min-width: 44rem; padding-top: 1.5rem; }
+.mission-walkback { position: absolute; width: 100%; height: 1.25rem; top: .125rem; color: rgb(255 255 255 / .5); }
+.mission-time-track { position: relative; height: 2rem; margin-top: .5rem; }
+.mission-time-station, .mission-time-segment { position: absolute; top: 0; height: 2rem; border-inline: 2px solid transparent; background-clip: padding-box; border-radius: .375rem; }
+.mission-time-station { background-color: rgb(255 255 255 / .22); padding: 0; font-size: .875rem; }
+.mission-time-station[aria-pressed=true] { outline: 1px solid white; background-color: rgb(255 255 255 / .4); }
+.mission-time-station[data-hovered=true] { background-color: rgb(255 255 255 / .4); }
+.mission-time-segment { display: grid; place-items: center; font-size: .625rem; text-transform: capitalize; overflow: hidden; white-space: nowrap; background-color: rgb(255 255 255 / .08); }
+.mission-time-segment[data-kind=reserve] { background-image: repeating-linear-gradient(115deg, transparent 0 5px, rgb(255 255 255 / .08) 5px 6px); }
+.mission-time-axis { height: 1.125rem; margin-top: .25rem; position: relative; font-size: .625rem; color: rgb(255 255 255 / .82); }
+.mission-time-axis > span { position: absolute; top: 0; }
+.mission-time-axis > span:last-child { translate: -100% 0; }
+.mission-time-previous { position: relative; height: .3rem; margin-top: .25rem; }
+.mission-time-previous > span { position: absolute; height: .25rem; background: rgb(255 255 255 / .2); border-inline: 1px solid transparent; background-clip: padding-box; }
+.mission-show-panel { position: absolute; right: var(--mission-edge); top: 10rem; }
+.mission-app .site-credit { color: rgb(255 255 255 / .82); }
+@media (max-width: 1100px) and (min-width: 760px) {
+  .mission-app { --mission-edge: 1rem; }
+  .mission-heading { max-width: 17rem; }
+  .mission-status-position { width: calc(100% - 20rem); }
+  .mission-status { padding: .75rem 1rem; }
+  .mission-status-values { gap: .75rem; }
+  .mission-status-values span { font-size: .6875rem; }
+  .mission-status-values strong { font-size: .875rem; }
+  .mission-panel-presence { width: 23rem; top: 11rem; bottom: 17rem; }
+  .mission-panel-heading { padding-inline: 1.25rem; }
+  .mission-panel-scroll { padding-inline: 1.25rem; }
 }
 @media (max-width: 759px) {
-  .immersive-app {
-    --scene-inset: 1.5rem;
-  }
-  .immersive-clock {
-    display: none;
-  }
-  .immersive-safety {
-    max-width: 14rem;
-  }
-  .immersive-demo-tag {
-    max-width: 14rem;
-    text-align: right;
-    padding-inline: 0;
-  }
-  .immersive-panel {
-    top: auto;
-    bottom: calc(var(--scene-inset) + 6rem);
-    left: var(--scene-inset);
-    width: auto;
-    max-width: none;
-  }
-  .immersive-panel-window {
-    max-height: calc(100dvh - 18rem);
-  }
-  .immersive-timeline-panel {
-    margin: 0;
-  }
-  .immersive-image-credit {
-    bottom: 0.25rem;
-  }
-  .site-map-image {
-    background-position: 60% center;
-  }
+  .mission-app { --mission-edge: .75rem; min-height: 42rem; }
+  .mission-heading { top: .75rem; flex-direction: row; gap: .75rem; align-items: baseline; }
+  .mission-heading > [data-text-style] { font-size: 1.0625rem; }
+  .mission-heading [data-text-style=footnote] { font-size: .6875rem; }
+  .mission-status-position { top: 3.25rem; left: .75rem; right: .75rem; width: auto; }
+  .mission-status { padding: .625rem .875rem; gap: .375rem; }
+  .mission-status-values { grid-template-columns: .8fr 1fr 1.1fr; gap: .5rem; }
+  .mission-status-values span { font-size: .5625rem; }
+  .mission-status-values strong { font-size: .6875rem; }
+  .mission-status-source { gap: .25rem; }
+  .mission-status-source [data-text-style], .mission-status-source [data-slot=status-badge] { font-size: .5625rem; }
+  .mission-tabs { top: 10rem; left: .75rem; }
+  .mission-tabs [data-slot=tab-bar] { padding: .375rem; }
+  .mission-panel-presence { left: .75rem; right: .75rem; top: auto; bottom: 11.75rem; width: auto; height: min(20rem, 38dvh); }
+  .mission-panel { height: 100%; }
+  .mission-panel-window { border-radius: 1.75rem; }
+  .mission-panel-heading { padding: .75rem 1rem .375rem; }
+  .mission-panel-heading h2 { font-size: 1.125rem; }
+  .mission-panel-heading button { height: 2rem; width: 2rem; }
+  .mission-panel-scroll { padding: .25rem 1rem 1rem; gap: 1rem; }
+  .mission-stack { gap: 1rem; }
+  .mission-objective [data-text-style=body] { font-size: .875rem; }
+  .mission-objective [data-text-style=footnote] { font-size: .625rem; }
+  .mission-metrics { gap: .75rem; }
+  .mission-metrics dd { font-size: 1.125rem; }
+  .mission-metrics dt { font-size: .625rem; }
+  .mission-layer-window { flex-wrap: nowrap; overflow-x: auto; border-radius: 1rem; padding: .125rem; }
+  .mission-layer-window button { height: 1.75rem; padding-inline: .5rem; font-size: .5625rem; }
+  .mission-timeline-position { bottom: .75rem; }
+  .mission-time { padding: .5rem .75rem .75rem; }
+  .mission-time header [data-text-style] { font-size: .5625rem; }
+  .mission-time-inner { min-width: 34rem; }
+  .mission-app .site-hud-row { gap: .5rem; }
+  .mission-app .site-coords { display: none; }
+  .mission-app .site-credit { font-size: .5rem; max-width: 16rem; }
+  .mission-show-panel { top: auto; bottom: 12rem; }
 }
-/* Keep timeline targets usable at narrow widths; the plot scrolls, not the page. */
-.mission-timeline {
-  overflow-x: auto;
-  padding-block: 0.5rem;
+@media (prefers-reduced-motion: reduce) { .mission-time-now, .mission-bingo { transition: none; } }
+/* Second visual pass: measured clearances and denser station rows keep the brief legible. */
+.mission-status-source { flex-wrap: nowrap; }
+.mission-status-source > [data-level] { flex: 1; min-width: 0; }
+.mission-status-source > [data-level] [data-text-style] { font-size: .6875rem; }
+.mission-provenance { flex-shrink: 0; font-size: .6875rem; color: rgb(255 255 255 / .9); }
+.mission-panel-presence { width: 400px; top: var(--mission-panel-top, 150px); bottom: 14rem; }
+.mission-station-row { padding-block: .5rem; min-height: 3rem; }
+.mission-station-copy, .mission-station-probability { line-height: 1.25; }
+.mission-app .vision-vibrancy { --vibrancy-ink: rgb(255 255 255 / .82); --vibrancy-mode: normal; --vibrancy-wash: transparent; }
+@media (max-width: 1100px) and (min-width: 760px) { .mission-panel-presence { width: 360px; bottom: 15rem; } }
+@media (max-width: 759px) { .mission-panel-presence { width: auto; top: auto; } .mission-status-source { flex-wrap: wrap; } .mission-provenance { font-size: .5625rem; } }
+@media (max-width: 759px) {
+  .mission-app .site-hud-row { font-size: .5625rem; }
+  .mission-app .site-credit { font-size: .5rem; }
+  .mission-objective > :first-child, .mission-objective > :last-child { display: none; }
+  .mission-objective [data-text-style=body] { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .75rem; line-height: 1.3; }
+  .mission-metrics dt { line-height: 1.3; }
+  .mission-metrics dd { line-height: 1.5; }
+  .mission-stations { position: relative; flex-direction: row; overflow-x: auto; gap: .5rem; padding-top: 2rem; padding-bottom: .25rem; scrollbar-width: thin; }
+  .mission-station-header { position: absolute; top: 0; left: 0; width: 100%; padding-bottom: .375rem; }
+  .mission-station-row { flex: 0 0 10rem; width: 10rem; margin: 0; min-height: 3.25rem; background: rgb(255 255 255 / .06); }
+  .mission-station-row > [data-vision-content] { gap: .5rem; }
+  .mission-station-copy > span { max-width: 4.75rem; }
+  .mission-station-probability > strong { font-size: .8125rem; }
 }
-.mission-timeline-track,
-.mission-timeline-scale {
-  min-width: 40rem;
+.mission-replan { gap: .625rem; }
+.mission-replan [data-text-style=body] { font-size: .875rem; }
+@media (max-width: 1100px) and (min-width: 760px) {
+  .mission-panel-presence { bottom: 11rem; }
+  .mission-panel-scroll { gap: 1rem; }
+  .mission-objective > :first-child { display: none; }
+  .mission-metrics { gap: .75rem; }
+  .mission-station-row { min-height: 2.5rem; padding-block: .375rem; }
+}
+.mission-panel-scroll [data-window-current], .mission-panel-scroll [data-window-outgoing] { display: flex; flex-direction: column; gap: 1.5rem; }
+/* Map tools: camera under the tabs; layers (or the EV minimap) and the legend above the
+   timeline. Positions come from measured chrome (--mission-timeline-y, --mission-tabs-bottom). */
+.mission-scene { position: absolute; inset: 0; }
+.mission-camera { position: absolute; left: var(--mission-edge); top: calc(var(--mission-tabs-bottom, 60%) + 1rem); display: flex; flex-direction: column; gap: .5rem; }
+.mission-map-tools { position: absolute; left: 9rem; bottom: calc(var(--mission-timeline-y, 9rem) + .75rem); max-width: calc(100% - 9rem - 400px - 3rem); display: flex; flex-direction: column; align-items: start; gap: .5rem; pointer-events: none; }
+.mission-map-tools > * { pointer-events: auto; }
+.mission-layer-window { padding: .375rem; border-radius: 1.25rem; flex-wrap: wrap; justify-content: start; }
+.mission-layer-window [aria-pressed=true] { background: rgb(255 255 255 / .15); }
+.mission-layer-window button { font-size: .75rem; }
+.mission-legend { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1rem; padding-inline: .5rem; pointer-events: none; font-size: .6875rem; line-height: 1.4; color: rgb(255 255 255 / .9); text-shadow: 0 0 3px #000, 0 1px 4px #000; }
+.mission-legend > span { display: inline-flex; align-items: center; gap: .375rem; white-space: nowrap; }
+.mission-legend i { display: inline-block; flex-shrink: 0; }
+.mission-legend i[data-key=arc] { width: .75rem; height: .75rem; border-radius: 50%; border: 2px solid rgb(255 255 255 / .25); border-top-color: #fff; border-right-color: #fff; }
+.mission-legend i[data-key=hab] { width: .75rem; height: .75rem; border-radius: .2rem; border: 1px solid rgb(255 255 255 / .7); background: rgb(0 0 0 / .45); }
+.mission-legend i[data-key=route] { width: 1.125rem; border-top: 2px solid rgb(255 255 255 / .9); }
+.mission-legend i[data-key=previous] { width: 1.125rem; border-top: 1.5px dashed rgb(255 255 255 / .55); }
+.mission-legend i[data-key=ring] { width: .75rem; height: .75rem; border-radius: 50%; border: 1px solid rgb(255 255 255 / .4); }
+.mission-app .site-hud { right: calc(var(--site-inset-right) + .25rem); bottom: calc(var(--mission-timeline-y, 9rem) + 1rem); }
+.mission-destination { position: absolute; top: calc(var(--site-inset-top, 9rem) + .5rem); left: 9rem; pointer-events: none; text-shadow: 0 0 4px #000, 0 2px 6px #000; display: flex; flex-direction: column; gap: .25rem; }
+.mission-destination > :last-child { color: rgb(255 255 255 / .82); }
+.mission-minimap { margin: 0; padding: .5rem .5rem .375rem; display: flex; flex-direction: column; gap: .25rem; border-radius: 1rem; background: rgb(0 0 0 / .55); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .16); }
+.mission-minimap svg { width: 8.25rem; height: 8.25rem; display: block; fill: none; }
+.mission-minimap figcaption { font-size: .625rem; color: rgb(255 255 255 / .82); text-align: center; }
+.mission-minimap-route { stroke: rgb(255 255 255 / .7); stroke-width: 1.25; stroke-linejoin: round; }
+.mission-minimap-station { fill: #1a1917; stroke: rgb(255 255 255 / .8); stroke-width: 1; }
+.mission-minimap-station[data-measured] { fill: rgb(255 255 255 / .8); }
+.mission-minimap-position, .mission-minimap-heading { fill: #fff; stroke: #000; stroke-width: 1; }
+.mission-minimap-north { stroke: rgb(255 255 255 / .8); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+.mission-minimap-label { fill: rgb(255 255 255 / .8); font-size: 8px; font-weight: 600; }
+/* Timeline marks: bingo and (in execution) now. Labels stay inside the scroll area. */
+.mission-bingo, .mission-time-now { position: absolute; top: -1.5rem; bottom: 0; border-left: 1px dashed rgb(255 255 255 / .85); pointer-events: none; }
+.mission-bingo > span, .mission-time-now > span { position: absolute; top: 0; left: .25rem; white-space: nowrap; font-size: .625rem; line-height: 1.2; padding: .1rem .25rem; background: rgb(0 0 0 / .7); border-radius: .2rem; }
+.mission-bingo:not([data-first=true]) > span { display: none; }
+.mission-time-now { border-left-style: solid; top: 0; bottom: -1.25rem; }
+.mission-time-now > span { top: auto; bottom: 0; }
+.mission-walkback-min { position: absolute; top: .875rem; translate: -100% 0; padding-right: .375rem; font-size: .625rem; line-height: 1; white-space: nowrap; color: rgb(255 255 255 / .82); }
+.mission-walkback-min::after { content: ""; position: absolute; right: -.1875rem; bottom: -.125rem; width: .375rem; height: .375rem; border-radius: 50%; background: #fff; }
+/* Globe entry: Mars full screen over the (inert) site, with its own two actions. */
+.mission-globe { position: absolute; inset: 0; background: #000; }
+.mission-globe-actions { position: absolute; left: 50%; bottom: 2.5rem; translate: -50% 0; display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; width: max-content; max-width: calc(100% - 2rem); }
+.mission-globe-credits { position: absolute; bottom: .5rem; right: .75rem; max-width: calc(100% - 1.5rem); text-align: right; font-size: 10px; line-height: 1.25; }
+.mission-globe-credits .cesium-widget-credits { position: static; padding: 0; font-size: 10px; color: rgb(255 255 255 / .7); }
+.mission-scene { animation: mission-enter var(--motion-surface, 360ms) var(--ease-settle, ease-out); }
+.mission-scene[inert] { animation: none; visibility: hidden; }
+@keyframes mission-enter { from { opacity: 0; } }
+@media (max-width: 1100px) and (min-width: 760px) {
+  .mission-camera { gap: .375rem; top: calc(var(--mission-tabs-bottom, 60%) + .75rem); }
+  .mission-camera button { width: 2.25rem; height: 2.25rem; }
+  .mission-map-tools { left: 6.5rem; max-width: calc(100% - 6.5rem - 360px - 2.5rem); bottom: calc(var(--mission-timeline-y, 9rem) + .5rem); }
+  .mission-layer-window button { padding-inline: .5rem; font-size: .6875rem; }
+  .mission-app .site-hud { bottom: calc(var(--site-inset-bottom) - .5rem); }
+  .mission-destination { left: 6.5rem; }
 }
 @media (max-width: 759px) {
-  /* Keep navigation outside every contextual panel's hit area. */
-  .immersive-view-tabs {
-    top: 6rem;
-    bottom: auto;
-    right: var(--scene-inset);
-    justify-content: center;
-  }
-  .immersive-panel-window {
-    max-height: calc(100dvh - 21rem);
-  }
+  .mission-globe-actions { bottom: 6.5rem; }
+  .mission-globe-credits { max-width: calc(100% - 4rem); }
+  /* Keep status words near their marker without colliding with the next row.
+     Station identifiers and full measurement data remain in the selected card and log. */
+  .mission-app .site-tag { font-size: .5625rem; }
+  .mission-app .site-tag-detail, .mission-app .site-label { display: none; }
+  .mission-app .site-tags:has([data-tag="added"]), .mission-app .site-tags:has([data-tag="dropped"]) { top: 50%; left: 0; transform: translate(calc(-100% - .375rem), -50%); align-items: flex-end; }
+  .mission-app .site-tags:has([data-tag="measured"]), .mission-app .site-tags:has([data-tag="next"]) { top: auto; bottom: calc(100% + .15rem); }
+  .mission-camera { top: 10rem; right: .75rem; left: auto; flex-direction: row; gap: .25rem; }
+  .mission-camera button { height: 2rem; width: 2rem; }
+  .mission-map-tools { display: contents; }
+  .mission-panel-presence { bottom: calc(var(--mission-timeline-y, 8.5rem) + 2.75rem); height: min(17rem, 34dvh); }
+  .mission-layer-position { position: absolute; bottom: calc(var(--mission-timeline-y, 8.5rem) + .375rem); left: .75rem; right: .75rem; }
+  .mission-layer-window { flex-wrap: nowrap; overflow-x: auto; border-radius: 1rem; padding: .125rem; }
+  .mission-layer-window button { height: 1.75rem; padding-inline: .5rem; font-size: .5625rem; }
+  .mission-legend { position: absolute; top: calc(var(--mission-tabs-bottom, 13.5rem) + .375rem); left: .75rem; right: .75rem; padding: 0; gap: .125rem .625rem; font-size: .5625rem; }
+  .mission-app .site-hud { right: .75rem; bottom: calc(100dvh - var(--mission-panel-y, 340px) + 4px); }
+  .mission-app .site-hud, .mission-app .site-hud-row, .mission-app .site-credit { line-height: 1; }
+  .mission-app .site-north { flex-direction: row; }
+  .mission-app .site-north svg { width: .5rem; height: .75rem; }
+  .mission-destination { top: auto; bottom: calc(100dvh - var(--mission-panel-y, 340px) + 4px); left: .75rem; max-width: 55%; }
+  .mission-destination > [data-text-style] { font-size: .6875rem; }
+  .mission-destination > [data-text-style=title-2] { font-size: .9375rem; }
+  .mission-minimap { position: absolute; left: .75rem; top: calc(var(--mission-tabs-bottom, 13.5rem) + 2.25rem); padding: .25rem; }
+  .mission-minimap svg { width: 5rem; height: 5rem; }
+  .mission-minimap figcaption { display: none; }
+  .mission-show-panel { bottom: calc(var(--mission-timeline-y, 8.5rem) + 3rem); }
 }
-.immersive-compact-status-label {
-  display: none;
-}
-@media (max-width: 759px) {
-  .immersive-site-region,
-  .immersive-wide-status-label,
-  .immersive-demo-tag {
-    display: none;
-  }
-  .immersive-compact-status-label {
-    display: block;
-  }
-  .immersive-status-value {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .immersive-view-tabs {
-    top: 7rem;
-  }
-}
-.immersive-app[data-focused="true"] .immersive-heading,
-.immersive-app[data-focused="true"] .immersive-view-tabs,
-.immersive-app[data-focused="true"] .immersive-image-credit {
-  visibility: hidden;
-  --vision-presence: 0;
-  transition: visibility 0s 160ms;
-}
-
-/* Keep the environment stationary; only contextual glass arrives or departs. */
-
-.site-map-image {
-  transition: transform 360ms var(--ease-liquid);
-}
-.site-map > svg {
-  transition: opacity 180ms var(--ease-settle);
-}
-.site-map-hit-layer > * {
-  transition:
-    left 320ms var(--ease-liquid),
-    top 320ms var(--ease-liquid);
-}
-@media (prefers-reduced-motion: reduce) {
-  .site-map-image,
-  .site-map > svg,
-  .site-map-hit-layer > * {
-    transition: none;
-  }
-}
-
-.immersive-scene-motion {
-  position: absolute;
-  inset: 0;
-}
-.immersive-scene-motion
-  :where(.site-map-image, .ev-scene-image, canvas, .site-map > svg) {
-  opacity: var(--vision-presence);
-  transition: opacity 180ms var(--ease-settle);
-}
-@starting-style {
-  .immersive-scene-motion
-    :where(.site-map-image, .ev-scene-image, canvas, .site-map > svg) {
-    opacity: 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .immersive-scene-motion * {
-    transition: none !important;
-  }
-}
-
-.immersive-heading,
-.immersive-view-tabs,
-.immersive-image-credit {
-  transition: visibility 0s;
-}
-.immersive-heading [data-text-style],
-.immersive-image-credit,
-.immersive-view-tabs .vision-vibrancy {
-  opacity: var(--vision-presence);
-  transition: opacity 160ms var(--ease-settle);
-}
-.mission-dock-secondary {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  --surface-duration: 100ms;
-}
+@media (prefers-reduced-motion: reduce) { .mission-scene { animation: none; } }

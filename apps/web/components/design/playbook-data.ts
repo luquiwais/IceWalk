@@ -40,8 +40,29 @@ export type Family = {
   icon: LucideIcon;
   components: string;
   states: string;
+  extension?: boolean;
 };
 export const FAMILIES: Family[] = [
+  {
+    id: "input-controls",
+    name: "Input controls",
+    group: "Controls",
+    node: "487:10687",
+    icon: TextCursorInput,
+    components: "NumberField, Stepper, TextArea, Select, RadioGroup, Combobox, TokenField, RangeSlider, OTPField, FileField, Rating, Field",
+    states: "Kit compositions · units · keyboard · limits · validation · disabled",
+    extension: true,
+  },
+  {
+    id: "window-transitions",
+    name: "Window transitions",
+    group: "Navigation",
+    node: "420:4149",
+    icon: AppWindow,
+    components: "WindowMotion, WindowContent",
+    states: "Open · close · resize · navigation · interruption · reduced motion",
+    extension: true,
+  },
   {
     id: "colors",
     name: "Colors",

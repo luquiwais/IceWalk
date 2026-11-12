@@ -163,7 +163,9 @@ function Calendar({
           </IconButton>
         </div>
       </div>
-      <div key={month.toISOString()} role="grid" aria-label={label} className="vision-content-change relative mt-4">
+      <div role="grid" aria-label={label} className="relative mt-4">
+        {/* The weekday row holds vibrant labels and doesn't change: only the
+            days animate, so no fade sits above a blended paint. */}
         <div role="row" className="grid grid-cols-7">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
             <Text
@@ -178,56 +180,62 @@ function Calendar({
             </Text>
           ))}
         </div>
-        {Array.from({ length: Math.ceil((offset + days) / 7) }, (_, week) => (
-          <div
-            role="row"
-            key={week}
-            className="mt-[0.4375rem] grid grid-cols-7 justify-items-center"
-          >
-            {Array.from({ length: 7 }, (_, weekday) => {
-              const day = week * 7 + weekday - offset + 1;
-              if (day < 1 || day > days)
-                return <span role="gridcell" key={weekday} />;
-              const key = iso(
-                new Date(month.getFullYear(), month.getMonth(), day, 12),
-              );
-              return (
-                <span role="gridcell" aria-selected={key === value} key={key}>
-                  <button
-                    type="button"
-                    ref={(node) => {
-                      if (node) buttons.current.set(key, node);
-                      else buttons.current.delete(key);
-                    }}
-                    disabled={disabled}
-                    tabIndex={
-                      key ===
-                      (focusDay.startsWith(iso(month).slice(0, 7))
-                        ? focusDay
-                        : iso(month))
-                        ? 0
-                        : -1
-                    }
-                    aria-label={parseDate(key).toLocaleDateString("en-US", {
-                      dateStyle: "full",
-                    })}
-                    onKeyDown={(event) => keyboard(event, day)}
-                    onClick={() => {
-                      setFocusDay(key);
-                      onValueChange(key);
-                    }}
-                    className={cn(
-                      "size-11 rounded-full text-[1rem] outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
-                      key === value && "bg-white text-black hover:bg-white",
-                    )}
-                  >
-                    {day}
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        ))}
+        <div
+          key={month.toISOString()}
+          role="rowgroup"
+          className="vision-content-change"
+        >
+          {Array.from({ length: Math.ceil((offset + days) / 7) }, (_, week) => (
+            <div
+              role="row"
+              key={week}
+              className="mt-[0.4375rem] grid grid-cols-7 justify-items-center"
+            >
+              {Array.from({ length: 7 }, (_, weekday) => {
+                const day = week * 7 + weekday - offset + 1;
+                if (day < 1 || day > days)
+                  return <span role="gridcell" key={weekday} />;
+                const key = iso(
+                  new Date(month.getFullYear(), month.getMonth(), day, 12),
+                );
+                return (
+                  <span role="gridcell" aria-selected={key === value} key={key}>
+                    <button
+                      type="button"
+                      ref={(node) => {
+                        if (node) buttons.current.set(key, node);
+                        else buttons.current.delete(key);
+                      }}
+                      disabled={disabled}
+                      tabIndex={
+                        key ===
+                        (focusDay.startsWith(iso(month).slice(0, 7))
+                          ? focusDay
+                          : iso(month))
+                          ? 0
+                          : -1
+                      }
+                      aria-label={parseDate(key).toLocaleDateString("en-US", {
+                        dateStyle: "full",
+                      })}
+                      onKeyDown={(event) => keyboard(event, day)}
+                      onClick={() => {
+                        setFocusDay(key);
+                        onValueChange(key);
+                      }}
+                      className={cn(
+                        "size-11 rounded-full text-[1rem] outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
+                        key === value && "bg-white text-black hover:bg-white",
+                      )}
+                    >
+                      {day}
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </Material>
   );

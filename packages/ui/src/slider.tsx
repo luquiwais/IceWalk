@@ -100,6 +100,7 @@ function Slider({
             className="range-knob absolute top-1/2 rounded-full border-2 border-white"
           />
         ) : null}
+        {variant !== "color" ? <span aria-hidden className="range-spatial-thumb absolute top-1/2 rounded-full bg-white shadow-[0_2px_6px_rgb(0_0_0/.3)]" /> : null}
         <label htmlFor={id} className="sr-only">
           {label}
         </label>

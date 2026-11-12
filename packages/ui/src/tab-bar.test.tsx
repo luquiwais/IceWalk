@@ -99,9 +99,11 @@ describe("TabBar", () => {
     );
   });
 
-  it("collapsed hides the labels (they live in tooltips)", () => {
+  it("collapsed hides the retained labels from assistive technology until reveal", () => {
     render(<TabBar label="Views" tabs={tabs} defaultValue="ev" />);
-    expect(screen.getByRole("tab", { name: "EV" })).not.toHaveTextContent("EV");
+    // Labels stay mounted so expanding the glass preserves the icon/text
+    // anchors, rather than remounting a different tab halfway through motion.
+    expect(screen.getByRole("tab", { name: "EV" }).querySelector(".vision-tab-label")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByRole("tablist", { name: "Views" })).not.toHaveAttribute(
       "data-expanded",
     );

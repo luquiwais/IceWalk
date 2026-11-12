@@ -399,3 +399,26 @@ Ver `research/diseno-inmersivo-y-motion.md` y `research/motion-audit-2026-11-09.
 - Los ortos están en equirectangular con `lat_ts=0` y `R=3396190`; la grilla usa `lat_ts=35.1105` y `R=3389574.349`. Un recorte sin reproyectar deja el píxel estirado ~22 % en x y el cráter corrido ~150 m en x respecto de (0, 0). Hay que reproyectar a la grilla. El registro final (≤ 20 m) lo mide el script `apps/web/scripts/build-site-imagery.py`.
 - La zona de las estaciones (x 100…400, y −2300…−2200) es terreno picado sin rasgos grandes; el cráter queda a 2.2 km al norte. Las dos líneas oscuras del orto son artefactos del sensor.
 - `gdal` no está instalado en la máquina de Eitan; `rasterio` por `uv` alcanza.
+
+## 2026-11-10: recuperación y envío de mediciones (Codex)
+
+- Estado inicial recuperado: UI lint/tipos y89tests pasan. Web falla por11helpers ausentes de etapa2 (12tests nuevos de Claude), no por los cambios heredados de motion; el worker de diseño continúa ese rojo.
+- #58 reproducida: dos llamadas de `logMeasurement` sin esperar a la primera generan dos `/replan` desde el mismo plan_id; el segundo aborta el primero. El test espera un solo request y falla con2 antes del arreglo.
+- Guard síncrono en sesión API devuelve `busy` mientras hay replan pendiente; no cancela ni registra segundo envío. Después del primer resultado, la siguiente medición usa el plan_id nuevo. Reset conserva invalidación de respuestas anteriores.22tests de sesión pasan; ESLint de los dos archivos pasa.
+- El test anterior de supersesión por segundo envío se adapta al comportamiento aprobado de bloqueo; la supersesión por reset se conserva con su propio escenario. No se eliminó cobertura de respuestas viejas.
+
+## 2026-11-11: verificación de Claude recuperada e integración Codex
+
+Evidencia histórica del transcript `bfbd54aa-2f00-438b-9990-e0a9c35d7f86`, informes de inputs y motion del 11/11 a las 11:07 UTC. No confundir con una corrida nueva de Codex.
+
+- UI: lint y tipos limpios, 163 tests en 35 archivos; motion 46 tests. Se corrigieron con rojo → verde el doble settle de TimeWheel (salto de 25.6 px al soltar una fila), la marca inactiva de Collapse, vidrio de ventana sin fade inicial y backdrop de diálogo desmontado antes de terminar su fade.
+- Chromium dev 1440×900, según el agente: apertura 347–391 ms, salida 131–149 ms, selección 280 ms; p95 de cuadro 16.7–16.8 ms. Reduce Motion: cero animaciones visuales en las superficies recorridas. No prueba rendimiento de producción, GPU ni Safari.
+- Inputs: QA a 1440×900 y 390×844; Select/Combobox posicionados, foco de 2 px, validación/disabled y sin desborde horizontal. Corregidos banda vacía de Combobox y TokenField que saltaba de línea con `min-w-32` (se reduce a `min-w-24`). La mitad inferior normal a 390 no tuvo captura visual; se midió el ancho.
+- Evidencia auxiliar original: `/tmp/icewalk-inputs/` y `/tmp/icewalk-motion/verify/`. Los informes describen las limitaciones: notificaciones/share sheet/tooltips sin recorrido nuevo, Safari/WebKit sin validar y percepción estética pendiente del usuario.
+- Entrada Codex: `bun run moon run ui:lint ui:typecheck ui:test` recupera caché válida para esos mismos archivos (163 tests). Se registra como caché, no como ejecución nueva. Diseño se cortó después de 20 tests puntuales verdes y ediciones de layout, sin QA final; se continúa antes del build integrado.
+
+## 2026-11-11: fidelidad visionOS y cierre de vistas
+
+- Investigación nueva con clips primarios de visionOS, método de medición y límites en [visionos-motion-fidelity-2026-11-11.md](research/visionos-motion-fidelity-2026-11-11.md). La referencia anterior de Liquid Glass iOS/macOS no demostraba el movimiento del sistema espacial.
+- Pixel-test del shader SVG: Chromium desplaza el patrón detrás del panel y deja el exterior idéntico. Safari nativo (CUA, mismo HTML local) muestra patrón continuo sin efecto visible. Resultado técnico por motor, sin inferir soporte desde la sintaxis ni identidad con el material nativo.
+- QA de vistas final Chromium: 1440/1024/390, sin desborde horizontal; guía/minimapa EV, encuadre de la próxima estación y Map focus compacto corregidos con tests rojos → verdes. Web 149 tests; QA incluyó replan negativo, Science y vuelo Cesium real. Build y API vivo no probados por ese worker.

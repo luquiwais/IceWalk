@@ -6,10 +6,12 @@ import {
   fitCamera,
   FIT_MARGIN,
   freeArea,
+  horizonY,
   lerpCamera,
   MAX_PX_PER_M,
   MIN_PX_PER_M,
   NO_INSETS,
+  projectOblique,
   ringStepM,
   scaleBar,
   screenToWorld,
@@ -135,5 +137,39 @@ describe("scale, detail, rings", () => {
     expect(lerpCamera(a, b, 0)).toEqual(a);
     expect(lerpCamera(a, b, 1).pxPerM).toBeCloseTo(2);
     expect(lerpCamera(a, b, 0.5).pxPerM).toBeCloseTo(1);
+  });
+});
+
+describe("projectOblique", () => {
+  const pivot: [number, number] = [500, 600];
+  const p = { headingDeg: 0, pitchDeg: 58, perspectivePx: 900 };
+
+  it("keeps the pivot fixed and is the identity without pitch or heading", () => {
+    expect(projectOblique([500, 600], pivot, p)).toMatchObject({ x: 500, y: 600, scale: 1 });
+    const flat = projectOblique([620, 410], pivot, { headingDeg: 0, pitchDeg: 0, perspectivePx: 900 });
+    expect(flat.x).toBeCloseTo(620);
+    expect(flat.y).toBeCloseTo(410);
+    expect(flat.scale).toBeCloseTo(1);
+  });
+
+  it("foreshortens and shrinks what lies ahead, and enlarges what lies behind", () => {
+    const ahead = projectOblique([500, 300], pivot, p);
+    expect(ahead.x).toBeCloseTo(500);
+    expect(ahead.y).toBeGreaterThan(300);
+    expect(ahead.y).toBeLessThan(600);
+    expect(ahead.scale).toBeLessThan(1);
+    expect(projectOblique([500, 700], pivot, p).scale).toBeGreaterThan(1);
+  });
+
+  it("turns the heading to the top of the screen", () => {
+    // East of the pivot on a north-up map; heading 090 puts it straight ahead.
+    const east = projectOblique([700, 600], pivot, { ...p, headingDeg: 90 });
+    expect(east.x).toBeCloseTo(500);
+    expect(east.y).toBeLessThan(600);
+  });
+
+  it("never projects past the horizon", () => {
+    const far = projectOblique([500, -1e7], pivot, p);
+    expect(far.y).toBeGreaterThanOrEqual(horizonY(pivot, p) - 1e-6);
   });
 });

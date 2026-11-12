@@ -5,6 +5,7 @@ import { useLayoutEffect, useRef } from "react";
 
 import { MaterialLayers, SurfaceScroll } from "./material";
 import { cn } from "./utils";
+import { useGlassMorph } from "./motion";
 
 /*
  * visionOS ornament / toolbar (Figma: Toolbars): a glass capsule with a 1.4px
@@ -15,6 +16,7 @@ import { cn } from "./utils";
 function Ornament({ className, children, ...props }: Toolbar.Root.Props) {
   const content = useRef<HTMLDivElement>(null);
   const host = useRef<HTMLDivElement>(null);
+  useGlassMorph(host);
   useLayoutEffect(() => {
     const node = content.current;
     const root = host.current;

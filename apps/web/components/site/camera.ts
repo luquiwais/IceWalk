@@ -130,3 +130,30 @@ export function ringStepM(pxPerM: number): number | null {
   if (500 * pxPerM >= 28) return 500;
   return null;
 }
+
+/**
+ * Oblique presentation of the flat map: the plane is turned so `headingDeg`
+ * points up and tipped back by `pitchDeg` around the pivot, as CSS does with
+ * `perspective` + `rotateX() rotateZ()`. It is a tilted ortho image, not terrain.
+ */
+export type Oblique = { headingDeg: number; pitchDeg: number; perspectivePx: number };
+
+/** Screen position and size factor of a flat-map screen point under `oblique`. */
+export function projectOblique(point: readonly [number, number], pivot: readonly [number, number], oblique: Oblique) {
+  const h = (-oblique.headingDeg * Math.PI) / 180;
+  const a = (oblique.pitchDeg * Math.PI) / 180;
+  const dx = point[0] - pivot[0];
+  const dy = point[1] - pivot[1];
+  const x = dx * Math.cos(h) - dy * Math.sin(h);
+  const y = dx * Math.sin(h) + dy * Math.cos(h);
+  // Toward the viewer is positive; keep clear of the eye plane.
+  const z = Math.min(y * Math.sin(a), oblique.perspectivePx * 0.9);
+  const scale = oblique.perspectivePx / (oblique.perspectivePx - z);
+  return { x: pivot[0] + x * scale, y: pivot[1] + y * Math.cos(a) * scale, scale };
+}
+
+/** Screen y of the horizon of the tilted plane (-Infinity when it is not tilted). */
+export function horizonY(pivot: readonly [number, number], oblique: Oblique): number {
+  const a = (oblique.pitchDeg * Math.PI) / 180;
+  return Math.sin(a) < 1e-6 ? -Infinity : pivot[1] - (oblique.perspectivePx * Math.cos(a)) / Math.sin(a);
+}

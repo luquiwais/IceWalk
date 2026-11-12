@@ -77,6 +77,57 @@
   pointer-events: none;
 }
 
+/* Ground: imagery and vectors. Flat by default; in the oblique view the frame
+   loop sets the pitch, heading and pivot, and projects the markers to match. */
+
+.site-ground {
+  position: absolute;
+  inset: 0;
+}
+
+.site-scene[data-tilted] {
+  perspective: 900px; /* OBLIQUE_PERSPECTIVE_PX */
+  perspective-origin: var(--site-pivot-x) var(--site-pivot-y);
+}
+
+.site-scene[data-tilted] .site-ground {
+  transform-origin: var(--site-pivot-x) var(--site-pivot-y);
+  transform: rotateX(var(--site-pitch)) rotateZ(var(--site-heading));
+  will-change: transform;
+}
+
+/* Haze toward the horizon, where the ortho ends. */
+.site-haze {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--site-void) 0,
+    var(--site-void) var(--site-horizon, 0px),
+    transparent calc(var(--site-horizon, 0px) + 45%)
+  );
+  transition: opacity var(--motion-surface, 360ms) var(--ease-settle, ease-out);
+}
+
+.site-scene[data-tilted] .site-haze {
+  opacity: 1;
+}
+
+.site-scene[data-projected] {
+  cursor: default;
+}
+
+.site-scene[data-projected] .site-scale,
+.site-scene[data-projected] .site-coords {
+  display: none;
+}
+
+.site-scene[data-tilted] .site-north svg {
+  transform: rotate(var(--site-north, 0deg));
+}
+
 /* Imagery --------------------------------------------------------------- */
 
 .site-imagery {
@@ -561,6 +612,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-haze,
   .site-imagery,
   .site-station-body,
   .site-station-dot,

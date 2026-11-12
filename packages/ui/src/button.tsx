@@ -2,12 +2,15 @@
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Children, isValidElement } from "react";
+import { Children, isValidElement, useLayoutEffect, useRef, useState } from "react";
+import { ChevronLeft } from "lucide-react";
 import type * as React from "react";
 
 import { MaterialLayers } from "./material";
 import { Tooltip } from "./tooltip";
 import { cn } from "./utils";
+import { useGlassMorph } from "./motion";
+import { useHoverReveal } from "./hover-reveal";
 
 /*
  * visionOS buttons (Figma: Buttons). Sizes, paddings, radii and type come from
@@ -116,5 +119,44 @@ function IconButton({ label, showTooltip = true, ...props }: IconButtonProps) {
   return <Tooltip label={label}>{button}</Tooltip>;
 }
 
-export { Button, ButtonContent, IconButton, buttonVariants };
-export type { ButtonProps, ButtonVariant, IconButtonProps };
+type BackButtonProps = Omit<ButtonPrimitive.Props, "children" | "aria-label"> & { label: string };
+
+/** Leading-anchored circle → capsule from WWDC25/303; icon/text never scale. */
+function BackButton({ label, className, ref, ...props }: BackButtonProps) {
+  const host = useRef<HTMLElement>(null);
+  const text = useRef<HTMLSpanElement>(null);
+  const [labelWidth, setLabelWidth] = useState(0);
+  const intent = useHoverReveal(!props.disabled);
+  useGlassMorph(host, true, 760);
+  useLayoutEffect(() => {
+    const label = text.current;
+    if (!label) return;
+    const measure = () => setLabelWidth(label.getBoundingClientRect().width);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(label);
+    return () => observer.disconnect();
+  }, [label]);
+  return <ButtonPrimitive {...props}
+    ref={(node) => {
+      host.current = node;
+      const button = node instanceof HTMLButtonElement ? node : null;
+      if (typeof ref === "function") ref(button);
+      else if (ref) ref.current = button;
+    }}
+    aria-label={label} data-slot="back-button" data-revealed={intent.revealed ? "" : undefined}
+    className={cn("vision-control vision-surface vision-back-button relative inline-flex h-11 shrink-0 items-center rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label", className)}
+    style={{ ...props.style, width: intent.revealed ? `calc(2.75rem + ${labelWidth}px + .875rem)` : "2.75rem" }}
+    onPointerEnter={(event) => { intent.onPointerEnter(event); props.onPointerEnter?.(event); }}
+    onPointerLeave={(event) => { intent.onPointerLeave(event); props.onPointerLeave?.(event); }}
+    onFocusCapture={(event) => { intent.onFocusCapture(event); props.onFocusCapture?.(event); }}
+    onBlurCapture={(event) => { intent.onBlurCapture(event); props.onBlurCapture?.(event); }}>
+    <MaterialLayers kind="platter" />
+    <span aria-hidden className="flex size-11 shrink-0 items-center justify-center"><ChevronLeft className="size-5" /></span>
+    <span ref={text} aria-hidden className="vision-back-label shrink-0 whitespace-nowrap text-body font-semibold">{label}</span>
+  </ButtonPrimitive>;
+}
+
+export { BackButton, Button, ButtonContent, IconButton, buttonVariants };
+export type { BackButtonProps, ButtonProps, ButtonVariant, IconButtonProps };

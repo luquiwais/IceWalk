@@ -24,17 +24,20 @@ import {
   type Ref,
 } from "react";
 
-import { type Plan } from "@/lib/plan";
+import { measurementSummary, nextStation, type Measurement, type Plan } from "@/lib/plan";
 
 import {
+  clamp,
   clampCamera,
   detailOpacity,
   easeInOut,
   fitCamera,
   freeArea,
+  horizonY,
   lerpCamera,
   NO_INSETS,
   panBy,
+  projectOblique,
   ringStepM,
   scaleBar,
   screenToWorld,
@@ -68,6 +71,8 @@ export type SiteLayers = { grid: boolean; rings: boolean };
 /** A raster in grid meters, e.g. the ice potential from /maps once it exists. */
 export type SiteRaster = { url: string; bounds: Box; legend?: unknown };
 
+export type SiteProjection = { headingDeg: number; pitchDeg: number; focus?: readonly [number, number] };
+
 export type SiteSceneHandle = {
   /** Frame these stations (all + habitat when omitted) in the free area. */
   fit: (ids?: readonly string[]) => void;
@@ -78,6 +83,12 @@ export type SiteSceneProps = {
   plan: Plan;
   /** The plan before a re-plan: its route is drawn dashed and the diff is labeled. */
   previousPlan?: Plan;
+  measurements?: readonly Measurement[];
+  /**
+   * Oblique presentation of the ortho, heading up, pivoting on `focus` (grid
+   * meters). A tilted flat map, not a terrain elevation model; pan and zoom are off.
+   */
+  projection?: SiteProjection;
   selectedStationId: string | null;
   hoveredStationId: string | null;
   onSelectStation: (id: string | null) => void;
@@ -90,7 +101,30 @@ export type SiteSceneProps = {
   ref?: Ref<SiteSceneHandle>;
 };
 
-const CAMERA_MS = 600;
+const CAMERA_MS = 280;
+/** Tilt in and out of the oblique view: the kit's surface morph time. */
+const OBLIQUE_MS = 360;
+const OBLIQUE_PERSPECTIVE_PX = 900;
+/** Ground width shown across the free area at the pivot, in meters. */
+const OBLIQUE_SPAN_M = 260;
+/** The pivot sits low in the free area, so the view looks ahead along the heading. */
+const OBLIQUE_PIVOT_Y = 0.7;
+
+type Tilt = { pitch: number; heading: number };
+const FLAT: Tilt = { pitch: 0, heading: 0 };
+
+function obliqueCamera(focus: readonly [number, number], view: Size, insets: Insets): Camera {
+  const free = freeArea(view, insets);
+  // Keep the next 100 m leg below the legend even above a compact bottom sheet.
+  const k = clamp(Math.min(free.width / OBLIQUE_SPAN_M, free.height / 120), 0.5, 4);
+  const py = free.top + free.height * OBLIQUE_PIVOT_Y;
+  return { pxPerM: k, cx: focus[0] - (free.cx - view.width / 2) / k, cy: focus[1] + (py - view.height / 2) / k };
+}
+
+function lerpTilt(a: Tilt, b: Tilt, t: number): Tilt {
+  const turn = ((b.heading - a.heading + 540) % 360) - 180;
+  return { pitch: a.pitch + (b.pitch - a.pitch) * t, heading: a.heading + turn * t };
+}
 const KEY_PAN_PX = 80;
 const KEY_ZOOM = 1.5;
 const CHEVRON_SPACING_PX = 80;
@@ -127,6 +161,15 @@ function minSpacing(points: readonly (readonly [number, number])[]): number {
   return Number.isFinite(best) ? best : STATION_CELL_M;
 }
 
+/** Where north falls on screen when `headingDeg` points up. */
+function northSide(headingDeg: number): string {
+  const h = ((headingDeg % 360) + 360) % 360;
+  if (h < 22.5 || h >= 337.5) return "north ahead";
+  if (h < 157.5) return h < 67.5 ? "north ahead to the left" : h < 112.5 ? "north to the left" : "north behind to the left";
+  if (h < 202.5) return "north behind";
+  return h < 247.5 ? "north behind to the right" : h < 292.5 ? "north to the right" : "north ahead to the right";
+}
+
 function prefersReducedMotion(): boolean {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
 }
@@ -143,11 +186,14 @@ type Live = {
   layers: SiteLayers;
   insets: Insets;
   habitatOffset: boolean;
+  projection: SiteProjection | null;
 };
 
 export function SiteScene({
   plan,
   previousPlan,
+  measurements = [],
+  projection,
   selectedStationId,
   hoveredStationId,
   onSelectStation,
@@ -160,6 +206,13 @@ export function SiteScene({
 }: SiteSceneProps) {
   const helpId = useId();
   const { stations, dropped } = useMemo(() => sceneStations(plan, previousPlan), [plan, previousPlan]);
+  /** Stations + habitat, and what a re-plan dropped, so the diff stays in frame. */
+  const framing = useMemo(
+    () => [...framePoints(plan), ...dropped.map((s) => [s.position[0], s.position[1]] as [number, number])],
+    [plan, dropped],
+  );
+  const measuredById = new Map(measurements.map((m) => [m.station_id, m]));
+  const nextId = measurements.length ? nextStation(plan, measurements)?.id : undefined;
   const lines = useMemo(() => routeLines(plan), [plan]);
   const previousLines = useMemo(() => (previousPlan ? routeLines(previousPlan) : []), [previousPlan]);
   const habitatOffset = habitatOnStation([...stations, ...dropped]);
@@ -182,6 +235,7 @@ export function SiteScene({
   const rangeCircle = useRef<SVGCircleElement>(null);
   const rangeLabel = useRef<SVGTextElement>(null);
   const leader = useRef<SVGLineElement>(null);
+  const northEl = useRef<HTMLDivElement>(null);
   const scaleBarEl = useRef<HTMLDivElement>(null);
   const scaleLabel = useRef<HTMLSpanElement>(null);
   const coords = useRef<HTMLSpanElement>(null);
@@ -190,8 +244,15 @@ export function SiteScene({
 
   // Frame state, outside React.
   const camera = useRef<Camera | null>(null);
+  const autoFrame = useRef(true);
+  const framedIds = useRef<readonly string[] | undefined>(undefined);
   const size = useRef<Size>({ width: 0, height: 0 });
   const anim = useRef<{ from: Camera; to: Camera; start: number } | null>(null);
+  const tilt = useRef<Tilt>(FLAT);
+  const tiltAnim = useRef<{ from: Tilt; to: Tilt; start: number } | null>(null);
+  /** World point the tilt pivots on; kept after the projection ends so the way back is continuous. */
+  const pivotWorld = useRef<readonly [number, number]>(HABITAT_XY);
+  const projectionKey = useRef("");
   const pointer = useRef<[number, number] | null>(null);
   const frame = useRef(0);
   const flags = useRef({ ready: false, detail: false });
@@ -205,6 +266,7 @@ export function SiteScene({
     layers,
     insets,
     habitatOffset,
+    projection: null,
   });
 
   const draw = useCallback(() => {
@@ -214,19 +276,59 @@ export function SiteScene({
     const L = live.current;
     if (!camera.current) {
       if (!L.framing.length) return;
-      camera.current = clampCamera(fitCamera(L.framing, view, L.insets), view, L.insets, SCENE_BOUNDS);
+      camera.current = clampCamera(
+        L.projection ? obliqueCamera(pivotWorld.current, view, L.insets) : fitCamera(L.framing, view, L.insets),
+        view,
+        L.insets,
+        SCENE_BOUNDS,
+      );
+    }
+    const ta = tiltAnim.current;
+    if (ta) {
+      const t = Math.min(1, (performance.now() - ta.start) / OBLIQUE_MS);
+      tilt.current = lerpTilt(ta.from, ta.to, easeInOut(t));
+      if (t >= 1) tiltAnim.current = null;
+      else if (!frame.current) frame.current = requestAnimationFrame(draw);
     }
     const a = anim.current;
     if (a) {
       const t = Math.min(1, (performance.now() - a.start) / CAMERA_MS);
       camera.current = lerpCamera(a.from, a.to, easeInOut(t));
       if (t >= 1) anim.current = null;
-      else frame.current = requestAnimationFrame(draw);
+      else if (!frame.current) frame.current = requestAnimationFrame(draw);
     }
     const cam = camera.current;
     const k = cam.pxPerM;
     const toScreen = (x: number, y: number) => worldToScreen(cam, view, x, y);
     const fmt = (v: number) => v.toFixed(1);
+
+    // Oblique view: the ground layer is tilted in CSS; markers are projected here and stay upright.
+    const T = tilt.current;
+    const tilted = T.pitch > 0.01;
+    const pivot = toScreen(pivotWorld.current[0], pivotWorld.current[1]);
+    const oblique = tilted ? { headingDeg: T.heading, pitchDeg: T.pitch, perspectivePx: OBLIQUE_PERSPECTIVE_PX } : null;
+    const el = root.current;
+    if (el) {
+      if (tilted !== (el.dataset.tilted !== undefined)) {
+        if (tilted) el.dataset.tilted = "";
+        else delete el.dataset.tilted;
+      }
+      const vars = tilted
+        ? `${T.pitch.toFixed(2)}|${(-T.heading).toFixed(2)}|${fmt(pivot[0])}|${fmt(pivot[1])}|${fmt(Math.max(0, horizonY(pivot, oblique!)))}`
+        : "";
+      if (vars !== el.dataset.tilt) {
+        el.dataset.tilt = vars;
+        const [pitch, heading, px, py, horizon] = vars ? vars.split("|") : ["0", "0", "0", "0", "0"];
+        el.style.setProperty("--site-pitch", `${pitch}deg`);
+        el.style.setProperty("--site-heading", `${heading}deg`);
+        el.style.setProperty("--site-pivot-x", `${px}px`);
+        el.style.setProperty("--site-pivot-y", `${py}px`);
+        el.style.setProperty("--site-horizon", `${horizon}px`);
+        if (northEl.current) northEl.current.style.setProperty("--site-north", `${heading}deg`);
+      }
+    }
+    const place = (p: readonly [number, number]) =>
+      oblique ? projectOblique(p, pivot, oblique) : { x: p[0], y: p[1], scale: 1 };
 
     // Imagery: one transform per image, at its native pixel size.
     for (const { el, box, width } of images.current.values()) {
@@ -362,19 +464,25 @@ export function SiteScene({
     // Markers.
     for (const [id, el] of anchors.current) {
       let p: [number, number] | undefined;
+      let offset: readonly [number, number] = [0, 0];
       if (id === "@habitat") {
-        p = [hx + (L.habitatOffset ? HAB_OFFSET_PX[0] : 0), hy + (L.habitatOffset ? HAB_OFFSET_PX[1] : 0)];
+        p = [hx, hy];
+        if (L.habitatOffset) offset = HAB_OFFSET_PX;
       } else if (id === "@crater") {
         p = toScreen(CRATER_XY[0], CRATER_XY[1]);
       } else {
         const w = L.points.get(id);
         if (w) p = toScreen(w[0], w[1]);
       }
-      if (p) el.style.transform = `translate3d(${fmt(p[0])}px, ${fmt(p[1])}px, 0)`;
+      if (!p) continue;
+      const at = place(p);
+      el.style.transform =
+        `translate3d(${fmt(at.x + offset[0])}px, ${fmt(at.y + offset[1])}px, 0)` +
+        (oblique ? ` scale(${clamp(at.scale, 0.45, 1.4).toFixed(3)})` : "");
     }
     const lead = leader.current;
     if (lead) {
-      if (L.habitatOffset) {
+      if (L.habitatOffset && !oblique) {
         const len = Math.hypot(...HAB_OFFSET_PX);
         const ux = HAB_OFFSET_PX[0] / len;
         const uy = HAB_OFFSET_PX[1] / len;
@@ -441,7 +549,7 @@ export function SiteScene({
     if (scaleLabel.current) scaleLabel.current.textContent = bar.label;
     if (coords.current) {
       const p = pointer.current;
-      if (p) {
+      if (p && !oblique) {
         const [wx, wy] = screenToWorld(cam, view, p[0], p[1]);
         coords.current.textContent = `x ${signed(wx)} m · y ${signed(wy)} m`;
       } else coords.current.textContent = "";
@@ -483,15 +591,19 @@ export function SiteScene({
   const fit = useCallback(
     (ids?: readonly string[]) => {
       if (!size.current.width) return;
-      animateTo(fitCamera(framePoints(plan, ids), size.current, live.current.insets));
+      autoFrame.current = true;
+      framedIds.current = ids;
+      if (live.current.projection) return;
+      animateTo(fitCamera(ids?.length ? framePoints(plan, ids) : framing, size.current, live.current.insets));
     },
-    [animateTo, plan],
+    [animateTo, plan, framing],
   );
 
   const zoomBy = useCallback(
     (factor: number) => {
       const cam = camera.current;
-      if (!cam) return;
+      if (!cam || live.current.projection) return;
+      autoFrame.current = false;
       const free = freeArea(size.current, live.current.insets);
       setCamera(zoomAt(cam, size.current, factor, free.cx, free.cy));
     },
@@ -502,8 +614,9 @@ export function SiteScene({
 
   // Props into the frame loop.
   useLayoutEffect(() => {
+    const layoutChanged = Object.keys(insets).some((key) => live.current.insets[key as keyof Insets] !== insets[key as keyof Insets]);
     live.current = {
-      framing: framePoints(plan),
+      framing,
       spacingM: minSpacing([...stations, ...dropped].map((s) => s.position)),
       lines,
       previousLines,
@@ -512,9 +625,42 @@ export function SiteScene({
       layers,
       insets,
       habitatOffset,
+      projection: projection ?? null,
     };
+    if (projection?.focus) pivotWorld.current = projection.focus;
+    const flatCamera = () =>
+      fitCamera(framedIds.current?.length ? framePoints(plan, framedIds.current) : framing, size.current, insets);
+    const key = projection ? `${projection.headingDeg}|${projection.pitchDeg}|${pivotWorld.current.join(",")}` : "";
+    if (key !== projectionKey.current) {
+      // Into, out of, or along the oblique view: camera and tilt move together.
+      projectionKey.current = key;
+      const to: Tilt = projection ? { pitch: projection.pitchDeg, heading: projection.headingDeg } : FLAT;
+      autoFrame.current = true;
+      if (size.current.width && camera.current) {
+        const target = projection ? obliqueCamera(pivotWorld.current, size.current, insets) : flatCamera();
+        if (prefersReducedMotion()) {
+          tiltAnim.current = null;
+          tilt.current = to;
+          setCamera(target);
+        } else {
+          tiltAnim.current = { from: tilt.current.pitch > 0.01 ? tilt.current : FLAT, to, start: performance.now() };
+          animateTo(target);
+        }
+      } else {
+        tiltAnim.current = null;
+        tilt.current = to;
+      }
+    } else if (layoutChanged && autoFrame.current && size.current.width) {
+      anim.current = null;
+      camera.current = clampCamera(
+        projection ? obliqueCamera(pivotWorld.current, size.current, insets) : flatCamera(),
+        size.current,
+        insets,
+        SCENE_BOUNDS,
+      );
+    }
     schedule();
-  }, [plan, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, schedule]);
+  }, [plan, framing, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera]);
 
   // Size, gestures and keys: native listeners, so wheel can be non-passive and
   // nothing goes through React per frame.
@@ -525,7 +671,12 @@ export function SiteScene({
     const measure = () => {
       const rect = el.getBoundingClientRect();
       size.current = { width: rect.width, height: rect.height };
-      if (camera.current) camera.current = clampCamera(camera.current, size.current, live.current.insets, SCENE_BOUNDS);
+      const L = live.current;
+      if (camera.current) camera.current = L.projection
+        ? clampCamera(obliqueCamera(pivotWorld.current, size.current, L.insets), size.current, L.insets, SCENE_BOUNDS)
+        : autoFrame.current
+          ? clampCamera(fitCamera(L.framing, size.current, L.insets), size.current, L.insets, SCENE_BOUNDS)
+          : clampCamera(camera.current, size.current, L.insets, SCENE_BOUNDS);
       schedule();
     };
     measure();
@@ -546,6 +697,8 @@ export function SiteScene({
     };
 
     const onPointerDown = (e: PointerEvent) => {
+      if (live.current.projection) return;
+      autoFrame.current = false;
       if (e.button !== 0 || onObject(e)) return;
       el.setPointerCapture?.(e.pointerId);
       pointers.set(e.pointerId, local(e));
@@ -584,6 +737,8 @@ export function SiteScene({
       schedule();
     };
     const onWheel = (e: WheelEvent) => {
+      if (live.current.projection) return;
+      autoFrame.current = false;
       const cam = camera.current;
       if (!cam) return;
       e.preventDefault();
@@ -594,6 +749,8 @@ export function SiteScene({
       setCamera(zoomAt(cam, size.current, factor, sx, sy));
     };
     const onDoubleClick = (e: MouseEvent) => {
+      if (live.current.projection) return;
+      autoFrame.current = false;
       const cam = camera.current;
       if (!cam || onObject(e)) return;
       const [sx, sy] = local(e);
@@ -624,6 +781,7 @@ export function SiteScene({
   }, [animateTo, schedule, setCamera]);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "+", "-", "="].includes(e.key)) autoFrame.current = false;
     const cam = camera.current;
     if (!cam || e.altKey || e.metaKey || e.ctrlKey) return;
     const pan = e.shiftKey ? KEY_PAN_PX * 3 : KEY_PAN_PX;
@@ -693,12 +851,13 @@ export function SiteScene({
       ref={root}
       className={["site-scene", className].filter(Boolean).join(" ")}
       data-ready={ready ? "" : undefined}
-      tabIndex={0}
+      data-projected={projection ? "" : undefined}
+      tabIndex={projection ? -1 : 0}
       role="group"
       aria-roledescription="map"
       aria-label="Site map, S1094b"
       aria-describedby={helpId}
-      onKeyDown={onKeyDown}
+      onKeyDown={projection ? undefined : onKeyDown}
       style={
         {
           "--site-inset-top": `${insets.top}px`,
@@ -712,6 +871,7 @@ export function SiteScene({
         North up. Drag or use the arrow keys to pan, plus and minus to zoom, 0 to frame the plan. Tab moves between stations.
       </p>
 
+      <div className="site-ground">
       <div className="site-imagery" aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element -- transformed per frame; next/image adds nothing here */}
         <img
@@ -754,8 +914,6 @@ export function SiteScene({
         ) : null}
       </div>
       <div className="site-tint" aria-hidden />
-      <div className="site-vignette" aria-hidden />
-
       <svg className="site-vectors" aria-hidden>
         <defs>
           <clipPath id={clipId}>
@@ -797,6 +955,9 @@ export function SiteScene({
         </text>
         <line ref={leader} className="site-leader" />
       </svg>
+      </div>
+      <div className="site-haze" aria-hidden />
+      <div className="site-vignette" aria-hidden />
 
       <div className="site-markers">
         <div ref={anchorRef("@crater")} className="site-anchor" data-site-object>
@@ -808,11 +969,11 @@ export function SiteScene({
 
         {dropped.map((s) => (
           <div key={`dropped-${s.id}`} ref={anchorRef(s.id)} className="site-anchor">
-            <div className="site-dropped" role="img" aria-label={`Dropped station ${s.id}, was station ${s.order}`} data-site-object>
+            <div className="site-dropped" role="img" aria-label={measuredById.has(s.id) ? `Measured station ${s.id}, ${measurementSummary(measuredById.get(s.id)!)}` : `Dropped station ${s.id}, was station ${s.order}`} data-site-object>
               <span className="site-station-dot">{s.order}</span>
               <span className="site-tags" aria-hidden>
-                <span className="site-tag" data-tag="dropped">
-                  Dropped
+                <span className="site-tag" data-tag={measuredById.has(s.id) ? "measured" : "dropped"}>
+                  {measuredById.has(s.id) ? <>Measured<span className="site-tag-detail"> · {measurementSummary(measuredById.get(s.id)!)}</span></> : "Dropped"}
                 </span>
                 <span className="site-label site-label-static">{s.id}</span>
               </span>
@@ -835,7 +996,7 @@ export function SiteScene({
               <button
                 type="button"
                 className="site-station"
-                aria-label={stationName(s) + (s.status === "added" ? ", added by the re-plan" : "")}
+                aria-label={stationName(s) + (measuredById.has(s.id) ? `, measured, ${measurementSummary(measuredById.get(s.id)!)}` : s.status === "added" ? ", added by the re-plan" : "")}
                 aria-pressed={isSelected}
                 data-selected={isSelected ? "" : undefined}
                 data-hovered={isHovered ? "" : undefined}
@@ -860,6 +1021,7 @@ export function SiteScene({
                   <span className="site-station-dot">{s.order}</span>
                 </span>
                 <span className="site-tags" aria-hidden>
+                  {measuredById.has(s.id) ? <span className="site-tag" data-tag="measured">Measured<span className="site-tag-detail"> · {measurementSummary(measuredById.get(s.id)!)}</span></span> : s.id === nextId ? <span className="site-tag" data-tag="next">Next</span> : null}
                   {s.status === "added" ? (
                     <span className="site-tag" data-tag="added">
                       Added
@@ -877,7 +1039,12 @@ export function SiteScene({
 
       <div className="site-hud">
         <div className="site-hud-row">
-          <div className="site-north" role="img" aria-label="North is up">
+          <div
+            ref={northEl}
+            className="site-north"
+            role="img"
+            aria-label={projection ? `Heading ${String(Math.round(projection.headingDeg) % 360).padStart(3, "0")}°, ${northSide(projection.headingDeg)}` : "North is up"}
+          >
             <svg viewBox="0 0 12 16" aria-hidden>
               <path d="M6 0 12 16 6 12 0 16Z" />
             </svg>

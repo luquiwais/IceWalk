@@ -5,8 +5,8 @@ import { X } from "lucide-react";
 import type { ReactElement, ReactNode } from "react";
 import { Button, IconButton } from "./button";
 import { MaterialLayers, SurfaceScroll } from "./material";
-import { MotionPresence } from "./motion";
-import { useState } from "react";
+import { MotionPresence, useModalDepth } from "./motion";
+import { useLayoutEffect, useState } from "react";
 import { Text } from "./text";
 import { cn } from "./utils";
 
@@ -34,9 +34,11 @@ function SystemDialog({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const depth = useModalDepth();
+  useLayoutEffect(() => { if (open !== undefined) depth.update(open); }, [open]);
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger render={trigger} />
+    <Dialog.Root open={open} onOpenChange={(next) => { if (open === undefined) depth.update(next); onOpenChange?.(next); }}>
+      <Dialog.Trigger ref={depth.trigger} render={trigger} />
       <Dialog.Portal>
         <Dialog.Backdrop className="vision-motion-backdrop fixed inset-0 z-40 bg-black/25 backdrop-blur-[3px]" />
         <Dialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -87,9 +89,10 @@ function Alert({
   actions: SystemAction[];
   children?: ReactNode;
 }) {
+  const depth = useModalDepth();
   return (
-    <Dialog.Root>
-      <Dialog.Trigger render={trigger} />
+    <Dialog.Root onOpenChange={depth.update}>
+      <Dialog.Trigger ref={depth.trigger} render={trigger} />
       <Dialog.Portal>
         <Dialog.Backdrop className="vision-motion-backdrop fixed inset-0 z-40 bg-black/25 backdrop-blur-[3px]" />
         <Dialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -191,7 +194,7 @@ function Notification({
       <article
         aria-label={`${app} notification`}
         className={cn(
-          "vision-surface relative flex w-[27.25rem] max-w-full flex-col gap-4 rounded-[2.875rem] px-6 py-5 text-label [--glass-stroke-width:1.4px] [--glass-stroke-angle:147.397deg]",
+          "vision-surface vision-self-blur relative flex w-[27.25rem] max-w-full flex-col gap-4 rounded-[2.875rem] px-6 py-5 text-label [--glass-stroke-width:1.4px] [--glass-stroke-angle:147.397deg]",
           className,
         )}
       >
@@ -261,7 +264,7 @@ function TemporaryNotice({
     <MotionPresence present={!dismissed} onExitComplete={onDismiss}>
       <div
         role="status"
-        className="vision-surface relative flex max-w-full flex-wrap items-center gap-3 rounded-[3rem] p-4 text-label [--glass-stroke-width:0.75px]"
+        className="vision-surface vision-self-blur relative flex max-w-full flex-wrap items-center gap-3 rounded-[3rem] p-4 text-label [--glass-stroke-width:0.75px]"
       >
         <NotificationMaterial />
         <IconButton
@@ -326,7 +329,7 @@ function SharePlayActivity({
   return (
     <div
       className={cn(
-        "vision-surface relative flex w-[27.25rem] max-w-full flex-wrap items-center gap-4 rounded-[2.875rem] p-5 text-label",
+        "vision-surface vision-self-blur relative flex w-[27.25rem] max-w-full flex-wrap items-center gap-4 rounded-[2.875rem] p-5 text-label",
         className,
       )}
     >

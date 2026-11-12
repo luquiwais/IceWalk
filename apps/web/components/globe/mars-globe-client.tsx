@@ -31,6 +31,8 @@ export type MarsGlobeProps = {
   route?: RouteFeatureCollection;
   /** When set, the camera flies to this point. Without it, the whole globe is shown. */
   focus?: GlobeFocus;
+  /** Called when the flight to `focus` lands (at once with Reduce Motion). */
+  onFocusComplete?: () => void;
   onSelectStation?: (id: string) => void;
   /** Classes for the root element (it fills its positioned container by default). */
   className?: string;
@@ -85,6 +87,7 @@ export default function MarsGlobe({
   stations,
   route,
   focus,
+  onFocusComplete,
   onSelectStation,
   className,
   creditsClassName,
@@ -97,12 +100,14 @@ export default function MarsGlobe({
   const routeSourceRef = useRef<CesiumNS.CustomDataSource | null>(null);
   const tilesetModeRef = useRef(false);
   const onSelectRef = useRef(onSelectStation);
+  const onFocusCompleteRef = useRef(onFocusComplete);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [basemapKind, setBasemapKind] = useState<MarsBasemap["kind"]>("trek");
 
   useEffect(() => {
     onSelectRef.current = onSelectStation;
-  }, [onSelectStation]);
+    onFocusCompleteRef.current = onFocusComplete;
+  }, [onSelectStation, onFocusComplete]);
 
   // Create the viewer once, on the client.
   useEffect(() => {
@@ -330,6 +335,7 @@ export default function MarsGlobe({
       {
         offset: new HeadingPitchRange(0, CMath.toRadians(-70), fHeight),
         duration: reduce ? 0 : 3,
+        complete: () => onFocusCompleteRef.current?.(),
       },
     );
   }, [status, fLon, fLat, fHeight]);

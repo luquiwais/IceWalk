@@ -19,7 +19,7 @@ export function Disclosure({
       <ListSection>
         <ListRow
           expanded={open}
-          controls={id}
+          controls={open ? id : undefined}
           onClick={() => setOpen((value) => !value)}
         >
           {title}

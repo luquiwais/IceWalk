@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { demoPlan, demoReplan } from "@/lib/plan";
+import { demoMeasurement, demoPlan, demoReplan } from "@/lib/plan";
 
 import { fitCamera, worldToScreen } from "./camera";
 import { framePoints, habitatOnStation, routeLines, sceneStations, stationName } from "./site-data";
@@ -98,6 +98,11 @@ describe("site data", () => {
 });
 
 describe("SiteScene", () => {
+  it("calls a completed station Measured instead of Dropped after re-planning", () => {
+    setup({ plan: demoReplan, previousPlan: demoPlan, measurements: [demoMeasurement] });
+    expect(screen.getByRole("img", { name: /Measured station E03S22.*no ice to 1.0 m/ })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /Dropped station E03S22/ })).not.toBeInTheDocument();
+  });
   it("renders every station as a button with its accessible name", () => {
     setup();
     for (const s of demoPlan.stations) {
@@ -114,6 +119,18 @@ describe("SiteScene", () => {
   it("frames the plan in the free area on first layout", () => {
     const insets = { top: 88, right: 440, bottom: 176, left: 96 };
     setup({ insets });
+    const cam = fitCamera(framePoints(demoPlan), VIEW, insets);
+    const [ex, ey] = worldToScreen(cam, VIEW, 300, -2200);
+    const [x, y] = translate(anchorOf(/^Station 1,/));
+    expect(x).toBeCloseTo(ex, 0);
+    expect(y).toBeCloseTo(ey, 0);
+  });
+
+  it("reframes when measured interface insets arrive after the initial camera", () => {
+    const { rerender } = setup();
+    const insets = { top: 120, right: 440, bottom: 176, left: 96 };
+    rerender(<SiteScene plan={demoPlan} selectedStationId={null} hoveredStationId={null} onSelectStation={vi.fn()} onHoverStation={vi.fn()} layers={{ grid: true, rings: true }} insets={insets} />);
+    flushFrames();
     const cam = fitCamera(framePoints(demoPlan), VIEW, insets);
     const [ex, ey] = worldToScreen(cam, VIEW, 300, -2200);
     const [x, y] = translate(anchorOf(/^Station 1,/));
@@ -240,5 +257,65 @@ describe("SiteScene", () => {
   it("draws a raster when one is passed", () => {
     const { container } = setup({ raster: { url: "/maps/test.png", bounds: { xmin: 0, ymin: -2500, xmax: 500, ymax: -2000 } } });
     expect(container.querySelector('img[data-kind="raster"]')).toHaveAttribute("src", "/maps/test.png");
+  });
+
+  describe("oblique projection", () => {
+    const insets = { top: 120, right: 440, bottom: 176, left: 96 };
+    const reduced = () => vi.stubGlobal("matchMedia", () => ({ matches: true, addEventListener() {}, removeEventListener() {} }));
+
+    it("keeps the next station below the legend when a compact EV viewport has little free height", () => {
+      reduced();
+      vi.mocked(HTMLElement.prototype.getBoundingClientRect).mockReturnValue({
+        x: 0, y: 0, left: 0, top: 0, right: 390, bottom: 844, width: 390, height: 844, toJSON: () => ({}),
+      });
+      const compactInsets = { top: 265, right: 20, bottom: 500, left: 20 };
+      setup({ insets: compactInsets, projection: { headingDeg: 90, pitchDeg: 58, focus: [300, -2200] } });
+      const [, y2] = translate(anchorOf(/^Station 2,/));
+      expect(y2).toBeGreaterThan(compactInsets.top + 16);
+      const [, y1] = translate(anchorOf(/^Station 1,/));
+      expect(y1).toBeLessThan(844 - compactInsets.bottom - 16);
+    });
+
+    it("turns the heading up around the focus and keeps markers upright", () => {
+      reduced();
+      setup({ insets, projection: { headingDeg: 90, pitchDeg: 58, focus: [300, -2200] } });
+      const map = screen.getByRole("group", { name: "Site map, S1094b" });
+      expect(map).toHaveAttribute("data-projected");
+      expect(map).toHaveAttribute("data-tilted");
+      // Station 1 is the focus; station 2 is 100 m east of it, so it lies straight ahead.
+      const [x1, y1] = translate(anchorOf(/^Station 1,/));
+      const [x2, y2] = translate(anchorOf(/^Station 2,/));
+      expect(x1).toBeCloseTo(96 + (VIEW.width - 96 - 440) / 2, 0);
+      expect(x2).toBeCloseTo(x1, 0);
+      expect(y2).toBeLessThan(y1 - 20);
+      expect(anchorOf(/^Station 2,/).style.transform).toMatch(/scale\(0\.\d+\)/);
+      expect(screen.getByRole("img", { name: "Heading 090°, north to the left" })).toBeInTheDocument();
+      expect(screen.queryByRole("img", { name: "North is up" })).not.toBeInTheDocument();
+    });
+
+    it("returns to the north-up framing when the projection is removed", () => {
+      reduced();
+      const { rerender } = setup({ insets, projection: { headingDeg: 90, pitchDeg: 58, focus: [300, -2200] } });
+      rerender(<SiteScene plan={demoPlan} selectedStationId={null} hoveredStationId={null} onSelectStation={vi.fn()} onHoverStation={vi.fn()} layers={{ grid: true, rings: true }} insets={insets} />);
+      flushFrames();
+      const map = screen.getByRole("group", { name: "Site map, S1094b" });
+      expect(map).not.toHaveAttribute("data-tilted");
+      const cam = fitCamera(framePoints(demoPlan), VIEW, insets);
+      const [ex, ey] = worldToScreen(cam, VIEW, 300, -2200);
+      const [x, y] = translate(anchorOf(/^Station 1,/));
+      expect(x).toBeCloseTo(ex, 0);
+      expect(y).toBeCloseTo(ey, 0);
+      expect(anchorOf(/^Station 1,/).style.transform).not.toMatch(/scale/);
+    });
+
+    it("frames the stations a re-plan dropped together with the new plan", () => {
+      setup({ insets, plan: demoReplan, previousPlan: demoPlan });
+      const dropped = sceneStations(demoReplan, demoPlan).dropped.map((s) => [s.position[0], s.position[1]] as [number, number]);
+      const cam = fitCamera([...framePoints(demoReplan), ...dropped], VIEW, insets);
+      const [ex, ey] = worldToScreen(cam, VIEW, 400, -2200);
+      const [x, y] = translate(anchorOf(/^Station 1,/));
+      expect(x).toBeCloseTo(ex, 0);
+      expect(y).toBeCloseTo(ey, 0);
+    });
   });
 });

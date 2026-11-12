@@ -53,9 +53,32 @@ describe("visionOS playbook", () => {
         screen.getAllByRole("link", { name: /^Figma source:/ }),
       ).toHaveLength(30),
     );
+    expect(screen.getAllByRole("link", { name: /^Figma materials reference:/ })).toHaveLength(2);
     await userEvent.click(screen.getByRole("button", { name: "Date & time" }));
     expect(
       await screen.findByRole("grid", { name: "Choose a date" }),
     ).toBeInTheDocument();
+  });
+
+  it("opens the input extension, changes a number and exposes its validation", async () => {
+    render(<Playbook />);
+    await userEvent.click(screen.getByRole("button", { name: "Input controls" }));
+    const input = await screen.findByRole("spinbutton", { name: "Survey depth" });
+    await userEvent.click(input);
+    await userEvent.keyboard("{ArrowUp}");
+    expect(input).toHaveAttribute("aria-valuenow", "1.75");
+    await userEvent.click(screen.getByRole("switch", { name: "Show validation messages" }));
+    expect(input).toHaveAccessibleDescription("Tool reach: 0–3 m Depth must fit the tool reach.");
+    await userEvent.click(screen.getByRole("switch", { name: "Disabled" }));
+    expect(input).toBeDisabled();
+    expect(screen.getByRole("textbox", { name: "Evidence filters" })).toBeDisabled();
+  });
+
+  it("opens the window transition extension and its live lifecycle specimen", async () => {
+    render(<Playbook />);
+    await userEvent.click(screen.getByRole("button", { name: "Window transitions" }));
+    const open = await screen.findByRole("button", { name: "Open specimen window" });
+    await userEvent.click(open);
+    expect(screen.getByRole("button", { name: "Station details" })).toBeVisible();
   });
 });

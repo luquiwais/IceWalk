@@ -20,7 +20,8 @@ export type PlanSource = "api" | "mock";
 /** idle: API configured, first request not sent yet (also the server render). */
 export type SessionStatus = "idle" | "loading" | "ready" | "error";
 /** superseded: a newer action started before this one answered; its result was dropped. */
-export type LogOutcome = "replanned" | "retained" | "failed" | "superseded";
+/** busy: a replan is pending; this measurement was not submitted or recorded. */
+export type LogOutcome = "replanned" | "retained" | "failed" | "superseded" | "busy";
 
 export type PlanSessionState = {
   plan: Plan;
@@ -119,6 +120,10 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
   }
 
   async function logMeasurement(measurement: Measurement, elapsedMin: number): Promise<LogOutcome> {
+    // Replans extend a server-side plan by id. Superseding one with a second
+    // measurement would fork the old plan and lose the first measurement.
+    // Guard synchronously as two submissions can occur before React disables UI.
+    if (state.source === "api" && state.status === "loading") return "busy";
     const { id, signal } = begin();
     const measurements = [...state.measurements, measurement];
 
