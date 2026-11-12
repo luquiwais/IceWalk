@@ -42,10 +42,10 @@ function Sidebar({ label, title, titleId, action, children, className, ...props 
     >
       <SurfaceScroll className="relative isolate flex-1">
       <Highlight variant="tabs" items="[data-slot='sidebar-item']:not(:disabled)" rest="[aria-current='page']" />
-      <div className="flex min-h-20 shrink-0 items-center gap-2 px-5 pt-3 pb-2">
+      <div className="flex min-h-16 shrink-0 items-center gap-2 px-5 pt-3 pb-2">
         <h2
           id={titleId}
-          className="min-w-0 flex-1 truncate font-display text-title-1 text-label"
+          className="min-w-0 flex-1 truncate font-display text-title-2 text-label"
         >
           {title}
         </h2>

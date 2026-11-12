@@ -17,8 +17,8 @@ type ListSectionProps = Omit<React.ComponentProps<"section">, "title"> & {
 };
 
 /*
- * visionOS inset grouped list (Figma: Lists > Row - Inset): rows on glass with a 16pt radius,
- * 60pt rows and hairline separators. Rows that come, go or move slide to their places on springs
+ * Inset grouped list: rows have a 44 pt minimum target, a 16 pt leading inset,
+ * 6 pt vertical padding and hairline separators. Rows that come, go or move slide to their places on springs
  * (Fluid Kit Layout).
  */
 function ListSection({
@@ -101,7 +101,7 @@ function ListRow({
           aria-expanded={expanded}
           aria-controls={controls}
           className={cn(
-            "relative flex min-h-11 w-full items-center gap-2 py-2.5 pr-2 pl-4 text-body outline-none hover:bg-fill-quaternary active:bg-fill-tertiary disabled:text-label-disabled",
+            "relative flex min-h-11 w-full items-center gap-2 py-1.5 pr-2 pl-4 text-body outline-none hover:bg-fill-quaternary active:bg-fill-tertiary disabled:text-label-disabled",
             "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label",
             className,
           )}
@@ -132,7 +132,7 @@ function ListRow({
         <div
           data-slot="list-row"
           className={cn(
-            "flex min-h-11 items-center gap-2 py-2.5 pr-4 pl-4 text-body",
+            "flex min-h-11 items-center gap-2 py-1.5 pr-4 pl-4 text-body",
             className,
           )}
         >

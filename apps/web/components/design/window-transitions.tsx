@@ -10,6 +10,7 @@ import { DropdownMenu } from "@icewalk/ui/menu";
 import { DatePicker, TimePicker } from "@icewalk/ui/pickers";
 import { Alert, SystemDialog } from "@icewalk/ui/system-surfaces";
 import { Compass, FlaskConical, Footprints } from "lucide-react";
+import { cn } from "@icewalk/ui/utils";
 import { Specimen } from "./playbook-specimens";
 
 type Surface = "button" | "brief" | "detail";
@@ -46,14 +47,14 @@ export function WindowTransitions() {
   const detailRef = useMergedRefs(detail, morph.state("detail"));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <Specimen
         title="Window morph"
         detail="Button → brief → details · interruptible springs"
       >
         <div
           ref={scene}
-          className="relative min-h-132 w-full overflow-x-clip"
+          className="relative w-full overflow-x-clip"
           onKeyDown={(event) => {
             if (event.key === "Escape" && !event.defaultPrevented && open) {
               event.preventDefault();
@@ -71,14 +72,17 @@ export function WindowTransitions() {
             <WindowOrigin ref={morph.state("button")} />
             {open ? "Close specimen window" : "Open specimen window"}
           </Button>
-          <div className="relative mt-6">
+          <div className="relative mt-4">
             <Window
               id="morph-window-brief"
               ref={briefRef}
               aria-label="Traverse brief"
               aria-hidden={surface !== "brief"}
               inert={surface !== "brief"}
-              className="invisible absolute top-0 left-0 z-2 w-80 max-w-full flex-col gap-4 p-6"
+              className={cn(
+                "invisible z-2 w-72 max-w-full flex-col gap-3 rounded-3xl p-4",
+                surface === "brief" ? "relative" : "absolute top-0 start-0",
+              )}
             >
               <Title2 as="h4">Traverse brief</Title2>
               <Body tone="secondary">Six stations. One safe traverse.</Body>
@@ -97,7 +101,10 @@ export function WindowTransitions() {
               aria-label="Station details"
               aria-hidden={surface !== "detail"}
               inert={surface !== "detail"}
-              className="invisible absolute top-0 left-0 z-2 w-100 max-w-full flex-col gap-4 p-6"
+              className={cn(
+                "invisible z-2 w-88 max-w-full flex-col gap-3 rounded-3xl p-4",
+                surface === "detail" ? "relative" : "absolute top-0 start-0",
+              )}
             >
               <Title2 as="h4">Station 01</Title2>
               <Body tone="secondary">

@@ -50,3 +50,20 @@ Se eliminan: capas `MaterialLayers` y `Vibrancy`, borde óptico SVG (`optical-*`
 - Apertura y contenido de ventanas: el ejemplo declara estados de Morph botón/resumen/detalle, todos medibles; el motor anima la superficie y mantiene la tipografía a tamaño natural. `WindowMotion` ofrece `morphOrigin` para ventanas reutilizables. Sin origen mantiene transición en su lugar. Sheets y alerts conservan la presentación modal de Base UI.
 - Los pickers de fecha/hora usan Morph desde su campo compacto. El foco, Escape, teclado y movimiento reducido se verifican; no se confunde ResizeObserver de un vuelo en curso con una transición automática de contenido en reposo.
 - Checks: 129 UI + 150 web, lint/tipos y build pasan. QA Chromium y ejemplos adaptativos; Safari y calibración Figma permanecen pendientes. Ver `EXPERIMENTS.md`.
+
+## Corrección de escala (feedback posterior)
+
+La escala del contenedor y la de las muestras se revisan por función. Se conservan los estilos tipográficos explícitos del catálogo y el tamaño base del navegador.
+
+| Elemento | Escala actual |
+| --- | --- |
+| Marco de página / sidebar de escritorio | Máximo 960 / 256 px |
+| Título de página / sección / descripción | 22 / 17 / 15 px |
+| Padding de muestras y tarjetas | 16 px |
+| Gaps internos / entre muestras | 12–16 / 24 px |
+| Filas de lista | Mínimo 44 px, inset lateral 16 px |
+| Calendario / selector de color | 340 / 352 px, limitados al ancho disponible |
+| Dígitos seleccionados de hora | 22 px |
+| Ventana resumen / detalle | 288 / 352 px, altura intrínseca |
+
+Las grillas de muestras pasan a dos columnas por ancho del contenedor (`@3xl`), sin depender solo del viewport. Se eliminan alturas mínimas decorativas grandes, incluida la reserva de 528 px del ejemplo Morph. Las descripciones de medidas coinciden con los controles renderizados.

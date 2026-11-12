@@ -80,7 +80,7 @@ type DatePickerProps = PopupPlacement & {
   expanded?: boolean;
   className?: string;
 };
-/** Figma expanded calendar 436pt, 44pt days, 7pt row gaps. */
+/** Calendar: 340 pt wide, 44 pt days and a 16 pt content inset. */
 function Calendar({
   label,
   value,
@@ -134,7 +134,7 @@ function Calendar({
   return (
     <Material
       kind="glass"
-      className={cn("w-[27.25rem] max-w-full rounded-[2rem] p-4", className)}
+      className={cn("w-85 max-w-full rounded-3xl p-4", className)}
     >
       <div className="relative flex items-center justify-between gap-2">
         <Text
@@ -211,7 +211,7 @@ function Calendar({
                   new Date(month.getFullYear(), month.getMonth(), day, 12),
                 );
                 return (
-                  <span role="gridcell" aria-selected={key === value} key={key}>
+                  <span role="gridcell" aria-selected={key === value} key={key} className="w-full">
                     <button
                       type="button"
                       ref={(node) => {
@@ -236,7 +236,7 @@ function Calendar({
                         onValueChange(key);
                       }}
                       className={cn(
-                        "size-11 rounded-full text-[1rem] outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
+                        "aspect-square w-full max-w-11 rounded-full text-[1rem] outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
                         key === value && "ui-selected hover:bg-accent",
                       )}
                     >
@@ -419,7 +419,7 @@ function ColorPicker({
   return (
     <Material
       kind="glass"
-      className="w-[25.5rem] max-w-full rounded-[2.875rem] p-6"
+      className="w-88 max-w-full rounded-3xl p-4"
     >
       <header className="relative flex items-center justify-between pb-6">
         <span aria-hidden className="flex size-11 items-center justify-center">
@@ -533,7 +533,7 @@ function ColorPicker({
                       : 0),
               );
             }}
-            className="relative h-[18.75rem] touch-none rounded-2xl outline-none focus-visible:outline-2 focus-visible:outline-label"
+            className="relative h-60 touch-none rounded-2xl outline-none focus-visible:outline-2 focus-visible:outline-label"
             style={{
               background:
                 "linear-gradient(0deg,black,transparent 50%,white),linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)",
@@ -549,7 +549,7 @@ function ColorPicker({
             />
           </div>
         ) : (
-          <div className="flex min-h-[18.75rem] flex-col justify-evenly gap-4">
+          <div className="flex min-h-60 flex-col justify-evenly gap-4">
             {["Red", "Green", "Blue"].map((channel, i) => (
               <div key={channel}>
                 <Text variant="callout" className="mb-2">
@@ -595,7 +595,7 @@ function ColorPicker({
       <div className="relative mt-6 flex gap-5">
         <span
           aria-label={`Selected color ${value}, ${opacity}% opacity`}
-          className="size-26 shrink-0 rounded-[1.375rem]"
+          className="size-16 shrink-0 rounded-2xl"
           style={{ background: value, opacity: opacity / 100 }}
         />
         <div className="grid flex-1 grid-cols-4 gap-3">

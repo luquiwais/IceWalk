@@ -27,6 +27,8 @@ import { FamilySpecimens, OverviewSpecimens } from "./playbook-specimens";
 import { InputSpecimens } from "./playbook-input-specimens";
 import { WindowTransitions } from "./window-transitions";
 
+const PAGE_FRAME = "mx-auto w-full max-w-240 px-4 lg:px-6";
+
 const GROUPS = ["Foundations", "Controls", "Navigation", "System"] as const;
 
 function subscribe(callback: () => void) {
@@ -114,7 +116,7 @@ export function Playbook() {
 
   return (
     <main
-      className="playbook relative flex h-dvh min-h-0 gap-3 overflow-hidden bg-grouped text-label md:p-3 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-label [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-label"
+      className="playbook relative flex h-dvh min-h-0 gap-2 overflow-hidden bg-grouped text-label md:p-2 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-label [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-label"
       onKeyDown={(event) => {
         if (event.key === "Escape" && mobileNav) {
           event.preventDefault();
@@ -136,7 +138,7 @@ export function Playbook() {
         title="IceWalk UI"
         titleId="library-nav-title"
         className={cn(
-          "absolute inset-y-2 start-2 z-20 w-[calc(100%-1rem)] max-w-84 md:relative md:inset-auto md:z-auto md:w-64 lg:w-72",
+          "absolute inset-y-2 start-2 z-20 w-[calc(100%-1rem)] max-w-72 rounded-3xl md:relative md:inset-auto md:z-auto md:w-64",
           !mobileNav && "hidden md:flex",
         )}
         action={
@@ -215,13 +217,16 @@ export function Playbook() {
         <div
           ref={heading}
           tabIndex={-1}
-          className="mx-auto w-full max-w-272 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3 outline-none md:px-5 md:pt-1 lg:px-8"
+          className={cn(
+            PAGE_FRAME,
+            "pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 outline-none md:pt-0",
+          )}
         >
           <NavigationBar
             title={name}
             titleAlign="leading"
             level={1}
-            className="px-0"
+            className="px-0 [&_h1]:text-title-2"
             leading={
               <IconButton
                 ref={navOpenButton}
@@ -236,7 +241,7 @@ export function Playbook() {
               </IconButton>
             }
             trailing={
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <IconButton
                   label={
                     appearance === "dark"
@@ -273,18 +278,27 @@ export function Playbook() {
           className="relative flex-1 [scrollbar-color:var(--color-fill)_transparent] [scrollbar-width:thin]"
           tabIndex={-1}
         >
-          <div className="mx-auto w-full max-w-272 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] md:px-5 lg:px-8">
+          <div
+            className={cn(
+              PAGE_FRAME,
+              "@container pb-[max(1.5rem,env(safe-area-inset-bottom))]",
+            )}
+          >
             {selected === "overview" ? (
               <>
-                <div className="pt-2 pb-7">
-                  <Text tone="secondary" className="max-w-[38rem]">
+                <div className="pt-1 pb-4">
+                  <Text
+                    variant="subheadline"
+                    tone="secondary"
+                    className="max-w-prose"
+                  >
                     A working library of controls, navigation and presentations,
                     organized around Apple’s Human Interface Guidelines.
                   </Text>
                 </div>
-                <section aria-labelledby="library-sections" className="mb-9">
+                <section aria-labelledby="library-sections" className="mb-6">
                   <div className="mb-3 flex items-center justify-between gap-3">
-                    <Text as="h2" id="library-sections" variant="title-2">
+                    <Text as="h2" id="library-sections" variant="headline">
                       Browse components
                     </Text>
                     <Button variant="plain" onClick={() => go("coverage")}>
@@ -321,14 +335,14 @@ export function Playbook() {
                   <Text
                     as="h2"
                     id="library-examples"
-                    variant="title-2"
+                    variant="headline"
                     className="mb-4"
                   >
                     In context
                   </Text>
                   <OverviewSpecimens disabled={disabled} notify={setFeedback} />
                 </section>
-                <footer className="flex flex-wrap items-center justify-between gap-3 pt-7 pb-2">
+                <footer className="flex flex-wrap items-center justify-between gap-3 pt-6 pb-2">
                   <Text variant="footnote" tone="secondary">
                     System backgrounds for content. Liquid Glass for the
                     controls above it.
@@ -346,15 +360,15 @@ export function Playbook() {
               </>
             ) : selected === "coverage" ? (
               <>
-                <div className="pt-2 pb-7">
-                  <Text tone="secondary">
+                <div className="pt-1 pb-4">
+                  <Text variant="subheadline" tone="secondary">
                     {FAMILIES.length} families. Open an example to explore its
                     behavior, or read its design guidance.
                   </Text>
                 </div>
                 {GROUPS.map((group) => (
-                  <section key={group} className="mb-8" aria-label={group}>
-                    <Text as="h2" variant="title-2" className="mb-3">
+                  <section key={group} className="mb-6" aria-label={group}>
+                    <Text as="h2" variant="headline" className="mb-3">
                       {group}
                     </Text>
                     <div className="overflow-clip rounded-row bg-grouped-secondary divide-y divide-separator">
@@ -362,7 +376,7 @@ export function Playbook() {
                         ({ id, name, icon: Icon, states, ref }) => (
                           <div
                             key={id}
-                            className="flex items-center gap-4 py-2 pr-3 pl-4"
+                            className="flex items-center gap-3 py-1 pr-2 pl-4"
                           >
                             <Icon
                               aria-hidden
@@ -400,12 +414,14 @@ export function Playbook() {
               </>
             ) : family ? (
               <>
-                <div className="pt-2 pb-7 flex flex-wrap items-start justify-between gap-4">
-                  <div className="max-w-[40rem]">
-                    <Text variant="footnote" tone="secondary" className="mb-2">
+                <div className="pt-1 pb-4 flex flex-wrap items-start justify-between gap-4">
+                  <div className="max-w-prose">
+                    <Text variant="footnote" tone="secondary" className="mb-1">
                       {family.group}
                     </Text>
-                    <Text tone="secondary">{family.states}</Text>
+                    <Text variant="subheadline" tone="secondary">
+                      {family.states}
+                    </Text>
                   </div>
                   <a
                     href={family.ref}
@@ -432,7 +448,7 @@ export function Playbook() {
                     notify={setFeedback}
                   />
                 )}
-                <footer className="flex flex-wrap items-center justify-between gap-3 pt-7 pb-2">
+                <footer className="flex flex-wrap items-center justify-between gap-3 pt-6 pb-2">
                   <Text variant="footnote" tone="secondary">
                     {family.components}
                   </Text>
