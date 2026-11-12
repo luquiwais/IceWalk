@@ -1,7 +1,59 @@
 # Plan de visión: documento de traspaso
 
-**Para:** el integrante que toma visión (a definir).
-**Rama:** `model/vision-contract`. **Código:** `packages/model/vision/`.
+**Para:** Guido, dueño de visión desde el 2026-11-11.
+**Rama sugerida:** `model/vision-bloques`, desde `main`. **Código:** `packages/model/vision/`.
+**Actualizado:** 2026-11-11, con el recorte para el hackatón (14-15 nov).
+
+## Para el hackatón: qué hacer y en qué orden
+
+**Empezá por acá.** El resto del documento es contexto y referencia.
+
+### Por qué cambia la prioridad
+
+- El GP ya tiene los 349 cráteres de Dundas 2023 (fondos planos y cotas) y validó que, a escala del sitio, ni los vecinos ni ninguna variable del terreno predicen la profundidad del hielo (`docs/EXPERIMENTS.md`, 2026-11-08). Mapear más cráteres aporta poco: **el paso 5b deja de ser prioridad máxima**.
+- Lo que más suma ahora es la **transitabilidad real** y las **rocas reales para la vista 3D**. El planificador ya lee `data/processed/s1094b/clear_path_width_m.tif` si existe (`apps/planner/app/traverse/route.py`) y prohíbe las celdas sin un pasillo de al menos 1.02 m (`apps/planner/config/traverse.yaml`). Si entregás esa capa, las rutas cambian sin tocar código del planificador.
+- Hoy el sitio no tiene ni un bloque real: todo lo de bloques es mock. Entregar el catálogo real es el hito que falta (era el del 8 nov).
+
+### Dónde y con qué imagen
+
+- **Zona:** la de la EVA. Hábitat en (300, −2200) m de la grilla, ±1.5 km: **x de −1200 a 1800 m, y de −3700 a −700 m** (es la ventana del mapa; `apps/planner/config/eva.yaml`). Coordenadas en metros de `packages/contracts/grid.json`, siempre con `vision.grid`.
+- **Imagen:** ESP_073578 (orto de 25 cm, abril 2022, incidencia 67.7°: 2.44 m de sombra por metro de alto). Es la mejor para sombras.
+- Para la vara de Tusberti, además, ESP_073077 (feb 2022, también orto) sobre su km². Ubicar ese km² en el póster (ver "Vara de validación").
+- El sitio entero, solo si sobra tiempo.
+
+### Tareas
+
+| # | Tarea | Entregable | Para | Listo cuando |
+| --- | --- | --- | --- | --- |
+| 1 | Entorno | `uv sync --extra dev --extra vision` en `packages/model`, imágenes bajadas (ver "Comandos") | 11/11 | `uv run pytest -q` pasa y `rasterio` abre la orto |
+| 2 | Verdad de terreno (paso 2, recortado) | ≥ 150 bloques en QGIS, en 2 recortes de ~250 × 250 m: uno dentro de la zona de la EVA y otro en la eyecta cercana. Un tercer recorte aparte, para ajustar. Si hay una segunda persona, que anote uno de los dos para medir el desacuerdo | 12/11, mediodía | Etiquetas guardadas fuera de Git (`data/raw/vision/labels/`). **El test no se toca al ajustar** |
+| 3 | `boulders.py` (paso 3) | Detector de sombras con tests sobre escena sintética | 12/11, noche | F1 ≥ 0.70 para diámetro ≥ 2 m en el test |
+| 4 | Capas reales (paso 4) | `boulders.geojson` real (`is_mock: false`, según `boulders.schema.json`) y las capas de bloques con `rasterize_catalog`, en `data/processed/s1094b/` | 13/11 | El catálogo valida contra el esquema (comando en "Comandos") y `validate.py` sigue pasando; `/plan` corre con la capa (`uses_corridor` en true) y las rutas siguen siendo válidas |
+| 5 | Vara de Tusberti | Detector sobre ESP_073077 en su km²: conteo y tamaños sobre 1.8 m | 13/11 | Resultado en `docs/EXPERIMENTS.md`, **aunque dé mal**. Si da bien, es un número para el pitch |
+| 6 | Entrega | Capas y catálogo en un zip a GitHub Releases; PR con código, tests y docs; aviso a Planificador y Frontend | 13/11, noche | PR abierto con CI en verde |
+
+**Durante el hackatón, si lo anterior está:** persistencia con ESP_077719, alineando por zona (segunda mitad del paso 4); hielo expuesto con color (paso 7) contra el área de Tusberti; el sitio entero.
+
+**Fuera del hackatón** (no empezar sin hablarlo con Luqui): BoulderNet (paso 5), salvo que el detector de sombras ya esté entregado y alguien tenga el servidor con GPU libre; cráteres (paso 5b); zonas y formas del terreno (paso 6); anomalías.
+
+### Antes de arrancar: tres trampas
+
+1. **Las capas falsas pisan las reales.** `python -m vision.mock_layers` escribe por defecto en `data/processed/s1094b/`, la misma carpeta que lee el planificador. Hoy el planificador usa `clear_path_width_m.tif` aunque sea mock (cuestión 62). Para probar, usá `--out data/processed/s1094b-mock`, y borrá las falsas de `s1094b/` antes de generar las reales.
+2. **`0` no es "libre".** En las capas de bloques, `0` es "nada detectado sobre `detection_limit_m`", y `nodata` es desconocido (fuera de la imagen). El planificador no prohíbe celdas sin dato.
+3. **Un corrimiento único no alcanza entre fechas.** Ver la tabla de alineación: entre imágenes sin orto el error (~4 m) supera a muchos bloques.
+
+### Reglas del repo que aplican
+
+- Toda capa nueva va a `data/layers.yaml` con fuente; toda fuente, a `docs/SOURCES.md` (créditos HiRISE: NASA/JPL-Caltech/UArizona).
+- Datos pesados nunca a Git: GitHub Releases.
+- Todo lo que se pruebe va a `docs/EXPERIMENTS.md`, incluido lo que falla; las decisiones, a `docs/DECISIONS.md`; el día, a `docs/log/AAAA-MM-DD.md`.
+- Sin Ultralytics YOLO (AGPL-3.0). Pesos de terceros con `torch.load(weights_only=True)`.
+- Cambiar `boulders.schema.json` es un solo PR con esquema, ejemplos, mocks y usos.
+- No tocar `apps/planner/` ni `apps/web/`: si algo de ellos hace falta, se pide.
+
+### Preguntas abiertas de visión
+
+12 (polígonos de Tusberti), 14 y 37 (imágenes posteriores a feb 2023), 18 (escarcha en dic 2022), 61 (cómo llega el catálogo a la web) y 62 (capas mock en el planificador), en `docs/OPEN_QUESTIONS.md`.
 
 ## Qué hace este módulo
 
@@ -27,7 +79,7 @@ Capas sobre `packages/contracts/grid.json` (10 m, COG float32) y catálogo `boul
 | `boulder_unresolved_density` | cost | MVP |
 | `ejecta_zone` | cost | MVP |
 | `surface_unit` | evidence | MVP |
-| Catálogo de cráteres con `resistant_layer_depth_m` o cota inferior | evidence | **Máxima** (entrada directa del GP) |
+| Catálogo de cráteres con `resistant_layer_depth_m` o cota inferior | evidence | Baja desde el 11/11: el GP ya usa los 349 de Dundas 2023 |
 | `periglacial_landform_score` | evidence | Alta |
 | `ice_exposure_fraction` | evidence | Media |
 | `visual_anomaly_score` | visual | Opcional |
@@ -109,7 +161,9 @@ Aplicar `rasterize_catalog` sobre el catálogo real y la huella real. Clasificar
 ### Paso 5. BoulderNet en paralelo (en el servidor con GPU)
 Pesos `model_0055999.pth` de Zenodo, sobre el mismo test. Ajuste fino con nuestras etiquetas, si hace falta. MLtools recomienda PyTorch 1.13.1: va en un entorno aislado, fuera de la API. Cargar con `torch.load(weights_only=True)`.
 
-### Paso 5b. `craters.py`: profundidad a la tabla de hielo (prioridad máxima)
+### Paso 5b. `craters.py`: profundidad a la tabla de hielo (fuera del hackatón)
+
+**Nota del 11/11:** el GP ya tiene los 349 cráteres de Dundas 2023 en la grilla y la validación mostró que no predicen a escala del sitio. Queda como referencia; no empezar sin hablarlo con Luqui.
 Mapear cráteres ≥ 5 m en ESP_073077: diámetro y, si tiene, diámetro del fondo plano. Con la relación de Bart (2014) y ángulo de reposo de 33°, Dundas et al. 2023 obtienen 0.97 ± 0.25 m; un error de 1 píxel cambia la profundidad en 0.15 m. Un cráter sin fondo plano da una cota inferior: 0.1-0.2 × diámetro. **Los cráteres no planos también son dato.**
 
 Es lo que más aporta al mapa de calor: da profundidades reales y permite medir el alcance del GP. Primero a mano en una zona; automatizar solo si rinde. Falta ver si el suplemento de Dundas publica posiciones, y conviene pedirlas a los autores.
@@ -148,11 +202,14 @@ Los umbrales son nuestros, y se ajustan después de medir el desacuerdo humano.
 ## Comandos
 
 ```bash
-cd model
-uv sync --extra dev
-uv run python -m vision.mock_layers     # capas falsas en data/processed/s1094b
-uv run ruff check . && uv run pytest -q
-python ../data/download.py --only hirise_ortho_25cm hirise_feb2022_ortho_25cm hirise_dec2022_red hirise_feb2023_red
+cd packages/model
+uv sync --extra dev --extra vision      # o: pip install -e ".[dev,vision]"
+uv run python -m vision.mock_layers --out ../../data/processed/s1094b-mock   # capas falsas, fuera de la carpeta del planificador
+uv run ruff check . && uv run pytest -q # o, desde la raíz: bun run moon run model:lint model:test
+python ../../data/download.py --only hirise_ortho_25cm hirise_feb2022_ortho_25cm hirise_dec2022_red hirise_feb2023_red
+python ../contracts/validate.py         # ejemplos y mocks (no mira data/processed/)
+# El catálogo real contra el contrato:
+uv run python -c "import json, jsonschema; jsonschema.validate(json.load(open('../../data/processed/s1094b/boulders.geojson')), json.load(open('../contracts/schemas/boulders.schema.json')))"
 ```
 
 ## Fuentes

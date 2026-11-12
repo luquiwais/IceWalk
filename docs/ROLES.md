@@ -5,7 +5,7 @@ Propuesta del 2026-11-04, a confirmar con el equipo. Un rol puede tener más de 
 | Rol | Personas sugeridas | Quién | De qué se encarga | Carpeta | Primera tarea | Depende de |
 | --- | --- | --- | --- | --- | --- | --- |
 | **GP y liderazgo** | 1 | Luqui | Mapas de probabilidad e incertidumbre, valor de medir, simulación; alcance, expertos y decisiones de producto | `packages/model/gp/` | Núcleo con datos censurados sintéticos | Visión |
-| **Visión** | 1 | A definir | Cráteres de fondo plano, bloques, pasillos, formas del terreno, zonas | `packages/model/vision/` | Mapear cráteres en una zona; etiquetar en QGIS | - |
+| **Visión** | 1 | Guido | Bloques y pasillos (transitabilidad), catálogo de rocas para la vista 3D; formas del terreno y zonas después del hackatón | `packages/model/vision/` | Bloques reales en la zona de la EVA: ver "Para el hackatón" en `plans/vision.md` (actualizado el 11/11) | - |
 | **Planificador y backend** | 2 | A definir | Factibilidad de NASA, ventana de EVA, STM y catálogo de herramientas, estaciones, ruta, ramas, API | `apps/planner/`, `packages/contracts/` | Regla del pasillo, costo metabólico y revisión de la STM | GP, Visión |
 | **Frontend 3D** | 1 | A definir | Globo, vista Planning, vista EV, rocas 3D, demo con link directo | `apps/web/`, `packages/ui/` | Esqueleto con capas falsas | Planificador, Diseño |
 | **Diseño y pitch** | 1 | A definir | Tres vistas, video de 30 s, página del proyecto, presentación | `design/` | Guion y bocetos | Frontend, GP |
