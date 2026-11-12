@@ -23,6 +23,7 @@ from . import donki, eva_planner, eva_window, maps, mock_planner
 from .contracts import CONTRACTS, ROOT, tool_catalog, tools_by_id
 from .ice import IceModel
 from .marstime import utc
+from .site_card import site_card
 from .traverse.params import default_params
 from .traverse.route import TraverseMap, cached_map
 
@@ -105,6 +106,7 @@ def _map(stm: dict, entry: dict | None = None) -> dict:
 
 
 def _store(plan: dict, stm: dict, measurements: list[dict], completed: list[dict]) -> dict:
+    plan["site_assessment"] = site_card(stm)  # plan y re-plan, real o mock
     _PLANS[plan["plan_id"]] = {"plan": plan, "stm": stm, "measurements": measurements,
                                "completed": completed}
     return plan

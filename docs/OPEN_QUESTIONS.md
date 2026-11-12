@@ -30,7 +30,6 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 51 | ¿`tool_assessment` (rendimiento por herramienta) en el plan o como endpoint aparte? | Bloque aditivo o endpoint, sin tocar `/replan` (§3.2) | Planificador + GP | 09/11 |
 | 53 | ¿La vista EV usa paneles sólidos aunque el estilo sea visionOS? | Sí, por legibilidad con luz extrema (§4.3) | Frontend | 09/11 |
 | 54 | ¿El radar va en la ruta y en «Which tool?», o como herramienta de estación? En los mocks todas las estaciones usan el taladro | En la ruta, coherente con DECISIONS | Planificador | 09/11 |
-| 58 | Tarjeta de sitio: ¿qué `min_p` (probabilidad mínima de hielo al alcance para ir) declara la STM, y por dónde llega a la web: un campo nuevo en la respuesta del plan o `GET /site`? Cambiar el contrato va en un solo PR | Un campo opcional en la STM, marcado como supuesto, y la tarjeta dentro de la respuesta del plan | Producto + Planificador | 10/11 |
 | 59 | Ventana de EVA: ¿se aceptan los umbrales supuestos (Sol bajo 10°, aire p10 bajo −70/−100 °C, viento 15/25 m/s, polvo tau 1/2/4, 48 h tras un SEP, ±12 h de una CME)? Están en `apps/planner/config/eva_window.yaml` | Sí para la demo; revisarlos con un experto (cuestión 20) | Producto + Planificador | 11/11 |
 | 61 | ¿Cómo llega el catálogo de bloques (`boulders.geojson`) a la web para las rocas 3D: `GET /boulders` del planificador (filtrado a la ventana del mapa) o archivo estático? Hoy la web no lo consume | `GET /boulders` con la misma ventana que `GET /maps`, sin cambiar el contrato | Planificador + Frontend + Visión | 11/11 |
 | 62 | El planificador usa `clear_path_width_m.tif` si existe, aunque sea mock (`vision.mock_layers` escribe en la misma carpeta y marca `is_mock` en los tags del COG). ¿Debe ignorarla o marcar el plan cuando `is_mock` es true? | Ignorarla y avisar en el log; mientras, visión genera los mocks en otra carpeta | Planificador | 11/11 |
@@ -39,7 +38,7 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 
 | # | Cuestión | Quién |
 | --- | --- | --- |
-| 26 | ¿Qué licencia tiene la tabla de Dundas 2023? Hasta saberlo, no se sube a Git | GP |
+| 26 | ¿Qué licencia tiene la tabla de Dundas 2023? Hasta saberlo, no se sube a Git ni a un Release (el repo es público). El 11/11 no se pudo leer: Wiley responde 403 a la lectura automática y la copia de Imperial College da 404. Abrir la página del artículo en el navegador y mirar la licencia y el "Open Research" | GP |
 | 56 | ¿Qué licencia tiene SWIM? La página no la declara. Hasta saberlo, no se redistribuyen los rasters ni los valores leídos (están en `data/raw/swim4mim/` y `data/processed/daubar2022/`, fuera de Git) | GP |
 | 57 | El dataset de Dundas 2021 (USGS, CC0, [DOI 10.5066/P9Y8FR1R](https://doi.org/10.5066/P9Y8FR1R)) puede traer la profundidad del hielo por cráter, que daría fuente a la relación 0.1 del prior regional. ScienceBase pide una verificación anti-bots: bajarlo a mano desde el navegador | Luqui |
 | 12 | ¿Tusberti comparte los polígonos de bloques y hielo? | Visión |

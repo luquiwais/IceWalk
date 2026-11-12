@@ -448,3 +448,15 @@ Terreno real con 349 cráteres sintéticos, y el terreno sintético de los tests
 | Ventana en vivo (14/11/2026 12:00 UTC, 6.4 h) | Hoy ya no entra (terminaría con Sol bajo); sol 1 a las 11:01, sin alertas. Con tau 2.5, misma hora con caution; con tau 5, no-go | El desempate por carga de alertas evita salir de madrugada cuando el polvo pone caution a todo |
 | Primer intento de desempate (cantidad de momentos en el peor nivel) | Con polvo en caution todo el sol, elegía las 05:45 (Sol a 2°, −98 °C) | Reemplazado por la carga por factor |
 | Tiempo | Demo 0.02 s; en vivo 1.5 s la primera vez (DONKI) | — |
+
+## 2026-11-11: tarjeta de sitio en S1094b (cuestión 58)
+
+`gp.regional.site_assessment` en 35.1105°N con las herramientas del catálogo que miden bajo la superficie y `min_p` = 0.5:
+
+| Herramienta | Alcance | P(hielo al alcance) | Intervalo 90 % | Veredicto |
+| --- | --- | --- | --- | --- |
+| Espectrómetro de neutrones | 0.6 m | 0.010 | 0.001-0.031 | NO_GO |
+| Taladro | 1 m | 0.057 | 0.009-0.149 | NO_GO |
+| Radar (GPR) | 10 m | 0.968 | 0.909-0.996 | GO |
+
+Mediana regional 2.89 m (1.91-4.36). Sitio: GO, por el radar. Con `min_p` entre 0.15 y 0.9 los tres veredictos no cambian: la decisión no depende del umbral exacto, que es lo que pide la regla de prospección (Peel 2015). A 10°N da INSUFFICIENT_DATA con aviso en inglés. Es el prior regional (solo latitud); no usa los 349 cráteres del sitio.

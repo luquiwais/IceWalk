@@ -507,5 +507,49 @@
       "message": "Objective 1: terrain units not available yet; stations chosen by ice potential.",
       "source": "planner"
     }
-  ]
+  ],
+  "site_assessment": {
+    "lat_deg": 35.1105,
+    "status": "ok",
+    "median_depth_m": 2.8867,
+    "median_depth_90_m": [
+      1.9101,
+      4.3627
+    ],
+    "sd_log_total": 0.6706,
+    "warnings": [
+      "Assumes excavation depth = 0.1 x crater diameter"
+    ],
+    "tools": {
+      "neutron_spectrometer": {
+        "depth_m": 0.6,
+        "p_ice": 0.0096,
+        "p_ice_90": [
+          0.0007,
+          0.0313
+        ],
+        "verdict": "NO_GO"
+      },
+      "gpr": {
+        "depth_m": 10.0,
+        "p_ice": 0.968,
+        "p_ice_90": [
+          0.9089,
+          0.9961
+        ],
+        "verdict": "GO"
+      },
+      "core_drill": {
+        "depth_m": 1.0,
+        "p_ice": 0.057,
+        "p_ice_90": [
+          0.0089,
+          0.149
+        ],
+        "verdict": "NO_GO"
+      }
+    },
+    "verdict": "GO",
+    "min_p": 0.5
+  }
 }
