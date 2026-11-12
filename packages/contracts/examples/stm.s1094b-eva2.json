@@ -9,7 +9,8 @@
     "walkback_caution_min": 15,
     "crew": 2,
     "mass_budget_kg": null,
-    "walking_speed_kmh": 2.0
+    "walking_speed_kmh": 2.0,
+    "site_min_p": 0.5
   },
   "objectives": [
     {

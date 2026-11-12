@@ -148,6 +148,37 @@
           "source": { "type": "string" }
         }
       }
+    },
+    "site_assessment": {
+      "type": "object",
+      "description": "Tarjeta de sitio, nivel región: P(hielo al alcance) por herramienta antes de ir, con el prior regional por latitud (gp.regional.site_assessment, Daubar 2022). No usa los cráteres del sitio ni las mediciones. Veredicto solo si la STM declara constraints.site_min_p: GO si todo el intervalo del 90 % la supera, NO_GO si queda todo debajo, CONDITIONAL si la cruza; el sitio toma el de la mejor herramienta. Sin datos regionales, INSUFFICIENT_DATA",
+      "required": ["lat_deg", "status", "warnings", "tools"],
+      "additionalProperties": false,
+      "properties": {
+        "lat_deg": { "type": "number" },
+        "status": { "enum": ["ok", "extrapolated", "no_data"] },
+        "median_depth_m": { "type": "number", "exclusiveMinimum": 0, "description": "Mediana regional de la profundidad a la tabla de hielo" },
+        "median_depth_90_m": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "sd_log_total": { "type": "number", "minimum": 0 },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "tools": {
+          "type": "object",
+          "description": "Por id de herramienta del catálogo (las que miden bajo la superficie)",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["depth_m", "p_ice", "p_ice_90"],
+            "additionalProperties": false,
+            "properties": {
+              "depth_m": { "type": "number", "exclusiveMinimum": 0 },
+              "p_ice": { "type": "number", "minimum": 0, "maximum": 1 },
+              "p_ice_90": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 1 }, "minItems": 2, "maxItems": 2 },
+              "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO"] }
+            }
+          }
+        },
+        "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO", "INSUFFICIENT_DATA"] },
+        "min_p": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 }
+      }
     }
   }
 }

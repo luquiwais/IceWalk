@@ -256,12 +256,14 @@ def site_assessment(
         raise ValueError("hace falta al menos una herramienta con su alcance")
     try:
         est = regional_estimate(lat_deg, fit)
-    except NoRegionalData as exc:
+    except NoRegionalData:
         return {
             "lat_deg": lat_deg,
             "status": "no_data",
             "verdict": "INSUFFICIENT_DATA",
-            "warnings": [str(exc)],
+            # En inglés: va a la interfaz. El detalle en castellano queda en la excepción.
+            "warnings": [f"No regional data at {lat_deg:.2f}°: the fit covers northern latitudes "
+                         "from 20°N only"],
             "tools": {},
         }
     tools: dict[str, dict[str, Any]] = {}

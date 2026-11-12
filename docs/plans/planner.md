@@ -25,6 +25,7 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 | Mapa de hielo `GET /maps?plan_id=` (`map.schema.json`), con caché y gzip | Hecho el 2026-11-11 | `app/maps.py`, `app/main.py` |
 | Margen de regreso: umbral de caution de la STM, Get Aheads que lo respetan, alertas caution/warning, re-plan tarde sin estaciones | Hecho el 2026-11-11 (cuestiones 46 y 55) | `app/eva_planner.py`, `app/mock_planner.py` |
 | Ventana de EVA (`GET /eva-window`) y DONKI en vivo (`GET /spaceweather`) | Hecho el 2026-11-11 | `app/eva_window.py`, `app/marstime.py`, `app/donki.py` |
+| Tarjeta de sitio (`site_assessment` en el plan, umbral `site_min_p` de la STM) | Hecho el 2026-11-11 (cuestión 58), por GP | `app/site_card.py`, `app/main.py:_store` |
 
 ## Próximos pasos
 
@@ -120,6 +121,14 @@ Decide cuándo salir. `GET /eva-window?plan_id=&date=&dust_tau=&demo=` devuelve 
 - Ejemplo del contrato y mock de la web: `scripts/export_window.py`.
 
 Para Frontend: barra de estado y Brief pueden mostrar `recommended` (hora local y UTC, nivel, motivos); la timeline del día puede pintar `hours[].level`; la ficha de estación, `stations[]`.
+
+## Tarjeta de sitio (`site_assessment`), cuestión 58
+
+Responde «¿vale ir, y con qué herramienta?» antes de bajar (nivel región). Viene en cada respuesta de `/plan` y `/replan`: P(hielo al alcance) por herramienta del catálogo que mide bajo la superficie, con intervalo del 90 %, a partir del prior regional por latitud (`gp.regional.site_assessment`). No usa los cráteres del sitio ni las mediciones. Con `constraints.site_min_p` en la STM (0.5 en los ejemplos, supuesto: `SOURCES.md`), cada herramienta y el sitio llevan `verdict`: `GO`, `CONDITIONAL`, `NO_GO` o `INSUFFICIENT_DATA`.
+
+En S1094b: espectrómetro `NO_GO` (1 %), taladro `NO_GO` (6 %), radar `GO` (97 %); sitio `GO`. Ya está en `apps/web/mock/plan.json` y `replan.json`.
+
+Para Frontend: una tarjeta en el Brief de Planning, con una fila por herramienta (`p_ice` como porcentaje, `p_ice_90` como rango y `verdict`), la mediana de profundidad con su rango y los `warnings`. Color solo en el veredicto (alerta). Aclarar que es «regional prior, before landing».
 
 ## Datos y despliegue
 

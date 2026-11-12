@@ -20,7 +20,8 @@
         "walkback_caution_min": { "type": "number", "minimum": 0, "description": "Margen de regreso (minutos, aparte de la reserva) bajo el cual el plan avisa con caution y no suma estaciones Get Ahead. Supuesto de la misión: no hay valor publicado (docs/SOURCES.md)" },
         "crew": { "type": "integer", "minimum": 1 },
         "mass_budget_kg": { "type": ["number", "null"], "minimum": 0 },
-        "walking_speed_kmh": { "type": "number", "exclusiveMinimum": 0 }
+        "walking_speed_kmh": { "type": "number", "exclusiveMinimum": 0 },
+        "site_min_p": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1, "description": "Probabilidad mínima de hielo al alcance de una herramienta para ir al sitio con ella (tarjeta de sitio, `site_assessment` del plan). Supuesto de la misión: ni NASA ni la literatura publican un valor. Regla de decisión de prospección (Peel 2015; Rose 2001): conviene ir si p > C / (C + R), con C el costo de una EVA sin hielo y R el valor de encontrarlo; 0.5 equivale a C = R. Sin este campo, la tarjeta da números sin veredicto (docs/SOURCES.md)" }
       }
     },
     "objectives": {

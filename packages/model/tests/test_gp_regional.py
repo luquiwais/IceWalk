@@ -120,6 +120,7 @@ def test_site_assessment_verdicts_follow_the_interval():
 def test_site_assessment_without_data_is_insufficient():
     card = site_assessment(-40.0, {"gpr": 10.0}, min_p=0.5)
     assert card["verdict"] == "INSUFFICIENT_DATA" and card["tools"] == {}
+    assert card["warnings"][0].startswith("No regional data")  # en inglés: va a la interfaz
     with pytest.raises(ValueError):
         site_assessment(S1094B_LAT, {"gpr": 10.0}, min_p=1.5)
     with pytest.raises(ValueError):

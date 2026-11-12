@@ -68,6 +68,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Viabilidad: ISRU, misiones de agua, instrumentos, variables orbitales y evaluación de sitios (unas 90 fuentes) | Tabla "Fuentes para docs/SOURCES.md" en `docs/research/viabilidad-expediciones.md` |
 | DTM y ortos de HiRISE en COG | USGS Astrogeology, STAC, CC0: https://stac.astrogeology.usgs.gov/api |
 | Inercia térmica THEMIS, tesela 30N180E, 100 m | Fergason et al. (2006) JGR; USGS, https://astrogeology.usgs.gov/search/map/themis_thermal_inertia_mosaic_quantitative_30n180e_100mpp |
+| Profundidad local de 97 cm en S1094b (de Dundas 2023) y modelos térmicos sin hielo en el sitio | Sizemore et al. (2026) PSJ 7:175, tabla 4 y §4.1.3, CC BY 4.0, https://doi.org/10.3847/PSJ/ae7b38 |
 | Kriging y expectation propagation para el GP | Rasmussen y Williams (2006), Gaussian Processes for Machine Learning, caps. 2 y 3, https://gaussianprocess.org/gpml/chapters/RW3.pdf |
 
 ## Supuestos del GP
@@ -96,6 +97,7 @@ Valores sin fuente en `apps/planner/config/eva.yaml` (marcados `assumption: true
 | Temperatura y viento del Viking Lander 2 como análogo de S1094b | Climatología por estación y hora | El VL2 está a 48°N y −3.6 km; S1094b a 35°N y −3.9 km: más cálido. Cuestión 60 |
 | `map_margin_m = 300` | Borde del mapa alrededor de estaciones, opciones y mediciones | 3 alcances del GP (100 m): más allá una medición no cambia el mapa (`gp.maps.UPDATE_REACH_RANGES`) |
 | `walkback_caution_min = 15` (STM de ejemplo) | Margen de regreso bajo el cual el plan avisa (caution) y no suma Get Aheads | Sin valor publicado: Apollo usó el walkback como límite duro (ALSJ, Apollo 17, Estación 4, https://apollojournals.org/alsj/a17/a17.sta4.html). 15 min es el ejemplo de `research/diseno-interfaz.md` y ~500 m de caminata a 2 km/h |
+| `site_min_p = 0.5` (STM de ejemplo) | Probabilidad mínima de hielo al alcance para ir con una herramienta (tarjeta de sitio) | Ni NASA (M-WIP, talleres de sitios de aterrizaje humano) ni la literatura publican un umbral (`research/viabilidad-expediciones.md`; búsqueda del 2026-11-11). En prospección, la práctica es decidir por valor esperado: ir si p > C / (C + R) (Rose 2001, *Risk Analysis and Management of Petroleum Exploration Ventures*, AAPG; Peel 2015, AAPG Bulletin, https://eprints.soton.ac.uk/381953/). 0.5 equivale a C = R, y coincide con el "hielo probable" de `sensitive_p_ice` |
 
 ## Software
 
