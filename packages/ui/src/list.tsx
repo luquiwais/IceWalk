@@ -40,7 +40,7 @@ function ListSection({
           {header}
         </Title3>
       ) : null}
-      <Layout.Root render={<ul />} className="ui-well relative flex flex-col rounded-row">
+      <Layout.Root render={<ul />} className="relative flex flex-col rounded-row bg-grouped-secondary">
         {children}
       </Layout.Root>
       {footer ? (
@@ -101,7 +101,7 @@ function ListRow({
           aria-expanded={expanded}
           aria-controls={controls}
           className={cn(
-            "relative flex min-h-11 w-full items-center gap-2 py-2.5 pr-2 pl-4 text-body outline-none hover:bg-white/6 active:bg-white/10 disabled:text-label-disabled",
+            "relative flex min-h-11 w-full items-center gap-2 py-2.5 pr-2 pl-4 text-body outline-none hover:bg-fill-quaternary active:bg-fill-tertiary disabled:text-label-disabled",
             "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label",
             className,
           )}

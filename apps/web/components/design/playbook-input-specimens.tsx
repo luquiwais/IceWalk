@@ -29,7 +29,7 @@ export function InputSpecimens({ disabled }: { disabled: boolean }) {
   const [errors, setErrors] = useState(false);
   return <div className="space-y-10">
     <div className="flex flex-col gap-4">
-      <Text tone="secondary" className="max-w-[44rem]">These controls extend the source library. They are not in Apple&apos;s kit as complete controls: they are composed from kit materials, field dimensions, and existing menu treatments. The rounded TextField below is the reference for height, corners, and focus.</Text>
+      <Text tone="secondary" className="max-w-[44rem]">Inputs for planning forms, composed from the same fields and fills: a gray fill on glass, a capsule or 12 pt corners, and the accent focus ring. The rounded TextField below is the reference for height, corners and focus.</Text>
       <Switch label="Show validation messages" checked={errors} onCheckedChange={setErrors} />
     </div>
     <Specimen title="Numbers and units" detail="Arrow keys · Shift ×10 · PageUp/Down · Home/End">

@@ -431,3 +431,16 @@ Evidencia histórica del transcript `bfbd54aa-2f00-438b-9990-e0a9c35d7f86`, info
 - Falló: el vidrio de los `<button>` salía sin relleno (solo blur, color del fondo). Causa: preflight de Tailwind en `base` después de `liquid-blur`. Resuelto con el orden de capas.
 - jsdom no tiene `matchMedia` ni `ResizeObserver`, y Fluid Kit los usa: se agregaron stubs en los `vitest.setup.ts`, con movimiento reducido (morph e indicator instantáneos).
 - Checks: UI 125/125, web 149/149, lint y tipos limpios. QA visual en Chromium de `/lab`, `/` y `/design`. Safari y build de producción sin probar en esta unidad.
+
+## 2026-11-12: cierre del playbook HIG y Morph (continuación Codex)
+
+- Revalidación nueva, sin depender solo del handoff: 129 tests UI (31 archivos), 150 web (12 archivos), lint y tipos de ambas áreas; build de producción pasa. Referencia de tests: ejemplo oficial `vercel/next.js/examples/with-vitest` y guía de Vitest de Next.js 16.4.5 instalada.
+- Rojo → verde: DatePicker/TimePicker ignoraban `side`/`align`; ahora los transmiten al positioner, conservan el botón y devuelven el foco. Test nuevo de apariencia comprueba claro/oscuro y restauración al desmontar. Tests nuevos de ventana verifican montaje/cierre, foco y reversión. El test del playbook comprueba navegación al detalle y Escape.
+- Falló la primera composición multiestado: callbacks de ref inline volvían a registrar los estados al actualizarse el motor. Corregido con `useMergedRefs`, manteniendo refs estables; se revalidaron el test y el navegador.
+- Morph real de resumen a detalle en Chromium: 21 cuadros muestreados con transform animado; destino 400 × 288 px a viewport 1440 × 900. El invocador permanece visible. Escape devuelve el foco. No es una medición de rendimiento ni identidad píxel a píxel con UIKit.
+- Fecha y hora: apertura/cierre real de sus pickers con Morph, teclado y sin errores de consola en el recorrido. Reduce Motion: estado detalle visible (`opacity: 1`) y sin transform al cambiar entre estados.
+- Layout: capturas a 1440, 390 y 320 px; ancho del documento igual al viewport en los recorridos pequeños. Apertura/cierre de sidebar móvil y devolución de foco comprobados. Cero fondos con URL en el playbook recorrido.
+- axe sobre la portada clara: al principio detectó 6 pares de texto secundarios con contraste insuficiente; se refuerza el token claro y se corrige el fondo de lista. Recorrido posterior: cero violaciones detectadas, 19 comprobaciones de contraste sobre vidrio indeterminadas por sus gradientes (requieren revisión visual). No equivale a auditoría integral WCAG de todas las familias.
+- Safari nativo no se considera validado: CUA agotó el tiempo y luego informó cambio de ventana durante uso del usuario; se cerró ese recorrido sin interferir. El kit de Figma de iOS 27 sigue sin medición. Evidencia temporal: `/tmp/icewalk-hig-*`, `/tmp/icewalk-morph-*`, `/tmp/icewalk-release-checks.log`.
+- QA final de portada móvil: la grilla implícita y el mínimo automático del slider ensanchaban las tarjetas aunque el scroller ocultaba el exceso. Corregidos con `grid-cols-1`, tracks `minmax(0, …)` y `min-w-0`, sin CSS de layout adicional.
+- Reduce Motion necesitó mover el foco también en `onRest`: en un cambio instantáneo `onStart` ocurre antes de mostrar el estado nuevo. Se mantiene el foco dentro de la ventana y se devuelve al botón al cerrar.

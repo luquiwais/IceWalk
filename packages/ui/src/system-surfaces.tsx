@@ -5,7 +5,6 @@ import { X } from "lucide-react";
 import { useState, type ReactElement, type ReactNode } from "react";
 import { Button, IconButton } from "./button";
 import { SurfaceScroll } from "./material";
-import { useMorphPopup } from "./morph-popup";
 import { Presence } from "./motion";
 import { Text } from "./text";
 import { cn } from "./utils";
@@ -20,7 +19,7 @@ type SystemAction = {
 const BACKDROP = "ui-pop fixed inset-0 z-40 bg-black/25";
 const VIEWPORT = "fixed inset-0 z-50 flex items-center justify-center p-4";
 
-/** A sheet that grows out of the button that opened it (Fluid Kit Morph) and goes back into it. */
+/** A sheet: glass in the middle of the screen, in and out on Fluid Kit's spring. Its button stays. */
 function SystemDialog({
   trigger,
   title,
@@ -38,16 +37,14 @@ function SystemDialog({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const popup = useMorphPopup({ open, onOpenChange });
   return (
-    <Dialog.Root {...popup.root}>
-      <Dialog.Trigger ref={popup.trigger} render={trigger} />
+    <Dialog.Root open={open} onOpenChange={(next) => onOpenChange?.(next)}>
+      <Dialog.Trigger render={trigger} />
       <Dialog.Portal>
         <Dialog.Backdrop className={BACKDROP} />
         <Dialog.Viewport className={VIEWPORT}>
           <Dialog.Popup
-            ref={popup.popup}
-            className={cn("lb ui-panel flex max-h-[calc(100dvh-2rem)] w-[27.25rem] max-w-full flex-col text-label outline-none", className)}
+            className={cn("lb ui-panel ui-pop flex max-h-[calc(100dvh-2rem)] w-[27.25rem] max-w-full flex-col text-label outline-none", className)}
           >
             <div className="flex shrink-0 items-center justify-between gap-4 px-6 pt-5 pb-4">
               <Dialog.Title className="text-title-3">{title}</Dialog.Title>
@@ -64,7 +61,7 @@ function SystemDialog({
   );
 }
 
-/** An alert that grows out of its button: title, message and a column of actions. */
+/** An iOS alert: title, message and capsule actions, in the middle of the screen. */
 function Alert({
   trigger,
   title,
@@ -80,17 +77,15 @@ function Alert({
   actions: SystemAction[];
   children?: ReactNode;
 }) {
-  const popup = useMorphPopup();
   return (
-    <Dialog.Root {...popup.root}>
-      <Dialog.Trigger ref={popup.trigger} render={trigger} />
+    <Dialog.Root>
+      <Dialog.Trigger render={trigger} />
       <Dialog.Portal>
         <Dialog.Backdrop className={BACKDROP} />
         <Dialog.Viewport className={VIEWPORT}>
           <Dialog.Popup
-            ref={popup.popup}
             role="alertdialog"
-            className="lb ui-panel flex max-h-[calc(100dvh-2rem)] w-[18.75rem] max-w-full flex-col p-4 text-center text-label outline-none"
+            className="lb ui-panel ui-pop flex max-h-[calc(100dvh-2rem)] w-[18.75rem] max-w-full flex-col p-4 text-center text-label outline-none"
           >
             {/* -m/p 1.5: room for the focus outline of full-width actions, which the scroller would clip. */}
             <SurfaceScroll className="-m-1.5 flex flex-col items-center gap-2 p-1.5">

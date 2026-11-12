@@ -1,7 +1,7 @@
 "use client";
 
 import { useMorph } from "@fluidkit/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type Ref } from "react";
 
 type MorphPopupOptions = {
   open?: boolean;
@@ -22,6 +22,10 @@ type MorphPopupOptions = {
  *
  * Base UI mounts the popup while `root.open` is true. Opening mounts it first, then flies once it
  * is positioned; closing flies back first, then unmounts, so Base UI never cuts the shape short.
+ *
+ * The trigger stays visible: the morph's first state is an invisible stand-in laid over it
+ * (`<MorphOrigin ref={popup.trigger} />` inside the trigger), so the glass grows out of the button
+ * while the button itself never hides.
  */
 function useMorphPopup({ open: controlled, defaultOpen = false, onOpenChange }: MorphPopupOptions = {}) {
   const [own, setOwn] = useState(defaultOpen);
@@ -126,3 +130,13 @@ function useMorphPopup({ open: controlled, defaultOpen = false, onOpenChange }: 
 }
 
 export { useMorphPopup };
+
+/**
+ * The invisible stand-in over a trigger that the popup's glass grows from and shrinks back into.
+ * Render it inside the trigger (which is positioned): it takes the trigger's box and corners.
+ */
+function MorphOrigin({ ref }: { ref: Ref<HTMLSpanElement> }) {
+  return <span ref={ref} aria-hidden data-slot="morph-origin" className="pointer-events-none! absolute inset-0 rounded-[inherit]" />;
+}
+
+export { MorphOrigin };

@@ -41,3 +41,12 @@ Se eliminan: capas `MaterialLayers` y `Vibrancy`, borde óptico SVG (`optical-*`
 4. Controles: switch, checkbox, sliders, stepper, rueda de hora, campos.
 5. Listas con `Layout` y scroll con `lb-edge`.
 6. Playbook `/design` actualizado, QA en Chromium y Safari, registro (`DECISIONS`, `SOURCES`, `EXPERIMENTS`, log), commit y push.
+
+## Estado vigente tras el feedback final de Eitan (2026-11-12)
+
+- `/design` usa fondos system/grouped sin imagen y utilidades Tailwind mobile-first; las reglas CSS de layout del playbook se eliminaron. Los tokens de `@theme static` permiten claro/oscuro y muestras dinámicas.
+- `Material regular/thick` son superficies sólidas de contenido; `glass/tooltip` conservan `lb`. Sidebar y navegación flotan; iconos secundarios neutros y énfasis reservado para interacción.
+- Menús y pickers: origen invisible dentro del botón, invocador visible y posición configurable. DatePicker/TimePicker transmiten las mismas props. Efectos del botón configurables; `ButtonGroup` usa `Glass.Group`.
+- Apertura y contenido de ventanas: el ejemplo declara estados de Morph botón/resumen/detalle, todos medibles; el motor anima la superficie y mantiene la tipografía a tamaño natural. `WindowMotion` ofrece `morphOrigin` para ventanas reutilizables. Sin origen mantiene transición en su lugar. Sheets y alerts conservan la presentación modal de Base UI.
+- Los pickers de fecha/hora usan Morph desde su campo compacto. El foco, Escape, teclado y movimiento reducido se verifican; no se confunde ResizeObserver de un vuelo en curso con una transición automática de contenido en reposo.
+- Checks: 129 UI + 150 web, lint/tipos y build pasan. QA Chromium y ejemplos adaptativos; Safari y calibración Figma permanecen pendientes. Ver `EXPERIMENTS.md`.

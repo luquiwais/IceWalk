@@ -37,7 +37,7 @@ function Keyboard({
         aria-pressed={pressed}
         onClick={action}
         className={cn(
-          "ui-key relative flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full pb-1 text-body outline-none hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled [&_svg]:size-[1.1875rem]",
+          "ui-key relative flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full pb-1 text-body outline-none hover:bg-fill focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled [&_svg]:size-[1.1875rem]",
           className,
         )}
       >
@@ -57,7 +57,7 @@ function Keyboard({
       data-slot="keyboard"
       className="lb relative w-[34rem] max-w-full overflow-clip rounded-[2.125rem] text-label"
     >
-      <header className="relative flex h-12 items-center justify-between bg-black/31 px-4">
+      <header className="relative flex h-12 items-center justify-between bg-fill-quaternary px-4">
         <IconButton
           label="Clear keyboard input"
           size="small"
@@ -69,7 +69,7 @@ function Keyboard({
         </IconButton>
         <Text variant="body" className="max-w-[24rem] truncate">
           {value || "Type something"}
-          <span aria-hidden className="ml-0.5 border-r-2 border-white/70" />
+          <span aria-hidden className="ml-0.5 border-r-2 border-label-secondary" />
         </Text>
         <span className="size-8" />
       </header>

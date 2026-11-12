@@ -4,7 +4,7 @@ import { Menu } from "@base-ui/react/menu";
 import { Check, ChevronDown, ChevronRight } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 import { Button } from "./button";
-import { useMorphPopup } from "./morph-popup";
+import { MorphOrigin, useMorphPopup } from "./morph-popup";
 import { Highlight } from "./selection";
 import { Text } from "./text";
 import { cn } from "./utils";
@@ -25,6 +25,29 @@ type MenuAction = {
   /** Starts a new section with this header (Figma: Section Header, 47pt). */
   section?: string;
 };
+
+/** Where a popup opens from its button. */
+type PopupPlacement = {
+  /** Side of the button it opens on. Default: bottom. */
+  side?: "top" | "bottom" | "left" | "right";
+  /** Alignment along that side. Default: start. */
+  align?: "start" | "center" | "end";
+  /** Gap from the button, pt. Default: 8. */
+  sideOffset?: number;
+  /** Open over the button instead of beside it (the button stays underneath). */
+  cover?: boolean;
+};
+
+/** Base UI positioner props for a placement. */
+function placement({ side = "bottom", align = "start", sideOffset = 8, cover = false }: PopupPlacement) {
+  return {
+    side,
+    align,
+    sideOffset: cover
+      ? ({ anchor }: { anchor: { width: number; height: number } }) => -(side === "top" || side === "bottom" ? anchor.height : anchor.width)
+      : sideOffset,
+  };
+}
 
 /** Icon-only action in the accessory bar above a context menu's rows. */
 type MenuAccessory = {
@@ -131,7 +154,10 @@ function AccessoryBar({ accessories }: { accessories: MenuAccessory[] }) {
   );
 }
 
-/** Figma dropdown + context menu: 280pt, 28pt corners, 56pt rows. The glass grows out of the button. */
+/**
+ * A pull-down menu: its glass grows out of the button (Fluid Kit Morph) and the button stays.
+ * Where it opens is set with `side`, `align`, `sideOffset` and `cover`.
+ */
 function DropdownMenu({
   label,
   items,
@@ -140,7 +166,8 @@ function DropdownMenu({
   disabled = false,
   size = "regular",
   className,
-}: {
+  ...position
+}: PopupPlacement & {
   label: string;
   items: MenuAction[];
   header?: string;
@@ -153,7 +180,6 @@ function DropdownMenu({
   return (
     <Menu.Root {...popup.root}>
       <Menu.Trigger
-        ref={popup.trigger}
         disabled={disabled}
         render={
           <Button
@@ -163,6 +189,7 @@ function DropdownMenu({
           />
         }
       >
+        <MorphOrigin ref={popup.trigger} />
         {label}
         <ChevronDown
           aria-hidden
@@ -171,7 +198,7 @@ function DropdownMenu({
         />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner sideOffset={8} align="start" className="z-50">
+        <Menu.Positioner {...placement(position)} className="z-50">
           <Menu.Popup ref={popup.popup} className={POPUP}>
             <Highlight items="[role^=menuitem]:not([data-disabled])" />
             {accessories?.length ? <AccessoryBar accessories={accessories} /> : null}
@@ -188,5 +215,5 @@ function DropdownMenu({
   );
 }
 
-export { DropdownMenu };
-export type { MenuAccessory, MenuAction };
+export { DropdownMenu, placement };
+export type { MenuAccessory, MenuAction, PopupPlacement };

@@ -31,16 +31,16 @@ function SegmentedControl({ label, options, value, defaultValue, onValueChange, 
       <Tabs.List
         aria-label={label}
         data-disabled={disabled ? "" : undefined}
-        className="ui-well relative isolate flex h-9 items-center rounded-full p-0.5 select-none data-disabled:opacity-50"
+        className="ui-tabs relative isolate flex items-center rounded-full p-[3px] data-disabled:opacity-50"
       >
-        <Highlight items="[role=tab]" rest="[data-active]" className="bg-white/22 data-pressed:bg-white/30" />
+        <Highlight variant="tabs" items="[role=tab]" rest="[data-active]" />
         {options.map((option) => (
           <Tabs.Tab
             key={option.value}
             data-slot="segment"
             value={option.value}
             disabled={disabled || option.disabled}
-            className="flex h-8 min-w-14 flex-1 items-center justify-center gap-1 rounded-full px-3 text-subheadline font-medium whitespace-nowrap outline-none data-active:font-semibold [&_svg]:size-4"
+            className="flex h-8 min-w-14 flex-1 items-center justify-center gap-1 rounded-full px-2.5 text-[0.875rem] font-medium whitespace-nowrap text-label-secondary transition-colors duration-200 outline-none data-active:text-label focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-current [&_svg]:size-4"
           >
             {option.icon}
             {option.label}

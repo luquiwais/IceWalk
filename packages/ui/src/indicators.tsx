@@ -29,7 +29,7 @@ function ProgressBar({
     >
       <span
         aria-hidden
-        className="relative block h-full rounded-full bg-white/60 transition-[width] duration-150 motion-reduce:transition-none"
+        className="relative block h-full rounded-full bg-label-secondary transition-[width] duration-150 motion-reduce:transition-none"
         style={{ width: `${max > 0 ? (clamped / max) * 100 : 0}%` }}
       />
     </div>
@@ -64,7 +64,7 @@ function ActivityIndicator({
         <span
           key={i}
           aria-hidden
-          className="ui-activity-bar absolute left-[45%] top-0 h-[28%] w-[10%] origin-[50%_178.57%] rounded-full bg-white"
+          className="ui-activity-bar absolute left-[45%] top-0 h-[28%] w-[10%] origin-[50%_178.57%] rounded-full bg-label"
           style={
             {
               transform: `rotate(${i * 45}deg)`,
@@ -112,11 +112,11 @@ function PageControl({
             data-slot="page-dot"
             data-current={i === value}
             className={cn(
-              "relative h-2 rounded-full bg-white/30",
-              i === value ? "w-4" : "w-2 group-hover:bg-white/60",
+              "relative h-2 rounded-full bg-label/30",
+              i === value ? "w-4" : "w-2 group-hover:bg-label-secondary",
             )}
           >
-            <span className="absolute right-0 size-2 rounded-full bg-white" />
+            <span className="absolute right-0 size-2 rounded-full bg-label" />
           </span>
         </button>
       ))}

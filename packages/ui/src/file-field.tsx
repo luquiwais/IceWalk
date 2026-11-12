@@ -61,7 +61,7 @@ function FileField({ label, value, defaultValue = [], onValueChange, accept, mul
       <input {...field} ref={native} type="file" name={name} accept={accept} multiple={multiple} disabled={disabled} className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed" onChange={(event) => select(Array.from(event.target.files ?? []))} />
     </div>
     <ul aria-label={`${label} selected files`} className="flex flex-col gap-1">
-      {files.map((file, index) => <li key={`${file.name}-${index}`} className="flex min-h-11 items-center gap-2 text-footnote"><span className="min-w-0 flex-1 truncate">{file.name}</span><button type="button" disabled={disabled} aria-label={`Remove ${file.name}`} onClick={() => change(files.filter((_, at) => at !== index))} className="flex size-11 shrink-0 items-center justify-center rounded-full outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><X aria-hidden className="size-4" /></button></li>)}
+      {files.map((file, index) => <li key={`${file.name}-${index}`} className="flex min-h-11 items-center gap-2 text-footnote"><span className="min-w-0 flex-1 truncate">{file.name}</span><button type="button" disabled={disabled} aria-label={`Remove ${file.name}`} onClick={() => change(files.filter((_, at) => at !== index))} className="flex size-11 shrink-0 items-center justify-center rounded-full outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><X aria-hidden className="size-4" /></button></li>)}
     </ul>
   </>}</Field>;
 }

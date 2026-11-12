@@ -1,7 +1,7 @@
 "use client";
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
-import { usePress } from "@fluidkit/react";
+import { Glass, usePress } from "@fluidkit/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { ChevronLeft } from "lucide-react";
 import type * as React from "react";
@@ -25,8 +25,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        glass: "lb lb-interactive",
-        prominent: "lb lb-interactive lb-tinted font-semibold",
+        glass: "lb",
+        prominent: "lb lb-tinted font-semibold",
         platter: "ui-fill transition-colors",
         plain: "ui-plain transition-colors",
       },
@@ -59,16 +59,48 @@ const buttonVariants = cva(
 
 type ButtonVariant = "glass" | "prominent" | "platter" | "plain";
 
-type ButtonProps = ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & { variant?: ButtonVariant };
+/**
+ * Fluid Kit's press effects, for glass buttons (`glass`, `prominent`); all on unless turned off.
+ * Fills on glass (`platter`, `plain`) aren't glass and take none.
+ */
+type PressEffects = {
+  /** Lights up where it's pressed. */
+  highlight?: boolean;
+  /** Grows while pressed, more the smaller it is. */
+  swell?: boolean;
+  /** Pulls toward the finger and stretches along a drag; `x` or `y` for one axis. */
+  stretch?: boolean | "x" | "y";
+};
+
+type ButtonProps = ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & PressEffects & { variant?: ButtonVariant };
 
 /** A button's label and symbol, side by side. */
 function ButtonContent({ children, className }: { children: React.ReactNode; className?: string }) {
   return <span className={cn("inline-flex min-w-0 items-center justify-center gap-1.5", className)}>{children}</span>;
 }
 
-function Button({ className, variant, shape, size, ...props }: ButtonProps) {
+function Button({ className, variant, shape, size, highlight = true, swell = true, stretch = true, ...props }: ButtonProps) {
   usePress();
-  return <ButtonPrimitive data-slot="button" className={cn(buttonVariants({ variant, shape, size }), className)} {...props} />;
+  const glass = variant === "glass" || variant === "prominent";
+  return (
+    <ButtonPrimitive
+      data-slot="button"
+      className={cn(
+        buttonVariants({ variant, shape, size }),
+        glass && [highlight && "lb-highlight", swell && "lb-swell", stretch && "lb-stretch", stretch === "x" && "[--lb-stretch-axis:x]", stretch === "y" && "[--lb-stretch-axis:y]"],
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * Glass buttons that melt into one surface where they come close, and part as they move apart
+ * (Fluid Kit `Glass.Group`). Its children are glass buttons; `merge` is how close, in px.
+ */
+function ButtonGroup({ className, merge, children }: { className?: string; merge?: number; children: React.ReactNode }) {
+  return <Glass.Group merge={merge} className={cn("flex items-center gap-2", className)}>{children}</Glass.Group>;
 }
 
 type IconButtonProps = Omit<ButtonProps, "shape" | "aria-label"> & {
@@ -94,5 +126,5 @@ function BackButton(props: BackButtonProps) {
   );
 }
 
-export { BackButton, Button, ButtonContent, IconButton, buttonVariants };
-export type { BackButtonProps, ButtonProps, ButtonVariant, IconButtonProps };
+export { BackButton, Button, ButtonContent, ButtonGroup, IconButton, buttonVariants };
+export type { BackButtonProps, ButtonProps, ButtonVariant, IconButtonProps, PressEffects };

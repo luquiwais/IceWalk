@@ -5,15 +5,14 @@ import { cn } from "./utils";
 type MaterialKind = "glass" | "regular" | "thick" | "recessed" | "platter" | "tooltip";
 
 /*
- * visionOS materials on Fluid Kit's Liquid Blur: one element, plain CSS. Thinner and thicker
- * glass is the same material with less or more fill (`--lb-transparency`); recessed is a well
- * cut into the glass, with no blur of its own; platter is a control's fill on glass.
+ * Liquid Glass is reserved for floating controls and presentations. Content surfaces use
+ * the system background hierarchy; wells and control fills have no blur of their own.
  */
 const MATERIAL: Record<MaterialKind, string> = {
   glass: "lb",
   tooltip: "lb",
-  regular: "lb",
-  thick: "lb",
+  regular: "bg-surface-secondary",
+  thick: "bg-surface-tertiary",
   recessed: "ui-well",
   platter: "ui-fill",
 };
@@ -38,7 +37,7 @@ function SurfaceScroll({ direction = "vertical", className, ...props }: React.Co
 
 type MaterialProps = React.ComponentProps<"div"> & { kind: MaterialKind; scrollable?: ScrollDirection };
 
-/** A block of a visionOS material with its content. */
+/** A semantic surface, using Liquid Glass only when explicitly requested. */
 function Material({ kind, className, children, scrollable, ...props }: MaterialProps) {
   return (
     <div

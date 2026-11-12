@@ -49,8 +49,8 @@ function NumberField({ label, value, defaultValue, onValueChange, min, max, step
           />
           {unit ? <span aria-hidden className="relative text-body text-label">{unit}</span> : null}
           {controls ? <span className="relative flex shrink-0 gap-1">
-            <Primitive.Decrement aria-label={`Decrease ${label}`} className="flex size-10 items-center justify-center rounded-full outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Minus aria-hidden className="size-4" /></Primitive.Decrement>
-            <Primitive.Increment aria-label={`Increase ${label}`} className="flex size-10 items-center justify-center rounded-full outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Plus aria-hidden className="size-4" /></Primitive.Increment>
+            <Primitive.Decrement aria-label={`Decrease ${label}`} className="flex size-10 items-center justify-center rounded-full outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Minus aria-hidden className="size-4" /></Primitive.Decrement>
+            <Primitive.Increment aria-label={`Increase ${label}`} className="flex size-10 items-center justify-center rounded-full outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Plus aria-hidden className="size-4" /></Primitive.Increment>
           </span> : null}
         </Primitive.Group>
       </Primitive.Root>

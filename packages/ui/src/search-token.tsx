@@ -55,7 +55,7 @@ function SearchToken({
           disabled={disabled}
           aria-label={`Remove ${typeof children === "string" ? children : "filter"}`}
           onClick={onRemove}
-          className="flex size-8 shrink-0 items-center justify-center border-l border-white/20 outline-none hover:bg-white/15 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white disabled:opacity-40"
+          className="flex size-8 shrink-0 items-center justify-center border-l border-separator outline-none hover:bg-fill-secondary focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label disabled:opacity-40"
         >
           <X aria-hidden className="size-3.5" />
         </button>

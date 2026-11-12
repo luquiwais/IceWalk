@@ -29,7 +29,7 @@ function RadioGroup({ label, children, value, defaultValue, onValueChange, name,
 function Radio({ value, label, disabled, className }: { value: string; label: ReactNode; disabled?: boolean; className?: string }) {
   const id = useId();
   return <label className={cn("inline-flex min-h-11 cursor-pointer items-center gap-3 text-body has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:text-label-disabled", className)}>
-    <Primitive.Root render={<button type="button" />} nativeButton value={value} disabled={disabled} aria-labelledby={id} className="relative flex transition-colors size-7 shrink-0 items-center justify-center rounded-full bg-black/10 text-label shadow-[inset_0_-0.5px_1px_rgb(255_255_255/0.3),inset_1px_1.5px_4px_rgb(0_0_0/0.08)] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label data-checked:bg-accent data-disabled:bg-white/10">
+    <Primitive.Root render={<button type="button" />} nativeButton value={value} disabled={disabled} aria-labelledby={id} className="relative flex transition-colors size-7 shrink-0 items-center justify-center rounded-full bg-black/10 text-label shadow-[inset_0_-0.5px_1px_rgb(255_255_255/0.3),inset_1px_1.5px_4px_rgb(0_0_0/0.08)] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label data-checked:bg-accent data-disabled:bg-fill-tertiary">
       <Primitive.Indicator className="size-3 rounded-full bg-white" />
     </Primitive.Root>
     <span id={id}>{label}</span>

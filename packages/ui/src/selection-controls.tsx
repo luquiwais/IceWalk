@@ -88,7 +88,7 @@ function Checkbox({
         {...props}
         aria-labelledby={id}
         onCheckedChange={(checked) => onCheckedChange?.(checked)}
-        className="relative flex transition-colors size-7 shrink-0 items-center justify-center rounded-full bg-black/10 text-label shadow-[inset_0_-0.5px_1px_rgb(255_255_255/0.3),inset_1px_1.5px_4px_rgb(0_0_0/0.08)] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label data-checked:bg-accent data-checked:shadow-none data-checked:backdrop-blur-[20px] data-indeterminate:bg-accent data-disabled:bg-white/10 data-disabled:text-label-disabled"
+        className="relative flex transition-colors size-7 shrink-0 items-center justify-center rounded-full bg-black/10 text-label shadow-[inset_0_-0.5px_1px_rgb(255_255_255/0.3),inset_1px_1.5px_4px_rgb(0_0_0/0.08)] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label data-checked:bg-accent data-checked:shadow-none data-checked:backdrop-blur-[20px] data-indeterminate:bg-accent data-disabled:bg-fill-tertiary data-disabled:text-label-disabled"
       >
         <CheckboxPrimitive.Indicator keepMounted data-slot="checkbox-indicator">
           {props.indeterminate ? (

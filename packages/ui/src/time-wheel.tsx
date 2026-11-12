@@ -295,7 +295,7 @@ function TimeWheel({
               "flex h-8 w-full shrink-0 items-center justify-center",
               delta === 0
                 ? "text-large-title font-semibold"
-                : "text-title-2 text-white/40",
+                : "text-title-2 text-label-secondary",
               delta === 0 && editing && "invisible",
             )}
             style={{ transform: `perspective(14rem) rotateX(${Math.max(-85, Math.min(85, -delta * 16))}deg)` }}
@@ -367,7 +367,7 @@ function TimeWheel({
           }
         }}
         className={cn(
-          "absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 rounded-lg bg-transparent text-center text-large-title font-semibold outline-none focus:bg-white/10 focus:ring-2 focus:ring-inset focus:ring-white/40",
+          "absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 rounded-lg bg-transparent text-center text-large-title font-semibold outline-none focus:bg-fill-tertiary focus:ring-2 focus:ring-inset focus:ring-label",
           !editing && "opacity-0",
         )}
       />

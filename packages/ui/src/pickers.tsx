@@ -4,6 +4,7 @@ import { Popover } from "@base-ui/react/popover";
 import { useMergedRefs } from "@fluidkit/react";
 import { ChevronLeft, ChevronRight, Pipette, X } from "lucide-react";
 import {
+  cloneElement,
   useEffect,
   useRef,
   useState,
@@ -17,16 +18,20 @@ import { SegmentedControl } from "./segmented-control";
 import { Slider } from "./slider";
 import { TimeWheel as Wheel } from "./time-wheel";
 import { Text } from "./text";
-import { useMorphPopup } from "./morph-popup";
+import { MorphOrigin, useMorphPopup } from "./morph-popup";
+import { placement, type PopupPlacement } from "./menu";
 import { cn } from "./utils";
 
-/** A picker that grows out of its button (Fluid Kit Morph) and shrinks back into it. */
+/** A picker that grows out of its button (Fluid Kit Morph); the button stays. Placement is configurable. */
 function PickerPopover({
   trigger,
   label,
   children,
   focusPopup = false,
-}: {
+  side = "bottom",
+  align = "center",
+  ...position
+}: PopupPlacement & {
   trigger: ReactElement;
   label: string;
   children: ReactNode;
@@ -38,9 +43,11 @@ function PickerPopover({
   const ref = useMergedRefs(popup, morph.popup);
   return (
     <Popover.Root {...morph.root}>
-      <Popover.Trigger ref={morph.trigger} render={trigger} />
+      <Popover.Trigger
+        render={cloneElement(trigger, {}, <>{(trigger.props as { children?: ReactNode }).children}<MorphOrigin ref={morph.trigger} /></>)}
+      />
       <Popover.Portal>
-        <Popover.Positioner sideOffset={12} className="z-50">
+        <Popover.Positioner {...placement({ side, align, ...position })} className="z-50">
           <Popover.Popup
             ref={ref}
             initialFocus={focusPopup ? popup : true}
@@ -65,7 +72,7 @@ function parseDate(value: string) {
   return new Date(y, m - 1, d, 12);
 }
 
-type DatePickerProps = {
+type DatePickerProps = PopupPlacement & {
   label: string;
   value: string;
   onValueChange: (date: string) => void;
@@ -229,8 +236,8 @@ function Calendar({
                         onValueChange(key);
                       }}
                       className={cn(
-                        "size-11 rounded-full text-[1rem] outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
-                        key === value && "bg-white text-black hover:bg-white",
+                        "size-11 rounded-full text-[1rem] outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
+                        key === value && "ui-selected hover:bg-accent",
                       )}
                     >
                       {day}
@@ -245,11 +252,15 @@ function Calendar({
     </Material>
   );
 }
-function DatePicker(props: DatePickerProps) {
+function DatePicker({ side, align, sideOffset, cover, ...props }: DatePickerProps) {
   if (props.expanded) return <Calendar {...props} />;
   return (
     <PickerPopover
       label={props.label}
+      side={side}
+      align={align}
+      sideOffset={sideOffset}
+      cover={cover}
       trigger={
         <Button disabled={props.disabled} aria-label={props.label}>
           {parseDate(props.value).toLocaleDateString("en-US", {
@@ -265,19 +276,25 @@ function DatePicker(props: DatePickerProps) {
   );
 }
 
+type TimePickerProps = PopupPlacement & {
+  label: string;
+  value: string;
+  onValueChange: (time: string) => void;
+  expanded?: boolean;
+  disabled?: boolean;
+};
+
 function TimePicker({
   label,
   value,
   onValueChange,
   expanded = false,
   disabled = false,
-}: {
-  label: string;
-  value: string;
-  onValueChange: (time: string) => void;
-  expanded?: boolean;
-  disabled?: boolean;
-}) {
+  side,
+  align,
+  sideOffset,
+  cover,
+}: TimePickerProps) {
   const [h, m] = value.split(":").map(Number);
   const hour = h % 12 || 12;
   const period = h >= 12 ? "PM" : "AM";
@@ -325,6 +342,10 @@ function TimePicker({
     <PickerPopover
       label={label}
       focusPopup
+      side={side}
+      align={align}
+      sideOffset={sideOffset}
+      cover={cover}
       trigger={
         <Button disabled={disabled} aria-label={label}>
           {hour}:{String(m).padStart(2, "0")} {period}
@@ -597,4 +618,4 @@ function ColorPicker({
 }
 
 export { Calendar, ColorPicker, DatePicker, PickerPopover, TimePicker };
-export type { DatePickerProps };
+export type { DatePickerProps, TimePickerProps };

@@ -17,7 +17,7 @@
  */
 @import "@fluidkit/react/style.css";
 
-@theme {
+@theme static {
   /* SF Pro through the system stack on Apple devices; Inter elsewhere. */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", var(--font-inter), system-ui, sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro", var(--font-inter), system-ui, sans-serif;
@@ -91,6 +91,14 @@
   --color-system-gray: #98989d;
   --color-accent: #0091ff;
 
+  /* UIKit semantic background hierarchy. Content uses these, never Liquid Glass. */
+  --color-surface: #000;
+  --color-surface-secondary: #1c1c1e;
+  --color-surface-tertiary: #2c2c2e;
+  --color-grouped: #000;
+  --color-grouped-secondary: #1c1c1e;
+  --color-grouped-tertiary: #2c2c2e;
+
   /* Alert levels (PRD): warning red, caution yellow; advisory cyan is an assumption. */
   --color-advisory: #5ac8f5;
   --color-caution: #ffd60a;
@@ -109,6 +117,41 @@
   --radius-sidebar-item: 0.75rem;
   --radius-tab-bar: 9999px;
   --radius-segment: 9999px;
+}
+
+/* The app stays dark by default; the playbook can preview either system appearance.
+   Fluid Kit reads the same data-theme, including popups portaled to document.body. */
+:root[data-theme="light"] {
+  --color-label: #000;
+  /* Solid web surfaces need the increased-contrast label to retain 4.5:1. */
+  --color-label-secondary: rgb(60 60 67 / 0.8);
+  --color-label-tertiary: rgb(60 60 67 / 0.3);
+  --color-label-disabled: rgb(60 60 67 / 0.3);
+  --color-separator: rgb(60 60 67 / 0.29);
+  --color-fill: rgb(120 120 128 / 0.2);
+  --color-fill-secondary: rgb(120 120 128 / 0.16);
+  --color-fill-tertiary: rgb(118 118 128 / 0.12);
+  --color-fill-quaternary: rgb(116 116 128 / 0.08);
+  --color-system-red: #ff383c;
+  --color-system-orange: #ff8d28;
+  --color-system-yellow: #ffcc00;
+  --color-system-green: #34c759;
+  --color-system-mint: #00c8b3;
+  --color-system-teal: #00c3d0;
+  --color-system-cyan: #00c0e8;
+  --color-system-blue: #0088ff;
+  --color-system-indigo: #6155f5;
+  --color-system-purple: #cb30e0;
+  --color-system-pink: #ff2d55;
+  --color-system-brown: #ac7f5e;
+  --color-system-gray: #8e8e93;
+  --color-accent: #0088ff;
+  --color-surface: #fff;
+  --color-surface-secondary: #f2f2f7;
+  --color-surface-tertiary: #fff;
+  --color-grouped: #f2f2f7;
+  --color-grouped-secondary: #fff;
+  --color-grouped-tertiary: #f2f2f7;
 }
 
 /* A tinted fill for chosen and primary things on glass (a selected toggle, a picked day). */
@@ -141,9 +184,16 @@
   /* A well in the glass: text fields, tracks (Fluid Kit's tabs track). */
   .ui-well { background: color-mix(in srgb, currentColor 9%, transparent); }
 
-  /* The highlight that moves over glass (Fluid Kit's Indicator examples). */
-  .ui-thumb { background: color-mix(in srgb, currentColor 8%, transparent); }
-  .ui-thumb[data-pressed] { background: color-mix(in srgb, currentColor 14%, transparent); }
+  /* Fluid Kit's Indicator examples, as they ship: a menu highlight, deeper while pressed; and a
+     tabs thumb, white in the light and a light veil in the dark. */
+  .ui-highlight { background: color-mix(in srgb, currentColor calc(6% + var(--lb-dark) * 6%), transparent); }
+  .ui-highlight[data-pressed] { background: color-mix(in srgb, currentColor calc(11% + var(--lb-dark) * 7%), transparent); }
+  .ui-thumb {
+    background: color-mix(in srgb, #fff calc(100% - var(--lb-dark) * 78%), transparent);
+    box-shadow: 0 1px 3px rgb(0 0 0 / calc(0.12 - var(--lb-dark) * 0.12)), 0 0 0 0.5px rgb(0 0 0 / 0.04);
+  }
+  /* Fluid Kit's tabs track */
+  .ui-tabs { background: color-mix(in srgb, currentColor 9%, transparent); touch-action: none; user-select: none; }
 
   /* Fluid Kit's switch example: track filled by how far the knob is (--on), knob white glass that
      turns into a lens while held. */

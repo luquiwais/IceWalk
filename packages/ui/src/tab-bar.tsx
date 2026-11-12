@@ -24,6 +24,8 @@ type TabBarProps = {
   expanded?: boolean;
   /** Horizontal: the iOS tab bar. Vertical: a column of the same tabs, for wide layouts. */
   orientation?: "vertical" | "horizontal";
+  /** Regular-width iPad layout puts labels beside symbols. */
+  layout?: "compact" | "regular";
   className?: string;
 };
 
@@ -31,15 +33,34 @@ type TabBarProps = {
  * iOS 26/27 tab bar: a floating glass capsule; each tab a symbol over its caption. The chosen tab is
  * tinted and sits on a fill that glides between tabs (Fluid Kit Indicator), never a second glass.
  */
-function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = false, orientation = "horizontal", className }: TabBarProps) {
+function TabBar({
+  label,
+  tabs,
+  value,
+  defaultValue,
+  onValueChange,
+  expanded = false,
+  orientation = "horizontal",
+  layout = "compact",
+  className,
+}: TabBarProps) {
   const vertical = orientation === "vertical";
   return (
-    <Tabs.Root orientation={orientation} value={value} defaultValue={defaultValue ?? tabs[0]?.value} onValueChange={(next) => onValueChange?.(String(next))} className={className}>
+    <Tabs.Root
+      orientation={orientation}
+      value={value}
+      defaultValue={defaultValue ?? tabs[0]?.value}
+      onValueChange={(next) => onValueChange?.(String(next))}
+      className={className}
+    >
       <Tabs.List
         aria-label={label}
-        className={cn("lb lb-stretch relative isolate flex gap-0.5 rounded-full p-1 select-none", vertical && "flex-col")}
+        className={cn(
+          "lb relative isolate flex gap-0.5 rounded-full p-1 touch-none select-none",
+          vertical && "flex-col",
+        )}
       >
-        <Highlight items="[role=tab]" rest="[data-active]" />
+        <Highlight variant="tabs" items="[role=tab]" rest="[data-active]" />
         {tabs.map((tab) => (
           <Tabs.Tab
             key={tab.value}
@@ -47,11 +68,19 @@ function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = fa
             disabled={tab.disabled}
             className={cn(
               "flex items-center justify-center rounded-full text-label outline-none data-active:text-accent [&_svg]:size-6",
-              vertical && expanded ? "h-12 gap-2 px-4 text-subheadline font-medium" : "min-h-13 min-w-16 flex-col gap-0.5 px-3 text-caption-2 font-medium",
+              (vertical && expanded) || (!vertical && layout === "regular")
+                ? "h-12 gap-2 px-4 text-subheadline font-medium"
+                : "min-h-13 min-w-16 flex-col gap-0.5 px-3 text-caption-2 font-medium",
             )}
           >
-            <span aria-hidden className="flex">{tab.icon}</span>
-            {!vertical || expanded ? tab.label : <span className="sr-only">{tab.label}</span>}
+            <span aria-hidden className="flex">
+              {tab.icon}
+            </span>
+            {!vertical || expanded ? (
+              tab.label
+            ) : (
+              <span className="sr-only">{tab.label}</span>
+            )}
           </Tabs.Tab>
         ))}
       </Tabs.List>

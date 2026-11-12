@@ -9,6 +9,11 @@ type HighlightProps = {
   items: string;
   /** Selector of the item it rests on (the chosen one); none rests nowhere (menus). */
   rest?: string;
+  /**
+   * menu: follows the pointer and keyboard focus, as Fluid Kit's menu example.
+   * tabs: a thumb on the chosen tab, dragged across by a press, as Fluid Kit's tabs example.
+   */
+  variant?: "menu" | "tabs";
   className?: string;
 };
 
@@ -19,13 +24,15 @@ type HighlightProps = {
  * fill, not glass: glass never sits on glass. Base UI keeps roles, keyboard and the value; this
  * only draws, resting on whatever matches `rest` as attributes change.
  */
-function Highlight({ items, rest, className }: HighlightProps) {
+function Highlight({ items, rest, variant = "menu", className }: HighlightProps) {
   const thumb = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const indicator = thumb.current;
     const container = indicator?.parentElement;
     if (!indicator || !container) return;
-    const engine = createIndicator({ container, indicator, items });
+    const tabs = variant === "tabs";
+    // Tabs: it shows the choice; keyboard focus keeps its own ring
+    const engine = createIndicator({ container, indicator, items, trigger: tabs ? "press" : "auto", focus: !tabs });
     const follow = () => {
       const chosen = rest ? container.querySelector<HTMLElement>(rest) : null;
       if (engine.rest !== chosen) engine.rest = chosen;
@@ -37,8 +44,8 @@ function Highlight({ items, rest, className }: HighlightProps) {
       observer.disconnect();
       engine.destroy();
     };
-  }, [items, rest]);
-  return <span ref={thumb} aria-hidden data-slot="highlight" className={cn("ui-thumb pointer-events-none absolute top-0 left-0 -z-1", className)} />;
+  }, [items, rest, variant]);
+  return <span ref={thumb} aria-hidden data-slot="highlight" className={cn(variant === "tabs" ? "ui-thumb" : "ui-highlight", "pointer-events-none absolute top-0 left-0 -z-1", className)} />;
 }
 
 export { Highlight };
