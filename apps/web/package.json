@@ -15,6 +15,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fluidkit/react": "2.0.0",
     "@icewalk/ui": "workspace:*",
     "cesium": "^1.147.0",
     "lucide-react": "^1.70.0",

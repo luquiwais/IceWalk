@@ -19,7 +19,6 @@ import {
   DatePicker,
   TimePicker,
 } from "@icewalk/ui/pickers";
-import { MotionPresence } from "@icewalk/ui/motion";
 import { SearchToken } from "@icewalk/ui/search-token";
 import { Checkbox, Switch } from "@icewalk/ui/selection-controls";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
@@ -887,12 +886,8 @@ export function FamilySpecimens({
             "Search tokens",
             "32 pt · filter actions",
             <>
-              {["Design", "Favorites", "This week"].map((token) => (
-                <MotionPresence
-                  key={token}
-                  present={tokens.includes(token)}
-                  className="inline-flex"
-                >
+              {["Design", "Favorites", "This week"].filter((token) => tokens.includes(token)).map((token) => (
+                <span key={token} className="inline-flex">
                   <SearchToken
                     selected={token === "Favorites"}
                     disabled={disabled}
@@ -904,7 +899,7 @@ export function FamilySpecimens({
                   >
                     {token}
                   </SearchToken>
-                </MotionPresence>
+                </span>
               ))}
               <Button
                 size="small"
@@ -938,7 +933,7 @@ export function FamilySpecimens({
               >
                 <Text
                   key={page}
-                  className="vision-content-change"
+                  className="ui-swap"
                   variant="xl-title-2"
                 >
                   A new perspective. {page + 1}
@@ -1264,7 +1259,7 @@ export function FamilySpecimens({
               <Text
                 key={tab}
                 variant="title-1"
-                className="vision-content-change capitalize"
+                className="ui-swap capitalize"
               >
                 {tab}
               </Text>

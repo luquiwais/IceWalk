@@ -3,7 +3,6 @@
 import { NumberField as Primitive } from "@base-ui/react/number-field";
 import { Minus, Plus } from "lucide-react";
 import { Field } from "./field";
-import { MaterialLayers } from "./material";
 import { INPUT, SURFACE, useInputValue } from "./input-utils";
 import { cn } from "./utils";
 
@@ -40,7 +39,6 @@ function NumberField({ label, value, defaultValue, onValueChange, min, max, step
     <Field {...{ label, id, description, error, showLabel, className }}>{(field) => (
       <Primitive.Root id={field.id} value={current} onValueChange={(next) => change(next)} min={min} max={max} step={step} largeStep={step * 10} locale={locale} format={numberFormat} disabled={disabled} readOnly={readOnly} required={required} name={name}>
         <Primitive.Group data-disabled={disabled ? "" : undefined} className={cn(SURFACE, controls && "pr-1")}>
-          <MaterialLayers kind={disabled ? "regular" : "recessed"} />
           <Primitive.Input {...field} role="spinbutton" aria-roledescription={undefined} aria-valuenow={current ?? undefined} aria-valuemin={min} aria-valuemax={max} aria-valuetext={[text, unit].filter(Boolean).join(" ")} className={INPUT}
             onKeyDown={(event) => {
               if (disabled || readOnly || !["PageUp", "PageDown"].includes(event.key)) return;
@@ -49,10 +47,10 @@ function NumberField({ label, value, defaultValue, onValueChange, min, max, step
               change(Math.max(min ?? -Infinity, Math.min(max ?? Infinity, next)));
             }}
           />
-          {unit ? <span aria-hidden className="vision-input-unit relative text-body text-label">{unit}</span> : null}
+          {unit ? <span aria-hidden className="relative text-body text-label">{unit}</span> : null}
           {controls ? <span className="relative flex shrink-0 gap-1">
-            <Primitive.Decrement aria-label={`Decrease ${label}`} className="vision-input-control flex size-10 items-center justify-center rounded-full outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Minus aria-hidden className="size-4" /></Primitive.Decrement>
-            <Primitive.Increment aria-label={`Increase ${label}`} className="vision-input-control flex size-10 items-center justify-center rounded-full outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Plus aria-hidden className="size-4" /></Primitive.Increment>
+            <Primitive.Decrement aria-label={`Decrease ${label}`} className="flex size-10 items-center justify-center rounded-full outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Minus aria-hidden className="size-4" /></Primitive.Decrement>
+            <Primitive.Increment aria-label={`Increase ${label}`} className="flex size-10 items-center justify-center rounded-full outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled"><Plus aria-hidden className="size-4" /></Primitive.Increment>
           </span> : null}
         </Primitive.Group>
       </Primitive.Root>

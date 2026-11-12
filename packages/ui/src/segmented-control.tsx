@@ -3,15 +3,12 @@
 import { Tabs } from "@base-ui/react/tabs";
 import type * as React from "react";
 
-import { MaterialLayers } from "./material";
-import { LiquidIndicator } from "./motion";
-import { cn } from "./utils";
-import { Vibrancy } from "./vibrancy";
+import { Highlight } from "./selection";
 
 type SegmentedOption = {
   value: string;
   label: string;
-  /** Optional symbol before the label (Figma segment with symbol: gap 3, 15pt Semibold). */
+  /** Optional symbol before the label. */
   icon?: React.ReactNode;
   disabled?: boolean;
 };
@@ -27,60 +24,26 @@ type SegmentedControlProps = {
   className?: string;
 };
 
-/*
- * visionOS segmented control: Recessed when enabled, Regular when disabled
- * track (h 44, padding 4, gap 4) with segments of h 36. The selected segment
- * is a platter with a 0.5px edge and a soft shadow; idle labels are secondary.
- */
-function SegmentedControl({
-  label,
-  options,
-  value,
-  defaultValue,
-  onValueChange,
-  disabled = false,
-  className,
-}: SegmentedControlProps) {
+/** iOS segmented control: a capsule track with a thumb that glides to the chosen segment. */
+function SegmentedControl({ label, options, value, defaultValue, onValueChange, disabled = false, className }: SegmentedControlProps) {
   return (
-    <Tabs.Root
-      value={value}
-      defaultValue={defaultValue}
-      onValueChange={(next) => onValueChange?.(String(next))}
-      className={className}
-    >
+    <Tabs.Root value={value} defaultValue={defaultValue ?? options[0]?.value} onValueChange={(next) => onValueChange?.(String(next))} className={className}>
       <Tabs.List
         aria-label={label}
-        data-motion-tabs="segments"
         data-disabled={disabled ? "" : undefined}
-        className="vision-surface relative flex h-11 items-center gap-1 rounded-full p-1"
+        className="ui-well relative isolate flex h-9 items-center rounded-full p-0.5 select-none data-disabled:opacity-50"
       >
-        <MaterialLayers kind={disabled ? "regular" : "recessed"} />
-        <LiquidIndicator segmented />
+        <Highlight items="[role=tab]" rest="[data-active]" className="bg-white/22 data-pressed:bg-white/30" />
         {options.map((option) => (
           <Tabs.Tab
             key={option.value}
             data-slot="segment"
             value={option.value}
             disabled={disabled || option.disabled}
-            className={cn(
-              "vision-control vision-surface group relative flex h-9 min-w-14 flex-1 sm:min-w-24 items-center justify-center rounded-full px-2",
-              "text-callout whitespace-nowrap outline-none select-none",
-              "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-label",
-              "not-data-active:[--fill-lighten:transparent] not-data-active:[--fill-dodge:transparent]",
-              "hover:not-data-active:not-data-disabled:[--fill-lighten:rgb(255_255_255/0.06)] hover:not-data-active:not-data-disabled:[--fill-dodge:rgb(94_94_94/0.18)]",
-              "hover:not-data-active:not-data-disabled:[--fill-glow:radial-gradient(100%_100%_at_50%_100%,rgb(255_255_255/0.12),transparent_66.7%)]",
-              "hover:not-data-active:not-data-disabled:[--fill-glow-dodge:radial-gradient(100%_100%_at_50%_100%,rgb(94_94_94/0.32),transparent_73.8%)]",
-              "data-disabled:[--fill-lighten:transparent] data-disabled:[--fill-dodge:transparent]",
-              "data-disabled:data-active:shadow-[0_1px_4px_0_rgb(0_0_0/0.1)]",
-            )}
+            className="flex h-8 min-w-14 flex-1 items-center justify-center gap-1 rounded-full px-3 text-subheadline font-medium whitespace-nowrap outline-none data-active:font-semibold [&_svg]:size-4"
           >
-            <MaterialLayers kind="platter" />
-            {option.icon ? (
-              <Vibrancy className="mr-[0.1875rem] [&_svg]:size-4">
-                {option.icon}
-              </Vibrancy>
-            ) : null}
-            <Vibrancy>{option.label}</Vibrancy>
+            {option.icon}
+            {option.label}
           </Tabs.Tab>
         ))}
       </Tabs.List>

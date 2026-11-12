@@ -3,7 +3,6 @@
 import { Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Field } from "./field";
-import { MaterialLayers } from "./material";
 import { useInputValue } from "./input-utils";
 import { cn } from "./utils";
 
@@ -55,8 +54,7 @@ function FileField({ label, value, defaultValue = [], onValueChange, accept, mul
     } else syncNative(files);
   }
   return <Field {...{ label, description, className }} error={error || validation}>{(field) => <>
-    <div data-disabled={disabled ? "" : undefined} onDragOver={(event) => { event.preventDefault(); if (!disabled) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); if (!disabled) select(Array.from(event.dataTransfer.files)); }} className={cn("vision-input-surface vision-surface relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl px-4 py-5", dragging && "outline-2 outline-offset-2 outline-label")}>
-      <MaterialLayers kind={disabled ? "regular" : "recessed"} />
+    <div data-disabled={disabled ? "" : undefined} onDragOver={(event) => { event.preventDefault(); if (!disabled) setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); if (!disabled) select(Array.from(event.dataTransfer.files)); }} className={cn("ui-well relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-xl px-4 py-5", dragging && "outline-2 outline-offset-2 outline-label")}>
       <Upload aria-hidden className="relative size-6" />
       <span className="relative text-body">{multiple ? "Choose files or drop here" : "Choose a file or drop here"}</span>
       {accept ? <span className="relative text-footnote">{accept}</span> : null}

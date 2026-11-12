@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { Field } from "./field";
-import { MaterialLayers } from "./material";
 import { SearchToken } from "./search-token";
 import { INPUT, SURFACE, useInputValue } from "./input-utils";
 import { cn } from "./utils";
@@ -38,7 +37,6 @@ function TokenField({ label, value, defaultValue = [], onValueChange, max = Infi
   }
   return <Field {...{ label, description, error, className }}>{(field) => <>
     <div data-disabled={disabled ? "" : undefined} className={cn(SURFACE, "flex-wrap gap-2 px-2 py-1")}>
-      <MaterialLayers kind={disabled ? "regular" : "recessed"} />
       {tokens.map((token, index) => <SearchToken key={`${token}-${index}`} disabled={disabled} onRemove={() => { change(tokens.filter((_, at) => at !== index)); input.current?.focus(); }}>{token}</SearchToken>)}
       <input {...field} ref={input} disabled={disabled} value={draft} placeholder={placeholder} className={cn(INPUT, "h-9 min-w-24 px-3")} onChange={(event) => setDraft(event.target.value)} onBlur={() => { if (draft.trim()) add(); }} onPaste={(event) => { const text = event.clipboardData.getData("text"); if (/[,\n]/.test(text)) { event.preventDefault(); add(draft + text); } }} onKeyDown={(event) => {
         if (event.nativeEvent.isComposing) return;

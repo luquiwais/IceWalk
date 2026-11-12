@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 import { cn } from "./utils";
-import { createSpringTrack, springFrames, springState, type SpringTrack } from "./spring-motion";
+import { SpringAnimator } from "@fluidkit/react";
 
 type TimeWheelProps = {
   label: string;
@@ -25,7 +25,7 @@ function TimeWheel({
   const reel = useRef<HTMLDivElement>(null);
   // The settle/step animation and where it started, to retarget without
   // reading computed styles.
-  const motion = useRef<{ animation: Animation; track: SpringTrack } | null>(null);
+  const motion = useRef<SpringAnimator<"y"> | null>(null);
   const drag = useRef<{
     y: number;
     index: number;
@@ -86,23 +86,22 @@ function TimeWheel({
   function settle(from: number, velocity = 0) {
     const node = reel.current;
     if (!node) return;
-    motion.current?.animation.cancel();
+    motion.current?.stop();
     motion.current = null;
     node.style.transform = "translateY(0px)";
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (!from || reduced || typeof node.animate !== "function") return;
-    const track = createSpringTrack({ from, to: 0, velocity, duration: 160, bounce: 0 });
-    motion.current = { track, animation: node.animate(
-      springFrames([track], ([offset]) => ({ transform: `translateY(${offset}px)` })),
-      { duration: track.duration, easing: "linear" },
-    ) };
+    if (!from || reduced) return;
+    // Fluid Kit's spring keeps its speed when retargeted: a quick second step flows on
+    const spring = new SpringAnimator({ y: from }, { duration: 0.16, bounce: 0 }, ({ y }) => {
+      node.style.transform = `translateY(${y}px)`;
+    }, () => { if (motion.current === spring) motion.current = null; });
+    motion.current = spring;
+    spring.to({ y: 0 }, undefined, { y: velocity });
 
   }
   /** Where an interrupted settle currently shows the reel. */
   function visibleOffset() {
-    const active = motion.current;
-    if (!active) return 0;
-    return springState(active.track, Number(active.animation.currentTime ?? 0)).position;
+    return motion.current?.values().y ?? 0;
   }
   useLayoutEffect(() => {
     const delta = rows(current, previous.current);
@@ -114,14 +113,14 @@ function TimeWheel({
       return;
     }
     const step = stepHeight();
-    const incoming = motion.current ? springState(motion.current.track, Number(motion.current.animation.currentTime ?? 0)).velocity : 0;
+    const incoming = motion.current?.velocities().y ?? 0;
     // Home/End across most of the wheel are immediate; nearby steps retain
     // physical motion and the visible position/velocity of an interrupted step.
     settle(Math.abs(delta) > 5 ? 0 : visibleOffset() + delta * step, incoming);
   }, [current, editing, numeric, values.length]);
   useEffect(
     () => () => {
-      motion.current?.animation.cancel();
+      motion.current?.stop();
       if (frame.current !== undefined) cancelAnimationFrame(frame.current);
     },
     [],
@@ -197,7 +196,7 @@ function TimeWheel({
       return;
     event.preventDefault();
     const shown = visibleOffset();
-    motion.current?.animation.cancel();
+    motion.current?.stop();
     motion.current = null;
     try {
       event.currentTarget.setPointerCapture?.(event.pointerId);

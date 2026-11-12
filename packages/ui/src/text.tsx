@@ -1,11 +1,11 @@
 import type * as React from "react";
 
 import { cn } from "./utils";
-import { Vibrancy } from "./vibrancy";
 
 /*
- * Text styles from the visionOS 26 kit (Figma: Text Styles), as components,
- * so a style is picked by name like in Figma instead of repeating sizes.
+ * Text styles from the visionOS 26 kit (Figma: Text Styles), as components, so a style is picked
+ * by name like in Figma. Sizes are points (rem) and scale with the viewport (theme.css).
+ * Server components: plain semantic HTML.
  *
  *   style         size/line   weight
  *   xl-title-1    48/56       bold
@@ -19,10 +19,7 @@ import { Vibrancy } from "./vibrancy";
  *   callout       15/20       semibold (590)
  *   subheadline   15/20       regular
  *   footnote      13/18       medium
- *   caption-1     12/16       medium
- *   caption-2     12/16       medium
- *
- * Sizes are points (rem), so they scale with the viewport (see theme.css).
+ *   caption-1/2   12/16       medium
  */
 
 type TextVariant =
@@ -63,8 +60,8 @@ const VARIANT: Record<TextVariant, string> = {
 
 const TONE: Record<TextTone, string> = {
   primary: "text-label",
-  secondary: "",
-  tertiary: "",
+  secondary: "text-label-secondary",
+  tertiary: "text-label-tertiary",
   disabled: "text-label-disabled",
   inherit: "",
 };
@@ -88,23 +85,13 @@ type TextProps = Omit<React.HTMLAttributes<HTMLElement>, "color"> & {
   id?: string;
 };
 
-function Text({
-  variant = "body",
-  tone = "primary",
-  weight,
-  as: Element = "p",
-  className,
-  children,
-  ...props
-}: TextProps) {
+function Text({ variant = "body", tone = "primary", weight, as: Element = "p", className, ...props }: TextProps) {
   return (
     <Element
       data-text-style={variant}
       className={cn(VARIANT[variant], TONE[tone], weight && WEIGHT[weight], className)}
       {...props}
-    >
-      {tone === "secondary" || tone === "tertiary" ? <Vibrancy tone={tone}>{children}</Vibrancy> : children}
-    </Element>
+    />
   );
 }
 

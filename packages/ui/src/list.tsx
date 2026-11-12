@@ -1,13 +1,12 @@
 "use client";
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { Layout } from "@fluidkit/react";
 import { Check, ChevronRight } from "lucide-react";
 import type * as React from "react";
 
-import { MaterialLayers } from "./material";
 import { Footnote, Title3 } from "./text";
 import { cn } from "./utils";
-import { Vibrancy } from "./vibrancy";
 
 type ListSectionProps = Omit<React.ComponentProps<"section">, "title"> & {
   /** Section header (Title 3), above the rows. */
@@ -18,8 +17,9 @@ type ListSectionProps = Omit<React.ComponentProps<"section">, "title"> & {
 };
 
 /*
- * visionOS inset grouped list (Figma: Lists > Row - Inset): rows on the Regular
- * material with a 16 pt radius, 60 pt rows and hairline separators.
+ * visionOS inset grouped list (Figma: Lists > Row - Inset): rows on glass with a 16pt radius,
+ * 60pt rows and hairline separators. Rows that come, go or move slide to their places on springs
+ * (Fluid Kit Layout).
  */
 function ListSection({
   header,
@@ -36,16 +36,15 @@ function ListSection({
       {...props}
     >
       {header ? (
-        <Title3 as="h3" id={headerId} className="px-5 pb-[0.4375rem]">
+        <Title3 as="h3" id={headerId} className="px-4 pb-2 text-headline">
           {header}
         </Title3>
       ) : null}
-      <ul className="vision-surface relative flex flex-col rounded-row">
-        <MaterialLayers kind="regular" />
+      <Layout.Root render={<ul />} className="ui-well relative flex flex-col rounded-row">
         {children}
-      </ul>
+      </Layout.Root>
       {footer ? (
-        <Footnote tone="secondary" className="px-5 pt-2">
+        <Footnote tone="secondary" className="px-4 pt-2">
           {footer}
         </Footnote>
       ) : null}
@@ -101,14 +100,12 @@ function ListRow({
           aria-pressed={accessory === "selection" ? selected : undefined}
           aria-expanded={expanded}
           aria-controls={controls}
-          data-platter="false"
           className={cn(
-            "vision-control vision-surface relative flex min-h-15 w-full items-center gap-2 py-2 pr-2 pl-5 text-body outline-none",
+            "relative flex min-h-11 w-full items-center gap-2 py-2.5 pr-2 pl-4 text-body outline-none hover:bg-white/6 active:bg-white/10 disabled:text-label-disabled",
             "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label",
             className,
           )}
         >
-          <MaterialLayers kind="platter" />
           {content}
           {accessory !== "none" ? (
             <span
@@ -117,19 +114,17 @@ function ListRow({
                   ? "list-disclosure"
                   : "list-selection"
               }
-              className="flex size-11 shrink-0 items-center justify-center"
+              className="flex size-8 shrink-0 items-center justify-center text-label-tertiary data-[slot=list-selection]:text-accent"
             >
-              <Vibrancy>
                 {accessory === "disclosure" ? (
                   <ChevronRight
                     aria-hidden
-                    className={cn("size-5", expanded && "rotate-90")}
+                    className={cn("size-5 transition-transform duration-(--fk-snappy-duration) ease-(--fk-snappy-easing)", expanded && "rotate-90")}
                     strokeWidth={2.25}
                   />
                 ) : selected ? (
                   <Check aria-hidden className="size-5" strokeWidth={2.25} />
                 ) : null}
-              </Vibrancy>
             </span>
           ) : null}
         </ButtonPrimitive>
@@ -137,7 +132,7 @@ function ListRow({
         <div
           data-slot="list-row"
           className={cn(
-            "flex min-h-15 items-center gap-2 py-2 pr-5 pl-5 text-body",
+            "flex min-h-11 items-center gap-2 py-2.5 pr-4 pl-4 text-body",
             className,
           )}
         >

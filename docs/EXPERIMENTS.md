@@ -422,3 +422,12 @@ Evidencia histórica del transcript `bfbd54aa-2f00-438b-9990-e0a9c35d7f86`, info
 - Investigación nueva con clips primarios de visionOS, método de medición y límites en [visionos-motion-fidelity-2026-11-11.md](research/visionos-motion-fidelity-2026-11-11.md). La referencia anterior de Liquid Glass iOS/macOS no demostraba el movimiento del sistema espacial.
 - Pixel-test del shader SVG: Chromium desplaza el patrón detrás del panel y deja el exterior idéntico. Safari nativo (CUA, mismo HTML local) muestra patrón continuo sin efecto visible. Resultado técnico por motor, sin inferir soporte desde la sintaxis ni identidad con el material nativo.
 - QA de vistas final Chromium: 1440/1024/390, sin desborde horizontal; guía/minimapa EV, encuadre de la próxima estación y Map focus compacto corregidos con tests rojos → verdes. Web 149 tests; QA incluyó replan negativo, Science y vuelo Cesium real. Build y API vivo no probados por ese worker.
+
+## 2026-11-12: Fluid Kit y Liquid Glass iOS 27
+
+- Morph de Fluid Kit sobre popups de Base UI (Chromium, a 0.08× con `SpringAnimator.timeScale`): el botón se convierte en el menú en un trazo continuo con un leve rebote y vuelve a él al cerrar; asentado en ~450 ms a velocidad normal.
+- Falló: registrar el popup en el morph al montarlo. Quedaba `visibility: hidden` dos cuadros y Base UI no podía enfocar el primer ítem al abrir con teclado (test rojo de foco). Se registra recién al volar, con `opacity: 0` antes, que sí admite foco.
+- Falló: con Reduce Motion el morph restauraba ese `opacity: 0` propio y la ventana quedaba invisible (test rojo en el playbook). Se limpia antes de entregarla al morph.
+- Falló: el vidrio de los `<button>` salía sin relleno (solo blur, color del fondo). Causa: preflight de Tailwind en `base` después de `liquid-blur`. Resuelto con el orden de capas.
+- jsdom no tiene `matchMedia` ni `ResizeObserver`, y Fluid Kit los usa: se agregaron stubs en los `vitest.setup.ts`, con movimiento reducido (morph e indicator instantáneos).
+- Checks: UI 125/125, web 149/149, lint y tipos limpios. QA visual en Chromium de `/lab`, `/` y `/design`. Safari y build de producción sin probar en esta unidad.

@@ -5,7 +5,6 @@ import { Combobox } from "@icewalk/ui/combobox";
 import { Field } from "@icewalk/ui/field";
 import { FileField } from "@icewalk/ui/file-field";
 import { TextField } from "@icewalk/ui/fields";
-import { MaterialLayers } from "@icewalk/ui/material";
 import { NumberField } from "@icewalk/ui/number-field";
 import { OTPField } from "@icewalk/ui/otp-field";
 import { Radio, RadioGroup } from "@icewalk/ui/radio-group";
@@ -93,7 +92,7 @@ export function InputSpecimens({ disabled }: { disabled: boolean }) {
     </Specimen>
     <Specimen title="Shared field labeling" detail="Label, supporting text and inline validation">
       <div className="flex w-full min-w-0 flex-wrap items-start gap-4">
-      <Field label="Sample identifier" description="Native input using the common field wrapper." error={errors ? "Enter a sample identifier." : undefined}>{(props) => <div data-disabled={disabled ? "" : undefined} className="vision-input-surface vision-surface relative flex items-center px-5"><MaterialLayers kind={disabled ? "regular" : "recessed"} /><input {...props} placeholder="S1094b-001" disabled={disabled} className="vision-input-control vision-input relative h-11 w-full bg-transparent text-body text-label caret-accent outline-none placeholder:text-white/60" /></div>}</Field>
+      <Field label="Sample identifier" description="Native input using the common field wrapper." error={errors ? "Enter a sample identifier." : undefined}>{(props) => <div data-disabled={disabled ? "" : undefined} className="ui-well relative flex items-center rounded-xl px-5 focus-within:outline-2 focus-within:outline-label"><input {...props} placeholder="S1094b-001" disabled={disabled} className="h-11 w-full bg-transparent text-body text-label caret-accent outline-none placeholder:text-label-tertiary" /></div>}</Field>
       </div>
     </Specimen>
   </div>;

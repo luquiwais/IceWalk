@@ -3,7 +3,6 @@
 import { ChevronDown, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "./button";
-import { MaterialLayers } from "./material";
 
 function SearchToken({
   children,
@@ -25,9 +24,8 @@ function SearchToken({
       data-slot="search-token"
       data-disabled={disabled ? "" : undefined}
       data-selected={selected ? "" : undefined}
-      className="vision-surface vision-search-token relative inline-flex max-w-full items-center overflow-hidden rounded-[0.625rem] text-callout"
+      className="ui-fill relative data-selected:ui-selected inline-flex max-w-full items-center overflow-hidden rounded-[0.625rem] text-callout"
     >
-      <MaterialLayers kind="platter" />
       {onClick ? (
         <Button
           variant="plain"

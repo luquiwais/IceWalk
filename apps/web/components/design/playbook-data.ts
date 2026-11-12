@@ -78,7 +78,7 @@ export const FAMILIES: Family[] = [
     group: "Foundations",
     node: "215:105157",
     icon: Layers,
-    components: "Material, MaterialLayers, SurfaceScroll",
+    components: "Material, SurfaceScroll",
     states: "Glass · regular · recessed · platter",
   },
   {

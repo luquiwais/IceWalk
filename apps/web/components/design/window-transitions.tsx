@@ -15,7 +15,6 @@ import { Compass, FlaskConical, Footprints } from "lucide-react";
 export function WindowTransitions() {
   const [open, setOpen] = useState(false);
   const [detail, setDetail] = useState(false);
-  const [optics, setOptics] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   return <div className="flex min-h-100 flex-col items-start gap-5">
     <div className="flex w-full flex-wrap items-start gap-8" data-testid="spatial-motion-controls">
@@ -57,18 +56,5 @@ export function WindowTransitions() {
         </WindowContent>
       </Window>
     </WindowMotion>
-    <section aria-label="Optical edge comparison" className="flex w-full flex-col items-start gap-4 border-t border-white/15 pt-5">
-      <Title2>Material and edge</Title2>
-      <Body tone="secondary">Compare the standard material with an optional edge lens. The text stays sharp and the material keeps its normal fallback.</Body>
-      <Button onClick={() => setOptics(value => !value)} aria-pressed={optics}>{optics ? "Disable optical edge" : "Enable optical edge"}</Button>
-      <div className="flex max-w-full flex-wrap gap-4">
-        {[false, true].map(enhanced => <div key={String(enhanced)} className="relative h-48 w-80 max-w-full overflow-hidden rounded-2xl bg-[repeating-linear-gradient(115deg,#21354d_0_12px,#c3aa86_12px_24px)] p-6">
-          <Window morph={false} optics={enhanced && optics} className="h-36 w-full flex-col justify-center gap-2 p-5">
-            <Body>{enhanced ? "Optical edge" : "Standard glass"}</Body>
-            <Footnote tone="secondary">Station 01 · 40 min</Footnote>
-          </Window>
-        </div>)}
-      </div>
-    </section>
   </div>;
 }

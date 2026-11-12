@@ -1,6 +1,7 @@
 "use client";
 
 import { Popover } from "@base-ui/react/popover";
+import { useMergedRefs } from "@fluidkit/react";
 import { ChevronLeft, ChevronRight, Pipette, X } from "lucide-react";
 import {
   useEffect,
@@ -16,8 +17,10 @@ import { SegmentedControl } from "./segmented-control";
 import { Slider } from "./slider";
 import { TimeWheel as Wheel } from "./time-wheel";
 import { Text } from "./text";
+import { useMorphPopup } from "./morph-popup";
 import { cn } from "./utils";
 
+/** A picker that grows out of its button (Fluid Kit Morph) and shrinks back into it. */
 function PickerPopover({
   trigger,
   label,
@@ -31,16 +34,18 @@ function PickerPopover({
   focusPopup?: boolean;
 }) {
   const popup = useRef<HTMLDivElement>(null);
+  const morph = useMorphPopup();
+  const ref = useMergedRefs(popup, morph.popup);
   return (
-    <Popover.Root>
-      <Popover.Trigger render={trigger} />
+    <Popover.Root {...morph.root}>
+      <Popover.Trigger ref={morph.trigger} render={trigger} />
       <Popover.Portal>
         <Popover.Positioner sideOffset={12} className="z-50">
           <Popover.Popup
-            ref={popup}
+            ref={ref}
             initialFocus={focusPopup ? popup : true}
             data-slot="picker-popover"
-            className="vision-motion-popup relative max-w-[calc(100vw-2rem)] text-label outline-none"
+            className="lb max-w-[calc(100vw-2rem)] rounded-[2rem] text-label outline-none"
           >
             <Popover.Title className="sr-only">{label}</Popover.Title>
             {children}
@@ -183,7 +188,7 @@ function Calendar({
         <div
           key={month.toISOString()}
           role="rowgroup"
-          className="vision-content-change"
+          className="ui-swap"
         >
           {Array.from({ length: Math.ceil((offset + days) / 7) }, (_, week) => (
             <div
@@ -425,7 +430,7 @@ function ColorPicker({
           { value: "sliders", label: "Sliders" },
         ]}
       />
-      <div key={tab} className="vision-motion-enter relative mt-4">
+      <div key={tab} className="ui-swap relative mt-4">
         {tab === "grid" ? (
           <div
             aria-label="Color grid"

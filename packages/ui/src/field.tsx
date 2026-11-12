@@ -2,7 +2,6 @@
 
 import { useId, type ReactNode, type RefObject } from "react";
 import { cn } from "./utils";
-import "./inputs.css";
 
 type FieldControlProps = {
   id: string;
@@ -32,7 +31,7 @@ function Field({ label, description, error, id, showLabel = true, group = false,
   const describedBy = [description && `${controlId}-description`, error && `${controlId}-error`].filter(Boolean).join(" ") || undefined;
   const labelClass = showLabel ? "px-3 text-footnote" : "sr-only";
   return (
-    <div className={cn("vision-field flex min-w-0 w-[19.0625rem] max-w-full flex-col gap-2", className)}>
+    <div className={cn("flex min-w-0 w-[19.0625rem] max-w-full flex-col gap-2", className)}>
       {group || focusTarget
         ? <span id={`${controlId}-label`} className={labelClass} onClick={focusTarget ? () => focusTarget.current?.focus() : undefined}>{label}</span>
         : <label id={`${controlId}-label`} htmlFor={controlId} className={labelClass}>{label}</label>}

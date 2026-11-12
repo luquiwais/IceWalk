@@ -3,7 +3,7 @@
 import { ArrowBigUp, Delete, Keyboard as KeyboardIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { IconButton } from "./button";
-import { MaterialLayers, SurfaceScroll } from "./material";
+import { SurfaceScroll } from "./material";
 import { Text } from "./text";
 import { cn } from "./utils";
 
@@ -37,7 +37,7 @@ function Keyboard({
         aria-pressed={pressed}
         onClick={action}
         className={cn(
-          "vision-key relative flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full pb-1 text-body outline-none hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled [&_svg]:size-[1.1875rem]",
+          "ui-key relative flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full pb-1 text-body outline-none hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled [&_svg]:size-[1.1875rem]",
           className,
         )}
       >
@@ -55,9 +55,8 @@ function Keyboard({
   return (
     <div
       data-slot="keyboard"
-      className="vision-surface relative w-[34rem] max-w-full overflow-clip rounded-[2.125rem] text-label"
+      className="lb relative w-[34rem] max-w-full overflow-clip rounded-[2.125rem] text-label"
     >
-      <MaterialLayers kind="glass" />
       <header className="relative flex h-12 items-center justify-between bg-black/31 px-4">
         <IconButton
           label="Clear keyboard input"
@@ -75,7 +74,7 @@ function Keyboard({
         <span className="size-8" />
       </header>
       <SurfaceScroll direction="horizontal" className="relative">
-        <div key={`${numeric}-${shift}`} className="vision-content-change flex w-[34rem] flex-col gap-2 p-4">
+        <div key={`${numeric}-${shift}`} className="ui-swap flex w-[34rem] flex-col gap-2 p-4">
           <div className="mb-1 flex gap-3">
             {["Hello", "the", "to"].map((word) =>
               key(

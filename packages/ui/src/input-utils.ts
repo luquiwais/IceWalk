@@ -17,9 +17,13 @@ function useInputValue<T>(value: T | undefined, defaultValue: T, onChange?: (val
   return [current, change, latest] as const;
 }
 
-const INPUT = "vision-input-control vision-input relative h-11 min-w-0 flex-1 bg-transparent text-body text-label caret-accent outline-none placeholder:text-white/60";
-const SURFACE = "vision-input-surface vision-surface relative flex items-center gap-2 px-5";
-const POPUP = "vision-input-popup vision-surface vision-popup-glass vision-motion-popup vision-motion-menu relative rounded-[1.75rem] p-3 text-label outline-none shadow-2xl [--glass-stroke-width:1.4px] [--glass-stroke-angle:150.286deg] [--glass-stroke-start:0%] [--glass-stroke-fade:40.569%] [--glass-stroke-rise:57.437%] [--glass-stroke-end:100%]";
-const OPTION = "vision-input-option vision-control vision-surface relative flex min-h-14 w-full items-center gap-3 rounded-2xl px-3 text-body outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label data-disabled:cursor-not-allowed";
+/** The text inside a field. */
+const INPUT = "h-11 min-w-0 flex-1 bg-transparent text-body text-label caret-accent outline-none placeholder:text-label-tertiary disabled:text-label-disabled";
+/** A field: a well cut into the glass; the focus ring and the invalid edge sit on it. */
+const SURFACE = "ui-well relative flex min-h-11 items-center gap-2 rounded-xl px-5 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-label has-aria-invalid:shadow-[inset_0_0_0_1px_var(--color-warning)] aria-invalid:shadow-[inset_0_0_0_1px_var(--color-warning)] data-disabled:text-label-disabled";
+/** A list popup (select, combobox): glass on Fluid Kit's blur-replace. */
+const POPUP = "lb ui-pop min-w-(--anchor-width) max-w-[calc(100vw-2rem)] max-h-[min(24rem,var(--available-height))] overflow-y-auto rounded-[1.75rem] p-3 text-label outline-none";
+/** A row in a list popup. */
+const OPTION = "flex min-h-14 w-full items-center gap-3 rounded-2xl px-3 text-body outline-none data-highlighted:bg-white/10 data-disabled:cursor-not-allowed data-disabled:text-label-disabled";
 
 export { useInputValue, INPUT, SURFACE, POPUP, OPTION };

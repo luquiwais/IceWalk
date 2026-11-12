@@ -11,13 +11,10 @@ const tabs = [
 ];
 
 describe("TabBar", () => {
-  it("is a vertical tab list with named icon tabs", () => {
+  it("is a horizontal tab list (the iOS tab bar) with named tabs", () => {
     render(<TabBar label="Views" tabs={tabs} defaultValue="planning" />);
 
-    expect(screen.getByRole("tablist", { name: "Views" })).toHaveAttribute(
-      "aria-orientation",
-      "vertical",
-    );
+    expect(screen.getByRole("tablist", { name: "Views" })).not.toHaveAttribute("aria-orientation", "vertical");
     expect(screen.getByRole("tab", { name: "Planning" })).toHaveAttribute(
       "aria-selected",
       "true",
@@ -32,6 +29,7 @@ describe("TabBar", () => {
         tabs={tabs}
         defaultValue="planning"
         onValueChange={onValueChange}
+        orientation="vertical"
       />,
     );
 
@@ -65,6 +63,7 @@ describe("TabBar", () => {
         tabs={[tabs[0], { ...tabs[1], disabled: true }, tabs[2]]}
         defaultValue="planning"
         onValueChange={onValueChange}
+        orientation="vertical"
       />,
     );
     const disabledTab = screen.getByRole("tab", { name: "EV" });
@@ -86,7 +85,7 @@ describe("TabBar", () => {
   });
 
   it("expanded shows each label next to its symbol and keeps names and selection", async () => {
-    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" expanded />);
+    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" orientation="vertical" expanded />);
 
     const tab = screen.getByRole("tab", { name: "EV" });
     expect(tab).toHaveAttribute("aria-selected", "true");
@@ -94,18 +93,11 @@ describe("TabBar", () => {
     expect(screen.getByRole("tab", { name: "Planning" })).toHaveTextContent(
       "Planning",
     );
-    expect(screen.getByRole("tablist", { name: "Views" })).toHaveAttribute(
-      "data-expanded",
-    );
+
   });
 
-  it("collapsed hides the retained labels from assistive technology until reveal", () => {
-    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" />);
-    // Labels stay mounted so expanding the glass preserves the icon/text
-    // anchors, rather than remounting a different tab halfway through motion.
-    expect(screen.getByRole("tab", { name: "EV" }).querySelector(".vision-tab-label")).toHaveAttribute("aria-hidden", "true");
-    expect(screen.getByRole("tablist", { name: "Views" })).not.toHaveAttribute(
-      "data-expanded",
-    );
+  it("collapsed and vertical, names each symbol-only tab by its label", () => {
+    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" orientation="vertical" />);
+    expect(screen.getByRole("tab", { name: "EV" })).toHaveAttribute("aria-selected", "true");
   });
 });

@@ -2,8 +2,7 @@
 import { Search, X } from "lucide-react";
 import { useId, useRef, useState, type ComponentProps } from "react";
 import { IconButton } from "./button";
-import { MaterialLayers } from "./material";
-import { MotionPresence } from "./motion";
+import { Presence } from "./motion";
 import { cn } from "./utils";
 
 type TextFieldProps = Omit<
@@ -67,13 +66,12 @@ function TextField({
           }
         }}
         className={cn(
-          "vision-surface relative flex h-11 items-center gap-2 px-5",
+          "ui-well relative flex h-11 items-center gap-2 px-5",
           "focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-label",
           shape === "pill" ? "rounded-full" : "rounded-xl",
           kind === "search" && "px-2",
         )}
       >
-        <MaterialLayers kind={disabled ? "regular" : "recessed"} />
         {kind === "search" ? (
           <span
             aria-hidden
@@ -100,13 +98,10 @@ function TextField({
             change(event.target.value);
             onChange?.(event);
           }}
-          className="vision-input relative h-full min-w-0 flex-1 bg-transparent text-body text-label caret-accent outline-none placeholder:text-white/60 disabled:text-label-disabled [&::-webkit-search-cancel-button]:appearance-none"
+          className="relative h-full min-w-0 flex-1 bg-transparent text-body text-label caret-accent outline-none placeholder:text-label-tertiary disabled:text-label-disabled [&::-webkit-search-cancel-button]:appearance-none"
         />
         {kind === "search" ? (
-          <MotionPresence
-            present={Boolean(current)}
-            className="vision-field-clear"
-          >
+          <Presence present={Boolean(current)} className="[--fk-scale:.6]">
             <IconButton
               label={`Clear ${label}`}
               disabled={disabled}
@@ -120,7 +115,7 @@ function TextField({
             >
               <X className="size-[1.0625rem]!" strokeWidth={2.5} />
             </IconButton>
-          </MotionPresence>
+          </Presence>
         ) : null}
       </div>
     </div>

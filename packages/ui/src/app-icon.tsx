@@ -22,7 +22,7 @@ function AppIcon({
       role="img"
       aria-label={`${label}${badge ? `, ${badge} notifications` : ""}`}
       className={cn(
-        "vision-app-icon relative inline-flex shrink-0 items-center justify-center rounded-full",
+        "ui-app-icon relative inline-flex shrink-0 items-center justify-center rounded-full",
         size === "small"
           ? "size-11"
           : size === "medium"

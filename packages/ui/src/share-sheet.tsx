@@ -5,7 +5,7 @@ import { useState, type ReactElement, type ReactNode } from "react";
 import { Button } from "./button";
 import { ListRow, ListSection } from "./list";
 import { Material, SurfaceScroll } from "./material";
-import { MotionPresence } from "./motion";
+import { Presence } from "./motion";
 import { SystemDialog } from "./system-surfaces";
 import { Text } from "./text";
 import { cn } from "./utils";
@@ -94,11 +94,11 @@ function ShareSheet({
             ))}
           </div>
         </SurfaceScroll>
-        <MotionPresence present={Boolean(selected)}>
+        <Presence present={Boolean(selected)}>
           <Button onClick={() => { if (selected) onShare(selected); }}>
             Share with {contacts.find((c) => c.id === selected)?.name}
           </Button>
-        </MotionPresence>
+        </Presence>
         <ListSection>
           <>
             {destinations.map((destination) => (

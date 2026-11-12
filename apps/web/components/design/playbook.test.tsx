@@ -79,6 +79,7 @@ describe("visionOS playbook", () => {
     await userEvent.click(screen.getByRole("button", { name: "Window transitions" }));
     const open = await screen.findByRole("button", { name: "Open specimen window" });
     await userEvent.click(open);
-    expect(screen.getByRole("button", { name: "Station details" })).toBeVisible();
+    // The window grows out of the button over the next frames (Fluid Kit Morph)
+    await waitFor(() => expect(screen.getByRole("button", { name: "Station details" })).toBeVisible());
   });
 });

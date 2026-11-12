@@ -1,3 +1,5 @@
+/* Fluid Kit's glass after Tailwind's preflight (which clears button backgrounds), before utilities. */
+@layer theme, base, liquid-blur, components, utilities;
 @import "tailwindcss";
 @import "@icewalk/ui/theme.css";
 

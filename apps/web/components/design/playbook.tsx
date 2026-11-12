@@ -4,7 +4,7 @@ import { Button, IconButton } from "@icewalk/ui/button";
 import { TextField } from "@icewalk/ui/fields";
 import { Material, SurfaceScroll } from "@icewalk/ui/material";
 import { Switch } from "@icewalk/ui/selection-controls";
-import { MotionPresence } from "@icewalk/ui/motion";
+import { Presence } from "@icewalk/ui/motion";
 import { Sidebar, SidebarItem, SidebarSection } from "@icewalk/ui/sidebar";
 import { Text } from "@icewalk/ui/text";
 import { NavigationBar, Window } from "@icewalk/ui/window";
@@ -286,7 +286,7 @@ export function Playbook() {
             key={selected}
             id="playbook-content"
             ref={content}
-            className="playbook-content vision-motion-enter relative flex-1 px-9 pb-10"
+            className="playbook-content ui-swap relative flex-1 px-9 pb-10"
             tabIndex={-1}
           >
             {selected === "overview" ? (
@@ -528,7 +528,7 @@ export function Playbook() {
         aria-live="polite"
         className="pointer-events-none absolute right-10 bottom-14 z-30 max-w-[calc(100vw-3rem)]"
       >
-        <MotionPresence present={Boolean(feedback)}>
+        <Presence present={Boolean(feedback)}>
           <Material
             kind="glass"
             className="pointer-events-auto flex items-center gap-5 rounded-full py-3 pr-2 pl-5"
@@ -544,7 +544,7 @@ export function Playbook() {
               <X aria-hidden />
             </IconButton>
           </Material>
-        </MotionPresence>
+        </Presence>
       </div>
     </main>
   );
