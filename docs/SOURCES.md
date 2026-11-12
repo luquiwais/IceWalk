@@ -16,6 +16,8 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Exposiciones de hielo | https://doi.org/10.5066/P9Y8FR1R | Dundas et al. (2021) USGS |
 | Clima espacial | https://ccmc.gsfc.nasa.gov/tools/DONKI | NASA CCMC DONKI (acreditar a CCMC) |
 | Mosaico Viking MDIM 2.1 colorizado, 232 m/px (fondo del globo sin token) | https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml | NASA/USGS Astrogeology Science Center, vía NASA Trek |
+| Zonas de exploración para misiones humanas (51 zonas, capa EZMars; las usa `scripts/exploration_zones.py`) | https://trek.nasa.gov/mars/trekarcgis/rest/services/EZMars/MapServer | NASA Mars Trek (NASA/JPL-Caltech); First Landing Site/Exploration Zone Workshop for Human Missions to the Surface of Mars (2015) |
+| Impactos de Daubar 2022 al norte de 20°N (lat, lon, D, hielo), copia en `packages/model/gp/regional_impacts.csv` para el control local de la tarjeta | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets, CC BY 4.0 |
 | Cesium Mars (con token de ion; asset 3644333) | https://cesium.com/platform/cesium-ion/content/cesium-mars/ | NASA/USGS Astrogeology (Viking MDIM 2.1 y MOLA-HRSC 200 m); Cesium |
 
 ## Ciencia y operación
@@ -54,7 +56,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Regiones especiales | Kminek et al. (2010) Advances in Space Research (COSPAR) |
 | Playbook, SUITS, NASA-STD-3001 | Ver sección Interfaz del PRD |
 | Cota de cráteres sin fondo plano: `d > 0.2 × diámetro`. El paper presenta 0.1 y 0.2; se usa 0.2 porque es coherente con su tabla | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
-| Tabla de 349 cráteres: `X, Y, D_crater, D_resistant` (suplemento, `2022GL100747-sup-0002-Table SI-S01.csv`). Licencia sin confirmar | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
+| Tabla de 349 cráteres: `X, Y, D_crater, D_resistant` (suplemento, `2022GL100747-sup-0002-Table SI-S01.csv`). Artículo y suplemento **CC BY-NC-ND 4.0** (leído en la página de Wiley el 2026-11-12): se puede compartir el original sin modificar, sin fines comerciales y citando; no una versión adaptada | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
 | Get Aheads, borrado, Cribsheet, flight rules | Kagey (2024), https://ntrs.nasa.gov/api/citations/20240005248/downloads/EVA%20Ops%20101%20for%20Artemis%203%20External%20Teams.pdf |
 | Science Officer y SER | Young (2025), https://ntrs.nasa.gov/api/citations/20250004322/downloads/Young_LSSWMay2025_ScienceOpsOverview_v2.pdf; Bell et al. (2023) LPSC #2460, https://www.hou.usra.edu/meetings/lpsc2023/pdf/2460.pdf |
 | BASALT: ConOps, capacidades, decisión táctica, soporte científico y replanificación | Beaton et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238/ y https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237/; Stevens et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282/; Payler et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442258/; Marquez et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442304/ |
@@ -69,6 +71,9 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | DTM y ortos de HiRISE en COG | USGS Astrogeology, STAC, CC0: https://stac.astrogeology.usgs.gov/api |
 | Inercia térmica THEMIS, tesela 30N180E, 100 m | Fergason et al. (2006) JGR; USGS, https://astrogeology.usgs.gov/search/map/themis_thermal_inertia_mosaic_quantitative_30n180e_100mpp |
 | Profundidad local de 97 cm en S1094b (de Dundas 2023) y modelos térmicos sin hielo en el sitio | Sizemore et al. (2026) PSJ 7:175, tabla 4 y §4.1.3, CC BY 4.0, https://doi.org/10.3847/PSJ/ae7b38 |
+| Hielo en el sitio de Phoenix (68.2°N) a 4.6 cm de profundidad media, con variación de más de 10 veces entre zanjas (control del prior regional) | Mellon et al. (2009) JGR 114, E00E07, doi:10.1029/2009JE003417 |
+| Viking Lander 2 (48°N): zanja de 10-15 cm sin hielo; Byrne et al. estiman que un poco más abajo habría llegado al hielo | NASA/JPL PIA12214, https://www.jpl.nasa.gov/images/pia12214-expected-depths-to-ice-mid-latitude-northern-mars/; Byrne et al. (2009) Science 325:1674, doi:10.1126/science.1175307 |
+| Enunciado oficial del desafío 2026 (leído el 2026-11-12) | https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/ |
 | Kriging y expectation propagation para el GP | Rasmussen y Williams (2006), Gaussian Processes for Machine Learning, caps. 2 y 3, https://gaussianprocess.org/gpml/chapters/RW3.pdf |
 
 ## Supuestos del GP
@@ -84,6 +89,9 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | `NEUTRON_SIGMA_LOG = 0.3` | Alcance gradual del espectrómetro | ~0.4-1 m alrededor de 0.6 m (`research/viabilidad-expediciones.md`) |
 | `CRATER_ERROR_M = 0.15`, usado en un taladro | Error de un taladro que no informa el suyo | Se reutiliza el valor de cráteres: 1 px en Dundas et al. (2023). Para taladro, sin fuente |
 | Profundidad excavada = 0.1 × diámetro (prior regional) | Hasta dónde "ve" un cráter nuevo de Daubar 2022: con hielo, d < 0.1·D; sin hielo, d > 0.1·D | Sin fuente directa. Byrne et al. 2009 describe cráteres con hielo de pocos metros y decímetros de profundidad (~0.1; resumen en [Dundas et al. 2014, USGS](https://pubs.usgs.gov/publication/70073409)); el DTM de S1094b da ~0.14 ([HiRISE](https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155)). Con 0.2 el regional no coincide con el sitio (`EXPERIMENTS.md`, 2026-11-10). Fuente posible: cuestión 57 |
+| 50 sondeos de radar independientes por EVA (`gp.tool_strategy`) | Cuántos lugares puede marcar el radar en una EVA | Uno cada ~40 m en 2 km. El radar mide de forma continua, pero los sondeos cercanos no son independientes; sin fuente |
+| Reflector falso a una profundidad sacada de la distribución del sitio (`gp.tool_strategy`) | Dónde aparece un reflector que no es hielo | Es la mezcla que EP aproxima ensanchando el error (`gp/observations.py`); sin fuente |
+| Taladro hipotético de 3 m (`exploration_zones.json`) | Qué cambia en cada zona con más alcance | No está en el catálogo de herramientas; ilustrativo |
 | Alcance de 100 m y reparto 50/50 fuera de S1094b | Alcance del kernel y parte espacial de la varianza en un sitio sin catálogo (`gp.planning.regional_prior`) | Se toman los ajustados en S1094b; sin fuente para otros sitios |
 
 ## Supuestos del planificador

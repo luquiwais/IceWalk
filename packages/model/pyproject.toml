@@ -23,9 +23,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["vision*", "gp*"]
 
-# Coeficientes del prior regional (gp/regional_fit.json).
+# Coeficientes del prior regional (gp/regional_fit.json) e impactos del control local (CSV).
 [tool.setuptools.package-data]
-gp = ["*.json"]
+gp = ["*.json", "*.csv"]
 
 [tool.ruff]
 line-length = 100

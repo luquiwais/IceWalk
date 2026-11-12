@@ -1,6 +1,7 @@
 """Prior regional por latitud (Daubar 2022) y tarjeta de sitio."""
 
 import math
+from dataclasses import replace
 
 import numpy as np
 import pytest
@@ -13,6 +14,7 @@ from gp.regional import (
     bootstrap_fit,
     fit_censored,
     load_fit,
+    nearby_check,
     regional_estimate,
     site_assessment,
 )
@@ -52,6 +54,7 @@ def test_bootstrap_gives_valid_covariance_and_roundtrip():
     cov = np.asarray(fit.beta_cov)
     assert np.linalg.eigvalsh(cov).min() >= 0 and cov[0, 0] > 0
     assert fit.n_craters == 800 and fit.n_ice == int(ice.sum())
+    assert fit.ice_lat_min_deg == pytest.approx(lat[ice].min())
     assert RegionalFit.from_json(fit.to_json()) == fit
 
 
@@ -61,6 +64,15 @@ def test_committed_fit_loads_and_is_sane():
     assert fit.beta[1] < 0  # más al norte, hielo más somero
     assert fit.lat_range_deg[0] >= MIN_LAT_DEG
     assert fit.meta["assumption"] is True and "CC BY 4.0" in fit.meta["source"]
+    assert fit.lat_range_deg[0] < fit.ice_lat_min_deg < 40  # 39.1°N en Daubar 2022
+
+
+def test_status_marks_latitudes_without_ice_detections():
+    fit = load_fit()
+    south = regional_estimate(fit.ice_lat_min_deg - 0.5)
+    north = regional_estimate(fit.ice_lat_min_deg + 0.5)
+    assert south.status == "extrapolated" and north.status == "ok"
+    assert regional_estimate(30.0, replace(fit, ice_lat_min_deg=None)).status == "ok"
 
 
 def test_s1094b_agrees_with_site_prior():
@@ -68,7 +80,9 @@ def test_s1094b_agrees_with_site_prior():
     est = regional_estimate(S1094B_LAT)
     lo, hi = est.median_interval_m()
     assert lo < math.exp(FITTED["mean"]) < hi
-    assert est.status == "ok"
+    # Al sur del impacto con hielo más austral: coincide, pero se marca como extrapolado.
+    assert est.status == "extrapolated"
+    assert any("No ice-exposing impact south of 39.1" in w for w in est.warnings)
     assert 0.02 < est.p_within(1.0) < 0.15
 
 
@@ -105,7 +119,8 @@ def test_site_assessment_without_threshold_has_no_verdict():
     card = site_assessment(S1094B_LAT, {"core_drill": 1.0, "gpr": 10.0})
     assert "verdict" not in card
     assert card["tools"]["gpr"]["p_ice"] > card["tools"]["core_drill"]["p_ice"]
-    assert card["status"] == "ok"
+    assert card["status"] == "extrapolated"
+    assert site_assessment(45.0, {"gpr": 10.0})["status"] == "ok"
 
 
 def test_site_assessment_verdicts_follow_the_interval():
@@ -137,3 +152,22 @@ def test_regional_prior_splits_total_variance():
         regional_prior(-30.0)
     with pytest.raises(ValueError):
         regional_prior(50.0, rho=0.0)
+
+
+def test_nearby_check_flags_arcadia_but_not_everywhere():
+    # Amazonis/Arcadia (46°N, 189°E): sobran impactos con hielo, el prior es conservador ahí.
+    arcadia = nearby_check(46.16, 188.8)
+    assert arcadia["ice"] > arcadia["expected_ice"] and arcadia["z"] > 2
+    # Longitud negativa o mayor a 360 es la misma: la ventana da la vuelta al planeta.
+    assert nearby_check(46.16, 188.8 - 360) == arcadia
+    card = site_assessment(46.16, {"gpr": 10.0}, lon_e_deg=188.8)
+    assert card["nearby_impacts"] == arcadia
+    assert any("likely shallower" in w for w in card["warnings"])
+    # Alrededor de Viking 2 (134°E) no sobra: el control local no explica la tensión con Byrne.
+    vl2 = site_assessment(47.97, {"gpr": 10.0}, lon_e_deg=134.26)
+    assert vl2["nearby_impacts"]["z"] < 2
+    assert not any("likely shallower" in w for w in vl2["warnings"])
+    # Sin longitud no hay control local.
+    assert "nearby_impacts" not in site_assessment(47.97, {"gpr": 10.0})
+    with pytest.raises(ValueError):
+        nearby_check(40.0, float("nan"))

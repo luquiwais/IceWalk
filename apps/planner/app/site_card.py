@@ -2,7 +2,8 @@
 
 Nivel región de la decisión de los tres niveles (DECISIONS 2026-11-10): P(hielo al alcance) por
 herramienta con el prior regional por latitud (`gp.regional.site_assessment`). No usa los cráteres
-del sitio ni las mediciones: es lo que se sabe antes de bajar. El umbral para el veredicto lo
+del sitio ni las mediciones: es lo que se sabe antes de bajar. Con la longitud del sitio suma el
+control local con los impactos cercanos (`gp.regional.nearby_check`). El umbral para el veredicto lo
 declara la STM (`constraints.site_min_p`, supuesto; cuestión 58 y docs/SOURCES.md).
 """
 
@@ -34,13 +35,14 @@ def subsurface_tools() -> dict[str, float]:
 
 
 @lru_cache(maxsize=8)
-def _card(lat_deg: float, min_p: float | None) -> dict[str, Any]:
-    return _round(site_assessment(lat_deg, subsurface_tools(), min_p=min_p))
+def _card(lat_deg: float, lon_e_deg: float, min_p: float | None) -> dict[str, Any]:
+    return _round(site_assessment(lat_deg, subsurface_tools(), min_p=min_p, lon_e_deg=lon_e_deg))
 
 
 def site_card(stm: dict) -> dict[str, Any]:
     """Tarjeta del sitio de la grilla, con el `site_min_p` de la STM si lo trae."""
     min_p = stm.get("constraints", {}).get("site_min_p")
-    lat = float(grid()["crs"]["center_lat_deg"])
+    crs = grid()["crs"]
+    lat, lon = float(crs["center_lat_deg"]), float(crs["center_lon_east_deg"])
     # Copia profunda: la caché no se comparte entre planes que después se modifiquen.
-    return copy.deepcopy(_card(lat, None if min_p is None else float(min_p)))
+    return copy.deepcopy(_card(lat, lon, None if min_p is None else float(min_p)))

@@ -130,14 +130,19 @@ En S1094b: espectrómetro `NO_GO` (1 %), taladro `NO_GO` (6 %), radar `GO` (97 %
 
 Para Frontend: una tarjeta en el Brief de Planning, con una fila por herramienta (`p_ice` como porcentaje, `p_ice_90` como rango y `verdict`), la mediana de profundidad con su rango y los `warnings`. Color solo en el veredicto (alerta). Aclarar que es «regional prior, before landing».
 
+**Cambios del 2026-11-12:**
+- S1094b sale `status: "extrapolated"`, porque queda al sur del impacto con hielo más austral (39.1°N). Los veredictos no cambian.
+- `nearby_impacts` es el control local: impactos con hielo observados contra esperados alrededor del sitio. Va como una línea chica ("Nearby fresh impacts: 7 with ice vs 3.4 expected"); el aviso ya viene en `warnings`.
+- **Zonas de NASA en el globo** (`packages/contracts/examples/exploration_zones.json`, esquema `exploration_zones.schema.json`): las 51 zonas de exploración propuestas en 2015, cada una con su tarjeta. Sirve para mostrar que la herramienta funciona en otros lugares: un punto por zona, con el veredicto de la mejor herramienta, y la misma tarjeta al tocarla. `drill_3m` es hipotético y hay que rotularlo así. Sin datos (sur o debajo de 20°N): gris, `INSUFFICIENT_DATA`. Es un complemento: el centro de la demo sigue siendo S1094b.
+
 ## Datos y despliegue
 
 - El catálogo de cráteres (`data/processed/s1094b/craters_dundas2023.csv`) y el DTM están **fuera de Git**.
-- **La licencia de la tabla de Dundas 2023 está sin confirmar (cuestión 26):** no se puede subir al repo ni publicar hasta saberla.
+- **La tabla de Dundas 2023 es CC BY-NC-ND 4.0 (cuestión 26, cerrada el 12/11):** el original se puede compartir sin modificar (cuestión 65, Release público a decidir por Luqui); el CSV llevado a la grilla es una adaptación y va solo por privado (equipo y servidor del deploy).
 - **Plan aprobado:**
   1. Un script genera un paquete chico del sitio (cráteres en la grilla y máscara de pendiente de las candidatas) en `data/processed/`.
   2. La API lo usa si está; si no, cae al mock.
-  3. Para desplegar va como GitHub Release, según `CLAUDE.md`, después de confirmar la licencia.
+  3. Para desplegar, las capas del terreno van como GitHub Release (CC0) y el catálogo convertido como archivo privado del servidor.
 - **Cómo regenerar el catálogo:** necesita la imagen RED y el orto en `data/raw/`, y se corre `python -m gp.craters` desde `packages/model`. Pedile los archivos al dueño del GP.
 - **Hábitat por defecto:** (300, -2200) m en la grilla, marcado como supuesto (decisión del 2026-11-08). Es uno de los hábitats de la simulación con muchos cráteres cerca. Cuando se toque el contrato de la STM, sumar `habitat_xy`.
 

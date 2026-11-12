@@ -6,12 +6,25 @@ Revisión del 2026-11-11, a 3 días del evento (14-15 nov). Revisar de nuevo el 
 
 | Tema | Estado | Fuente |
 | --- | --- | --- |
-| Nombre del desafío | **Interplanetary Survival Guide: Martian Map**: mapa en capas de un lugar o ruta en Marte para planificar y hacer una Marswalk con ciencia | Copia de terceros (spacedata.swapniltamse.com, parafraseada) y repos de otros equipos. No es texto oficial |
+| Nombre del desafío | **Interplanetary Survival Guide: Martian Map**: mapa en capas de un lugar o ruta en Marte para planificar y hacer una Marswalk con ciencia | **Oficial**, leído en el navegador el 12/11. Dificultad Intermediate |
 | Fechas de entrega | Abre el sábado 14/11 a las 9:00 y cierra el domingo 15/11 a las 23:59, hora local | Búsqueda sobre el sitio oficial (resumen, no leído directo) |
 | Guía de entrega y guía de jurado y premios | Salen el **13/11** | FAQ oficial, vía búsqueda (cuestión 17) |
-| Lista oficial de recursos | Abre el 13/11 en el sitio de Space Apps | Copia de terceros |
+| Lista oficial de recursos | "Resources will be available on Friday, November 13" | Pestaña Resources del desafío, 12/11 |
+| Otros desafíos | 14 en total. El único de sitios de aterrizaje es **Lunar Landing Site Navigator** (polo sur de la Luna: luz y visibilidad de la Tierra). Ninguno de Marte se pisa con el nuestro | Página oficial de desafíos, 12/11 |
 | Formato de entrega | Solo la guía 2025: video de hasta 30 s con subtítulos en inglés, o hasta 7 slides, con link público. Criterios 2025: impacto, creatividad, validez, relevancia y presentación | PRD. **Confirmar el 13/11** |
-| Texto oficial del enunciado | **No se pudo leer.** spaceappschallenge.org falla por certificado (TLS) desde WebFetch y desde `curl` en esta compu. No se forzó la conexión | Abrir en el navegador. La tabla "Alineación con el challenge" del PRD se armó con el texto del 28/10 |
+| Texto oficial del enunciado | **Leído el 12/11** con el navegador (desde WebFetch y `curl` sigue fallando el certificado). Puntos clave abajo | https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/ |
+
+## Lo que dice el enunciado oficial (12/11)
+
+Resumen propio, sin citar de largo:
+
+- Pide un mapa, herramienta o interfaz que un astronauta use en una excursión en Marte, con datos y herramientas de NASA, que ayude a planificar y hacer una Marswalk con ciencia.
+- Marca el hueco: Mars Trek y el mapeo geológico de USGS sirven para vistas regionales y globales, **no para las zonas hiperlocales** de una EVA. Es exactamente S1094b a 10 m.
+- Sugiere al menos tres tipos de datos (óptico, térmico, espectral, topográfico, geofísico, atmosférico, radiación, químico).
+- La seguridad es lo primero: clima espacial y radiación, movilidad con traje y carga, y una ruta que evite obstáculos grandes como rocas.
+- Opcionales: formato (pantalla del hábitat, tablet, HUD en el visor), mapa estático o **"a tool or system that generates maps of different locations"**, ventana de tiempo pasada o prevista, **imágenes en primera persona**, rovers y **trabajo en pareja**.
+
+Para nosotros: las zonas de NASA (`exploration_zones.json`) entran como "genera mapas de otros lugares", pero el centro tiene que seguir siendo lo hiperlocal. La vista en primera persona y las rocas (visión) aparecen explícitas.
 
 ## Dónde estamos frente a lo que pide el desafío
 

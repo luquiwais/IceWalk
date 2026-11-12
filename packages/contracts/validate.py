@@ -21,6 +21,7 @@ PAIRS = [
     ("schemas/boulders.schema.json", C / "examples/boulders.example.json"),
     ("schemas/map.schema.json", C / "examples/map.example.json"),
     ("schemas/eva_window.schema.json", C / "examples/eva_window.example.json"),
+    ("schemas/exploration_zones.schema.json", C / "examples/exploration_zones.json"),
     ("schemas/eva_window.schema.json", ROOT / "apps/web/mock/eva-window.json"),
     ("schemas/plan.schema.json", ROOT / "apps/web/mock/plan.json"),
     ("schemas/plan.schema.json", ROOT / "apps/web/mock/replan.json"),
