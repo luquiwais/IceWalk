@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Archivo, Inter, JetBrains_Mono } from "next/font/google";
 
 import "./globals.css";
 
@@ -9,6 +9,10 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+// Claude Design pass: Archivo (width axis for condensed titles) and JetBrains Mono, see app/theme-dc.css.
+const archivo = Archivo({ variable: "--font-archivo", subsets: ["latin"], axes: ["wdth"] });
+const jetbrains = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"] });
+
 export const metadata: Metadata = {
   title: "IceWalk",
   description:
@@ -16,13 +20,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1c120e",
+  themeColor: "#121010",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-theme="dark" className={`dark ${inter.variable} h-full`}>
+    <html lang="en" data-theme="dark" className={`dark ${inter.variable} ${archivo.variable} ${jetbrains.variable} h-full`}>
       <body className="min-h-full bg-black">{children}</body>
     </html>
   );
