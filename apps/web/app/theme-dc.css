@@ -217,3 +217,40 @@
 .mission-uncertainty figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
 .mission-uncertainty img { width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated; border: 1px solid var(--dc-line); border-radius: 4px; background: var(--dc-panel); }
 .mission-uncertainty figcaption { font-family: var(--font-mono); font-size: .625rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dc-muted); }
+
+/* Flow pass: tabs read as the four EVA phases, numbered, each with who works in it. */
+.mission-app .mission-tabs [role=tablist] { counter-reset: phase; }
+.mission-app .mission-tabs [role=tab] { counter-increment: phase; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; align-content: center; column-gap: 8px; row-gap: 1px; text-align: left; }
+.mission-app .mission-tabs [role=tab] > span[aria-hidden] { display: none; }
+.mission-app .mission-tabs [role=tab]::before { content: counter(phase) / ""; grid-row: 1 / span 2; align-self: center; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid currentColor; font-size: .6875rem; }
+.mission-app .mission-tabs [role=tab]::after { grid-column: 2; font-size: .5625rem; font-weight: 500; letter-spacing: .06em; color: var(--dc-faint); text-transform: none; }
+.mission-app .mission-tabs [role=tab]:nth-of-type(1)::after { content: "strategic · is it worth it" / ""; }
+.mission-app .mission-tabs [role=tab]:nth-of-type(2)::after { content: "IV · tactical traverse" / ""; }
+.mission-app .mission-tabs [role=tab]:nth-of-type(3)::after { content: "EV1 / EV2 · execution" / ""; }
+.mission-app .mission-tabs [role=tab]:nth-of-type(4)::after { content: "science · replan" / ""; }
+.mission-app .mission-tabs [role=tab][aria-selected=true]::before { background: var(--dc-accent); border-color: var(--dc-accent); color: var(--dc-bg); }
+@media (max-width: 1100px) { .mission-app .mission-tabs [role=tab]::after { display: none; } }
+
+/* Next step: the panel always ends with the one action that moves the EVA forward. */
+.mission-next { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px 16px; border-top: 1px solid var(--dc-line); background: var(--dc-bg); }
+.mission-next > span { font-size: .75rem; color: var(--dc-muted); line-height: 1.3; }
+.mission-next > button { flex-shrink: 0; min-height: 44px; padding-inline: 18px; border-radius: 4px; font-weight: 700; }
+
+/* Layer bar: grouped and labelled (base is fixed, overlays are exclusive, extras toggle). */
+.mission-layer-window { align-items: center; gap: 2px; }
+.mission-layer-label { font-family: var(--font-mono); font-size: .5625rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dc-faint); padding: 0 6px 0 10px; }
+.mission-layer-label:first-child { padding-left: 6px; }
+.mission-layer-fixed { font-size: .75rem; font-weight: 600; color: var(--dc-muted); padding: 0 8px; }
+.mission-app .mission-layer-window [aria-pressed=true] { background: var(--dc-ink); color: var(--dc-bg); }
+.mission-app .mission-layer-window [aria-pressed=true] * { color: inherit; }
+@media (min-width: 760px) {
+  .mission-app .mission-status-values { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .mission-app .mission-status-values > :last-child { grid-column: auto; }
+  .mission-app .mission-status-values span { font-size: .5625rem; }
+  .mission-app .mission-status-values strong { font-size: .875rem; white-space: normal; }
+  .mission-app .mission-status { padding: 12px 20px; gap: 8px; }
+  .mission-app .mission-status-source [data-level] [data-text-style] { font-size: .6875rem; line-height: 1.35; }
+}
+.mission-site-globe .mission-globe-layers button { border-radius: 4px; }
+/* EVA: the alert lives in the big band over the map; don't repeat it in the column. */
+@media (min-width: 760px) { .mission-app[data-view=ev] .mission-status-source [data-level] { display: none; } }

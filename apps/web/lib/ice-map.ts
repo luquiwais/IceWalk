@@ -41,7 +41,7 @@ export type IceMapMode = "potential" | "probability" | "uncertainty" | "change";
 
 export const ICE_MAP_MODES: { value: IceMapMode; label: string }[] = [
   { value: "potential", label: "Ice potential" },
-  { value: "probability", label: "P(ice)" },
+  { value: "probability", label: "Ice probability" },
   { value: "uncertainty", label: "Uncertainty" },
   { value: "change", label: "Change vs prior" },
 ];

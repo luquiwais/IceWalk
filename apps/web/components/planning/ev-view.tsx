@@ -60,7 +60,7 @@ export function EVView({ plan, measurements, pending, onLog, onReview }: {
       <ListRow trailing={<Value>{String(station.order).padStart(2, "0")}</Value>}><RowLabel title={station.id} detail={station.tools.map(toolName).join(" · ")} /></ListRow>
       <ListRow trailing={<Value>{Math.round(direction!.distanceM)} m</Value>}><RowLabel title={direction!.distanceM ? direction!.label : "At habitat"} detail="Straight-line grid distance · simulated position" /></ListRow>
     </ListSection> : <Body>All planned stations measured. Return to habitat.</Body>}
-    {last ? <section className="mission-last-result" aria-label="Last measurement"><Footnote>Measured {last.station_id} · {measurementSummary(last)}</Footnote><Button size="small" variant="plain" onClick={onReview}>Review in Science</Button></section> : null}
+    {last ? <section className="mission-last-result" aria-label="Last measurement"><Footnote>Measured {last.station_id} · {measurementSummary(last)}</Footnote><Button size="small" variant="plain" onClick={onReview}>Review results</Button></section> : null}
     {station ? <MeasurementForm key={station.id} station={station} pending={pending} onLog={onLog} /> : null}
     <SurfaceAnalog />
   </div>;

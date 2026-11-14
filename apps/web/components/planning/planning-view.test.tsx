@@ -20,11 +20,21 @@ const second = orderedStations(demoPlan)[1];
 const visible = { ignore: "script, style, [aria-hidden], [aria-hidden] *" };
 
 describe("Mission table", () => {
+  it("opens on the site and walks the EVA phases with one next-step button each", async () => {
+    render(<PlanningView />);
+    expect(screen.getByRole("tab", { name: "Site" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("region", { name: "Site brief" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Plan the traverse →" }));
+    expect(screen.getByRole("region", { name: "Mission brief" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Start EVA →" }));
+    expect(screen.getByRole("tab", { name: "EVA" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.queryByRole("button", { name: "Review results →" })).not.toBeInTheDocument();
+  });
   it("keeps EV guidance in the window on compact screens, leaving the map and minimap clear", async () => {
     vi.stubGlobal("matchMedia", vi.fn((query: string) => ({ matches: query === "(max-width: 759px)", addEventListener: vi.fn(), removeEventListener: vi.fn() })));
     try {
-      render(<PlanningView />);
-      await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+      render(<PlanningView initialView="planning" />);
+      await userEvent.click(screen.getByRole("tab", { name: "EVA" }));
       expect(screen.getByRole("region", { name: "Current station" })).toHaveTextContent(first.id);
       expect(screen.getByRole("img", { name: "North-up traverse minimap" })).toBeInTheDocument();
       expect(screen.queryByText(`Next station · ${first.order} · ${first.id}`, visible)).not.toBeInTheDocument();
@@ -34,16 +44,16 @@ describe("Mission table", () => {
     }
   });
   it("shows an oblique real-ortho EV view with a north-up minimap", async () => {
-    render(<PlanningView />);
-    await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+    render(<PlanningView initialView="planning" />);
+    await userEvent.click(screen.getByRole("tab", { name: "EVA" }));
     expect(screen.getByTestId("mock-map")).toHaveAttribute("data-projected", "true");
     expect(screen.getByRole("img", { name: "North-up traverse minimap" })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("tab", { name: "Science" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Review" }));
     expect(screen.getByTestId("mock-map")).toHaveAttribute("data-projected", "false");
   });
   it("offers the Mars globe and can enter the site without waiting for a flight", async () => {
-    render(<PlanningView />);
-    await userEvent.click(screen.getByRole("button", { name: "View Mars" }));
+    render(<PlanningView initialView="planning" />);
+    await userEvent.click(screen.getByRole("tab", { name: "Site" }));
     expect(screen.getByTestId("mars-globe")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Fly to S1094b" }));
     expect(screen.getByRole("button", { name: "Complete flight" })).toBeInTheDocument();
@@ -53,8 +63,8 @@ describe("Mission table", () => {
   });
 
   it("hands over to the site when the globe flight lands", async () => {
-    render(<PlanningView />);
-    await userEvent.click(screen.getByRole("button", { name: "View Mars" }));
+    render(<PlanningView initialView="planning" />);
+    await userEvent.click(screen.getByRole("tab", { name: "Site" }));
     expect(screen.queryByRole("region", { name: "Mission brief" })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Fly to S1094b" }));
     await userEvent.click(screen.getByRole("button", { name: "Complete flight" }));
@@ -62,22 +72,22 @@ describe("Mission table", () => {
     expect(screen.getByRole("region", { name: "Mission brief" })).toBeInTheDocument();
   });
   it("explains arcs, habitat, traverse and data origin in the map legend", () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     const legend = screen.getByRole("group", { name: "Map legend" });
     for (const text of ["P(ice ≤ 3 m)", "Habitat", "Traverse", "Model estimate", "349 craters", "Bundled mock data"]) expect(legend).toHaveTextContent(text);
   });
   it("keeps the Planning selection out of the EV scene and restores it on return", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     await userEvent.click(screen.getByRole("button", { name: `Map ${first.id}` }));
-    await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+    await userEvent.click(screen.getByRole("tab", { name: "EVA" }));
     expect(screen.getByRole("button", { name: `Map ${first.id}` })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("region", { name: "Map layers" })).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole("tab", { name: "Planning" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Plan" }));
     expect(screen.getByRole("heading", { name: `Station ${first.id}` })).toBeInTheDocument();
   });
 
   it("shows the mission brief, stations, time, safety and provenance without opening anything", () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     expect(screen.getByRole("region", { name: "Mission brief" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Plan timeline" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "EVA status" })).toHaveTextContent("Bundled mock data");
@@ -93,7 +103,7 @@ describe("Mission table", () => {
   });
 
   it("answers whether the EVA can be walked: effort, load, soil, comms and mobility", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     await userEvent.click(screen.getByRole("button", { name: "Can we walk it? · Feasibility" }));
     const card = screen.getByRole("region", { name: "Feasibility" });
     const f = demoPlan.summary.feasibility!;
@@ -104,7 +114,7 @@ describe("Mission table", () => {
   });
 
   it("says where the unreported dust opacity comes from (Hope EMIRS)", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     await userEvent.click(screen.getByRole("button", { name: "EVA window & weather" }));
     const card = screen.getByRole("region", { name: "EVA window and weather" });
     expect(card).toHaveTextContent("Hope EMIRS (UAE)");
@@ -112,7 +122,7 @@ describe("Mission table", () => {
   });
 
   it("shares selection and hover between map, list and timeline, and returns to Brief", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     const timeline = screen.getByRole("group", { name: "Plan timeline" });
     const block = within(timeline).getByRole("button", { name: new RegExp(first.id) });
     await userEvent.hover(block);
@@ -126,7 +136,7 @@ describe("Mission table", () => {
   });
 
   it("navigates timeline station blocks with arrows and Enter", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     const timeline = screen.getByRole("group", { name: "Plan timeline" });
     const a = within(timeline).getByRole("button", { name: new RegExp(first.id) });
     const b = within(timeline).getByRole("button", { name: new RegExp(second.id) });
@@ -138,18 +148,18 @@ describe("Mission table", () => {
   });
 
   it("does not move focus back to a previous tab when changing views", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     await userEvent.click(screen.getByRole("button", { name: `Map ${first.id}` }));
-    const science = screen.getByRole("tab", { name: "Science" });
+    const science = screen.getByRole("tab", { name: "Review" });
     await userEvent.click(science);
     expect(science).toHaveFocus();
-    const ev = screen.getByRole("tab", { name: "EV" });
+    const ev = screen.getByRole("tab", { name: "EVA" });
     await userEvent.click(ev);
     expect(ev).toHaveFocus();
   });
 
   it("toggles real geometry layers and the ice map modes from the bundled real-model map", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     const layers = screen.getByRole("region", { name: "Map layers" });
     const grid = within(layers).getByRole("button", { name: "Grid" });
     await userEvent.click(grid);
@@ -164,16 +174,16 @@ describe("Mission table", () => {
   });
 
   it("keeps the selected station through Map focus", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     await userEvent.click(screen.getByRole("button", { name: `Map ${first.id}` }));
-    await userEvent.click(screen.getByRole("button", { name: "Map focus" }));
+    await userEvent.click(screen.getByRole("button", { name: "Hide panel · expand map" }));
     expect(screen.queryByRole("heading", { name: `Station ${first.id}` })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Show planning window" }));
     expect(screen.getByRole("heading", { name: `Station ${first.id}` })).toBeInTheDocument();
   });
 
   it("shows station tasks, tools and decisions and logs a negative result with Measured on the scene", async () => {
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     await userEvent.click(screen.getByRole("button", { name: `Map ${first.id}` }));
     for (const task of first.tasks.EV1 ?? []) expect(screen.getByText(task, visible)).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Decision point" })).toBeInTheDocument();
@@ -187,12 +197,12 @@ describe("Mission table", () => {
   });
 
   it.each(["Ice", "Inconclusive"])("moves to the next unmeasured station after %s without changing the nominal route", async (result) => {
-    render(<PlanningView />);
-    await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+    render(<PlanningView initialView="planning" />);
+    await userEvent.click(screen.getByRole("tab", { name: "EVA" }));
     await userEvent.click(screen.getByRole("button", { name: result }));
     expect(screen.getByRole("region", { name: "Next station" })).toHaveTextContent(second.id);
     expect(screen.getByRole("status", { name: "Session update" })).toHaveTextContent("Nominal traverse retained");
-    await userEvent.click(screen.getByRole("tab", { name: "Science" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Review" }));
     expect(screen.getByRole("region", { name: "Measurement log" })).toHaveTextContent(first.id);
     await userEvent.click(screen.getByRole("button", { name: "Approve plan" }));
     expect(screen.getByRole("button", { name: "Plan approved" })).toBeDisabled();
@@ -201,8 +211,8 @@ describe("Mission table", () => {
   });
 
   it("rejects a depth beyond the assigned instrument's catalog reach", async () => {
-    render(<PlanningView />);
-    await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+    render(<PlanningView initialView="planning" />);
+    await userEvent.click(screen.getByRole("tab", { name: "EVA" }));
     const field = screen.getByRole("spinbutton", { name: "Measurement depth (m)" });
     await userEvent.clear(field);
     await userEvent.type(field, "5");
@@ -219,7 +229,7 @@ describe("Mission table API states", () => {
   it("labels API failure clearly and preserves the bundled plan", async () => {
     vi.stubEnv("NEXT_PUBLIC_PLANNER_API_URL", BASE);
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("Failed to fetch")));
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     expect(await screen.findByText(/Using bundled mock data/, visible)).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Mission brief" })).toBeInTheDocument();
   });
@@ -228,9 +238,9 @@ describe("Mission table API states", () => {
     let resolveReplan!: (value: Response) => void;
     const fetch = vi.fn(async (url: string) => url.endsWith("/health") ? response({ status: "ok", planner: "real" }) : url.endsWith("/plan") ? response(demoPlan) : new Promise<Response>((resolve) => { resolveReplan = resolve; }));
     vi.stubGlobal("fetch", fetch);
-    render(<PlanningView />);
+    render(<PlanningView initialView="planning" />);
     await waitFor(() => expect(screen.getByRole("region", { name: "EVA status" })).toHaveTextContent("Planner API"));
-    await userEvent.click(screen.getByRole("tab", { name: "EV" }));
+    await userEvent.click(screen.getByRole("tab", { name: "EVA" }));
     const before = Date.now();
     await userEvent.click(screen.getByRole("button", { name: "Ice" }));
     expect(screen.getByRole("button", { name: "No ice" })).toBeDisabled();

@@ -28,7 +28,8 @@ import { TraverseMinimap } from "./traverse-minimap";
 import { HABITAT_XY } from "@/components/site/site-data";
 
 type View = "site" | "planning" | "ev" | "science";
-const VIEWS = [{ value: "site", label: "Site", icon: <Globe /> }, { value: "planning", label: "Planning", icon: <MapIcon /> }, { value: "ev", label: "EV", icon: <Footprints /> }, { value: "science", label: "Science", icon: <FlaskConical /> }];
+/** The four phases of an EVA, in NASA's order: strategic site choice, tactical plan (IV), execution (EV1/EV2), science review. */
+const VIEWS = [{ value: "site", label: "Site", icon: <Globe /> }, { value: "planning", label: "Plan", icon: <MapIcon /> }, { value: "ev", label: "EVA", icon: <Footprints /> }, { value: "science", label: "Review", icon: <FlaskConical /> }];
 const COMPACT_QUERY = "(max-width: 759px)";
 /** EV looks along the leg ahead; web-design.md, "EV y Science": rotateX(58deg). */
 const EV_PITCH_DEG = 58;
@@ -38,9 +39,9 @@ function subscribeCompact(listener: () => void) {
   return () => media.removeEventListener("change", listener);
 }
 
-export function PlanningView() {
+export function PlanningView({ initialView = "site" }: { initialView?: View } = {}) {
   const compact = useSyncExternalStore(subscribeCompact, () => window.matchMedia?.(COMPACT_QUERY).matches ?? false, () => false);
-  const [view, setView] = useState<View>("planning");
+  const [view, setView] = useState<View>(initialView);
   const globe = view === "site";
   const [stationId, setStationId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -58,7 +59,6 @@ export function PlanningView() {
   const timelineRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const legendRef = useRef<HTMLDivElement>(null);
-  const globeButtonRef = useRef<HTMLButtonElement>(null);
   const sceneRef = useRef<SiteSceneHandle>(null);
   const panelOrigin = useRef<HTMLElement | null>(null);
   const reopenRef = useRef<HTMLButtonElement | null>(null);
@@ -124,7 +124,7 @@ export function PlanningView() {
     if (hadFocus) requestAnimationFrame(() => { const target = panelOrigin.current; if (target?.isConnected) target.focus(); else contentRef.current?.focus(); panelOrigin.current = null; });
   }
   function switchView(value: string) { setView(value as View); setMapFocus(false); panelOrigin.current = null; if (value === "science") sceneRef.current?.fit(); }
-  const enterSite = useCallback(() => { setView("planning"); requestAnimationFrame(() => globeButtonRef.current?.focus()); }, []);
+  const enterSite = useCallback(() => setView("planning"), []);
   function reset() { session.reset(); setStationId(null); setApproved(false); setAnnouncement("Session reset to the nominal plan."); }
   async function logMeasurement(target: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") {
     if (pending) return;
@@ -135,7 +135,7 @@ export function PlanningView() {
     setApproved(false); setStationId(null);
     setAnnouncement(`${result === "no_ice" ? "No ice" : result === "ice" ? "Ice" : "Inconclusive"} recorded at ${target.id}. ${outcome === "replanned" ? "Replanned traverse ready for review." : "Nominal traverse retained."}`);
   }
-  const title = view === "site" ? "Site" : view === "ev" ? "Surface operations" : view === "science" ? "Science review" : station ? `Station ${station.id}` : evaName(plan);
+  const title = view === "site" ? "Site" : view === "ev" ? "Surface operations" : view === "science" ? "Review" : station ? `Station ${station.id}` : evaName(plan);
   return <main ref={rootRef} className="mission-app" data-view={view} data-focused={mapFocus} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToBrief(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
     <div className="mission-scene" inert={globe}><SiteScene ref={sceneRef} plan={plan} previousPlan={session.previous ?? undefined} measurements={session.measurements} projection={projection} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} /></div>
@@ -143,9 +143,9 @@ export function PlanningView() {
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
     {globe ? null : <div className="mission-status-position" ref={statusRef}><Window className="mission-status-window"><MissionStatus plan={plan} elapsedMin={view === "planning" ? 0 : elapsedMin} execution={view !== "planning"} session={session} /></Window></div>}
     <div className="mission-tabs" ref={tabsRef}><TabBar label="Mission view" layout={compact ? "compact" : "regular"} value={view} tabs={VIEWS} onValueChange={switchView} /></div>
-    <div className="mission-camera"><IconButton ref={globeButtonRef} variant="glass" label="View Mars" onClick={() => switchView("site")}><Globe /></IconButton>{view !== "ev" && !globe ? <><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></> : null}</div>
+    <div className="mission-camera">{view !== "ev" && !globe ? <><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Fit route to view" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></> : null}</div>
     <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Contextual planning window">
-      <header className="mission-panel-heading">{station && view === "planning" ? <IconButton label="Back to brief" variant="plain" onClick={backToBrief}><ArrowLeft /></IconButton> : null}<Title2 as="h2">{title}</Title2><IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton></header>
+      <header className="mission-panel-heading">{station && view === "planning" ? <IconButton label="Back to brief" variant="plain" onClick={backToBrief}><ArrowLeft /></IconButton> : null}<Title2 as="h2">{title}</Title2><IconButton label="Hide panel · expand map" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton></header>
       <div className="mission-panel-scroll" tabIndex={-1} ref={contentRef}>
         <WindowContent contentKey={view === "planning" ? stationId ?? "brief" : view} direction={station ? "forward" : "back"}>
         {view === "site" ? <SiteBrief plan={plan} /> : null}
@@ -156,13 +156,14 @@ export function PlanningView() {
           : <>{iceMap.map ? <UncertaintyPair map={iceMap.map} /> : null}<ScienceView plan={plan} measurements={session.measurements} approved={approved} onApprove={() => { setApproved(true); setAnnouncement("Plan approved locally in this session."); }} onReset={reset} /></>}
         </WindowContent>
       </div>
+      <NextStep view={view} measured={session.measurements.length > 0} station={!!station} onGo={switchView} />
     </Window></div></WindowMotion>
     {mapFocus ? <Button ref={reopenRef} variant="glass" className="mission-show-panel" onClick={() => setMapFocus(false)}>Show planning window</Button> : null}
     {view === "ev" && !compact && next && direction ? <div className="mission-destination"><Footnote>Next station · {next.order} · {next.id}</Footnote><div className="mission-hud-row"><span className="mission-compass" aria-hidden style={{ "--hud-rot": `${direction.deg - (heading ?? 0)}deg` } as React.CSSProperties}><i /></span><Title2>{direction.distanceM >= 1 ? `${Math.round(direction.distanceM)} m · ${direction.label}` : "On station"}</Title2></div><Footnote>{toolName(measuringTool(next))}</Footnote>{plan.summary.min_walkback_margin_min != null ? <p className="mission-turnback"><span>Turn back in</span><strong>{formatNumber(plan.summary.min_walkback_margin_min, 0)} min</strong><span>min walkback margin, planned</span></p> : null}<Footnote>Simulated position · heading-up oblique of the flat ortho</Footnote></div> : null}
     {view === "ev" && !compact ? <EvAlert plan={plan} /> : null}
     {globe ? null : <><div className="mission-map-tools" ref={toolsRef}>
       {view === "ev" ? <TraverseMinimap plan={plan} measurements={session.measurements} position={position} headingDeg={heading} />
-        : <section className="mission-layer-position" aria-label="Map layers"><Window className="mission-layer-window"><Button variant="plain" size="small" disabled>HiRISE imagery</Button><Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button><Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button>{iceMap.map ? ICE_MAP_MODES.map((m) => <Button key={m.value} variant="plain" size="small" aria-pressed={mapMode === m.value} onClick={() => setMapMode((cur) => (cur === m.value ? null : m.value))}>{m.label}</Button>) : <Button variant="plain" size="small" disabled>{iceMap.loading ? "Ice map · loading" : "Ice map unavailable"}</Button>}</Window></section>}
+        : <section className="mission-layer-position" aria-label="Map layers"><Window className="mission-layer-window"><span className="mission-layer-label">Base</span><span className="mission-layer-fixed">HiRISE 25 cm</span><span className="mission-layer-label">Overlay</span>{iceMap.map ? ICE_MAP_MODES.map((m) => <Button key={m.value} variant="plain" size="small" aria-pressed={mapMode === m.value} onClick={() => setMapMode((cur) => (cur === m.value ? null : m.value))}>{m.label}</Button>) : <Button variant="plain" size="small" disabled>{iceMap.loading ? "Ice map · loading" : "Ice map unavailable"}</Button>}<span className="mission-layer-label">Show</span><Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button><Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button></Window></section>}
       <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
         <span><i data-key="arc" aria-hidden />Arc · P(ice{plan.summary.ice_threshold_m !== undefined ? ` ≤ ${plan.summary.ice_threshold_m} m` : ""})</span><span><i data-key="hab" aria-hidden />HAB · Habitat</span><span><i data-key="route" aria-hidden />Traverse</span>
         {iceMap.map && mapMode ? <IceLegend map={iceMap.map} mode={mapMode} /> : null}
@@ -189,4 +190,14 @@ function UncertaintyPair({ map }: { map: IceMap }) {
       <img src={p.url} alt={`${p.label} map of the site`} />
       <figcaption>{p.label}</figcaption></figure> : null)}
   </section>;
+}
+
+/** One primary action per phase: the step that comes next in the EVA (strategic → tactical → execution → review). */
+function NextStep({ view, measured, station, onGo }: { view: View; measured: boolean; station: boolean; onGo: (v: View) => void }) {
+  const step = view === "site" ? { to: "planning" as const, hint: "Worth going, with the right tool", label: "Plan the traverse" }
+    : view === "planning" ? (station ? null : { to: "ev" as const, hint: "Check bingo and walkback, then egress", label: "Start EVA" })
+    : view === "ev" ? (measured ? { to: "science" as const, hint: "A result is logged", label: "Review results" } : null)
+    : { to: "planning" as const, hint: "The replan is the next traverse", label: "Back to the plan" };
+  if (!step) return null;
+  return <footer className="mission-next"><span>{step.hint}</span><Button variant="prominent" onClick={() => onGo(step.to)}>{step.label} →</Button></footer>;
 }
