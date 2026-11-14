@@ -694,6 +694,29 @@ Errores que se ven: faltan bloques grandes y brillantes, y sobran pozos chicos y
 
 Siguiente paso recomendado: un detector aprendido (CNN chica o BoulderNet) entrenado con este dataset, sumando los recortes lunares para tener más datos. Hay que decidirlo con Luqui (`plans/vision.md`).
 
+### BoulderNet (Mask R-CNN publicado) sobre el dataset y sobre S1094b (2026-11-14)
+
+`python -m vision.bouldernet_infer` con los pesos `model_0055999.pth` de Prieur et al. (2023) (Zenodo 8171052, CC BY 4.0), sin reentrenar. Recortes de 500 px a 0.5 m/px como en su entrenamiento, umbral de score 0.30 elegido en `validation` (el mejor para ≥ 2 m) y medido **una sola vez** en `test`. La partición de Marte es chica: 6 recortes de validación y 4 de test (uno por imagen HiRISE). Corrió en la RTX 3060 del PC de Simon (1.4 s los 4 recortes; 8 min la zona de la EVA, dos fechas); los mismos números en CPU.
+
+| Recortes de Marte del dataset | BoulderNet F1 ≥ 2 m | ≥ 3 m | Sombras F1 ≥ 2 m | ≥ 3 m |
+| --- | --- | --- | --- | --- |
+| `validation` (800 bloques ≥ 2 m) | 0.72 | 0.75 | 0.37 | 0.52 |
+| `test` (274 bloques ≥ 2 m) | **0.70** | **0.73** | 0.29 | 0.44 |
+| `test`, con el estiramiento de niveles que necesita S1094b | 0.67 | 0.70 | | |
+
+**En su propio dominio gana con holgura. En S1094b no sirve:**
+
+1. **Niveles.** Los ortos de S1094b vienen estirados muy distinto que los recortes (abril: mediana 219 y desvío 8; febrero: 202 y 13; recortes: 115-157 y 9-59). Sin corregirlo, BoulderNet encuentra 25 bloques en abril y 524 en febrero en 9 km². Se agregó un estiramiento lineal de los percentiles 1 y 99 de cada imagen a los del `train` (48 y 210); en el dataset casi no cambia el F1 (fila 3).
+2. **Con los niveles corregidos detecta pozos y cráteres chicos, no bloques.** 18 270 objetos en la zona de la EVA (11 861 en las dos fechas). Contra la vara de Tusberti (febrero de 2022, 1 km² centrado en el cráter): 1276 por km² de 3 m o más (Tusberti ~220, sombras 247), 1094 de 4 m o más (~50, sombras 139), índice −0.92 (−4.68; sombras −1.86). A ojo, en tres recortes de 80 m (eyecta, hábitat, sur de la EVA) los círculos caen sobre depresiones redondas de 4-8 m: medialuna oscura en la pared que da al sol y borde iluminado enfrente, la misma firma que un bloque con su sombra a 64-68° de incidencia (en su entrenamiento, hasta 58°). Los bloques chicos y brillantes de la eyecta no los marca.
+
+**Decisión: queda el detector de sombras** (regla de `plans/vision-bouldernet.md`; `DECISIONS.md`). El catálogo de BoulderNet queda solo local (`data/processed/s1094b-bouldernet*/`, no se publica). Lo que falló, para no repetirlo:
+
+- Los pesos publicados no cargan con `weights_only=True`: guardan el estado del entrenamiento con un `getattr` (`CyclicLR.scale_fn`). `clean_weights()` lee solo los tensores con un unpickler restringido y deja un `.model_only.pth` que sí carga en modo seguro.
+- detectron2 sin compilar alcanza para Mask R-CNN (ROIAlign y NMS vienen de torchvision); `DefaultPredictor` no, porque importa el evaluador COCO. Con un predictor propio anda en Windows sin MSVC ni toolkit de CUDA.
+- Las corridas en segundo plano en dev-cachy morían al cerrarse la sesión de Claude Code: usar `systemd-run --user`.
+
+Para que BoulderNet sirva acá haría falta **reentrenarlo con bloques de S1094b** (o de imágenes con sol tan bajo) y con cráteres chicos como negativos: depende de las etiquetas a mano (cuestión 74).
+
 ## 2026-11-14: pendiente en el esfuerzo, exclusión del hábitat y regla de volver
 
 - **Plan nominal de S1094b** con la exclusión de 150 m: la estación 1 pasa de 0 m (encima del hábitat) a 200 m; 6 estaciones entre 200 y 510 m, 1.14 km, margen mínimo 20.6 min. Sube 19 m en total: media 1050 BTU/h, pico 1617 (tope 2000), VO2 30 % del máximo (límite 43 %): sigue siendo a pie.

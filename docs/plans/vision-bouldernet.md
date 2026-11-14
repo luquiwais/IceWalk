@@ -2,6 +2,10 @@
 
 **Fecha:** 2026-11-14. **Para:** quien tome visión con una GPU NVIDIA. **Entrega:** domingo 15/11, antes de las 18:00, para que entre en el deploy y el video.
 
+## Resultado (14/11, noche)
+
+**Hecho y descartado.** `python -m vision.bouldernet_infer` (eval y site) corrió en una RTX 3060: F1 0.70 (≥ 2 m) en el test del dataset contra 0.29 del de sombras, pero en S1094b marca pozos y cráteres chicos como bloques (contra Tusberti: 1276 por km² de 3 m o más contra ~220). **Queda el detector de sombras.** Detalle, números y lo que falló en `EXPERIMENTS.md` (2026-11-14); decisión en `DECISIONS.md`. No hay Release de BoulderNet. Diferencias con lo de abajo: los niveles de los ortos se estiran a los del entrenamiento; `evidence` usa `appearance` y `height_source` es `null` sin pareja (lo que permite el esquema); detectron2 sin compilar.
+
 ## Por qué
 
 El detector de sombras (`packages/model/vision/boulders.py`) encuentra 2808 objetos en la zona de la EVA, pero medido contra las rocas marcadas a mano de BoulderNet da **F1 0.13-0.49** (objetivo: 0.70). Ver `docs/EXPERIMENTS.md`, "Medición externa: bloques marcados a mano de BoulderNet (2026-11-14)". BoulderNet (Prieur et al. 2023, JGR Planets; datos y pesos CC BY 4.0, Zenodo 8171052) es un Mask R-CNN entrenado para esto. Si mejora el F1, reemplaza al detector de sombras para el **contorno y el diámetro**; la **altura** sigue saliendo de la sombra.
