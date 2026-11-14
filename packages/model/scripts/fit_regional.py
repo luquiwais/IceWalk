@@ -30,6 +30,7 @@ sys.path.insert(0, str(ROOT / "packages" / "model"))
 from gp.regional import (  # noqa: E402
     EXCAVATION_RATIO,
     FIT_PATH,
+    IMPACTS_PATH,
     MIN_LAT_DEG,
     _features,
     bootstrap_fit,
@@ -95,6 +96,15 @@ def sector_cv_logloss(lat, lon, diam, ice, ratio) -> dict[str, float]:
     return {"latitude": round(ll, 4), "constant_rate": round(ll0, 4)}
 
 
+def write_impacts(lat, lon, diam, ice, path: Path = IMPACTS_PATH) -> None:
+    """Tabla chica para el control local de la tarjeta (CC BY 4.0: se redistribuye citando)."""
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["lat_deg", "lon_e_deg", "diameter_m", "ice"])
+        for row in zip(lat, lon, diam, ice, strict=True):
+            w.writerow([f"{row[0]:.4f}", f"{row[1]:.4f}", f"{row[2]:.2f}", int(row[3])])
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--xlsx", type=Path, help="tabla S1 original; escribe el CSV limpio")
@@ -124,6 +134,7 @@ def main() -> None:
         "script": "packages/model/scripts/fit_regional.py",
     }
     fit = replace(fit, meta=meta)
+    write_impacts(lat, lon, diam, ice)
     FIT_PATH.write_text(json.dumps(fit.to_json(), indent=2, ensure_ascii=False) + "\n",
                         encoding="utf-8")
 

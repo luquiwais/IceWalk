@@ -204,7 +204,7 @@ Código: `packages/model/gp/validation.py` y `simulation.py robustness`, con tes
 Campaña de 3 EVAs: con verdad sin estructura, todas las estrategias quedan parejas (por ejemplo, 11.5-12.3 puntos con hielo de 18 con 3 m); con `rho` 0.5, potencial + incertidumbre suma 1-2 puntos más en los hábitats con cráteres.
 
 **Conclusión:**
-- **Sin estructura, elegir dónde medir no le gana a la grilla.** Y los cráteres reales no muestran estructura predictiva. El ×2.8 de la simulación anterior **no está respaldado por datos reales** y no va al pitch.
+- **Sin estructura, elegir dónde medir no le gana a la grilla.** Y los cráteres reales no muestran estructura predictiva. El ×2.8 de la simulación anterior **no está respaldado por datos reales** y no va al pitch. **Corregido el 2026-11-12:** esta validación no tenía potencia para ver la estructura (ver la entrada de ese día); el ×2.8 queda sin confirmar, no refutado.
 - Potencial + incertidumbre **nunca pierde** de forma clara y gana si hay estructura, así que sigue siendo un buen criterio por defecto, sin costo. Con estructura, también le gana al geólogo.
 - **La palanca grande es la herramienta, no el lugar:** con cualquier estrategia, 1 m da ~0.2-0.5 puntos con hielo por EVA y 3 m da ~4 de 6.
 - Lo que queda por ver es si las mediciones de la EVA revelan estructura a menos de ~100 m, que los cráteres no resuelven. Solo una EVA real podría mostrarlo.
@@ -460,3 +460,57 @@ Terreno real con 349 cráteres sintéticos, y el terreno sintético de los tests
 | Radar (GPR) | 10 m | 0.968 | 0.909-0.996 | GO |
 
 Mediana regional 2.89 m (1.91-4.36). Sitio: GO, por el radar. Con `min_p` entre 0.15 y 0.9 los tres veredictos no cambian: la decisión no depende del umbral exacto, que es lo que pide la regla de prospección (Peel 2015). A 10°N da INSUFFICIENT_DATA con aviso en inglés. Es el prior regional (solo latitud); no usa los 349 cráteres del sitio.
+
+## 2026-11-12: validación para el jurado (GP)
+
+Código: `gp/validation.py` (`power_test`), `gp/regional_validation.py`, `gp/tool_strategy.py`, `scripts/validate_regional.py` y `scripts/exploration_zones.py`, con tests. Resultados en `data/processed/s1094b/validation_power.json` y `data/processed/daubar2022/validation.json`, fuera de Git; las zonas, en `packages/contracts/examples/exploration_zones.json`.
+
+**1. ¿La validación del 8/11 podía ver la estructura?** Se sortearon 150 catálogos por escenario, con las posiciones y los diámetros reales y profundidades del GP (fondo plano si `d < 0.2 D`, error de 15 cm), y se les corrió la misma validación (leave-one-out, modelo con `rho` 0.5). Salen 55 fondos planos en promedio, contra 48 reales.
+
+| Verdad | AUC medio | 90 % de los mundos | Mundos con AUC ≤ 0.52 (el real) |
+| --- | --- | --- | --- |
+| Sin estructura (`rho` 0) | 0.496 | 0.39-0.61 | 65 % |
+| Débil (`rho` 0.25) | 0.537 | 0.40-0.69 | 40 % |
+| La del ×2.8 (`rho` 0.5) | 0.566 | 0.43-0.69 | 28 % |
+
+**La prueba no tiene potencia.** Con 29 positivos, las distribuciones se pisan casi enteras: el AUC real de 0.52 favorece "sin estructura" apenas 1.3 a 1 (cociente de densidades, cálculo propio aproximado). **Corrección de la entrada del 8/11:** el ×2.8 no quedó refutado por los datos reales, quedó **sin confirmar**. Sigue siendo un resultado condicionado a la estructura que estimó el ajuste del sitio (variograma con p = 0.09). Solo mediciones a menos de ~100 m entre sí, en una EVA o con un rover, lo decidirían.
+
+**2. Calibración del prior regional fuera de muestra.** Cada impacto de Daubar 2022 (383 al norte de 20°N, 37 con hielo) se predijo con un ajuste sin su sector de 60° de longitud.
+
+| P predicha | Impactos | Predicho | Observado (90 %) |
+| --- | --- | --- | --- |
+| 0-0.05 | 306 | 0.003 | 0.003 (0.00-0.01) |
+| 0.05-0.20 | 27 | 0.093 | 0.111 (0.05-0.25) |
+| 0.20-0.50 | 18 | 0.339 | 0.333 (0.18-0.53) |
+| 0.50-0.80 | 13 | 0.643 | 0.846 (0.63-0.95) |
+| 0.80-1.00 | 19 | 0.960 | 0.842 (0.66-0.94) |
+
+Brier 0.033 contra 0.087 de una tasa fija; 36.2 impactos con hielo esperados por 37 observados; por franja de latitud, todas dentro de ~2 (20-35°N: 0 por 2.0; 40-45°N: 7 por 4.9; 45-50°N: 7 por 4.8). El AUC de 0.98 viene sobre todo de la latitud, que separa trivialmente norte y sur: no conviene venderlo solo. Entre 0.5 y 0.8 el prior subestima y arriba de 0.8 sobreestima, con intervalos que casi tocan lo predicho.
+
+**3. Sitios donde una misión cavó (el ajuste nunca los vio).**
+
+| Sitio | Prior regional | Encontrado | Lectura |
+| --- | --- | --- | --- |
+| Phoenix (68.2°N) | Mediana 7 cm; 90 % local 2-22 cm; P(hielo ≤ 18 cm) 0.91 | Hielo a 4.6 cm de media, variación de más de 10 veces (Mellon et al. 2009) | **Coincide** |
+| Viking 2 (48.0°N) | Mediana 68 cm; 90 % local 24-192 cm; P(hielo ≤ 15 cm) 0.01 | Sin hielo en su zanja de 10-15 cm (PIA12214) | Coincide con lo observado |
+| Viking 2, según Byrne et al. 2009 | P(hielo ≤ 30 cm) 0.10 | Estiman hielo "slightly deeper" que la zanja (modelo térmico + cráteres, no medido) | **Tensión abierta** (cuestión 66) |
+
+**4. ¿El prior por latitud falla en alguna longitud?** En 130-190°E y 40-60°N (caja elegida después de ver lo de Viking 2): 10 impactos con hielo por 5.3 esperados (z = 3.2, a posteriori). El exceso está en Arcadia (165-190°E): Amazonis 12 por 6.9, Phlegra y Acheron 10-11 por 5.1-5.4, y alrededor de S1094b 7 por 3.4 (z = 2.7). Alrededor de Viking 2 (±30° en 134°E) no es significativo: 6 por 4.9. Con esto, la tarjeta suma el control local `nearby_impacts` y avisa "ice is likely shallower here" cuando z ≥ 2. En S1094b coincide con el prior del sitio (2.36 m contra 2.89 m del regional).
+
+**5. Radar primero, taladro después.** Monte Carlo con la mezcla exacta del reflector falso, prior de S1094b, taladro de 1 m y 6 estaciones.
+
+| Regla | P(hielo) por estación | EVA con al menos un acierto | EVAs hasta confirmar |
+| --- | --- | --- | --- |
+| Perforar a ciegas | 0.058 | 0.30 | 3.3 |
+| Perforar donde el radar marca ≤ 1 m (50 sondeos por EVA) | 0.50 (×8.7) | 0.86 | 1.16 (×2.9 menos) |
+| Igual, con 20 sondeos | 0.50 | 0.63 | 1.58 (×2.1 menos) |
+| Marcar a ≤ 0.8 m | 0.69 (×11.9) | - | - |
+
+Sensibilidad con `false_p` 0.10-0.45 y error de permitividad 0.10-0.30: el rendimiento por estación va de ×5.7 a ×11.4. Con el taladro de 3 m la ventaja cae a ×1.3, porque a ciegas ya acierta el 67 %. **No depende de la estructura espacial:** radar y taladro miden en el mismo punto. Límites: los sondeos y las estaciones se suponen independientes, y la regla necesita re-planificar dentro de la EVA (es lo que hace `/replan`).
+
+**6. Zonas de exploración de NASA** (51 de Mars Trek, 15 con datos al norte de 20°N; taladro de 3 m hipotético): Amazonis, taladro de 1 m 0.62 (CONDITIONAL) y 3 m 0.98 (GO); Deuteronilus, 0.27 (NO_GO) y 0.86 (GO); Phlegra y Acheron, 0.17 y 0.77, con aviso de hielo más somero; S1094b, 0.06 y 0.52; al sur de 30°N, ni el radar llega a GO. Al sur de 39.1°N (impacto con hielo más austral) todo queda `extrapolated`, S1094b incluido.
+
+**Conclusión:**
+- El prior regional, que es el que decide la tarjeta, está **calibrado con datos que no vio** y acierta Phoenix. Es la validación positiva con datos reales que nos faltaba.
+- El ×2.8 vuelve como "no confirmado, no refutado". El número robusto para el pitch es el del radar: **×2.9 menos EVAs para confirmar hielo**, que no depende de ese supuesto.
+- El prior por latitud es conservador en Arcadia y la tarjeta ahora lo dice. Con Viking 2 queda una tensión abierta con una estimación publicada, que conviene declarar.

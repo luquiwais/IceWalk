@@ -25,7 +25,11 @@ def test_plan_carries_site_card_with_verdict():
     jsonschema.validate(plan, PLAN_SCHEMA)
     card = plan["site_assessment"]
     assert card["min_p"] == 0.5  # de la STM de ejemplo
-    assert card["status"] == "ok"
+    # 35°N queda al sur del impacto con hielo más austral (39.1°N): se marca, igual veredicto.
+    assert card["status"] == "extrapolated"
+    assert any("No ice-exposing impact" in w for w in card["warnings"])
+    # Control local con los impactos de Daubar alrededor del sitio (190°E).
+    assert card["nearby_impacts"]["n"] > 0
     tools = card["tools"]
     # S1094b a 35°N: el hielo casi nunca está a menos de 1 m, y casi siempre a menos de 10 m.
     assert tools["neutron_spectrometer"]["verdict"] == "NO_GO"

@@ -420,7 +420,7 @@
   ],
   "site_assessment": {
     "lat_deg": 35.1105,
-    "status": "ok",
+    "status": "extrapolated",
     "median_depth_m": 2.8867,
     "median_depth_90_m": [
       1.9101,
@@ -428,7 +428,9 @@
     ],
     "sd_log_total": 0.6706,
     "warnings": [
-      "Assumes excavation depth = 0.1 x crater diameter"
+      "Assumes excavation depth = 0.1 x crater diameter",
+      "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend",
+      "Nearby fresh impacts show more ice than the latitude trend predicts (7 vs 3.4): ice is likely shallower here"
     ],
     "tools": {
       "neutron_spectrometer": {
@@ -458,6 +460,16 @@
         ],
         "verdict": "NO_GO"
       }
+    },
+    "nearby_impacts": {
+      "window_deg": [
+        10.0,
+        30.0
+      ],
+      "n": 35,
+      "ice": 7,
+      "expected_ice": 3.4484,
+      "z": 2.6745
     },
     "verdict": "GO",
     "min_p": 0.5

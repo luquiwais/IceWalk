@@ -9,6 +9,13 @@ Decisiones (`docs/DECISIONS.md`, 2026-11-10; resultados en `docs/EXPERIMENTS.md`
 - Solo latitud: le ganó a SWIM y a latitud + SWIM en la validación por sectores de longitud.
 - Solo hemisferio norte por encima de 20°N: con el sur mezclado el ajuste se vuelve inestable.
 - `r = 0.1` es un supuesto (`docs/SOURCES.md`); con 0.2 el regional no coincide con S1094b.
+- Al sur del impacto con hielo más austral (`ice_lat_min_deg`, 39.1°N) no hay detecciones: la
+  profundidad sale de los "no" y de la tendencia lineal, así que el estado es `extrapolated`.
+- Solo latitud: en 130-190°E y 40-60°N hay el doble de impactos con hielo que lo esperado (10
+  contra 5.3, caja elegida a posteriori), concentrados en Arcadia (165-190°E). Allí el prior es
+  conservador; `nearby_check` lo avisa en la tarjeta. Alrededor de Viking 2 (134°E) el exceso no es
+  significativo, y la tensión con Byrne et al. (2009), que estiman hielo justo debajo de su zanja
+  de 10-15 cm (el prior da 1 %), queda abierta. Ver `gp/regional_validation.py`.
 
 En S1094b manda el prior ajustado con sus 349 cráteres (`planning.fitted_prior`); este prior sirve
 para otros sitios, para la tarjeta de sitio y como control.
@@ -18,10 +25,12 @@ Los coeficientes viven en `gp/regional_fit.json` y se regeneran con `scripts/fit
 
 from __future__ import annotations
 
+import csv
 import json
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
@@ -30,6 +39,10 @@ from scipy.optimize import minimize
 from scipy.special import log_ndtr, ndtr
 
 FIT_PATH = Path(__file__).with_name("regional_fit.json")
+# Impactos del ajuste (lat, lon, D, hielo), para el control local. Daubar 2022, CC BY 4.0.
+IMPACTS_PATH = Path(__file__).with_name("regional_impacts.csv")
+NEARBY_WINDOW_DEG = (10.0, 30.0)  # ±10° de latitud, ±30° de longitud
+NEARBY_Z_WARN = 2.0  # desde acá, el control local avisa que el hielo puede estar más somero
 EXCAVATION_RATIO = 0.1  # supuesto: profundidad excavada / diámetro
 LAT_REF_DEG = 40.0  # centro de la variable: (lat - 40) / 10
 LAT_SCALE_DEG = 10.0
@@ -92,6 +105,7 @@ class RegionalFit:
     ratio: float = EXCAVATION_RATIO
     n_craters: int = 0
     n_ice: int = 0
+    ice_lat_min_deg: float | None = None  # impacto con hielo más austral del ajuste
     meta: dict[str, Any] = field(default_factory=dict, compare=False)
 
     def __post_init__(self) -> None:
@@ -115,12 +129,15 @@ class RegionalFit:
             "ratio": self.ratio,
             "n_craters": self.n_craters,
             "n_ice": self.n_ice,
+            **({} if self.ice_lat_min_deg is None else {"ice_lat_min_deg": self.ice_lat_min_deg}),
             **self.meta,
         }
 
     @classmethod
     def from_json(cls, data: dict[str, Any]) -> RegionalFit:
-        known = {"beta", "sigma_log", "beta_cov", "lat_range_deg", "ratio", "n_craters", "n_ice"}
+        known = {"beta", "sigma_log", "beta_cov", "lat_range_deg", "ratio", "n_craters", "n_ice",
+                 "ice_lat_min_deg"}
+        ice_lat = data.get("ice_lat_min_deg")
         cov = data["beta_cov"]
         return cls(
             beta=(float(data["beta"][0]), float(data["beta"][1])),
@@ -130,6 +147,7 @@ class RegionalFit:
             ratio=float(data.get("ratio", EXCAVATION_RATIO)),
             n_craters=int(data.get("n_craters", 0)),
             n_ice=int(data.get("n_ice", 0)),
+            ice_lat_min_deg=None if ice_lat is None else float(ice_lat),
             meta={k: v for k, v in data.items() if k not in known},
         )
 
@@ -165,6 +183,7 @@ def bootstrap_fit(
         ratio=ratio,
         n_craters=int(y.size),
         n_ice=int(y.sum()),
+        ice_lat_min_deg=float(lat[y].min()),
     )
 
 
@@ -234,7 +253,50 @@ def regional_estimate(lat_deg: float, fit: RegionalFit | None = None) -> Regiona
     if lat_deg > hi:
         status = "extrapolated"
         warnings.append(f"Latitude beyond the regional data ({hi:.1f}°N): extrapolated")
+    elif fit.ice_lat_min_deg is not None and lat_deg < fit.ice_lat_min_deg:
+        status = "extrapolated"
+        warnings.append(
+            f"No ice-exposing impact south of {fit.ice_lat_min_deg:.1f}°N: depth extrapolated "
+            "from the latitude trend"
+        )
     return RegionalEstimate(lat_deg, mean, fit.sigma_log, sd_coef, status, tuple(warnings))
+
+
+@lru_cache(maxsize=1)
+def _impacts(path: Path = IMPACTS_PATH) -> tuple[np.ndarray, ...]:
+    with path.open(encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    cols = [np.array([float(r[k]) for r in rows]) for k in ("lat_deg", "lon_e_deg", "diameter_m")]
+    return (*cols, np.array([r["ice"] == "1" for r in rows]))
+
+
+def nearby_check(
+    lat_deg: float, lon_e_deg: float, fit: RegionalFit | None = None
+) -> dict[str, Any]:
+    """Control local: impactos con hielo cerca del sitio, observados contra esperados.
+
+    El prior usa solo la latitud. Si alrededor del sitio hay muchos más impactos con hielo que los
+    que espera, el hielo probablemente está más somero que lo que dice la tarjeta (pasa en Utopia y
+    Arcadia, `gp/regional_validation.py`). Es una comparación dentro de la muestra.
+    """
+    if not (math.isfinite(lon_e_deg) and -360 <= lon_e_deg <= 360):
+        raise ValueError(f"lon_e_deg fuera de rango: {lon_e_deg}")
+    fit = fit or load_fit()
+    lat, lon, diam, ice = _impacts()
+    dlat, dlon = NEARBY_WINDOW_DEG
+    gap = np.abs((lon - lon_e_deg % 360 + 180) % 360 - 180)
+    m = (np.abs(lat - lat_deg) <= dlat) & (gap <= dlon)
+    mean = _features(lat[m]) @ np.asarray(fit.beta)
+    p = ndtr((np.log(fit.ratio * diam[m]) - mean) / fit.sigma_log)
+    expected, sd = float(p.sum()), float(math.sqrt(np.sum(p * (1 - p))))
+    observed = int(ice[m].sum())
+    return {
+        "window_deg": [dlat, dlon],
+        "n": int(m.sum()),
+        "ice": observed,
+        "expected_ice": expected,
+        "z": (observed - expected) / sd if sd > 0 else None,
+    }
 
 
 def site_assessment(
@@ -242,6 +304,7 @@ def site_assessment(
     tool_depths_m: dict[str, float],
     min_p: float | None = None,
     fit: RegionalFit | None = None,
+    lon_e_deg: float | None = None,
 ) -> dict[str, Any]:
     """Números de la tarjeta de sitio: P(hielo al alcance) por herramienta, antes de ir.
 
@@ -249,6 +312,8 @@ def site_assessment(
     la STM (`docs/research/viabilidad-expediciones.md`). Sin `min_p` no hay veredicto `GO`/`NO_GO`,
     solo números. Con `min_p`: `GO` si todo el intervalo del 90 % la supera, `NO_GO` si queda todo
     por debajo y `CONDITIONAL` si la cruza. Sin datos regionales: `INSUFFICIENT_DATA`.
+
+    Con `lon_e_deg` suma el control local (`nearby_check`) y avisa si sobran impactos con hielo.
     """
     if min_p is not None and not (math.isfinite(min_p) and 0 < min_p < 1):
         raise ValueError(f"min_p debe estar entre 0 y 1: {min_p}")
@@ -283,6 +348,14 @@ def site_assessment(
         "warnings": list(est.warnings),
         "tools": tools,
     }
+    if lon_e_deg is not None:
+        local = nearby_check(lat_deg, lon_e_deg, fit)
+        out["nearby_impacts"] = local
+        if local["z"] is not None and local["z"] >= NEARBY_Z_WARN:
+            out["warnings"].append(
+                f"Nearby fresh impacts show more ice than the latitude trend predicts "
+                f"({local['ice']} vs {local['expected_ice']:.1f}): ice is likely shallower here"
+            )
     if min_p is not None:
         order = {"GO": 0, "CONDITIONAL": 1, "NO_GO": 2}
         out["verdict"] = min((t["verdict"] for t in tools.values()), key=order.__getitem__)

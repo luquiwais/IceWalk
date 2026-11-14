@@ -22,11 +22,21 @@ import math
 import numpy as np
 from scipy.special import ndtr
 
-from gp.craters import DEFAULT_CATALOG, REPO_ROOT, CraterCatalog, load_catalog, to_observations
-from gp.observations import NON_FLAT_RATIO
+from gp.craters import (
+    DEFAULT_CATALOG,
+    K_RIM,
+    PIXEL_M,
+    REPO_ROOT,
+    REPOSE_DEG,
+    CraterCatalog,
+    load_catalog,
+    to_observations,
+)
+from gp.observations import CRATER_ERROR_M, NON_FLAT_RATIO
 from gp.posterior import Prior, posterior
 
 RESULT = REPO_ROOT / "data" / "processed" / "s1094b" / "validation.json"
+POWER_RESULT = REPO_ROOT / "data" / "processed" / "s1094b" / "validation_power.json"
 NEIGHBOR_RADIUS_M = 600.0
 
 
@@ -121,10 +131,82 @@ def validate(
     }
 
 
+def synthetic_catalog(
+    catalog: CraterCatalog, truth: Prior, rng, error_m: float = CRATER_ERROR_M
+) -> CraterCatalog:
+    """Mismas posiciones y diámetros, con profundidades sorteadas de `truth`.
+
+    Fondo plano si `d < 0.2 D` (la misma cota que usa el modelo para los que no lo tienen); su
+    diámetro sale de invertir `resistant_depth`, con `error_m` de error de medición en `d`.
+    """
+    x, y, diam = catalog.x_m, catalog.y_m, catalog.diameter_m
+    cov = truth.kernel(x, y, x, y)
+    cov[np.diag_indices_from(cov)] += truth.nugget + 1e-9
+    noise = np.linalg.cholesky(cov) @ rng.standard_normal(len(catalog))
+    depth = np.exp(truth.mean_log_depth + noise)
+    measured = np.maximum(depth + rng.normal(0.0, error_m, depth.size), PIXEL_M)
+    floor = K_RIM * diam - 2 * measured / math.tan(math.radians(REPOSE_DEG))
+    flat = (depth < NON_FLAT_RATIO * diam) & (floor > 0)
+    return CraterCatalog(x.copy(), y.copy(), diam.copy(), np.where(flat, floor, 0.0))
+
+
+def power_test(
+    catalog: CraterCatalog,
+    model: Prior,
+    truth_rhos: tuple[float, ...] = (1e-6, 0.5),
+    observed_auc: float | None = None,
+    n_worlds: int = 60,
+    threshold_m: float = 1.0,
+    seed: int = 0,
+) -> dict:
+    """¿La validación real distingue "hay estructura" de "no hay"?
+
+    Para cada `rho` verdadero se sortean `n_worlds` catálogos con las posiciones reales y se corre
+    la misma validación (leave-one-out con el modelo `model`). Si las distribuciones del AUC se
+    pisan, la prueba no tiene potencia y un AUC real cercano a 0.5 no descarta la estructura.
+    """
+    from gp.planning import fitted_prior
+
+    rng = np.random.default_rng(seed)
+    out: dict = {"threshold_m": threshold_m, "n_worlds": n_worlds, "by_rho": {}}
+    for rho in truth_rhos:
+        variance = model.kernel.sill + model.nugget
+        truth = fitted_prior(model.mean_log_depth, variance, rho, model.kernel.range_m)
+        aucs = []
+        for _ in range(n_worlds):
+            synth = synthetic_catalog(catalog, truth, rng)
+            labels_ = labels(synth, threshold_m)
+            if np.nansum(labels_) < 3:
+                continue
+            aucs.append(auc(leave_one_out(synth, model, threshold_m), labels_))
+        a = np.array(aucs)
+        row = {
+            "worlds": int(a.size),
+            "auc_mean": float(a.mean()),
+            "auc_5": float(np.percentile(a, 5)),
+            "auc_95": float(np.percentile(a, 95)),
+        }
+        if observed_auc is not None:
+            row["share_at_or_below_observed"] = float(np.mean(a <= observed_auc))
+        out["by_rho"][f"{rho:.2f}"] = row
+    if observed_auc is not None:
+        out["observed_auc"] = observed_auc
+    return out
+
+
 if __name__ == "__main__":
+    import sys
+
     from gp.simulation import FITTED, make_prior
 
-    result = validate(load_catalog(DEFAULT_CATALOG), make_prior(**FITTED))
+    catalog, model = load_catalog(DEFAULT_CATALOG), make_prior(**FITTED)
+    if "--power" in sys.argv:
+        real = json.loads(RESULT.read_text(encoding="utf-8")) if RESULT.exists() else {}
+        result = power_test(catalog, model, observed_auc=real.get("auc"))
+        POWER_RESULT.write_text(json.dumps(result, indent=2), encoding="utf-8")
+        print(json.dumps(result, indent=2))
+        raise SystemExit
+    result = validate(catalog, model)
     RESULT.write_text(json.dumps(result, indent=2), encoding="utf-8")
     for key, value in result.items():
         print(f"{key:24s} {value:.3f}" if isinstance(value, float) else f"{key:24s} {value}")

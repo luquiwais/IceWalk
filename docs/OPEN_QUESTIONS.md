@@ -35,25 +35,30 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 62 | El planificador usa `clear_path_width_m.tif` si existe, aunque sea mock (`vision.mock_layers` escribe en la misma carpeta y marca `is_mock` en los tags del COG). ¿Debe ignorarla o marcar el plan cuando `is_mock` es true? | Ignorarla y avisar en el log; mientras, visión genera los mocks en otra carpeta | Planificador | 11/11 |
 | 63 | Deploy público para el jurado: no hay link. ¿Quién lo arma y dónde (web en Vercel, API en Render o Hugging Face Spaces)? Las capas del terreno van a Releases (CC0); el catálogo de cráteres, como archivo privado del servidor (cuestión 26). Sin esos datos, la API desplegada usa el planificador mock | Antes del 14/11; Frontend la web, Planificador la API. Ver `research/hackaton-2026.md` | Luqui + Planificador + Frontend | 11/11 |
 | 64 | El guion del teaser y el pitch del PRD usan afirmaciones que ya no sostenemos ("decides where to measure", el número de la simulación, «We plan what to learn»). ¿Se reescriben alrededor de la tarjeta de sitio (taladro NO_GO, radar GO) y de los 97 cm frente a los 2.35 m? | Sí, antes de grabar; confirmar el formato con la guía del 13/11 | Luqui + Diseño | 11/11 |
+| 65 | ¿Se sube la tabla original de Dundas 2023 (`data/raw/dundas2023_craters.csv`, sin modificar) a un Release público, con cita y licencia? CC BY-NC-ND 4.0 lo permite sin fines comerciales. Sirve para que el equipo regenere el catálogo sin pasarse archivos | Sí, con un `LICENSE-dundas2023.txt` al lado. Es publicar: lo decide Luqui | Luqui | 12/11 |
+| 66 | El prior regional usa solo la latitud. En Arcadia (165-190°E) hay el doble de impactos con hielo que lo esperado, y Byrne et al. (2009) estiman hielo justo debajo de la zanja de Viking 2 (el prior da 1 % a 15 cm). ¿Se suma un término de longitud o de SWIM? Latitud + SWIM sobreajustaba (26 impactos con hielo) | Después del hackatón. Mientras, la tarjeta avisa con el control local (`nearby_impacts`) | GP | 12/11 |
+| 67 | ¿Hay presentación en vivo ante el jurado local el domingo desde las 15:00 (página de la sede) o solo cuenta la entrega de las 23:59 (cronograma de Discord)? | Preguntarlo a Javier Sabas en #consultas-y-sugerencias; mientras, tener la demo lista a las 15:00 | Luqui | 14/11 |
+| 68 | Darionautas no tiene canal privado en el Discord de la sede, que es por donde pasan los mentores. ¿Se pide en #equipos? | Sí, con nombre e integrantes, como hacen los demás equipos | Luqui | 14/11 |
+| 69 | ¿Qué texto va en la declaración de IA de la entrega? (asistentes de código e investigación; la idea y las decisiones, del equipo) | Redactarla con la lista de herramientas y para qué se usó cada una | Luqui + Diseño | 14/11 |
+| 70 | SkyFall (NASA) recibe propuestas de sitio hasta el 1/12/2026 (skyfall_lsw_input@jpl.nasa.gov; coordenadas, imagen HiRISE, trazabilidad). ¿Mandamos una con IceWalk (tarjeta en las 5 regiones, S1094b o AP-105) después del hackatón? Es enviar algo afuera: lo decide el equipo | Mencionarlo en el pitch como impacto inmediato; decidir el envío después del 15/11 | Luqui + equipo | 14/11 |
 
 ## A averiguar
 
 | # | Cuestión | Quién |
 | --- | --- | --- |
-| 26 | ¿Qué licencia tiene la tabla de Dundas 2023? Hasta saberlo, no se sube a Git ni a un Release (el repo es público). El 11/11 no se pudo leer: Wiley responde 403 a la lectura automática y la copia de Imperial College da 404. Abrir la página del artículo en el navegador y mirar la licencia y el "Open Research" | GP |
 | 56 | ¿Qué licencia tiene SWIM? La página no la declara. Hasta saberlo, no se redistribuyen los rasters ni los valores leídos (están en `data/raw/swim4mim/` y `data/processed/daubar2022/`, fuera de Git) | GP |
 | 57 | El dataset de Dundas 2021 (USGS, CC0, [DOI 10.5066/P9Y8FR1R](https://doi.org/10.5066/P9Y8FR1R)) puede traer la profundidad del hielo por cráter, que daría fuente a la relación 0.1 del prior regional. ScienceBase pide una verificación anti-bots: bajarlo a mano desde el navegador | Luqui |
 | 12 | ¿Tusberti comparte los polígonos de bloques y hielo? | Visión |
 | 13 | VRAM, CUDA y uso prolongado del servidor con GPU | Luqui |
 | 14 | ¿Hay imágenes HiRISE posteriores a feb 2023 con el cráter cubierto? | Visión |
 | 16 | Cómo evalúa el jurado local | Producto |
-| 17 | Criterios y guías 2026 (salen el 13 nov) | Producto |
+| 17 | Criterios y guías 2026 (salen el 13 nov). El 12/11 se leyó el enunciado oficial en el navegador (`research/hackaton-2026.md`); los recursos del desafío también salen el 13/11 | Producto |
 | 18 | ¿Diciembre de 2022 tiene escarcha? | Visión |
 | 19 | Sincronizar el PRD del repo con el doc de claude.ai | Luqui |
 | 20 | Revisión de un experto externo (Space Apps Connect) | Producto |
 | 60 | Temperatura y viento en el sitio y no en el análogo (VL2 a 48°N): ¿el modelo de Marte de NASA Ames (MCMC, datos públicos en `data.nas.nasa.gov/mcmcref`) trae salida diurna por hora? El portal avisaba problemas de almacenamiento | Planificador |
 | 40 | ¿Las manchas de pendiente > 20° sueltas en el SE del sitio son relieve o artefactos del DTM (cajas, costuras)? Revisar el mapa FOM (`DTF...JP2`) y el relieve sombreado | Planificador |
-| 42 | Catálogo de cráteres (`data/processed/s1094b/craters_dundas2023.csv`) para el planificador: sin él, el mapa es solo el prior y la elección de estaciones casi no informa. ¿Luqui lo comparte por fuera de Git (licencia, cuestión 26)? | Planificador + Luqui |
+| 42 | Catálogo de cráteres (`data/processed/s1094b/craters_dundas2023.csv`) para el planificador: sin él, el mapa es solo el prior y la elección de estaciones casi no informa. La licencia es CC BY-NC-ND 4.0 (cuestión 26, cerrada): el CSV convertido a la grilla es una adaptación y no se publica. Luqui lo pasa por privado al equipo y al servidor del deploy; quien tenga las imágenes HiRISE puede regenerarlo con `python -m gp.craters` desde la tabla original (cuestión 65) | Planificador + Luqui |
 | 45 | Textura del globo y del sitio: hoy el respaldo es Viking MDIM 2.1 (232 m/px, imágenes de los 70) y a escala del sitio se ve borroso. ¿Qué sirve el backend como teselas (mosaico CTX de Murray Lab ~5 m/px para el globo/región, ortoimagen HiRISE para el sitio) y con qué URL/formato las consume `MarsGlobe`? | Datos + backend (Frontend solo consume) |
 
 ## Riesgo aceptado

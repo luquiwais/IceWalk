@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Tarjetas de sitio en las zonas de exploración propuestas por NASA",
+  "description": "Las 'Exploration Zones' del taller de sitios de aterrizaje humano de 2015 (capa EZMars de Mars Trek), cada una con la tarjeta de sitio del prior regional por latitud (gp.regional.site_assessment). No elige dónde aterrizar: responde, en cada zona que NASA ya propuso, con qué herramienta vale salir a buscar hielo. Lo genera packages/model/scripts/exploration_zones.py",
+  "type": "object",
+  "required": [
+    "source",
+    "method",
+    "tools",
+    "min_p",
+    "reference_site",
+    "zones"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string"
+    },
+    "generated_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "tools": {
+      "type": "object",
+      "description": "Herramientas evaluadas y su alcance en metros. Las marcadas como hipotéticas no están en el catálogo",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "depth_m"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "depth_m": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "hypothetical": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "min_p": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "reference_site": {
+      "$ref": "#/$defs/zone"
+    },
+    "zones": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/zone"
+      }
+    }
+  },
+  "$defs": {
+    "zone": {
+      "type": "object",
+      "required": [
+        "name",
+        "lat_deg",
+        "lon_e_deg",
+        "site_assessment"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "lat_deg": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon_e_deg": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 360
+        },
+        "elevation_m": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "site_assessment": {
+          "$ref": "#/$defs/site_assessment"
+        }
+      }
+    },
+    "site_assessment": {
+      "type": "object",
+      "description": "Igual que site_assessment en plan.schema.json",
+      "required": [
+        "lat_deg",
+        "status",
+        "warnings",
+        "tools"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "lat_deg": {
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "extrapolated",
+            "no_data"
+          ]
+        },
+        "median_depth_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "median_depth_90_m": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "sd_log_total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tools": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "depth_m",
+              "p_ice",
+              "p_ice_90"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "depth_m": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "p_ice": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "p_ice_90": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "verdict": {
+                "enum": [
+                  "GO",
+                  "CONDITIONAL",
+                  "NO_GO"
+                ]
+              }
+            }
+          }
+        },
+        "verdict": {
+          "enum": [
+            "GO",
+            "CONDITIONAL",
+            "NO_GO",
+            "INSUFFICIENT_DATA"
+          ]
+        },
+        "min_p": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "nearby_impacts": {
+          "type": "object",
+          "description": "Control local: impactos nuevos de Daubar 2022 a ±10° de latitud y ±30° de longitud, con hielo observado contra esperado por el prior de latitud (dentro de la muestra). Si sobran (z >= 2), warnings avisa que el hielo probablemente está más somero",
+          "required": [
+            "window_deg",
+            "n",
+            "ice",
+            "expected_ice",
+            "z"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "window_deg": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "ice": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "expected_ice": {
+              "type": "number",
+              "minimum": 0
+            },
+            "z": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
