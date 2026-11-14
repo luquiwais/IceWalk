@@ -99,3 +99,57 @@
 .mission-minimap { border-radius: 4px; background: color-mix(in srgb, var(--dc-bg) 88%, transparent); box-shadow: inset 0 0 0 1px var(--dc-line); }
 .mission-analog-image { border-radius: 4px; }
 .mission-globe { background: var(--dc-bg); }
+
+/* Layout from the design (wide screens): header band with the title and the view tabs, a fixed
+   right column (status over the planning window), the timeline as a bottom band, and the map in
+   the remaining area. The scene stays full-bleed; solid bands sit over it, and the camera framing
+   still comes from the measured chrome (layout.ts). Narrow screens keep the bottom-sheet layout. */
+@media (min-width: 760px) {
+  .mission-app { --dc-header: 64px; --dc-col: 400px; --mission-edge: 20px; }
+  .mission-app .mission-scene { z-index: 0; }
+  .mission-app > :not(.mission-scene) { z-index: 2; }
+  .mission-app::before, .mission-app::after { content: ""; position: absolute; z-index: 1; background: var(--dc-bg); pointer-events: none; }
+  .mission-app::before { top: 0; left: 0; right: 0; height: var(--dc-header); border-bottom: 1px solid var(--dc-line); }
+  .mission-app::after { top: var(--dc-header); right: 0; bottom: 0; width: var(--dc-col); border-left: 1px solid var(--dc-line); }
+  .mission-app:has(.mission-globe)::before, .mission-app:has(.mission-globe)::after { display: none; }
+
+  .mission-app .mission-heading { top: 0; height: var(--dc-header); flex-direction: row; align-items: center; gap: 14px; text-shadow: none; }
+  .mission-app .mission-heading > [data-text-style]:first-child { font-size: 1.3rem; }
+  .mission-app .mission-heading > [data-text-style=footnote] { font-size: .6875rem; }
+
+  .mission-app .mission-tabs { top: 0; left: 24rem; height: var(--dc-header); }
+  .mission-app .mission-tabs > * { height: 100%; }
+  .mission-app .mission-tabs [role=tablist] { height: 100%; padding: 0; gap: 2px; background: none !important; box-shadow: none !important; border-radius: 0; }
+  .mission-app .mission-tabs [role=tablist] > :not([role=tab]) { display: none; }
+  .mission-app .mission-tabs [role=tab] { height: 100%; border-radius: 0; padding: 0 14px; border-bottom: 2px solid transparent; color: var(--dc-muted); font-family: var(--font-mono); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .mission-app .mission-tabs [role=tab] svg { width: 1rem; height: 1rem; }
+  .mission-app .mission-tabs [role=tab][aria-selected=true] { color: var(--dc-ink); border-bottom-color: var(--dc-accent); }
+
+  .mission-app .mission-status-position { top: var(--dc-header); right: 0; width: var(--dc-col); }
+  .mission-app .mission-status-window { border-radius: 0; box-shadow: inset 0 -1px 0 var(--dc-line) !important; background: var(--dc-bg) !important; }
+  .mission-app .mission-status { padding: 14px 20px; }
+  .mission-app .mission-status-values { grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .mission-app .mission-status-values > :last-child { grid-column: 1 / -1; }
+  .mission-app .mission-status-source { flex-wrap: wrap; }
+
+  .mission-app .mission-panel-presence { top: calc(var(--mission-panel-top, 200px) - 16px); right: 0; bottom: var(--mission-timeline-y, 9rem); width: var(--dc-col); }
+  .mission-app .mission-panel-window { border-radius: 0; background: var(--dc-bg) !important; box-shadow: none !important; }
+  .mission-app .mission-show-panel { top: calc(var(--dc-header) + 1rem); right: calc(var(--dc-col) + var(--mission-edge)); }
+
+  .mission-app .mission-timeline-position { left: 0; right: 0; bottom: 0; }
+  .mission-app .mission-timeline-window { border-radius: 0; background: var(--dc-bg) !important; box-shadow: inset 0 1px 0 var(--dc-line) !important; }
+  .mission-app .mission-time { padding: 14px 20px 18px; }
+
+  .mission-app .mission-camera { top: calc(var(--dc-header) + 1rem); }
+  .mission-app .mission-map-tools, .mission-app .mission-destination { left: calc(var(--mission-edge) + 4rem); }
+  .mission-app .mission-map-tools { max-width: calc(100% - var(--dc-col) - 7rem); }
+  .mission-app[data-focused=true]::after { display: none; }
+}
+@media (max-width: 1100px) and (min-width: 760px) {
+  .mission-app { --dc-col: 360px; }
+  .mission-app .mission-heading { max-width: none; }
+  .mission-app .mission-heading [data-text-style=footnote] { display: none; }
+  .mission-app .mission-tabs { left: 9rem; }
+  .mission-app .mission-panel-presence { width: var(--dc-col); bottom: var(--mission-timeline-y, 9rem); }
+  .mission-app .mission-map-tools { left: calc(var(--mission-edge) + 3.5rem); max-width: calc(100% - var(--dc-col) - 6rem); }
+}
