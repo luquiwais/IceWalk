@@ -153,3 +153,17 @@
 .site3d-stage .site3d-credit { left: var(--mission-edge, 1rem); right: calc(var(--dc-col, 0px) + 2 * var(--mission-edge, 1rem)); }
 .site3d-stage .site3d-toolbar { padding: 6px; border-radius: 14px; background: rgb(10 10 12 / 0.45); backdrop-filter: blur(8px); z-index: 2; }
 .site3d-stage .site3d-credit { padding: 4px 8px; border-radius: 8px; background: rgb(10 10 12 / 0.4); }
+
+/* Plan update in the helmet (site-3d-stage.tsx): the replan as the EV sees it. */
+.site3d-update {
+  position: absolute; top: calc(var(--dc-header, 5rem) + 4rem); left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 6px; min-width: 300px; max-width: min(420px, calc(100% - 32px));
+  padding: 14px 16px; border-radius: 14px; border: 1px solid rgb(180 220 255 / 0.7);
+  background: rgb(8 20 34 / 0.62); color: #e6f4ff; backdrop-filter: blur(6px);
+  font: 500 13px/1.45 ui-monospace, "SF Mono", Menlo, monospace; z-index: 3;
+}
+.site3d-update[data-alert="caution"] { border-color: var(--color-caution, #f0bf4f); }
+.site3d-update-call { font-size: 16px; letter-spacing: .04em; }
+.site3d-update[data-alert="caution"] .site3d-update-call { color: var(--color-caution, #f0bf4f); }
+.site3d-update-line { opacity: .9; }
+.site3d-label[data-kind="station-active"] { border: 1px solid #9fe8ff; color: #dff7ff; }

@@ -15,7 +15,7 @@ export const PHASES: { value: Phase; label: string; question: string; icon: Reac
   { value: "site", label: "Site", question: "Is there ice within reach here?", icon: <Globe /> },
   { value: "plan", label: "Plan", question: "Where do we go, and is it safe?", icon: <MapIcon /> },
   { value: "rehearse", label: "Brief", question: "Pre-EVA review: what will we find?", icon: <Box /> },
-  { value: "execute", label: "Execute", question: "What do we do now?", icon: <Footprints /> },
+  { value: "execute", label: "EVA", question: "During the EVA: what now?", icon: <Footprints /> },
   { value: "debrief", label: "Debrief", question: "What did we learn?", icon: <ClipboardCheck /> },
 ];
 
