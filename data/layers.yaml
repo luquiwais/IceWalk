@@ -163,7 +163,7 @@ layers:
     source: USGS Astrogeology / ASU
     url: https://asc-astropedia.s3.us-west-2.amazonaws.com/Mars/Odyssey/THEMIS-Global-Thermal-Inertia-Mosaic/Quantitative-32-Bit/THEMIS_TI_Mosaic_Quant_30N180E_100mpp.cub
     citation: Fergason et al. (2006) JGR
-    notes: Tesela 30N180E, ISIS3, 2.5 GB, dominio publico. Se lee a distancia solo el recorte del sitio (model/gp/covariates.py). Anterior al impacto de 2021.
+    notes: Tesela 30N180E, ISIS3, 2.5 GB, dominio publico. Se lee a distancia solo el recorte del sitio (model/gp/covariates.py y apps/planner/scripts/build_soil.py, que escribe data/processed/s1094b/soil_thermal_inertia.tif para la firmeza del suelo). Anterior al impacto de 2021.
     status: scripted (lectura remota)
 
   - id: mola_hrsc

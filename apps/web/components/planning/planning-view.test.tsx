@@ -92,6 +92,17 @@ describe("Mission table", () => {
     expect(screen.getByRole("button", { name: "Evidence · why trust it" })).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("answers whether the EVA can be walked: effort, load, soil, comms and mobility", async () => {
+    render(<PlanningView />);
+    await userEvent.click(screen.getByRole("button", { name: "Can we walk it? · Feasibility" }));
+    const card = screen.getByRole("region", { name: "Feasibility" });
+    const f = demoPlan.summary.feasibility!;
+    expect(card).toHaveTextContent(f.mobility.mode === "walk" ? "Walkable" : "advised");
+    expect(card).toHaveTextContent("Soil firmness");
+    expect(card).toHaveTextContent("Line of sight to habitat");
+    expect(card).toHaveTextContent("ICES-2026-127");
+  });
+
   it("says where the unreported dust opacity comes from (Hope EMIRS)", async () => {
     render(<PlanningView />);
     await userEvent.click(screen.getByRole("button", { name: "EVA window & weather" }));

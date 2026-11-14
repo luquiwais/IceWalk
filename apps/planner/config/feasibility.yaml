@@ -1,0 +1,106 @@
+# ¿Se puede hacer caminando? Esfuerzo, carga, suelo y comunicaciones (app/feasibility.py).
+# Cada valor con su fuente; los que no tienen, assumption: true (docs/SOURCES.md).
+
+effort:
+  task_btu_h:
+    value: 1000
+    source: >-
+      Trabajo en estación, egress e ingress: requisito medio del EMU en la ISS, 1000 BTU/h
+      (Ogilvie et al., Mars Spacesuit Mass Requirements, ICES-2026-127, NASA JSC, lámina 4).
+      Usarlo para tareas de superficie es supuesto
+    assumption: true
+  walk_btu_h_ref:
+    value: 1700
+    source: >-
+      Metabolismo de un tripulante promedio caminando de regreso a 2.2 mph (3.5 km/h), RER 0.85
+      (ICES-2026-127, lámina 9). Uno grande (percentil 95 de masa): 2300 BTU/h
+    assumption: false
+  walk_speed_ref_kmh:
+    value: 3.5
+    source: Velocidad de regreso a pie supuesta por Apollo, 2.2 mph (ICES-2026-127, lámina 9)
+    assumption: false
+  peak_limit_btu_h:
+    value: 2000
+    source: >-
+      Tope de metabolismo por tramo en la planificación del Apollo 14 (≤ 2000 BTU/h; media ≤ 1600).
+      Carr et al. 2003 (MIT), no es regla oficial
+    assumption: true
+  average_limit_btu_h:
+    value: 1200
+    source: Media de diseño para dimensionar el traje (ICES-2026-127)
+    assumption: false
+  crew_mass_kg:
+    value: 82
+    source: Tripulante promedio, 180 lbm (ICES-2026-127, lámina 2)
+    assumption: false
+  rer:
+    value: 0.85
+    source: Cociente respiratorio usado por ICES-2026-127
+    assumption: false
+  vo2max_ml_kg_min:
+    value: 36
+    source: Mínimo de regla de vuelo para EVA (ICES-2026-127, lámina 6)
+    assumption: false
+  vo2_fraction_limit:
+    value: 0.43
+    source: >-
+      Fracción de VO2max que se espera que sostenga un tripulante entrenado en una EVA
+      (ICES-2026-127, lámina 6: 35 % aeróbico de 8 h, 50 % entrenado, ~43 % en la mezcla de una EVA)
+    assumption: false
+
+carry:
+  allowance_per_crew_kg:
+    value: 23
+    source: Carga de herramientas y muestras supuesta por tripulante, 50 lbm (ICES-2026-127, lámina 7)
+    assumption: false
+  single_item_limit_kg:
+    value: 23
+    source: Límite NIOSH de carga para levantar, 51 lbf (ICES-2026-127, lámina 7)
+    assumption: false
+
+soil:
+  # Inercia térmica de THEMIS (J m-2 K-1 s-1/2), capa soil_thermal_inertia.tif.
+  dust_below_ti:
+    value: 100
+    source: >-
+      Superficies dominadas por polvo, posiblemente sin capacidad portante: inercia < 100
+      (Fergason et al. 2012, sitios de MSL; criterio de MER, Golombek et al. 2003)
+    assumption: false
+  loose_below_ti:
+    value: 200
+    source: >-
+      Entre 100 y 200, arena o polvo con algo de costra. Corte nuestro sobre la escala de Putzig
+      y Mellon (2007); sin umbral publicado para caminar
+    assumption: true
+  eta_dust:
+    value: 2.1
+    source: Coeficiente de terreno de arena suelta, Soule y Goldman (1972), ecuación de Pandolf
+    assumption: true
+  eta_loose:
+    value: 1.5
+    source: Coeficiente intermedio (monte pesado, Soule y Goldman 1972), como análogo
+    assumption: true
+  eta_firm:
+    value: 1.1
+    source: Coeficiente de camino de tierra, Soule y Goldman (1972), como análogo
+    assumption: true
+
+comms:
+  habitat_antenna_m:
+    value: 3.0
+    source: Altura de la antena del hábitat sobre el suelo. Sin fuente
+    assumption: true
+  suit_antenna_m:
+    value: 2.0
+    source: Altura de la antena del traje (casco/mochila). Sin fuente
+    assumption: true
+  max_min_without_los:
+    value: 15
+    source: >-
+      Artemis planifica con un "tiempo máximo sin línea de vista al módulo" (Kostak, Caswell y
+      Young 2025, NTRS 20250006988), pero no publica el valor. 15 min es nuestro
+    assumption: true
+  sample_step_m:
+    value: 10
+    source: Paso del muestreo sobre la ruta y sobre la línea de vista (la grilla es de 10 m)
+    assumption: true

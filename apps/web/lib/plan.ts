@@ -37,6 +37,20 @@ export type Station = {
   kind?: "survey" | "target";
   depth_median_m?: number;
   depth_shallow_m?: number;
+  /** Line of sight from the habitat antenna over the DTM; null without DTM. */
+  comm_los?: boolean | null;
+  /** THEMIS thermal inertia at the station (J m-2 K-1 s-1/2); below 100 is dust. */
+  soil_ti?: number | null;
+};
+
+/** "Can we walk it?" from app/feasibility.py (all values are planning assumptions). */
+export type Feasibility = {
+  mobility: { mode: "walk" | "cart" | "rover"; reasons: string[] };
+  effort: { average_btu_h: number; peak_btu_h: number; average_limit_btu_h?: number; peak_limit_btu_h?: number; vo2max_fraction?: number; vo2max_fraction_limit?: number; o2_kg_per_crew?: number };
+  carry: { per_crew_kg: number; allowance_kg?: number; heaviest?: { tool: string; mass_kg: number } | null; unknown_mass?: string[] };
+  soil: { class: "dust" | "loose" | "firm" | "unknown"; thermal_inertia_median?: number | null; terrain_coefficient?: number; dust_fraction?: number; source?: string | null };
+  comms: { route_los_fraction?: number | null; max_min_without_los: number; limit_min?: number; stations_without_los?: string[] };
+  is_assumption?: boolean;
 };
 
 export type TimelineItem = {
@@ -61,6 +75,7 @@ export type PlanSummary = {
   is_mock?: boolean;
   ice_threshold_m?: number;
   craters_in_model?: number;
+  feasibility?: Feasibility;
 };
 
 export type PlanAlert = {
