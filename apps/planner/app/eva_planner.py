@@ -241,10 +241,41 @@ class EvaPlanner:
         ok &= back * speed_mpm / 1000 <= walkback_km  # tiempo de regreso en km de llano
         ok &= back * 2 + self.cfg.ingress_min <= self.budget_min  # alcanzable ida y vuelta
         self.cx, self.cy, self.ccell = gx[ok], gy[ok], cells[ok]
+        self._terrain_units()
         done = np.zeros(self.cx.size, bool)
         for st in self.completed:
             done |= self._near(st["position"][0], st["position"][1])
         self.cdone = done
+
+    def _terrain_units(self) -> None:
+        """Unidades de terreno para `coverage: all_terrain_units`: tercios de inercia térmica.
+
+        La inercia térmica de THEMIS (capa de `scripts/build_soil.py`) sube con el suelo
+        cementado, la roca o el hielo cerca de la superficie: repartir estaciones entre sus tercios
+        en la zona alcanzable prueba si sigue al hielo. Sin la capa, `cunit` queda en None.
+        """
+        self.cunit: np.ndarray | None = None
+        self.units: list[dict] = []
+        soil = feasibility.soil_layer()
+        if soil is None or soil.shape != (self.tmap.grid.height, self.tmap.grid.width):
+            return
+        ti = soil.flat[self.ccell]
+        known = np.isfinite(ti)
+        if known.sum() < 3 or np.ptp(ti[known]) < 1:
+            return
+        edges = np.quantile(ti[known], [0, 1 / 3, 2 / 3, 1])
+        unit = np.full(ti.shape, -1)
+        unit[known] = np.clip(np.searchsorted(edges[1:-1], ti[known], side="right"), 0, 2)
+        self.cunit = unit
+        names = ("Lower thermal inertia", "Middle thermal inertia", "Higher thermal inertia")
+        self.units = [{"unit": u + 1, "label": names[u], "ti_min": round(float(edges[u])),
+                       "ti_max": round(float(edges[u + 1]))} for u in range(3)]
+
+    def unit_at(self, cell: int) -> int | None:
+        if self.cunit is None:
+            return None
+        hit = np.flatnonzero(self.ccell == cell)
+        return int(self.cunit[hit[0]]) + 1 if hit.size and self.cunit[hit[0]] >= 0 else None
 
     def _near(self, x: float, y: float) -> np.ndarray:
         return np.hypot(self.cx - x, self.cy - y) < self.cfg.min_station_separation_m
@@ -297,11 +328,13 @@ class EvaPlanner:
         return taken
 
     def next_survey(
-        self, stops: list[Stop], model: IceModel, req: Requirement, floor_min: float = 0.0
+        self, stops: list[Stop], model: IceModel, req: Requirement, floor_min: float = 0.0,
+        unit: int | None = None,
     ) -> Stop | None:
         """Mejor candidata por valor por minuto que entra al final del recorrido con regreso.
 
         `floor_min`: margen de regreso que tiene que quedar al terminarla (0 = el límite duro).
+        `unit`: solo candidatas de esa unidad de terreno (1-3).
         """
         sched = self.schedule(stops)
         if sched is None:
@@ -313,6 +346,8 @@ class EvaPlanner:
         total = t_end + leg + dur + self.hab_min[self.ccell] + self.cfg.ingress_min
         feasible = np.isfinite(leg) & (total <= self.budget_min - floor_min)
         feasible &= ~self._taken(stops)
+        if unit is not None and self.cunit is not None:
+            feasible &= self.cunit == unit - 1
         idx = np.flatnonzero(feasible)
         if idx.size == 0:
             return None
@@ -379,9 +414,9 @@ class EvaPlanner:
         model = self.model
         survey_reqs = [r for r in self.reqs if r.is_survey]
 
-        def add_survey(req: Requirement, floor_min: float = 0.0) -> bool:
+        def add_survey(req: Requirement, floor_min: float = 0.0, unit: int | None = None) -> bool:
             nonlocal model
-            stop = self.next_survey(stops, model, req, floor_min)
+            stop = self.next_survey(stops, model, req, floor_min, unit)
             if stop is None:
                 return False
             stops.append(stop)
@@ -392,13 +427,27 @@ class EvaPlanner:
         for req in survey_reqs:
             done = sum(1 for st in self.completed if req.rank in st.get("objective_ranks", []))
             need = max(req.min_stations - done, 0)
-            got = sum(add_survey(req) for _ in range(need))
+            got = 0
+            if req.coverage == "all_terrain_units" and self.cunit is not None:
+                # Primero una estación por unidad que todavía no tenga medición.
+                covered = {self.unit_at(self.tmap.snap(*st["position"])) for st in self.completed
+                           if req.rank in st.get("objective_ranks", [])}
+                for u in (1, 2, 3):
+                    if u in covered:
+                        continue
+                    if add_survey(req, unit=u):
+                        got += 1
+                    else:
+                        self.alerts.append(_alert("advisory", f"Objective {req.rank}: no "
+                                                  f"station fits in terrain unit {u}."))
+            got += sum(add_survey(req) for _ in range(max(need - got, 0)))
             if got < need:
                 self.alerts.append(_alert("caution", f"Objective {req.rank}: {done + got} of "
                                           f"{req.min_stations} required stations fit the EVA."))
-            if req.coverage == "all_terrain_units":
+            if req.coverage == "all_terrain_units" and self.cunit is None:
                 self.alerts.append(_alert("advisory", f"Objective {req.rank}: terrain units not "
-                                          "available yet; stations chosen by ice potential."))
+                                          "available (no thermal inertia layer); stations "
+                                          "chosen by ice potential."))
         # 2. Objetivos fijos y tareas en el mejor sitio, por rango.
         for req in self.reqs:
             if req.is_survey or req.rank in done_ranks:
@@ -537,6 +586,9 @@ def build(
             "depth_median_m": round(float(ev["depth_median_m"][i]), 2),
             "depth_shallow_m": round(float(ev["depth_shallow_m"][i]), 2),
         })
+        unit = planner.unit_at(s.cell)
+        if unit is not None:
+            stations[-1]["terrain_unit"] = unit
 
     alerts.extend(_margin_alerts(planner, sched, ids))
 
@@ -644,6 +696,7 @@ def build(
             "ice_threshold_m": model.threshold_m,
             "craters_in_model": model.craters,
             "feasibility": feas,
+            **({"terrain_units": planner.units} if planner.units else {}),
         },
         "alerts": alerts,
     }

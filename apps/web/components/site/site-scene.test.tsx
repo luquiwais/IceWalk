@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { demoMeasurement, demoPlan, demoReplan } from "@/lib/plan";
+import { demoMeasurement, demoPlan, demoReplan, orderedStations } from "@/lib/plan";
 
 import { fitCamera, worldToScreen } from "./camera";
 import { framePoints, habitatOnStation, routeLines, sceneStations, stationName } from "./site-data";
@@ -79,10 +79,10 @@ describe("site data", () => {
 
   it("converts the route as it comes, in grid meters", () => {
     const [line] = routeLines(demoPlan);
-    expect(line).toHaveLength(17);
-    // The planner's route vertices sit ~(+5, -5) m off the stations: drawn as given.
-    expect(line[0][0]).toBeCloseTo(305, 0);
-    expect(line[0][1]).toBeCloseTo(-2205, 0);
+    expect(line.length).toBeGreaterThan(1);
+    // The planner's route vertices sit at cell centers, a few meters off the stations: drawn as given.
+    const [x0, y0] = orderedStations(demoPlan)[0].position;
+    expect(Math.hypot(line[0][0] - x0, line[0][1] - y0)).toBeLessThan(10);
   });
 
   it("labels the re-plan diff", () => {
@@ -165,23 +165,28 @@ describe("SiteScene", () => {
     flushFrames();
     const panned = translate(anchorOf(/^Station 1,/));
     expect(panned[0]).toBeCloseTo(start[0] - 80, 0);
+    const gap = () => {
+      const a = translate(anchorOf(/^Station 1,/));
+      const b = translate(anchorOf(/^Station 2,/));
+      return Math.hypot(b[0] - a[0], b[1] - a[1]);
+    };
+    const before = gap();
     await userEvent.keyboard("-");
     flushFrames();
-    const s1 = translate(anchorOf(/^Station 1,/));
-    const s2 = translate(anchorOf(/^Station 2,/));
-    // 100 m apart; zoomed out from the 3.2 px/m fit by 1.5.
-    expect(s2[0] - s1[0]).toBeCloseTo((100 * 3.2) / 1.5, 0);
+    // Zooming out divides screen distances by 1.5.
+    expect(gap()).toBeCloseTo(before / 1.5, 0);
   });
 
   it("selects a station by click and by keyboard, and toggles it off", async () => {
     const { onSelectStation, rerender } = setup();
+    const second = orderedStations(demoPlan)[1].id;
     await userEvent.click(screen.getByRole("button", { name: /^Station 2,/ }));
-    expect(onSelectStation).toHaveBeenLastCalledWith("E04S22");
+    expect(onSelectStation).toHaveBeenLastCalledWith(second);
 
     rerender(
       <SiteScene
         plan={demoPlan}
-        selectedStationId="E04S22"
+        selectedStationId={second}
         hoveredStationId={null}
         onSelectStation={onSelectStation}
         onHoverStation={vi.fn()}
@@ -191,7 +196,7 @@ describe("SiteScene", () => {
     const selected = screen.getByRole("button", { name: /^Station 2,/ });
     expect(selected).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByText("Model range 100 m")).toBeInTheDocument();
-    expect(screen.getByText(/Selected Station 2, E04S22/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Selected Station 2, ${second}`))).toBeInTheDocument();
 
     selected.focus();
     await userEvent.keyboard("{Enter}");
@@ -199,7 +204,7 @@ describe("SiteScene", () => {
 
     screen.getByRole("button", { name: /^Station 5,/ }).focus();
     await userEvent.keyboard(" ");
-    expect(onSelectStation).toHaveBeenLastCalledWith("E02S23");
+    expect(onSelectStation).toHaveBeenLastCalledWith(orderedStations(demoPlan)[4].id);
 
     await userEvent.keyboard("{Escape}");
     expect(onSelectStation).toHaveBeenLastCalledWith(null);
@@ -288,13 +293,15 @@ describe("SiteScene", () => {
       const map = screen.getByRole("group", { name: "Site map, S1094b" });
       expect(map).toHaveAttribute("data-projected");
       expect(map).toHaveAttribute("data-tilted");
-      // Station 1 is the focus; station 2 is 100 m east of it, so it lies straight ahead.
+      // Station 1 is the focus; with east up, a station east of it lies ahead (higher on screen).
+      const ordered = orderedStations(demoPlan);
+      const east = ordered.find((s) => s.position[0] > ordered[0].position[0] + 50)!;
+      const eastName = new RegExp(`^Station ${east.order},`);
       const [x1, y1] = translate(anchorOf(/^Station 1,/));
-      const [x2, y2] = translate(anchorOf(/^Station 2,/));
+      const [, y2] = translate(anchorOf(eastName));
       expect(x1).toBeCloseTo(96 + (VIEW.width - 96 - 440) / 2, 0);
-      expect(x2).toBeCloseTo(x1, 0);
       expect(y2).toBeLessThan(y1 - 20);
-      expect(anchorOf(/^Station 2,/).style.transform).toMatch(/scale\(0\.\d+\)/);
+      expect(anchorOf(eastName).style.transform).toMatch(/scale\(0\.\d+\)/);
       expect(screen.getByRole("img", { name: "Heading 090°, north to the left" })).toBeInTheDocument();
       expect(screen.queryByRole("img", { name: "North is up" })).not.toBeInTheDocument();
     });
@@ -318,7 +325,8 @@ describe("SiteScene", () => {
       setup({ insets, plan: demoReplan, previousPlan: demoPlan });
       const dropped = sceneStations(demoReplan, demoPlan).dropped.map((s) => [s.position[0], s.position[1]] as [number, number]);
       const cam = fitCamera([...framePoints(demoReplan), ...dropped], VIEW, insets);
-      const [ex, ey] = worldToScreen(cam, VIEW, 400, -2200);
+      const [sx, sy] = orderedStations(demoReplan)[0].position;
+      const [ex, ey] = worldToScreen(cam, VIEW, sx, sy);
       const [x, y] = translate(anchorOf(/^Station 1,/));
       expect(x).toBeCloseTo(ex, 0);
       expect(y).toBeCloseTo(ey, 0);
