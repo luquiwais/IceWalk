@@ -10,6 +10,7 @@ import { bearing, measurementSummary, measuringTool, nextStation, toolName, tool
 import { HABITAT_XY } from "@/components/site/site-data";
 import { RESULT_LABEL, RowLabel, Value } from "./parts";
 import { SurfaceAnalog } from "./surface-analog";
+import { Site3DButton } from "@/components/site3d/site-3d-button";
 
 export function MeasurementForm({ station, pending, onLog, compact = false }: {
   station: Station; pending: boolean; compact?: boolean;
@@ -54,6 +55,7 @@ export function EVView({ plan, measurements, pending, onLog, onReview }: {
   const direction = station ? bearing(origin, station.position) : undefined;
   return <div className="mission-stack">
     <Footnote tone="secondary">Simulated position · heading-up oblique of the flat HiRISE ortho.</Footnote>
+    <Site3DButton plan={plan} measurements={measurements} initial="walk">3D walk · helmet view</Site3DButton>
     {station ? <ListSection header={last ? "Next station" : "Current station"} headerId="ev-station">
       <ListRow trailing={<Value>{String(station.order).padStart(2, "0")}</Value>}><RowLabel title={station.id} detail={station.tools.map(toolName).join(" · ")} /></ListRow>
       <ListRow trailing={<Value>{Math.round(direction!.distanceM)} m</Value>}><RowLabel title={direction!.distanceM ? direction!.label : "At habitat"} detail="Straight-line grid distance · simulated position" /></ListRow>

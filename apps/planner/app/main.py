@@ -8,6 +8,7 @@ mapa de hielo del GP (`app/maps.py`, `map.schema.json`) con o sin terreno.
 from __future__ import annotations
 
 import json
+import os
 import threading
 from contextlib import asynccontextmanager
 from datetime import timedelta
@@ -39,7 +40,11 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="IceWalk API", version="0.1.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# Orígenes permitidos: CORS_ORIGINS="https://web.example,..." en el servidor; local, el dev.
+CORS_ORIGINS = [o.strip() for o in os.environ.get(
+    "CORS_ORIGINS", "http://localhost:3000,http://localhost:3001").split(",") if o.strip()]
+app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_methods=["GET", "POST"],
+                   allow_headers=["Content-Type"])
 app.add_middleware(GZipMiddleware, minimum_size=1000)  # el mapa: ~250 kB, comprime bien
 
 

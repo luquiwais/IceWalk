@@ -148,6 +148,8 @@ Para Frontend: una tarjeta en el Brief de Planning, con una fila por herramienta
 
 ## Datos para el deploy (14/11)
 
+Variables del servidor: `CORS_ORIGINS` con la URL pública de la web (coma entre varias). En la web: `NEXT_PUBLIC_PLANNER_API_URL` con la URL de la API. Capas que necesita el servidor en `data/processed/s1094b/`: terreno y suelo (`icewalk-site-terrain.zip`), catálogo privado, y las de visión del Release `vision-s1094b-2026-11-13` (pasillo entre bloques).
+
 1. `cd apps/planner && python -m app.traverse.terrain`: capas del terreno desde el DTM de `data/raw/` (15 s).
 2. `python scripts/pack_site_data.py` arma tres zips en `dist/` (fuera de Git), con `SHA256SUMS.txt`:
    - `icewalk-site-terrain.zip` (10.4 MB): público, va al GitHub Release;
