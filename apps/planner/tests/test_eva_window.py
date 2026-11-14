@@ -158,9 +158,29 @@ def test_window_avoids_night_and_dust_storm_is_no_go():
     assert 6 <= noon <= 18  # alrededor del día
     storm = eva_window.eva_window(t0, 300, dust_tau=6.0, sw=CLEAR)
     assert storm["recommended"]["go"] is False
-    assert storm["dust"] == {"tau": 6.0, "reported": True}
+    assert storm["dust"] == {"tau": 6.0, "reported": True, "source": "crew"}
     assert any("Dust" in r for r in storm["recommended"]["reasons"])
-    assert w["dust"]["reported"] is False
+    assert w["dust"]["reported"] is False and w["dust"]["source"] == "hope_emirs"
+
+
+def test_background_dust_follows_hope_seasons():
+    cfg = eva_window.window_config()
+    clear, dusty = eva_window.background_dust(140.0, cfg), eva_window.background_dust(212.0, cfg)
+    assert clear["source"] == "hope_emirs" and "note" not in clear
+    assert clear["tau"] < cfg["dust"]["default_tau"] < dusty["tau"]  # afelio claro, perihelio no
+    gap = eva_window.background_dust(101.6, cfg)  # demo: hueco de Hope entre Ls 54 y 123
+    assert "interpolated" in gap["note"] and gap["ls_deg"] == 101.6
+    wrap = eva_window.background_dust(2.0, cfg)  # entre Ls 358.7 y 5.6: cruza el 0
+    lo, hi = sorted((eva_window.background_dust(358.7, cfg)["tau"],
+                     eva_window.background_dust(5.6, cfg)["tau"]))
+    assert lo <= wrap["tau"] <= hi
+
+
+def test_background_dust_without_hope_file(monkeypatch):
+    monkeypatch.setattr(eva_window, "emirs_dust", lambda: None)
+    d = eva_window.background_dust(140.0)
+    assert d == {"tau": eva_window.window_config()["dust"]["default_tau"], "reported": False,
+                 "source": "default"}
 
 
 # --- API -----------------------------------------------------------------------------------

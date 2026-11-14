@@ -6,7 +6,8 @@ todos supuestos):
 
 - Luz: elevación del Sol en S1094b con el algoritmo de Mars24 (`app/marstime.py`).
 - Temperatura y viento: climatología del Viking Lander 2 por estación y hora (`data/`, análogo).
-- Polvo: opacidad que reporta la tripulación; si no hay, el fondo típico (supuesto).
+- Polvo: opacidad que reporta la tripulación; si no hay, la que midió la sonda Hope (EMIRS) en la
+  zona y estación (`data/emirs_dust.json`), pasada a visible; sin esos datos, el fondo típico.
 - Clima espacial: DONKI en vivo, o el evento de agosto de 2023 en modo demo (`app/donki.py`).
 
 Se busca la primera hora de salida en los próximos soles con el peor nivel más bajo durante toda
@@ -31,6 +32,8 @@ from .marstime import SOL_S, mars_time, next_ltst
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config" / "eva_window.yaml"
 CLIMATE = ROOT / "data" / "vl2_climatology.json"
+EMIRS_DUST = ROOT / "data" / "emirs_dust.json"
+GAP_NOTE_DEG = 20.0  # avisar si la muestra de Hope más cercana está más lejos que esto en Ls
 LEVELS = ("none", "advisory", "caution", "warning")
 RANK = {lv: i for i, lv in enumerate(LEVELS)}
 
@@ -46,6 +49,39 @@ def window_config(path: Path = CONFIG) -> dict[str, dict[str, float | None]]:
 @lru_cache
 def climate(path: Path = CLIMATE) -> dict:
     return json.loads(path.read_text())
+
+
+@lru_cache
+def emirs_dust(path: Path = EMIRS_DUST) -> dict | None:
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+
+
+def background_dust(ls_deg: float, cfg: dict | None = None) -> dict:
+    """Polvo sin reporte de la tripulación: tau visible de Hope/EMIRS interpolado por Ls.
+
+    Interpolación lineal circular entre las dos muestras más cercanas en Ls (`emirs_dust.json`,
+    `tau_9um_site`, o la franja si la caja del sitio no tuvo datos), multiplicada por
+    `dust.visible_per_9um`. Sin el archivo, el fondo típico de `dust.default_tau`.
+    """
+    cfg = cfg or window_config()
+    du = cfg["dust"]
+    data = emirs_dust()
+    if not data or not data["samples"]:
+        return {"tau": du["default_tau"], "reported": False, "source": "default"}
+    pts = sorted((s["ls_deg"], s["tau_9um_site"] if s["tau_9um_site"] is not None
+                  else s["tau_9um_band"]) for s in data["samples"])
+    ls = ls_deg % 360.0
+    after = next((p for p in pts if p[0] >= ls), (pts[0][0] + 360.0, pts[0][1]))
+    before = next((p for p in reversed(pts) if p[0] <= ls), (pts[-1][0] - 360.0, pts[-1][1]))
+    span = after[0] - before[0]
+    w = 0.0 if span == 0 else (ls - before[0]) / span
+    tau9 = before[1] + w * (after[1] - before[1])
+    out = {"tau": round(tau9 * du["visible_per_9um"], 2), "reported": False,
+           "source": "hope_emirs", "ls_deg": round(ls, 1)}
+    if min(ls - before[0], after[0] - ls) > GAP_NOTE_DEG:
+        out["note"] = (f"No Hope map within {GAP_NOTE_DEG:g} deg of Ls; interpolated between "
+                       f"Ls {before[0] % 360:.0f} and {after[0] % 360:.0f}")
+    return out
 
 
 def site() -> tuple[float, float]:
@@ -211,8 +247,11 @@ def eva_window(
     sols = int(cfg["search"]["sols"])
     step_s = cfg["search"]["step_min"] * 60 * SOL_S / 86400  # minutos marcianos (1/1440 de sol)
     duration = timedelta(minutes=duration_min)
-    reported = dust_tau is not None
-    tau = dust_tau if reported else cfg["dust"]["default_tau"]
+    if dust_tau is not None:
+        dust = {"tau": dust_tau, "reported": True, "source": "crew"}
+    else:
+        dust = background_dust(mars_time(t0, lon, lat).ls_deg, cfg)
+    tau = dust["tau"]
     sw = sw or donki.space_weather(t0, timedelta(seconds=sols * SOL_S) + duration, demo=demo)
 
     midnight = next_ltst(t0 - timedelta(seconds=SOL_S), 0.0, lon, lat)  # empieza el sol 0
@@ -257,7 +296,7 @@ def eva_window(
         "requested_utc": t0.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "plan_id": plan["plan_id"] if plan else None,
         "eva_duration_min": round(duration_min, 1),
-        "dust": {"tau": tau, "reported": reported},
+        "dust": dust,
         "space_weather": {
             "source": "NASA CCMC DONKI",
             "status": sw.status,
@@ -272,7 +311,8 @@ def eva_window(
         "climate_source": climate()["source"],
         "is_assumption": True,
         "notes": "All thresholds are assumptions (no official Mars EVA limits). Temperature and "
-                 "wind are a Viking Lander 2 climatology (48N), an analogue for the site.",
+                 "wind are a Viking Lander 2 climatology (48N), an analogue for the site. "
+                 "Unreported dust comes from Hope/EMIRS maps of the site region.",
     }
 
 

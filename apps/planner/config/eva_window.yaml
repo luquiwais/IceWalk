@@ -45,8 +45,15 @@ dust:
   default_tau:
     value: 0.5
     source: >-
-      Fondo típico fuera de tormentas (tau ~0.5). Se usa si nadie reporta la opacidad; la
-      respuesta lo marca como supuesto
+      Fondo típico fuera de tormentas (tau ~0.5). Solo si nadie reporta la opacidad y no está
+      data/emirs_dust.json (Hope/EMIRS); la respuesta lo marca como supuesto
+    assumption: true
+  visible_per_9um:
+    value: 2.6
+    source: >-
+      Paso de la opacidad de absorción a ~9 µm (EMIRS, TES, THEMIS) a extinción visible
+      (0.67 µm), con la que se comparan los umbrales. Factor usado en las climatologías de polvo
+      de Montabone et al. 2015 (Icarus 251, 65-95); varía con el tamaño de las partículas
     assumption: true
   advisory_above_tau:
     value: 1.0

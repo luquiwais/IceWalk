@@ -92,6 +92,14 @@ describe("Mission table", () => {
     expect(screen.getByRole("button", { name: "Evidence · why trust it" })).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("says where the unreported dust opacity comes from (Hope EMIRS)", async () => {
+    render(<PlanningView />);
+    await userEvent.click(screen.getByRole("button", { name: "EVA window & weather" }));
+    const card = screen.getByRole("region", { name: "EVA window and weather" });
+    expect(card).toHaveTextContent("Hope EMIRS (UAE)");
+    expect(card).toHaveTextContent("interpolated across a data gap");
+  });
+
   it("shares selection and hover between map, list and timeline, and returns to Brief", async () => {
     render(<PlanningView />);
     const timeline = screen.getByRole("group", { name: "Plan timeline" });
