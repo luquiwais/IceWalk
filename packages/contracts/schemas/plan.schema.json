@@ -135,6 +135,11 @@
         "walkback_caution_min": { "type": "number", "minimum": 0, "description": "Umbral de caution del margen de regreso, copiado de la STM; la web lo dibuja en la curva de walkback margin" },
         "ice_threshold_m": { "type": "number", "exclusiveMinimum": 0, "description": "Umbral de profundidad de la STM para P(hielo)" },
         "craters_in_model": { "type": "integer", "minimum": 0, "description": "Cráteres del catálogo en el GP; 0 = solo el prior" },
+        "terrain_units": {
+          "type": "array",
+          "description": "Unidades de terreno del objetivo con coverage all_terrain_units: tercios de inercia térmica de THEMIS en la zona alcanzable (stations[].terrain_unit)",
+          "items": { "type": "object", "required": ["unit", "label"], "properties": { "unit": { "type": "integer" }, "label": { "type": "string" }, "ti_min": { "type": "number" }, "ti_max": { "type": "number" } } }
+        },
         "feasibility": {
           "type": "object",
           "description": "¿Se puede hacer caminando? Esfuerzo, carga, suelo, comunicaciones y movilidad (app/feasibility.py, config/feasibility.yaml; supuestos)",

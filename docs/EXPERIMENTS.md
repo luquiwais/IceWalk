@@ -589,6 +589,12 @@ Sensibilidad con `false_p` 0.10-0.45 y error de permitividad 0.10-0.30: el rendi
 - El ×2.8 vuelve como "no confirmado, no refutado". El número robusto para el pitch es el del radar: **×2.9 menos EVAs para confirmar hielo**, que no depende de ese supuesto.
 - El prior por latitud es conservador en Arcadia y la tarjeta ahora lo dice. Con Viking 2 queda una tensión abierta con una estimación publicada, que conviene declarar.
 
+## 2026-11-14: unidades de terreno por inercia térmica
+
+| Prueba | Resultado | Conclusión |
+| --- | --- | --- |
+| Plan real con una estación por tercio de inercia (395-474, 474-508, 508-652) | 6 estaciones (unidades 1, 2 y 3; P(hielo) 0.65-0.67), la más lejana a 500 m (antes 220 m), 1.11 km, margen mínimo 21.9 min (sobre el umbral de 15); E06S20 queda sin línea de vista al hábitat | El plan cubre más terreno y la señal aparece como aviso real. P(hielo) casi no cambia entre unidades: el modelo no sabe si la inercia sigue al hielo; para eso están las mediciones |
+
 ## 2026-11-14: factibilidad del plan en S1094b (suelo, esfuerzo, carga, señal)
 
 | Prueba | Resultado | Conclusión |
