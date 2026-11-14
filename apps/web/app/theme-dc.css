@@ -1,0 +1,30 @@
+/* Layout from the Claude Design pass (design/IceWalk.dc.html, by Jose) on wide screens, with the
+   team's visionOS glass kept as is: the view tabs sit in a header row beside the title, status and
+   the planning window form a right column, and the timeline is a bottom band. Only positions
+   change; colors, type and materials come from @icewalk/ui. The camera framing still comes from
+   the measured chrome (planning-view.tsx). Narrow screens keep the bottom-sheet layout. */
+@media (min-width: 760px) {
+  .mission-app { --dc-header: 5rem; --dc-col: 400px; }
+
+  .mission-app .mission-heading { top: 0; height: var(--dc-header); flex-direction: row; align-items: center; gap: .875rem; }
+  .mission-app .mission-tabs { top: 0; left: 22rem; height: var(--dc-header); display: flex; align-items: center; }
+
+  .mission-app .mission-status-position { top: var(--dc-header); right: var(--mission-edge); width: var(--dc-col); }
+  .mission-app .mission-status-values { grid-template-columns: 1fr 1fr; gap: .625rem 1rem; }
+  .mission-app .mission-status-values > :last-child { grid-column: 1 / -1; }
+  .mission-app .mission-status-source { flex-wrap: wrap; }
+
+  .mission-app .mission-panel-presence { top: var(--mission-panel-top, 200px); right: var(--mission-edge); bottom: calc(var(--mission-timeline-y, 9rem) + .75rem); width: var(--dc-col); }
+  .mission-app .mission-show-panel { top: calc(var(--dc-header) + 1rem); right: calc(var(--dc-col) + 2 * var(--mission-edge)); }
+
+  .mission-app .mission-camera { top: calc(var(--dc-header) + 1rem); }
+  .mission-app .mission-map-tools, .mission-app .mission-destination { left: calc(var(--mission-edge) + 4rem); }
+  .mission-app .mission-map-tools { max-width: calc(100% - var(--dc-col) - 7rem); }
+}
+@media (max-width: 1100px) and (min-width: 760px) {
+  .mission-app { --dc-col: 360px; }
+  .mission-app .mission-heading { max-width: none; }
+  .mission-app .mission-heading [data-text-style=footnote] { display: none; }
+  .mission-app .mission-tabs { left: 9rem; }
+  .mission-app .mission-map-tools { left: calc(var(--mission-edge) + 3.5rem); max-width: calc(100% - var(--dc-col) - 6rem); }
+}

@@ -2,6 +2,7 @@
 @layer theme, base, liquid-blur, components, utilities;
 @import "tailwindcss";
 @import "@icewalk/ui/theme.css";
+@import "./theme-dc.css";
 
 /* Tailwind scans the design system sources for class names. */
 @source "../../../packages/ui/src";

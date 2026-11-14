@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#121010;color:#efe7dc}
+*{box-sizing:border-box}
+a{color:#9fe0f2}
+a:hover{color:#efe7dc}
+button{font:inherit;color:inherit}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;font-family:Archivo,sans-serif;background:#121010;color:#efe7dc;font-size:14px">
+
+<header style="display:flex;align-items:stretch;gap:24px;padding:0 20px;min-height:60px;border-bottom:1px solid #332d29;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;gap:14px">
+    <span style="font-weight:750;font-size:21px;letter-spacing:-0.02em;font-stretch:88%">IceWalk</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a39889;letter-spacing:.05em">S1094b · AMAZONIS PLANITIA · 35.11°N 189.83°E</span>
+  </div>
+  <nav style="display:flex;gap:2px;align-items:stretch">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+      <button onClick="{{ t.go }}" style="background:none;border:0;border-bottom:2px solid {{ t.bd }};padding:0 14px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:2px;color:{{ t.fg }}">
+        <span style="font-size:13px;font-weight:650;letter-spacing:.1em">{{ t.label }}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">{{ t.role }}</span>
+      </button>
+    </sc-for>
+  </nav>
+  <div style="flex:1"></div>
+  <div style="display:flex;align-items:center;gap:20px;font-family:'JetBrains Mono',monospace;font-size:11px">
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid {{ sw.color }};border-radius:3px">
+      <span style="width:8px;height:8px;border-radius:50%;background:{{ sw.color }}"></span>
+      <span style="color:#a39889">DONKI</span>
+      <span style="color:{{ sw.color }};font-weight:700">{{ sw.label }}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+      <span style="color:#a39889">SOL 214 · LMST {{ lmst }}</span>
+      <span style="font-weight:700;color:#efe7dc">EVA {{ elapsedStr }}</span>
+    </div>
+  </div>
+</header>
+
+<sc-if value="{{ isSite }}" hint-placeholder-val="{{ true }}">
+<main style="flex:1;display:flex;flex-wrap:wrap">
+  <section style="flex:1 1 560px;display:flex;flex-direction:column;border-right:1px solid #332d29;min-width:0">
+    <div style="display:flex;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #332d29;flex-wrap:wrap">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#a39889">GLOBAL LAYER</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <sc-for list="{{ globeLayers }}" as="b" hint-placeholder-count="4">
+          <button onClick="{{ b.go }}" style="border:1px solid #332d29;background:{{ b.bg }};color:{{ b.fg }};padding:6px 12px;border-radius:3px;cursor:pointer;font-size:12px;font-weight:600">{{ b.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex:1;position:relative;display:grid;place-items:center;padding:24px;min-height:520px;background:radial-gradient(circle at 50% 50%,#1d1916 0%,#121010 70%)">
+      <canvas ref="{{ globeRef }}" width="640" height="640" onPointerDown="{{ gDown }}" onPointerMove="{{ gMove }}" onPointerUp="{{ gUp }}" onPointerLeave="{{ gUp }}" style="width:100%;max-width:600px;aspect-ratio:1;cursor:grab;touch-action:none"></canvas>
+      <div style="position:absolute;left:20px;bottom:20px;display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#a39889">
+        <span style="display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:#9fe0f2"></span>349 catalogued ice-exposing craters (model inputs)</span>
+        <span style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;border:2px solid #e2763f"></span>S1094b traverse site</span>
+        <span>SOURCE · {{ globeSource }}</span>
+      </div>
+      <div style="position:absolute;right:20px;bottom:20px;display:flex;gap:8px">
+        <button onClick="{{ flyTo }}" style="background:#221e1b;border:1px solid #4a423c;padding:10px 16px;border-radius:3px;cursor:pointer;font-weight:600">Fly to S1094b</button>
+        <button onClick="{{ goPlan }}" style="background:#e2763f;border:0;color:#121010;padding:10px 16px;border-radius:3px;cursor:pointer;font-weight:700">Open traverse plan →</button>
+      </div>
+      <div style="position:absolute;left:20px;top:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6f665d">DRAG TO ROTATE</div>
+    </div>
+  </section>
+
+  <aside style="flex:1 1 400px;max-width:560px;padding:28px;display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">SITE BRIEF</span>
+      <h1 style="margin:0;font-size:56px;font-weight:750;font-stretch:72%;letter-spacing:-0.01em;line-height:1">S1094b</h1>
+      <p style="margin:0;color:#a39889;line-height:1.5;text-wrap:pretty">Recent impact crater in Amazonis Planitia. The exposure of subsurface ice nearest the equator observed on Mars, within walking range of a surface habitat.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">WHAT TO CARRY</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6f665d">P(ice within reach) · 90% interval</span>
+      </div>
+      <sc-for list="{{ toolCards }}" as="c" hint-placeholder-count="3">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:16px;align-items:center;padding:14px 16px;background:#1a1715;border:1px solid #332d29;border-radius:4px">
+          <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+            <span style="font-weight:650;font-size:15px">{{ c.name }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a39889">reach {{ c.reach }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700">{{ c.p }}%<span style="font-size:11px;color:#a39889;font-weight:400"> {{ c.ciLabel }}</span></span>
+            <div style="position:relative;height:6px;background:#2a2521;border-radius:3px">
+              <div style="position:absolute;top:0;bottom:0;left:{{ c.ciLeft }};width:{{ c.ciWidth }};background:{{ c.color }};opacity:.45;border-radius:3px"></div>
+              <div style="position:absolute;top:-3px;bottom:-3px;width:2px;left:{{ c.pLeft }};background:{{ c.color }}"></div>
+            </div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:5px 8px;border-radius:3px;background:{{ c.color }};color:#121010;letter-spacing:.04em">{{ c.verdict }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;padding-top:4px;border-top:1px solid #332d29">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889;padding-top:18px">KEY FINDING · RADAR FIRST, DRILL SECOND</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:44px;font-weight:750;font-stretch:72%;color:#9fe0f2;line-height:1">8.7×</span>
+          <span style="color:#a39889;line-height:1.4">more often each drill hole finds ice</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:44px;font-weight:750;font-stretch:72%;color:#9fe0f2;line-height:1">2.9×</span>
+          <span style="color:#a39889;line-height:1.4">fewer EVAs to confirm ice</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;padding:16px;background:#1a1715;border:1px dashed #4a423c;border-radius:4px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#f0bf4f">MODEL LIMITS</span>
+      <p style="margin:0;line-height:1.5;color:#d8cfc4;text-wrap:pretty">Estimates use 349 real craters and a model calibrated on 383 recent impacts. Neighbouring craters cannot predict ice at an exact point, so every map shows uncertainty next to probability. Each walk's measurements tighten the map for the next.</p>
+    </div>
+  </aside>
+</main>
+</sc-if>
+
+<sc-if value="{{ isPlan }}" hint-placeholder-val="{{ false }}">
+<main style="flex:1;display:flex;flex-direction:column;min-width:0">
+  <div style="flex:1;display:flex;flex-wrap:wrap;min-height:0">
+    <aside style="flex:0 1 300px;min-width:260px;border-right:1px solid #332d29;padding:20px;display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">STM · SCIENCE OBJECTIVES</span>
+        <sc-for list="{{ stm }}" as="o" hint-placeholder-count="4">
+          <button onClick="{{ o.go }}" style="text-align:left;background:{{ o.bg }};border:1px solid {{ o.bd }};border-radius:4px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:6px">
+            <span style="display:flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px">
+              <span style="padding:2px 5px;border-radius:2px;background:{{ o.priColor }};color:#121010;font-weight:700">{{ o.pri }}</span>
+              <span style="color:#a39889">{{ o.id }} · {{ o.stations }}</span>
+            </span>
+            <span style="font-weight:600;line-height:1.3">{{ o.title }}</span>
+            <span style="font-size:12px;color:#a39889;line-height:1.35">{{ o.meas }}</span>
+          </button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">PRECOMPUTED PLANS</span>
+        <sc-for list="{{ planCards }}" as="p" hint-placeholder-count="3">
+          <button onClick="{{ p.go }}" style="text-align:left;background:{{ p.bg }};border:1px solid {{ p.bd }};border-radius:4px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:6px">
+            <span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+              <span style="font-weight:700">Plan {{ p.id }} · {{ p.name }}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:{{ p.tagColor }}">{{ p.tag }}</span>
+            </span>
+            <span style="font-size:12px;color:#a39889">{{ p.cond }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#d8cfc4">{{ p.seq }} · {{ p.dist }} · {{ p.dur }}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:{{ p.marginColor }}">min walkback margin {{ p.margin }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </aside>
+
+    <section style="flex:1 1 480px;min-width:0;display:flex;flex-direction:column">
+      <div style="display:flex;gap:18px;padding:12px 20px;border-bottom:1px solid #332d29;flex-wrap:wrap;align-items:center">
+        <div style="display:flex;gap:4px;align-items:center">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889;margin-right:4px">DATA</span>
+          <sc-for list="{{ dataSeg }}" as="b" hint-placeholder-count="3"><button onClick="{{ b.go }}" style="border:1px solid #332d29;background:{{ b.bg }};color:{{ b.fg }};padding:5px 10px;border-radius:3px;cursor:pointer;font-size:12px;font-weight:600">{{ b.label }}</button></sc-for>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889;margin-right:4px">REACH</span>
+          <sc-for list="{{ toolSeg }}" as="b" hint-placeholder-count="3"><button onClick="{{ b.go }}" style="border:1px solid #332d29;background:{{ b.bg }};color:{{ b.fg }};padding:5px 10px;border-radius:3px;cursor:pointer;font-size:12px;font-weight:600">{{ b.label }}</button></sc-for>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889;margin-right:4px">BASE</span>
+          <sc-for list="{{ baseSeg }}" as="b" hint-placeholder-count="4"><button onClick="{{ b.go }}" style="border:1px solid #332d29;background:{{ b.bg }};color:{{ b.fg }};padding:5px 10px;border-radius:3px;cursor:pointer;font-size:12px;font-weight:600">{{ b.label }}</button></sc-for>
+        </div>
+        <button onClick="{{ toggleHazard }}" style="border:1px solid {{ hazardBd }};background:none;color:{{ hazardFg }};padding:5px 10px;border-radius:3px;cursor:pointer;font-size:12px;font-weight:600">No-go &gt;20°</button>
+      </div>
+      <div style="flex:1;display:grid;place-items:center;padding:20px;background:#0e0c0b">
+        <div style="position:relative;width:100%;max-width:640px;aspect-ratio:1">
+          <canvas ref="{{ mapRef }}" width="720" height="720" style="position:absolute;inset:0;width:100%;height:100%;border:1px solid #332d29"></canvas>
+          <div style="position:absolute;left:15.4%;top:80.4%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none">
+            <span style="width:18px;height:18px;background:#efe7dc;border:3px solid #121010"></span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;background:#121010;padding:1px 4px">HAB</span>
+          </div>
+          <sc-for list="{{ measMarks }}" as="m" hint-placeholder-count="1">
+            <span style="position:absolute;left:{{ m.left }};top:{{ m.top }};width:12px;height:12px;transform:translate(-50%,-50%) rotate(45deg);background:{{ m.color }};border:2px solid #121010;pointer-events:none"></span>
+          </sc-for>
+          <sc-for list="{{ stMarks }}" as="s" hint-placeholder-count="4">
+            <button onClick="{{ s.go }}" style="position:absolute;left:{{ s.left }};top:{{ s.top }};transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:{{ s.bg }};color:{{ s.fg }};border:2px solid {{ s.bd }};font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;display:grid;place-items:center;box-shadow:0 0 0 3px #121010">{{ s.id }}</button>
+          </sc-for>
+          <span style="position:absolute;left:{{ evLeft }};top:{{ evTop }};transform:translate(-50%,-50%);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;background:#e2763f;color:#121010;padding:2px 5px;border-radius:2px;pointer-events:none;white-space:nowrap">EV1·EV2</span>
+          <div style="position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:4px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#d8cfc4;background:rgba(18,16,16,.85);padding:8px 10px;border-radius:3px">
+            <div style="width:25%;min-width:120px;display:flex;flex-direction:column;gap:3px"><span style="height:4px;background:#efe7dc"></span><span>500 m</span></div>
+            <span style="color:#a39889">{{ mapSource }}</span>
+          </div>
+          <div style="position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#d8cfc4;background:rgba(18,16,16,.85);padding:8px 10px;border-radius:3px;min-width:150px">
+            <span>{{ legendTitle }}</span>
+            <span style="height:8px;border-radius:2px;background:{{ legendGrad }}"></span>
+            <span style="display:flex;justify-content:space-between;color:#a39889"><span>{{ legendLo }}</span><span>{{ legendHi }}</span></span>
+            <span style="display:flex;align-items:center;gap:6px;color:#a39889"><span style="width:10px;height:10px;background:repeating-linear-gradient(45deg,#f06a5a 0 2px,transparent 2px 4px)"></span>slope &gt; 20° (no-go)</span>
+            <span style="display:flex;align-items:center;gap:6px;color:#a39889"><span style="width:8px;height:8px;transform:rotate(45deg);background:#9fe0f2"></span>logged measurement</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside style="flex:0 1 360px;min-width:300px;border-left:1px solid #332d29;padding:20px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">STATION · {{ sel.pri }} · {{ sel.obj }}</span>
+        <h2 style="margin:0;font-size:34px;font-weight:750;font-stretch:72%;line-height:1">{{ sel.id }} <span style="color:#a39889;font-weight:500">{{ sel.name }}</span></h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#332d29;border:1px solid #332d29;border-radius:4px;overflow:hidden">
+        <div style="background:#1a1715;padding:10px 12px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">TOOL</span><span style="font-weight:650">{{ sel.toolName }}</span></div>
+        <div style="background:#1a1715;padding:10px 12px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">TIME ON STATION</span><span style="font-weight:650">{{ sel.min }} min</span></div>
+        <div style="background:#1a1715;padding:10px 12px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">P(ICE IN REACH)</span><span style="font-weight:650;font-family:'JetBrains Mono',monospace">{{ sel.pIce }}</span></div>
+        <div style="background:#1a1715;padding:10px 12px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">EXPECTED INFO GAIN</span><span style="font-weight:650;font-family:'JetBrains Mono',monospace;color:#9fe0f2">{{ sel.gain }}</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#e2763f;padding-top:1px">EV1</span><span style="line-height:1.4">{{ sel.ev1 }}</span></div>
+        <div style="display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start"><span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#9fe0f2;padding-top:1px">EV2</span><span style="line-height:1.4">{{ sel.ev2 }}</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;background:#1a1715;border-radius:4px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">HYPOTHESIS</span>
+        <span style="line-height:1.45;text-wrap:pretty">{{ sel.hyp }}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;font-family:'JetBrains Mono',monospace;font-size:12px;border-top:1px solid #332d29;padding-top:12px">
+        <span style="color:#a39889">WALKBACK FROM HERE</span>
+        <span style="font-weight:700">{{ sel.wb }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid {{ sw.color }};border-radius:4px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:{{ sw.color }}">SPACE WEATHER · NASA DONKI · {{ sw.label }}</span>
+        <span style="line-height:1.45;font-size:13px">{{ sw.text }}</span>
+      </div>
+    </aside>
+  </div>
+
+  <section style="border-top:1px solid #332d29;padding:16px 20px 20px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">TIMELINE · PLAN {{ plan }} · 6 h EVA WINDOW · 20% WALKBACK RESERVE</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a39889">{{ planSummary }}</span>
+    </div>
+    <div style="position:relative;height:34px;background:#1a1715;border-radius:3px">
+      <sc-for list="{{ segs }}" as="g" hint-placeholder-count="8">
+        <button onClick="{{ g.go }}" style="position:absolute;top:0;bottom:0;left:{{ g.left }};width:{{ g.width }};background:{{ g.bg }};border:0;border-right:1px solid #121010;color:{{ g.fg }};font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;overflow:hidden;cursor:pointer;padding:0">{{ g.label }}</button>
+      </sc-for>
+      <span style="position:absolute;top:-4px;bottom:-4px;left:{{ cursorLeft }};width:2px;background:#e2763f"></span>
+    </div>
+    <div style="position:relative">
+      <canvas ref="{{ chartRef }}" style="width:100%;height:90px;display:block"></canvas>
+      <div style="display:flex;gap:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889;margin-top:4px;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:2px;background:#d8cfc4"></span>time left in EVA window (before ingress)</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:2px;background:#e2763f"></span>walkback to HAB + 20% reserve</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:8px;background:rgba(143,214,148,.25)"></span>margin</span>
+      </div>
+    </div>
+  </section>
+</main>
+</sc-if>
+
+<sc-if value="{{ isEva }}" hint-placeholder-val="{{ false }}">
+<main style="flex:1;background:#0a0908;padding:20px;display:flex;flex-direction:column;gap:16px">
+  <div style="display:flex;gap:16px;align-items:stretch;flex-wrap:wrap">
+    <div style="display:flex;gap:6px">
+      <sc-for list="{{ evSeg }}" as="b" hint-placeholder-count="2">
+        <button onClick="{{ b.go }}" style="min-width:96px;min-height:64px;border:2px solid {{ b.bd }};background:{{ b.bg }};color:{{ b.fg }};border-radius:6px;font-size:24px;font-weight:800;cursor:pointer;font-stretch:80%">{{ b.label }}</button>
+      </sc-for>
+    </div>
+    <div style="flex:1;min-width:280px;display:flex;align-items:center;gap:16px;padding:0 20px;border-radius:6px;background:{{ evaAlert.bg }};color:{{ evaAlert.fg }};min-height:64px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;letter-spacing:.08em">{{ evaAlert.level }}</span>
+      <span style="font-size:22px;font-weight:700">{{ evaAlert.text }}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;align-items:flex-end;font-family:'JetBrains Mono',monospace">
+      <span style="font-size:12px;color:#a39889">ELAPSED</span>
+      <span style="font-size:30px;font-weight:700">{{ elapsedStr }}</span>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;gap:16px;flex-wrap:wrap">
+    <section style="flex:1.5 1 520px;background:#151210;border:1px solid #2a2521;border-radius:8px;padding:28px;display:flex;gap:32px;align-items:center;flex-wrap:wrap">
+      <div style="position:relative;width:240px;height:240px;border-radius:50%;border:3px solid #3a332e;flex-shrink:0">
+        <span style="position:absolute;top:8px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e2763f">N</span>
+        <span style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:14px;color:#6f665d">S</span>
+        <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:14px;color:#6f665d">W</span>
+        <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:'JetBrains Mono',monospace;font-size:14px;color:#6f665d">E</span>
+        <div style="position:absolute;inset:0;transform:rotate({{ eva.bearing }}deg);display:flex;justify-content:center">
+          <div style="margin-top:36px;display:flex;flex-direction:column;align-items:center">
+            <span style="width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-bottom:52px solid #efe7dc"></span>
+            <span style="width:14px;height:44px;background:#efe7dc"></span>
+          </div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.12em;color:#a39889">{{ eva.kicker }}</span>
+        <span style="font-size:64px;font-weight:800;font-stretch:72%;line-height:.95">{{ eva.targetId }} <span style="color:#a39889;font-weight:600">{{ eva.targetName }}</span></span>
+        <div style="display:flex;column-gap:28px;row-gap:8px;align-items:baseline;flex-wrap:wrap">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:72px;font-weight:700;line-height:1;white-space:nowrap">{{ eva.dist }}<span style="font-size:28px;color:#a39889"> m</span></span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;white-space:nowrap">{{ eva.bearingStr }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:24px;color:#a39889;white-space:nowrap">ETA {{ eva.eta }} min</span>
+        </div>
+        <span style="display:inline-flex;align-self:flex-start;align-items:center;gap:10px;padding:8px 14px;border-radius:4px;background:{{ eva.pathBg }};color:#0a0908;font-size:20px;font-weight:800">{{ eva.pathText }}</span>
+      </div>
+    </section>
+
+    <section style="flex:1 1 340px;background:#151210;border:1px solid #2a2521;border-radius:8px;padding:24px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:.12em;color:#a39889">TURN BACK IN</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:72px;font-weight:700;line-height:1;color:{{ eva.marginColor }}">{{ eva.margin }}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:18px;color:#d8cfc4">walkback {{ eva.wb }} min incl. 20%</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ consumables }}" as="k" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:70px 1fr 64px;gap:12px;align-items:center">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700">{{ k.label }}</span>
+            <div style="height:16px;background:#2a2521;border-radius:3px;overflow:hidden"><div style="height:100%;width:{{ k.w }};background:{{ k.color }}"></div></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:18px;text-align:right">{{ k.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <section style="flex:1.5 1 520px;background:#151210;border:1px solid #2a2521;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:10px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.12em;color:#a39889">{{ ev }} CHECKLIST · {{ eva.targetId }}</span>
+      <sc-for list="{{ checklist }}" as="c" hint-placeholder-count="3">
+        <button onClick="{{ c.go }}" style="display:flex;align-items:center;gap:18px;min-height:64px;padding:0 16px;background:{{ c.bg }};border:2px solid #2a2521;border-radius:6px;cursor:pointer;text-align:left">
+          <span style="width:36px;height:36px;border-radius:4px;border:3px solid {{ c.box }};background:{{ c.fill }};display:grid;place-items:center;color:#0a0908;font-size:24px;font-weight:900;flex-shrink:0">{{ c.mark }}</span>
+          <span style="font-size:22px;font-weight:650;color:{{ c.fg }}">{{ c.label }}</span>
+        </button>
+      </sc-for>
+    </section>
+    <section style="flex:1 1 340px;display:flex;flex-direction:column;gap:12px">
+      <button onClick="{{ openLog }}" style="flex:1;min-height:110px;border:0;border-radius:8px;background:{{ logBtnBg }};color:#0a0908;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px">
+        <span style="font-size:32px;font-weight:850;font-stretch:80%;letter-spacing:.02em">LOG MEASUREMENT</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700">{{ eva.toolName }}</span>
+      </button>
+      <div style="position:relative;aspect-ratio:2/1;border-radius:8px;overflow:hidden;border:1px solid #2a2521">
+        <canvas ref="{{ evaMapRef }}" width="720" height="720" style="position:absolute;left:0;top:50%;width:100%;transform:translateY(-50%)"></canvas>
+      </div>
+    </section>
+  </div>
+
+  <sc-if value="{{ logOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(5,4,4,.88);display:grid;place-items:center;z-index:20;padding:20px">
+      <div style="width:min(860px,100%);background:#151210;border:2px solid #3a332e;border-radius:10px;padding:28px;display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+          <span style="font-size:36px;font-weight:800;font-stretch:76%">{{ eva.targetId }} · {{ eva.toolName }}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#a39889">{{ ev }} · GNSS {{ eva.latlon }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+          <sc-for list="{{ resultOpts }}" as="r" hint-placeholder-count="3">
+            <button onClick="{{ r.go }}" style="min-height:120px;border-radius:8px;border:3px solid {{ r.bd }};background:{{ r.bg }};color:{{ r.fg }};font-size:28px;font-weight:850;font-stretch:80%;cursor:pointer">{{ r.label }}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ showDepth }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:#a39889">DEPTH TO ICE</span>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <sc-for list="{{ depthOpts }}" as="d" hint-placeholder-count="5">
+                <button onClick="{{ d.go }}" style="min-width:96px;min-height:72px;border-radius:6px;border:3px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;cursor:pointer">{{ d.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex;gap:12px">
+          <button onClick="{{ closeLog }}" style="flex:1;min-height:80px;border-radius:8px;border:2px solid #4a423c;background:none;font-size:26px;font-weight:800;cursor:pointer">CANCEL</button>
+          <button onClick="{{ submitLog }}" style="flex:2;min-height:80px;border-radius:8px;border:0;background:{{ sendBg }};color:#0a0908;font-size:26px;font-weight:850;cursor:pointer">SEND · REPLAN</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</main>
+</sc-if>
+
+<sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+<main style="flex:1;padding:28px;display:flex;flex-direction:column;gap:28px;max-width:1400px;width:100%;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">REVIEW · EVA 07 · SOL 214</span>
+      <h1 style="margin:0;font-size:44px;font-weight:750;font-stretch:72%;line-height:1">Site uncertainty, before and after this walk</h1>
+    </div>
+    <div style="display:flex;gap:28px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">MEAN σ ICE-TABLE DEPTH</span><span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700">{{ rev.sBefore }} → {{ rev.sAfter }} m</span></div>
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">REDUCTION</span><span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:#9fe0f2">−{{ rev.pct }}%</span></div>
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">AREA RESOLVED (σ &lt; 0.75 m)</span><span style="font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700">{{ rev.resBefore }} → {{ rev.resAfter }}</span></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a39889">BEFORE · prior from orbital data and neighbouring craters</span>
+      <div style="position:relative;aspect-ratio:1"><canvas ref="{{ beforeRef }}" width="600" height="600" style="width:100%;height:100%;border:1px solid #332d29"></canvas></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a39889">AFTER · posterior with {{ rev.n }} geolocated measurements</span>
+      <div style="position:relative;aspect-ratio:1">
+        <canvas ref="{{ afterRef }}" width="600" height="600" style="width:100%;height:100%;border:1px solid #332d29"></canvas>
+        <sc-for list="{{ measMarks }}" as="m" hint-placeholder-count="1">
+          <span style="position:absolute;left:{{ m.left }};top:{{ m.top }};width:12px;height:12px;transform:translate(-50%,-50%) rotate(45deg);background:{{ m.color }};border:2px solid #121010"></span>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#a39889">
+        <span>σ ICE-TABLE DEPTH (m)</span>
+        <span style="height:10px;border-radius:2px;background:linear-gradient(90deg,#1e1610,#8c5a1e,#f0bf4f,#fff0c8)"></span>
+        <span style="display:flex;justify-content:space-between"><span>0.2 · known</span><span>2.8 · unknown</span></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">WHY RADAR GOES FIRST</span>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px">Drill holes that find ice</span>
+          <div style="display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px"><span style="color:#a39889">drill only</span><span style="height:12px;width:11.5%;background:#4a423c"></span><span style="color:#a39889">radar → drill</span><span style="display:flex;align-items:center;gap:8px"><span style="height:12px;width:100%;background:#9fe0f2"></span>8.7×</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px">EVAs needed to confirm ice</span>
+          <div style="display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px"><span style="color:#a39889">drill only</span><span style="display:flex;align-items:center;gap:8px"><span style="height:12px;width:100%;background:#4a423c"></span>2.9×</span><span style="color:#a39889">radar → drill</span><span style="height:12px;width:34.5%;background:#9fe0f2"></span></div>
+        </div>
+      </div>
+      <button onClick="{{ goPlan }}" style="align-self:flex-start;background:#e2763f;border:0;color:#121010;padding:12px 18px;border-radius:3px;cursor:pointer;font-weight:700">Use posterior for next traverse →</button>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#a39889">MEASUREMENT LOG · RELAYED TO EARTH</span>
+    <div style="border:1px solid #332d29;border-radius:4px;overflow:auto">
+      <div style="display:grid;grid-template-columns:60px 70px 60px minmax(140px,1.2fr) 110px 90px minmax(200px,1.4fr) 90px;min-width:880px;font-family:'JetBrains Mono',monospace;font-size:12px">
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">ID</span>
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">STATION</span>
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">CREW</span>
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">TOOL</span>
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">RESULT</span>
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">DEPTH</span>
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">LAT / LON</span>
+        <span style="padding:10px 12px;color:#a39889;border-bottom:1px solid #332d29">T+</span>
+      </div>
+      <sc-for list="{{ measRows }}" as="r" hint-placeholder-count="1">
+        <div style="display:grid;grid-template-columns:60px 70px 60px minmax(140px,1.2fr) 110px 90px minmax(200px,1.4fr) 90px;min-width:880px;font-family:'JetBrains Mono',monospace;font-size:12px;border-bottom:1px solid #26211e">
+          <span style="padding:10px 12px">{{ r.id }}</span>
+          <span style="padding:10px 12px">{{ r.st }}</span>
+          <span style="padding:10px 12px">{{ r.ev }}</span>
+          <span style="padding:10px 12px">{{ r.tool }}</span>
+          <span style="padding:10px 12px;color:{{ r.color }};font-weight:700">{{ r.res }}</span>
+          <span style="padding:10px 12px">{{ r.depth }}</span>
+          <span style="padding:10px 12px">{{ r.ll }}</span>
+          <span style="padding:10px 12px">{{ r.t }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<sc-if value="{{ replanning }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(5,4,4,.8);display:grid;place-items:center;z-index:30">
+    <div style="width:min(520px,90vw);display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:40px;font-weight:850;font-stretch:76%">REPLANNING</span>
+      <div style="height:10px;background:#2a2521;border-radius:5px;overflow:hidden"><div style="height:100%;width:{{ replanW }};background:#9fe0f2"></div></div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#a39889">Updating ice posterior · re-solving traverse · checking walkback</span>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:25;background:#9fe0f2;color:#0a0908;padding:16px 22px;border-radius:6px;display:flex;gap:16px;align-items:center;max-width:90vw">
+    <span style="font-size:18px;font-weight:750">{{ toast }}</span>
+    <button onClick="{{ dismissToast }}" style="background:none;border:2px solid #0a0908;border-radius:4px;padding:6px 12px;font-weight:800;cursor:pointer;color:#0a0908">OK</button>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;site&quot;,&quot;plan&quot;,&quot;eva&quot;,&quot;review&quot;],&quot;default&quot;:&quot;site&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototype&quot;},&quot;spaceWeather&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;advisory&quot;,&quot;caution&quot;,&quot;warning&quot;],&quot;default&quot;:&quot;advisory&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Simulation&quot;},&quot;walkSpeed&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:1.2,&quot;max&quot;:3.5,&quot;step&quot;:0.1,&quot;unit&quot;:&quot;km/h&quot;,&quot;default&quot;:2.2,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Simulation&quot;}}">
+class Component extends DCLogic {
+  state = { view: null, plan: 'A', idx: 1, legP: 0.55, sel: 'S2', selObj: null, dataLayer: 'prob', tool: 'r3', base: 'topo', hazard: true, globeLayer: 'topo', ev: 'EV1', elapsed: 80 * 60 + 12, checks: {}, logOpen: false, logRes: null, logDepth: null, replan: 0, toast: null,
+    meas: [{ id: 'M1', st: 'S1', x: 40, y: 74, tool: 'r3', res: 'ice', depth: 2.4, ev: 'EV1', t: 72 * 60 }] };
+  globeRef = React.createRef(); mapRef = React.createRef(); evaMapRef = React.createRef(); beforeRef = React.createRef(); afterRef = React.createRef(); chartRef = React.createRef();
+  g = { lon0: 2.4, lat0: 0.3, zoom: 1, auto: true, drag: null, anim: null };
+
+  lib = (() => {
+    const N = 120, CELL = 2000 / N, C = { x: 72, y: 46, R: 5 };
+    const H = (x, y, s) => { let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(s, 1442695041)) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+    const vn = (x, y, s) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf); const a = H(xi, yi, s), b = H(xi + 1, yi, s), c = H(xi, yi + 1, s), d = H(xi + 1, yi + 1, s); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
+    const fbm = (x, y, s, o) => { let t = 0, a = .5, f = 1, n = 0; for (let i = 0; i < o; i++) { t += a * vn(x * f, y * f, s + i * 17); n += a; a *= .5; f *= 2; } return t / n; };
+    const gs = (x, y, cx, cy, s) => Math.exp(-((x - cx) ** 2 + (y - cy) ** 2) / (2 * s * s));
+    const A = () => new Float32Array(N * N);
+    const z = A(), mu0 = A(), s0 = A(), th = A(), rd = A(), al = A(), sl = A(), hs = A();
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const i = y * N + x, r = Math.hypot(x - C.x, y - C.y) / C.R;
+      let e = fbm(x / 24, y / 24, 1, 4) * 36 + 44 * gs(x, y, 30, 30, 3.4) + 36 * gs(x, y, 104, 92, 3) + 28 * gs(x, y, 50, 16, 3);
+      const amp = 19 * (1 - Math.exp(-((x - 90) ** 2) / 32)) / (1 + Math.exp(-(x - 24) / 2));
+      e += amp * (0.5 + 0.5 * Math.tanh((0.35 * x + 8 - y) / 1.1));
+      if (r < 1) e -= 26 * (1 - r * r);
+      e += 8 * Math.exp(-(((r - 1) / .45) ** 2));
+      if (r > 1) e += (fbm(x / 2.5, y / 2.5, 7, 2) - .5) * 5 * Math.exp(-(r - 1) / 2.2);
+      z[i] = e;
+      const ej = r > 1 ? Math.exp(-(r - 1) / 2.4) : 1;
+      mu0[i] = Math.max(.3, 5.4 + (fbm(x / 18, y / 18, 3, 3) - .5) * 3.2 - 4.4 * Math.exp(-((r / 2.9) ** 2)));
+      s0[i] = Math.max(.35, 2.1 + (fbm(x / 26, y / 26, 5, 3) - .5) * 1.6 - 1.2 * Math.exp(-((r / 1.8) ** 2)));
+      th[i] = Math.min(1, Math.max(0, .25 + .55 * ej + (fbm(x / 9, y / 9, 11, 3) - .5) * .6));
+      rd[i] = Math.min(1, .15 + .5 * ej + fbm(x / 4, y / 4, 13, 3) * .45);
+      al[i] = fbm(x / 7, y / 7, 21, 4);
+    }
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const i = y * N + x, xm = Math.max(0, x - 1), xp = Math.min(N - 1, x + 1), ym = Math.max(0, y - 1), yp = Math.min(N - 1, y + 1);
+      const dx = (z[y * N + xp] - z[y * N + xm]) / ((xp - xm) * CELL), dy = (z[yp * N + x] - z[ym * N + x]) / ((yp - ym) * CELL);
+      sl[i] = Math.atan(Math.hypot(dx, dy)) * 57.2958;
+      hs[i] = Math.max(0, (dx * .5 + dy * .5 + .71) / Math.hypot(dx, dy, 1));
+    }
+    const TOOLS = {
+      d1: { name: 'Drill', long: 'Drill · 1 m', reach: '1 m', D: 1, L: 3, so: .15, verdict: 'NO_GO', p: 6, ci: [2, 13], color: '#f06a5a', depths: [0.3, 0.5, 0.8, 1.0] },
+      r3: { name: 'Radar', long: 'Radar · 3 m', reach: '3 m', D: 3, L: 6, so: .4, verdict: 'CONDITIONAL', p: 52, ci: [37, 67], color: '#f0bf4f', depths: [0.5, 1, 1.5, 2, 2.5, 3] },
+      g10: { name: 'Ground-penetrating radar', long: 'GPR · 10 m', reach: '10 m', D: 10, L: 7, so: .45, verdict: 'GO', p: 97, ci: [90, 99], color: '#8fd694', depths: [1, 2, 3, 4, 6, 8] },
+    };
+    const ST = {
+      HAB: { id: 'HAB', x: 18, y: 96, name: 'Habitat' },
+      S1: { id: 'S1', x: 40, y: 74, name: 'Radar baseline', pri: 'P3', obj: 'O4', tool: 'r3', min: 35, ev1: 'Run 3 m radar transect, 120 m east–west', ev2: 'Place GNSS marker, photo-document transect', hyp: 'Ice table shallower than 3 m extends 400 m south-west of the crater.' },
+      S2: { id: 'S2', x: 62, y: 58, name: 'Ejecta margin', pri: 'P1', obj: 'O1', tool: 'g10', min: 50, ev1: 'GPR grid 40 × 40 m at 2 m line spacing', ev2: 'Log grid corners, run thermal probe', hyp: 'Ice table lies 1.5–4 m under the ejecta blanket.' },
+      S3: { id: 'S3', x: 80, y: 56, name: 'Rim apron drill', pri: 'P1', obj: 'O2', tool: 'd1', min: 45, ev1: 'Drill to 1 m at the strongest radar pick', ev2: 'Core handling, sample bag 3A', hyp: 'Ice within 1 m on the crater apron where radar shows a strong return.' },
+      S4: { id: 'S4', x: 96, y: 30, name: 'Background control', pri: 'P3', obj: 'O4', tool: 'r3', min: 25, ev1: '3 m radar transect, 80 m', ev2: 'Photo panorama, GNSS fix', hyp: 'No shallow ice beyond 600 m from the crater.' },
+      S2b: { id: 'S2b', x: 66, y: 64, name: 'Ice confirmation core', pri: 'P2', obj: 'O3', tool: 'd1', min: 40, ev1: 'Drill at the strongest GPR reflector', ev2: 'Core photo, field purity test', hyp: 'The radar reflector at ≤1 m is ice-cemented regolith.' },
+      S5: { id: 'S5', x: 86, y: 42, name: 'North-east ejecta', pri: 'P1', obj: 'O1', tool: 'g10', min: 35, ev1: 'GPR grid 30 × 30 m', ev2: 'Log grid corners, photo-document', hyp: 'The ice table is deeper to the south-west; north-east ejecta is the better target.' },
+    };
+    const W1 = { x: 88, y: 62 };
+    const PLANS = {
+      A: { id: 'A', name: 'Nominal', cond: 'Baseline traverse', seq: ['S1', 'S2', 'S3', 'S4'], ret: [W1] },
+      B1: { id: 'B1', name: 'Ice at S2', cond: 'If GPR at S2 finds ice', seq: ['S1', 'S2', 'S2b', 'S3'], ret: [] },
+      B2: { id: 'B2', name: 'No ice at S2', cond: 'If S2 shows no ice to 10 m', seq: ['S1', 'S2', 'S5', 'S4'], ret: [W1] },
+    };
+    const STM = [
+      { id: 'O1', pri: 'P1', title: 'Confirm ground ice within EVA reach', meas: 'Subsurface dielectric contrast to 10 m · GPR' },
+      { id: 'O2', pri: 'P1', title: 'Constrain ice-table depth to ±0.5 m', meas: 'Radar pick, then drill to 1 m' },
+      { id: 'O3', pri: 'P2', title: 'Characterize ice purity', meas: 'Core sample · field purity test' },
+      { id: 'O4', pri: 'P3', title: 'Map lateral extent of shallow ice', meas: 'Radar transects to 3 m' },
+    ];
+    const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    const slopeAt = (x, y) => sl[Math.min(N - 1, Math.max(0, Math.round(y))) * N + Math.min(N - 1, Math.max(0, Math.round(x)))];
+    const maxSlope = (a, b) => { const n = Math.max(2, Math.ceil(dist(a, b) * 2)); let m = 0; for (let k = 0; k <= n; k++) m = Math.max(m, slopeAt(a.x + (b.x - a.x) * k / n, a.y + (b.y - a.y) * k / n)); return m; };
+    const wbDist = (p) => { const h = ST.HAB; if (maxSlope(p, h) <= 20) return dist(p, h); if (maxSlope(p, W1) <= 20 && maxSlope(W1, h) <= 20) return dist(p, W1) + dist(W1, h); return dist(p, h) * 1.4; };
+    const posterior = (meas, extra) => {
+      const mu = new Float32Array(mu0), s = new Float32Array(s0);
+      const all = extra ? meas.concat([extra]) : meas;
+      for (const m of all) {
+        const T = TOOLS[m.tool], L = T.L, R = Math.ceil(L * 4);
+        for (let y = Math.max(0, m.y - R); y <= Math.min(N - 1, m.y + R); y++) for (let x = Math.max(0, m.x - R); x <= Math.min(N - 1, m.x + R); x++) {
+          const i = y * N + x, w = Math.exp(-((x - m.x) ** 2 + (y - m.y) ** 2) / (2 * L * L));
+          let mo, so;
+          if (m.res === 'ice') { mo = m.depth; so = T.so; } else if (m.res === 'none') { mo = T.D + 1.5; so = 1.2; } else { mo = mu[i]; so = m.res === 'hyp' ? T.so : 2.5; }
+          const p1 = 1 / (s[i] * s[i]), p2 = w / (so * so);
+          mu[i] = (mu[i] * p1 + mo * p2) / (p1 + p2); s[i] = Math.sqrt(1 / (p1 + p2));
+        }
+      }
+      return { mu, s };
+    };
+    const prob = (F, D, i) => 1 / (1 + Math.exp(-1.702 * (D - F.mu[i]) / F.s[i]));
+    const meanS = (s) => { let t = 0; for (let i = 0; i < s.length; i++) t += s[i]; return t / s.length; };
+    const resolved = (s) => { let c = 0; for (let i = 0; i < s.length; i++) if (s[i] < .75) c++; return c / s.length; };
+    const ramp = (st, t) => { t = Math.min(1, Math.max(0, t)) * (st.length - 1); const i = Math.min(st.length - 2, Math.floor(t)), f = t - i; return [0, 1, 2].map(k => st[i][k] + (st[i + 1][k] - st[i][k]) * f); };
+    const RAMP = { topo: [[30, 23, 20], [118, 90, 72], [222, 192, 162]], thermal: [[24, 18, 44], [110, 40, 90], [226, 118, 63], [245, 214, 140]], radar: [[14, 20, 18], [80, 110, 100], [210, 230, 220]], image: [[52, 32, 22], [150, 96, 64], [226, 190, 156]],
+      prob: [[16, 24, 34], [28, 70, 100], [80, 170, 205], [159, 224, 242]], unc: [[30, 22, 16], [140, 90, 30], [240, 191, 79], [255, 240, 200]] };
+    const baseV = (b, i) => b === 'topo' ? hs[i] : b === 'thermal' ? th[i] : b === 'radar' ? rd[i] * (.6 + .4 * hs[i]) : al[i] * .5 + hs[i] * .5;
+    let hatch = null;
+    const drawMap = (cv, o) => {
+      if (!cv) return;
+      const W = cv.width, Hh = cv.height, ctx = cv.getContext('2d');
+      const off = document.createElement('canvas'); off.width = off.height = N;
+      const oc = off.getContext('2d'), img = oc.createImageData(N, N);
+      for (let i = 0; i < N * N; i++) {
+        let c = ramp(RAMP[o.base], baseV(o.base, i));
+        if (o.data === 'prob' || o.data === 'unc') {
+          const d = o.data === 'prob' ? ramp(RAMP.prob, prob(o.F, TOOLS[o.tool].D, i)) : ramp(RAMP.unc, (o.F.s[i] - .2) / 2.6);
+          c = c.map((v, k) => v * .25 + d[k] * .75);
+        }
+        img.data[i * 4] = c[0]; img.data[i * 4 + 1] = c[1]; img.data[i * 4 + 2] = c[2]; img.data[i * 4 + 3] = 255;
+      }
+      oc.putImageData(img, 0, 0);
+      ctx.imageSmoothingEnabled = true; ctx.clearRect(0, 0, W, Hh); ctx.drawImage(off, 0, 0, W, Hh);
+      const sx = W / N, sy = Hh / N;
+      if (o.hazard) {
+        if (!hatch) { hatch = document.createElement('canvas'); hatch.width = hatch.height = 8; const h = hatch.getContext('2d'); h.strokeStyle = '#f06a5a'; h.lineWidth = 1.6; h.beginPath(); h.moveTo(0, 8); h.lineTo(8, 0); h.moveTo(-2, 2); h.lineTo(2, -2); h.moveTo(6, 10); h.lineTo(10, 6); h.stroke(); }
+        ctx.save(); ctx.fillStyle = ctx.createPattern(hatch, 'repeat'); ctx.beginPath();
+        for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (sl[y * N + x] > 20) ctx.rect(x * sx, y * sy, sx + .5, sy + .5);
+        ctx.fill(); ctx.restore();
+      }
+      for (const r of (o.routes || [])) {
+        ctx.save(); ctx.strokeStyle = r.color; ctx.lineWidth = r.w * W / 720; ctx.setLineDash((r.dash || []).map(v => v * W / 720)); ctx.lineJoin = 'round'; ctx.beginPath();
+        r.pts.forEach((p, k) => { const X = (p.x + .5) * sx, Y = (p.y + .5) * sy; k ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }); ctx.stroke(); ctx.restore();
+      }
+      for (const m of (o.marks || [])) { ctx.fillStyle = m.color; ctx.beginPath(); ctx.arc((m.x + .5) * sx, (m.y + .5) * sy, m.r * W / 720, 0, 7); ctx.fill(); }
+    };
+    const planMetrics = (pid, spd) => {
+      const P = PLANS[pid], HAB = ST.HAB; const segs = [{ k: 'eg', t0: 0, t1: 25, label: 'EGRESS' }]; let t = 25, prev = HAB, d = 0; const track = [{ t: 0, x: HAB.x, y: HAB.y }, { t: 25, x: HAB.x, y: HAB.y }];
+      for (const id of P.seq) { const s = ST[id], l = dist(prev, s); segs.push({ k: 'walk', t0: t, t1: t + l / spd, label: '' }); t += l / spd; d += l; track.push({ t, x: s.x, y: s.y }); segs.push({ k: 'st', id, t0: t, t1: t + s.min, label: id }); t += s.min; track.push({ t, x: s.x, y: s.y }); prev = s; }
+      const r0 = t; for (const w of [...P.ret, HAB]) { const l = dist(prev, w); t += l / spd; d += l; track.push({ t, x: w.x, y: w.y }); prev = w; }
+      segs.push({ k: 'ret', t0: r0, t1: t, label: 'RETURN' }); segs.push({ k: 'in', t0: t, t1: t + 25, label: 'INGRESS' }); const total = t + 25; track.push({ t: total, x: HAB.x, y: HAB.y });
+      const posAt = (tt) => { for (let k = 1; k < track.length; k++) if (tt <= track[k].t) { const a = track[k - 1], b = track[k], f = b.t > a.t ? (tt - a.t) / (b.t - a.t) : 0; return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f }; } return HAB; };
+      const samples = []; let minM = 1e9;
+      for (let tt = 0; tt <= Math.min(total, 360); tt += 2) { const p = posAt(tt), wb = wbDist(p) / spd * 1.2, avail = 335 - tt; samples.push({ t: tt, wb, avail }); if (tt > 25 && tt < total - 25) minM = Math.min(minM, avail - wb); }
+      return { segs, total, distM: d * CELL, minM, samples, pts: [HAB, ...P.seq.map(k => ST[k]), ...P.ret, HAB] };
+    };
+    const tex = {};
+    const gtex = (layer) => {
+      if (tex[layer]) return tex[layer];
+      const W = 360, Hh = 180, d = new Uint8ClampedArray(W * Hh * 3), R = Math.PI / 180;
+      const n3 = (x, y, zz, f, s) => (fbm(x * f + 11, y * f + 3, s, 4) + fbm(y * f + 7, zz * f + 1, s + 3, 4) + fbm(zz * f + 2, x * f + 13, s + 5, 4)) / 3;
+      const ang = (la, lo, la2, lo2) => Math.acos(Math.min(1, Math.sin(la) * Math.sin(la2) + Math.cos(la) * Math.cos(la2) * Math.cos(lo - lo2)));
+      for (let j = 0; j < Hh; j++) for (let i = 0; i < W; i++) {
+        const la = (90 - j - .5) * R, lo = (i + .5) * R, x = Math.cos(la) * Math.sin(lo), y = Math.sin(la), zz = Math.cos(la) * Math.cos(lo);
+        const n = n3(x, y, zz, 3, 1), n2 = n3(x, y, zz, 9, 40);
+        let e = .48 - .2 * Math.sin(la) + .32 * Math.exp(-((ang(la, lo, 2 * R, 250 * R) / .45) ** 2)) + .25 * Math.exp(-((ang(la, lo, 18 * R, 226 * R) / .08) ** 2)) - .35 * Math.exp(-((ang(la, lo, -42 * R, 70 * R) / .35) ** 2)) + (n - .5) * .6 + (n2 - .5) * .15;
+        let c;
+        const latD = Math.abs(la / R);
+        if (layer === 'topo') c = ramp([[40, 60, 140], [50, 140, 170], [90, 170, 90], [220, 200, 90], [200, 90, 50], [240, 235, 230]], e);
+        else if (layer === 'thermal') c = ramp([[20, 14, 40], [100, 36, 90], [220, 110, 60], [246, 214, 140]], .2 + (1 - n) * .7 + (n2 - .5) * .3);
+        else if (layer === 'radar') { const band = latD > 28 && latD < 62 ? Math.exp(-(((latD - 45) / 12) ** 2)) : 0; c = ramp([[12, 18, 16], [60, 96, 100], [170, 230, 240]], .15 + band * (.4 + n2 * .7) + (n - .5) * .2); }
+        else { c = ramp([[66, 34, 22], [150, 78, 46], [206, 136, 92]], .3 + (n - .5) * 1.4 + (n2 - .5) * .4 + .15 * Math.sin(la)); if (latD > 82) c = [236, 228, 222]; }
+        const k = (j * W + i) * 3; d[k] = c[0]; d[k + 1] = c[1]; d[k + 2] = c[2];
+      }
+      return (tex[layer] = d);
+    };
+    const craters = []; for (let k = 0; k < 349; k++) { const hemi = H(k, 1, 9) < .72 ? 1 : -1; craters.push({ la: hemi * (24 + H(k, 2, 9) * 38) * Math.PI / 180, lo: H(k, 3, 9) * Math.PI * 2 }); }
+    const drawGlobe = (cv, g, layer) => {
+      const W = cv.width, ctx = cv.getContext('2d'), T = gtex(layer), img = ctx.createImageData(W, W), cx = W / 2, R = W * .42 * g.zoom;
+      const cl = Math.cos(g.lat0), sn = Math.sin(g.lat0);
+      for (let py = 0; py < W; py++) { const sy = (cx - py) / R; if (Math.abs(sy) > 1) continue; for (let px = 0; px < W; px++) {
+        const sx = (px - cx) / R, q = sx * sx + sy * sy; if (q > 1) continue; const sz = Math.sqrt(1 - q);
+        const y2 = sy * cl + sz * sn, z2 = -sy * sn + sz * cl; const la = Math.asin(y2); let lo = g.lon0 + Math.atan2(sx, z2); lo = ((lo % 6.2832) + 6.2832) % 6.2832;
+        const ti = Math.min(359, Math.floor(lo * 57.2958)), tj = Math.min(179, Math.floor((1.5708 - la) * 57.2958)), k = (tj * 360 + ti) * 3;
+        const sh = .3 + .85 * Math.max(0, -.45 * sx + .45 * sy + .77 * sz), o = (py * W + px) * 4;
+        img.data[o] = T[k] * sh; img.data[o + 1] = T[k + 1] * sh; img.data[o + 2] = T[k + 2] * sh; img.data[o + 3] = 255; } }
+      ctx.clearRect(0, 0, W, W); ctx.putImageData(img, 0, 0);
+      ctx.strokeStyle = 'rgba(226,118,63,.35)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(cx, cx, Math.min(R, W), 0, 7); ctx.stroke();
+      const proj = (la, lo) => { const x2 = Math.cos(la) * Math.sin(lo - g.lon0), y2 = Math.sin(la), z2 = Math.cos(la) * Math.cos(lo - g.lon0); const sy = y2 * cl - z2 * sn, sz = y2 * sn + z2 * cl; return { x: cx + x2 * R, y: cx - sy * R, v: sz > 0 }; };
+      ctx.fillStyle = '#9fe0f2';
+      for (const c of craters) { const p = proj(c.la, c.lo); if (p.v) { ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, 7); ctx.fill(); } }
+      const s = proj(35.11 * Math.PI / 180, 189.83 * Math.PI / 180);
+      if (s.v) { ctx.strokeStyle = '#e2763f'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(s.x, s.y, 11, 0, 7); ctx.stroke(); ctx.font = '700 15px JetBrains Mono, monospace'; ctx.fillStyle = '#121010'; ctx.fillRect(s.x + 16, s.y - 12, 72, 22); ctx.fillStyle = '#e2763f'; ctx.fillText('S1094b', s.x + 21, s.y + 4);
+        if (g.zoom > 2) { const b = 2 / 3389.5 * R * 6; ctx.strokeStyle = '#efe7dc'; ctx.lineWidth = 1; ctx.strokeRect(s.x - b, s.y - b, 2 * b, 2 * b); } }
+    };
+    const toLL = (x, y) => { const la = 35.11 - (y - C.y) * CELL / 59160, lo = 189.83 + (x - C.x) * CELL / 48400; return la.toFixed(5) + '°N ' + lo.toFixed(5) + '°E'; };
+    return { N, CELL, C, TOOLS, ST, PLANS, STM, W1, dist, maxSlope, wbDist, posterior, prob, meanS, resolved, drawMap, planMetrics, drawGlobe, toLL, mu0, s0 };
+  })();
+
+  componentDidMount() {
+    this.tick = setInterval(() => this.setState(s => ({ elapsed: s.elapsed + 1 })), 1000);
+    const loop = () => { this.raf = requestAnimationFrame(loop); this.globeFrame(); };
+    loop(); this.draw();
+  }
+  componentWillUnmount() { clearInterval(this.tick); cancelAnimationFrame(this.raf); clearInterval(this.rp); }
+  componentDidUpdate() { this.draw(); }
+
+  globeFrame() {
+    const cv = this.globeRef.current, g = this.g; if (!cv) { this._gk = null; return; }
+    if (g.anim) { const f = Math.min(1, (performance.now() - g.anim.t0) / 1800), e = f < .5 ? 2 * f * f : 1 - (-2 * f + 2) ** 2 / 2; for (const k of ['lon0', 'lat0', 'zoom']) g[k] = g.anim.from[k] + (g.anim.to[k] - g.anim.from[k]) * e; if (f >= 1) g.anim = null; }
+    else if (g.auto && !g.drag) g.lon0 += .003;
+    const key = [g.lon0.toFixed(4), g.lat0.toFixed(4), g.zoom.toFixed(3), this.state.globeLayer, cv === this._gcv].join();
+    if (key === this._gk) return; this._gk = key; this._gcv = cv; this.lib.drawGlobe(cv, g, this.state.globeLayer);
+  }
+
+  speed() { return (this.props.walkSpeed ?? 2.2) * 1000 / 60 / this.lib.CELL; }
+  fields() {
+    const k = this.state.meas.length; if (this._fk === k) return this._F;
+    const L = this.lib, post = L.posterior(this.state.meas), base = L.meanS(post.s), gains = {};
+    for (const id of Object.keys(L.ST)) { const s = L.ST[id]; if (!s.tool) continue; const h = L.posterior(this.state.meas, { x: s.x, y: s.y, tool: s.tool, res: 'hyp' }); gains[id] = (base - L.meanS(h.s)) / base * 100; }
+    this._fk = k; this._F = { post, prior: { mu: L.mu0, s: L.s0 }, gains }; return this._F;
+  }
+  evaGeo() {
+    const L = this.lib, st = this.state, P = L.PLANS[st.plan], done = st.idx >= P.seq.length;
+    const prev = st.idx === 0 ? L.ST.HAB : L.ST[P.seq[st.idx - 1]];
+    const next = done ? L.ST.HAB : L.ST[P.seq[st.idx]];
+    const pos = done ? prev : { x: prev.x + (next.x - prev.x) * st.legP, y: prev.y + (next.y - prev.y) * st.legP };
+    return { P, done, prev, next, pos };
+  }
+  draw() {
+    const L = this.lib, st = this.state, F = this.fields(), m = L.planMetrics(st.plan, this.speed());
+    const alt = Object.keys(L.PLANS).filter(k => k !== st.plan).map(k => ({ pts: L.planMetrics(k, this.speed()).pts, color: 'rgba(239,231,220,.35)', w: 2, dash: [4, 6] }));
+    const geo = this.evaGeo();
+    const routes = [...alt, { pts: m.pts, color: '#efe7dc', w: 3.5, dash: [] }, { pts: [L.ST.HAB, ...geo.P.seq.slice(0, st.idx).map(k => L.ST[k]), geo.pos], color: '#e2763f', w: 4.5, dash: [] }];
+    const mk = [st.view, st.dataLayer, st.tool, st.base, st.hazard, st.meas.length, st.plan, st.idx, st.legP].join();
+    const cv = this.mapRef.current;
+    if (cv && (cv !== this._mcv || mk !== this._mk)) { L.drawMap(cv, { base: st.base, data: st.dataLayer, tool: st.tool, hazard: st.hazard, F: F.post, routes }); this._mcv = cv; }
+    const ev = this.evaMapRef.current;
+    if (ev && (ev !== this._ecv || mk !== this._mk)) { L.drawMap(ev, { base: 'topo', data: 'none', hazard: true, routes: [{ pts: [geo.pos, geo.next], color: '#efe7dc', w: 8, dash: [] }, { pts: [geo.pos, L.ST.HAB], color: 'rgba(226,118,63,.7)', w: 4, dash: [10, 10] }], marks: [{ x: geo.pos.x, y: geo.pos.y, r: 14, color: '#e2763f' }, { x: geo.next.x, y: geo.next.y, r: 12, color: '#efe7dc' }] }); this._ecv = ev; }
+    const bf = this.beforeRef.current, af = this.afterRef.current;
+    if (bf && (bf !== this._bcv || mk !== this._mk)) { L.drawMap(bf, { base: 'topo', data: 'unc', hazard: false, F: F.prior }); this._bcv = bf; }
+    if (af && (af !== this._acv || mk !== this._mk)) { L.drawMap(af, { base: 'topo', data: 'unc', hazard: false, F: F.post }); this._acv = af; }
+    const ch = this.chartRef.current;
+    if (ch && (ch !== this._ccv || mk !== this._mk || ch.clientWidth * 2 !== ch.width)) {
+      const W = ch.width = ch.clientWidth * 2, Hh = ch.height = 180, ctx = ch.getContext('2d'), X = t => t / 360 * W, Y = v => Hh - 8 - Math.max(0, v) / 340 * (Hh - 16);
+      ctx.clearRect(0, 0, W, Hh); ctx.fillStyle = 'rgba(143,214,148,.22)'; ctx.beginPath();
+      m.samples.forEach((s, k) => k ? ctx.lineTo(X(s.t), Y(s.avail)) : ctx.moveTo(X(s.t), Y(s.avail))); [...m.samples].reverse().forEach(s => ctx.lineTo(X(s.t), Y(s.wb))); ctx.fill();
+      const line = (key, col) => { ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.beginPath(); m.samples.forEach((s, k) => k ? ctx.lineTo(X(s.t), Y(s[key])) : ctx.moveTo(X(s.t), Y(s[key]))); ctx.stroke(); };
+      line('avail', '#d8cfc4'); line('wb', '#e2763f');
+      ctx.fillStyle = '#e2763f'; ctx.fillRect(X(st.elapsed / 60) - 1, 0, 3, Hh);
+      this._ccv = ch;
+    }
+    this._mk = mk;
+  }
+
+  setView = (v) => this.setState({ view: v });
+  submit = () => {
+    const st = this.state; if (!st.logRes || (st.logRes === 'ice' && st.logDepth == null)) return;
+    const L = this.lib, geo = this.evaGeo(); if (geo.done) return;
+    const s = geo.next, mm = { id: 'M' + (st.meas.length + 1), st: s.id, x: s.x, y: s.y, tool: s.tool, res: st.logRes, depth: st.logRes === 'ice' ? st.logDepth : null, ev: st.ev, t: st.elapsed };
+    this.setState({ logOpen: false, replan: 1 });
+    clearInterval(this.rp);
+    this.rp = setInterval(() => {
+      if (this.state.replan < 100) { this.setState(x => ({ replan: Math.min(100, x.replan + 7) })); return; }
+      clearInterval(this.rp);
+      let plan = st.plan, msg;
+      if (s.id === 'S2' && st.plan === 'A') { plan = mm.res === 'ice' ? 'B1' : mm.res === 'none' ? 'B2' : 'A'; }
+      const P = L.PLANS[plan], nxt = P.seq[st.idx + 1];
+      msg = (plan !== st.plan ? 'Plan ' + plan + ' active · ' + P.name + '. ' : 'Plan ' + plan + ' holds. ') + (nxt ? 'Next: ' + nxt + ' ' + L.ST[nxt].name + '.' : 'Return to HAB.');
+      this.setState(x => ({ replan: 0, meas: [...x.meas, mm], plan, idx: x.idx + 1, legP: 0, sel: nxt || x.sel, logRes: null, logDepth: null, toast: msg }));
+    }, 80);
+  };
+
+  renderVals() {
+    const L = this.lib, st = this.state, view = st.view || this.props.startView || 'site', F = this.fields(), spd = this.speed();
+    const swl = this.props.spaceWeather || 'advisory';
+    const SW = { advisory: { label: 'ADVISORY', color: '#9fe0f2', text: 'Minor solar energetic particle enhancement possible. No change to the plan.' }, caution: { label: 'CAUTION', color: '#f0bf4f', text: 'Elevated proton flux forecast within 4 h. Drop P3 stations and keep walkback under 30 min.' }, warning: { label: 'WARNING', color: '#f06a5a', text: 'SEP event onset. Terminate EVA and ingress now.' } };
+    const sw = SW[swl];
+    const pad = n => String(Math.floor(n)).padStart(2, '0');
+    const hm = mins => { const a = Math.max(0, Math.round(mins)); return Math.floor(a / 60) + ':' + pad(a % 60); };
+    const e = st.elapsed, lm = 8 * 60 + 30 + e / 60;
+    const seg = (list, cur, key) => list.map(([v, label]) => ({ label, go: () => this.setState({ [key]: v }), bg: cur === v ? '#efe7dc' : 'transparent', fg: cur === v ? '#121010' : '#d8cfc4' }));
+    const tabs = [['site', 'SITE', 'orbit · layers'], ['plan', 'PLAN', 'IV · traverse'], ['eva', 'EVA', 'EV1 / EV2'], ['review', 'REVIEW', 'science · Earth']].map(([v, label, role]) => ({ label, role, go: () => this.setView(v), bd: view === v ? '#e2763f' : 'transparent', fg: view === v ? '#efe7dc' : '#a39889' }));
+    const GS = { topo: 'MOLA MEGDR · Mars Global Surveyor', thermal: 'THEMIS night IR · Mars Odyssey', radar: 'SHARAD subsurface radar · MRO', image: 'CTX global mosaic · MRO' };
+    const MS = { topo: 'HiRISE DTM · 1 m/px', thermal: 'THEMIS thermal inertia · 100 m/px', radar: 'SHARAD returns · MRO', image: 'HiRISE orthoimage · 25 cm/px' };
+    const P = L.PLANS[st.plan], m = L.planMetrics(st.plan, spd), pct = v => (v + .5) / L.N * 100 + '%';
+    const priColor = p => p === 'P1' ? '#e2763f' : p === 'P2' ? '#f0bf4f' : '#a39889';
+    const s = L.ST[st.sel] || L.ST.S2, T = L.TOOLS[s.tool], si = s.y * L.N + s.x;
+    const pI = L.prob(F.post, T.D, si);
+    const geo = this.evaGeo();
+    const resColor = r => r === 'ice' ? '#9fe0f2' : r === 'none' ? '#f06a5a' : '#f0bf4f';
+    // EVA
+    const warn = swl === 'warning', tgt = warn ? L.ST.HAB : geo.next, pos = geo.pos;
+    const dx = tgt.x - pos.x, dy = tgt.y - pos.y, brg = (Math.atan2(dx, -dy) * 57.2958 + 360) % 360, dM = Math.hypot(dx, dy) * L.CELL;
+    const card = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(brg / 45) % 8];
+    const legSlope = L.maxSlope(pos, tgt), wbMin = L.wbDist(pos) / spd * 1.2, marg = 335 - e / 60 - wbMin;
+    const toHab = tgt.id === 'HAB', tT = toHab ? null : L.TOOLS[tgt.tool];
+    const items = toHab ? ['Stow tools and samples', 'Partner in sight', 'Ingress checklist'] : ['GNSS fix at ' + tgt.id, st.ev === 'EV1' ? tgt.ev1 : tgt.ev2, 'Photo-document ' + tgt.id];
+    const alerts = warn ? { level: 'WARNING', text: 'SEP event · ingress now', bg: '#f06a5a', fg: '#0a0908' } : marg < 30 ? { level: 'CAUTION', text: 'Walkback margin low', bg: '#f0bf4f', fg: '#0a0908' } : swl === 'caution' ? { level: 'CAUTION', text: 'Proton flux rising · keep walkback < 30 min', bg: '#f0bf4f', fg: '#0a0908' } : { level: 'NOMINAL', text: 'No active alerts', bg: '#1a2420', fg: '#8fd694' };
+    const o2 = 1 - e / 60 / 480, pw = 1 - e / 60 / 540, h2o = 1 - e / 60 / 420, co2 = 1 - e / 60 / 500;
+    const cons = [['O₂', o2], ['PWR', pw], ['H₂O', h2o], ['CO₂', co2]].map(([label, v]) => ({ label, v: Math.round(v * 100) + '%', w: v * 100 + '%', color: v < .25 ? '#f06a5a' : v < .4 ? '#f0bf4f' : '#d8cfc4' }));
+    const before = L.meanS(L.s0), after = L.meanS(F.post.s);
+    return {
+      tabs, sw, lmst: pad(lm / 60 % 24) + ':' + pad(lm % 60), elapsedStr: pad(e / 3600) + ':' + pad(e / 60 % 60) + ':' + pad(e % 60),
+      isSite: view === 'site', isPlan: view === 'plan', isEva: view === 'eva', isReview: view === 'review',
+      globeRef: this.globeRef, mapRef: this.mapRef, evaMapRef: this.evaMapRef, beforeRef: this.beforeRef, afterRef: this.afterRef, chartRef: this.chartRef,
+      globeLayers: seg([['topo', 'Topography'], ['thermal', 'Thermal'], ['radar', 'Radar'], ['image', 'Imagery']], st.globeLayer, 'globeLayer'),
+      globeSource: GS[st.globeLayer],
+      gDown: ev => { this.g.drag = { x: ev.clientX, y: ev.clientY }; this.g.auto = false; this.g.anim = null; ev.currentTarget.setPointerCapture && ev.currentTarget.setPointerCapture(ev.pointerId); },
+      gMove: ev => { const d = this.g.drag; if (!d) return; const k = 0.006 / this.g.zoom; this.g.lon0 -= (ev.clientX - d.x) * k; this.g.lat0 = Math.max(-1.4, Math.min(1.4, this.g.lat0 + (ev.clientY - d.y) * k)); d.x = ev.clientX; d.y = ev.clientY; },
+      gUp: () => { this.g.drag = null; },
+      flyTo: () => { const g = this.g, tgtLon = 189.83 * Math.PI / 180; let lon = g.lon0; while (tgtLon - lon > Math.PI) lon += 2 * Math.PI; while (lon - tgtLon > Math.PI) lon -= 2 * Math.PI; g.lon0 = lon; g.auto = false; g.anim = { t0: performance.now(), from: { lon0: lon, lat0: g.lat0, zoom: g.zoom }, to: { lon0: tgtLon, lat0: 35.11 * Math.PI / 180, zoom: g.zoom > 1.5 ? 1 : 2.6 } }; },
+      goPlan: () => this.setView('plan'),
+      toolCards: ['d1', 'r3', 'g10'].map(k => { const t = L.TOOLS[k]; return { name: t.name, reach: t.reach, p: t.p, ciLabel: '[' + t.ci[0] + '–' + t.ci[1] + ']', ciLeft: t.ci[0] + '%', ciWidth: (t.ci[1] - t.ci[0]) + '%', pLeft: t.p + '%', color: t.color, verdict: t.verdict }; }),
+      stm: L.STM.map(o => { const on = st.selObj === o.id, sts = Object.values(L.ST).filter(x => x.obj === o.id).map(x => x.id).join(' '); return { ...o, stations: sts, priColor: priColor(o.pri), bg: on ? '#221e1b' : 'transparent', bd: on ? '#e2763f' : '#332d29', go: () => this.setState({ selObj: on ? null : o.id }) }; }),
+      planCards: Object.values(L.PLANS).map(p => { const mm = L.planMetrics(p.id, spd), on = p.id === st.plan; return { id: p.id, name: p.name, cond: p.cond, seq: p.seq.join('→'), dist: (mm.distM / 1000).toFixed(2) + ' km', dur: hm(mm.total), margin: hm(mm.minM), marginColor: mm.minM < 30 ? '#f06a5a' : '#8fd694', tag: on ? 'ACTIVE' : 'STANDBY', tagColor: on ? '#e2763f' : '#6f665d', bg: on ? '#221e1b' : 'transparent', bd: on ? '#e2763f' : '#332d29', go: () => this.setState({ plan: p.id }) }; }),
+      dataSeg: seg([['prob', 'Ice probability'], ['unc', 'Uncertainty'], ['none', 'Off']], st.dataLayer, 'dataLayer'),
+      toolSeg: seg([['d1', '1 m'], ['r3', '3 m'], ['g10', '10 m']], st.tool, 'tool'),
+      baseSeg: seg([['topo', 'Topo'], ['thermal', 'Thermal'], ['radar', 'Radar'], ['image', 'Image']], st.base, 'base'),
+      toggleHazard: () => this.setState({ hazard: !st.hazard }), hazardBd: st.hazard ? '#f06a5a' : '#332d29', hazardFg: st.hazard ? '#f06a5a' : '#a39889',
+      mapSource: MS[st.base] + (st.dataLayer !== 'none' ? ' · IceWalk model' : ''),
+      legendTitle: st.dataLayer === 'prob' ? 'P(ice within ' + L.TOOLS[st.tool].reach + ')' : st.dataLayer === 'unc' ? 'σ ice-table depth' : MS[st.base],
+      legendGrad: st.dataLayer === 'unc' ? 'linear-gradient(90deg,#1e1610,#8c5a1e,#f0bf4f,#fff0c8)' : st.dataLayer === 'prob' ? 'linear-gradient(90deg,#101822,#1c4664,#50aacd,#9fe0f2)' : 'linear-gradient(90deg,#1e1714,#765a48,#dec0a2)',
+      legendLo: st.dataLayer === 'unc' ? '0.2 m' : st.dataLayer === 'prob' ? '0' : 'low', legendHi: st.dataLayer === 'unc' ? '2.8 m' : st.dataLayer === 'prob' ? '1' : 'high',
+      measMarks: st.meas.map(x => ({ left: pct(x.x), top: pct(x.y), color: resColor(x.res) })),
+      stMarks: P.seq.map((id, k) => { const x = L.ST[id], on = st.sel === id, obj = st.selObj && x.obj === st.selObj, done = k < st.idx; return { id, left: pct(x.x), top: pct(x.y), go: () => this.setState({ sel: id }), bg: on ? '#efe7dc' : done ? '#3a332e' : '#121010', fg: on ? '#121010' : '#efe7dc', bd: obj ? '#e2763f' : on ? '#efe7dc' : '#a39889' }; }),
+      evLeft: pct(geo.pos.x), evTop: 'calc(' + pct(geo.pos.y) + ' - 22px)',
+      sel: { id: s.id, name: s.name, pri: s.pri, obj: s.obj, toolName: T.long, min: s.min, pIce: Math.round(pI * 100) + '% · σ ' + F.post.s[si].toFixed(1) + ' m', gain: 'σ −' + (F.gains[s.id] || 0).toFixed(1) + '% site', ev1: s.ev1, ev2: s.ev2, hyp: s.hyp, wb: Math.round(L.wbDist(s) / spd * 1.2) + ' min incl. 20%' },
+      plan: st.plan, planSummary: (m.distM / 1000).toFixed(2) + ' km · ' + hm(m.total) + ' total · min margin ' + hm(m.minM),
+      segs: m.segs.map(g => ({ left: g.t0 / 360 * 100 + '%', width: Math.max(.2, (g.t1 - g.t0) / 360 * 100) + '%', label: g.label, bg: g.k === 'st' ? (st.sel === g.id ? '#efe7dc' : '#4a423c') : g.k === 'walk' || g.k === 'ret' ? '#2a2521' : '#3a2a20', fg: g.k === 'st' && st.sel === g.id ? '#121010' : '#d8cfc4', go: () => g.id && this.setState({ sel: g.id }) })),
+      cursorLeft: Math.min(100, e / 60 / 360 * 100) + '%',
+      evSeg: ['EV1', 'EV2'].map(v => ({ label: v, go: () => this.setState({ ev: v }), bg: st.ev === v ? '#efe7dc' : 'transparent', fg: st.ev === v ? '#0a0908' : '#efe7dc', bd: st.ev === v ? '#efe7dc' : '#3a332e' })),
+      ev: st.ev, evaAlert: alerts,
+      eva: { bearing: brg, kicker: warn ? 'ABORT · RETURN' : toHab ? 'RETURN · INGRESS' : 'NEXT STATION', targetId: tgt.id, targetName: tgt.name, dist: Math.round(dM), bearingStr: String(Math.round(brg) % 360).padStart(3, '0') + '° ' + card, eta: Math.max(1, Math.round(dM / ((this.props.walkSpeed ?? 2.2) * 1000 / 60))),
+        pathBg: legSlope > 20 ? '#f06a5a' : legSlope > 15 ? '#f0bf4f' : '#8fd694', pathText: legSlope > 20 ? 'PATH BLOCKED · SLOPE ' + Math.round(legSlope) + '°' : 'PATH CLEAR · MAX SLOPE ' + Math.round(legSlope) + '°',
+        margin: hm(marg), marginColor: marg < 30 ? '#f06a5a' : marg < 60 ? '#f0bf4f' : '#8fd694', wb: Math.round(wbMin), toolName: tT ? tT.long : '—', latlon: L.toLL(Math.round(tgt.x), Math.round(tgt.y)) },
+      consumables: cons,
+      checklist: items.map((label, k) => { const key = tgt.id + st.ev + k, on = !!st.checks[key]; return { label, mark: on ? '✓' : '', bg: on ? '#151a16' : '#1c1815', box: on ? '#8fd694' : '#6f665d', fill: on ? '#8fd694' : 'transparent', fg: on ? '#a39889' : '#efe7dc', go: () => this.setState(x => ({ checks: { ...x.checks, [key]: !on } })) }; }),
+      openLog: () => { if (!toHab) this.setState({ logOpen: true, logRes: null, logDepth: null }); }, logBtnBg: toHab ? '#3a332e' : '#9fe0f2',
+      logOpen: st.logOpen, closeLog: () => this.setState({ logOpen: false }),
+      resultOpts: [['ice', 'ICE'], ['none', 'NO ICE'], ['inconc', 'UNCLEAR']].map(([v, label]) => { const on = st.logRes === v, c = resColor(v); return { label, go: () => this.setState({ logRes: v }), bd: c, bg: on ? c : 'transparent', fg: on ? '#0a0908' : c }; }),
+      showDepth: st.logRes === 'ice',
+      depthOpts: (tT ? tT.depths : []).map(d => { const on = st.logDepth === d; return { label: d + ' m', go: () => this.setState({ logDepth: d }), bd: on ? '#9fe0f2' : '#3a332e', bg: on ? '#9fe0f2' : 'transparent', fg: on ? '#0a0908' : '#efe7dc' }; }),
+      sendBg: st.logRes && (st.logRes !== 'ice' || st.logDepth != null) ? '#9fe0f2' : '#3a332e', submitLog: this.submit,
+      replanning: st.replan > 0, replanW: st.replan + '%', hasToast: !!st.toast, toast: st.toast, dismissToast: () => this.setState({ toast: null }),
+      rev: { sBefore: before.toFixed(2), sAfter: after.toFixed(2), pct: ((before - after) / before * 100).toFixed(1), resBefore: (L.resolved(L.s0) * 100).toFixed(1) + '%', resAfter: (L.resolved(F.post.s) * 100).toFixed(1) + '%', n: st.meas.length },
+      measRows: st.meas.map(x => ({ id: x.id, st: x.st, ev: x.ev, tool: L.TOOLS[x.tool].long, res: x.res === 'ice' ? 'ICE' : x.res === 'none' ? 'NO ICE' : 'UNCLEAR', color: resColor(x.res), depth: x.depth != null ? x.depth + ' m' : '—', ll: L.toLL(x.x, x.y), t: pad(x.t / 3600) + ':' + pad(x.t / 60 % 60) + ':' + pad(x.t % 60) })),
+    };
+  }
+}
+</script>
+</body>
+</html>
