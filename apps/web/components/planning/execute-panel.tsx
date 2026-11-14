@@ -2,6 +2,7 @@ import { Button } from "@icewalk/ui/button";
 import { ListRow, ListSection } from "@icewalk/ui/list";
 import { StatusBadge } from "@icewalk/ui/status-badge";
 import { Body, Footnote, Title3 } from "@icewalk/ui/text";
+import type { ReactNode } from "react";
 import { HABITAT_XY } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
 import { bearing, decisionPointFor, diffPlans, measurementSummary, measuringTool, nextStation, toolName, type Measurement, type Plan, type ReplanAssessment } from "@/lib/plan";
@@ -13,18 +14,21 @@ import { NextStep } from "./phases";
  * at the station (the IV is not there to measure); the IV sees them arrive, reviews the replan
  * and concurs or calls the EVA terminate.
  */
-export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, onAccept, onReturn, onDebrief }: {
+export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, onAccept, onReturn, onDebrief, tracker }: {
   plan: Plan; previous: Plan | null; measurements: Measurement[]; pending: boolean; reviewing: boolean; returning: boolean;
   onAccept: () => void; onReturn: () => void; onDebrief: () => void;
+  /** The EV's track map and progress, the same the EV sees in the helmet. */
+  tracker?: ReactNode;
 }) {
   const last = measurements.at(-1);
-  if (reviewing && previous && last) return <ReplanReview before={previous} after={plan} measurement={last} onAccept={onAccept} onReturn={onReturn} />;
+  if (reviewing && previous && last) return <>{tracker}<ReplanReview before={previous} after={plan} measurement={last} onAccept={onAccept} onReturn={onReturn} /></>;
   const station = returning ? undefined : nextStation(plan, measurements);
   const origin = last?.position ?? HABITAT_XY;
   const direction = station ? bearing(origin, station.position) : undefined;
   const decision = station ? decisionPointFor(plan, station.id) : undefined;
   return (
     <section aria-label="EVA execution" className="mission-stack">
+      {tracker}
       {returning ? <StatusBadge level="caution">EVA TERMINATE · walkback to the habitat · margin {formatNumber(plan.summary.min_walkback_margin_min ?? 0, 0)} min</StatusBadge> : null}
       {station && direction ? (
         <ListSection header={last ? "Next station" : "Current station"} headerId="ev-station">
