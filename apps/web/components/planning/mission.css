@@ -256,3 +256,6 @@
 
 /* Globe layer controls: top left, under the heading. */
 .mission-globe-layers { position: absolute; top: 96px; left: 24px; display: flex; flex-wrap: wrap; gap: 8px; max-width: min(560px, calc(100% - 48px)); align-items: center; }
+
+/* First-person analogue photo: full width of the window, rounded like the kit's media. */
+.mission-analog-image { width: 100%; height: auto; border-radius: 12px; }

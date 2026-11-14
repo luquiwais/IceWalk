@@ -9,6 +9,7 @@ import { useState } from "react";
 import { bearing, measurementSummary, measuringTool, nextStation, toolName, toolReachM, type Measurement, type Plan, type Station } from "@/lib/plan";
 import { HABITAT_XY } from "@/components/site/site-data";
 import { RESULT_LABEL, RowLabel, Value } from "./parts";
+import { SurfaceAnalog } from "./surface-analog";
 
 export function MeasurementForm({ station, pending, onLog, compact = false }: {
   station: Station; pending: boolean; compact?: boolean;
@@ -59,5 +60,6 @@ export function EVView({ plan, measurements, pending, onLog, onReview }: {
     </ListSection> : <Body>All planned stations measured. Return to habitat.</Body>}
     {last ? <section className="mission-last-result" aria-label="Last measurement"><Footnote>Measured {last.station_id} · {measurementSummary(last)}</Footnote><Button size="small" variant="plain" onClick={onReview}>Review in Science</Button></section> : null}
     {station ? <MeasurementForm key={station.id} station={station} pending={pending} onLog={onLog} /> : null}
+    <SurfaceAnalog />
   </div>;
 }
