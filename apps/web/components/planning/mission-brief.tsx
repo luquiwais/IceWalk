@@ -10,6 +10,7 @@ import { RadarFirst, SiteCard } from "./site-card";
 import { BeyondSite, Evidence } from "./evidence";
 import { EvaWindowCard } from "./eva-window-card";
 import { FeasibilityCard } from "./feasibility-card";
+import { Site3DButton } from "@/components/site3d/site-3d-button";
 import type { PlanSource } from "@/lib/use-plan-session";
 import { RowLabel, Value } from "./parts";
 
@@ -23,6 +24,7 @@ export const MissionBrief = memo(function MissionBrief({ plan, measurements, hov
   const mass = totalEquipmentMass(equipment);
   return <section aria-label="Mission brief" className="mission-stack">
     <div className="mission-objective"><Footnote tone="secondary">Science traceability matrix · {evaName(plan)}</Footnote><Body>{missionObjective(plan) ?? "Mission objective unavailable"}</Body>{plan.summary.ice_threshold_m !== undefined ? <Footnote tone="secondary">Ice threshold ≤ {plan.summary.ice_threshold_m} m</Footnote> : null}</div>
+    <Site3DButton plan={plan} measurements={measurements} initial="site">Fly over the site in 3D</Site3DButton>
     <MetricList aria-label="Plan numbers" className="mission-metrics">
       <Metric label={limit ? `Duration · limit ${formatDuration(limit)}` : "Duration"} value={formatDuration(plan.summary.duration_min)} />
       <Metric label="Traverse" value={formatNumber(plan.summary.distance_km, 2)} unit="km" />

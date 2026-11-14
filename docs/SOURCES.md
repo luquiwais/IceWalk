@@ -20,6 +20,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Mosaico Viking MDIM 2.1 colorizado, 232 m/px (fondo del globo sin token) | https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml | NASA/USGS Astrogeology Science Center, vía NASA Trek |
 | Zonas de exploración para misiones humanas (51 zonas, capa EZMars; las usa `scripts/exploration_zones.py`) | https://trek.nasa.gov/mars/trekarcgis/rest/services/EZMars/MapServer | NASA Mars Trek (NASA/JPL-Caltech); First Landing Site/Exploration Zone Workshop for Human Missions to the Surface of Mars (2015) |
 | Impactos de Daubar 2022 al norte de 20°N (lat, lon, D, hielo), copia en `packages/model/gp/regional_impacts.csv` para el control local de la tarjeta | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets, CC BY 4.0 |
+| Vista 3D: relieve del DTM DTEEC_073578_2155_073077_2155_A01 recortado a 6 y 2 m (`apps/web/scripts/build-site-3d.py`) con los ortos de la web y los bloques de `boulders.geojson` (Release de visión `vision-s1094b-2026-11-13`) | Copia controlada de USGS (CC0) | NASA/JPL-Caltech/UArizona; USGS Astrogeology |
 | Cesium Mars (con token de ion; asset 3644333) | https://cesium.com/platform/cesium-ion/content/cesium-mars/ | NASA/USGS Astrogeology (Viking MDIM 2.1 y MOLA-HRSC 200 m); Cesium |
 
 ## Ciencia y operación
