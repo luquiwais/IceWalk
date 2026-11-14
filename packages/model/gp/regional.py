@@ -43,6 +43,10 @@ FIT_PATH = Path(__file__).with_name("regional_fit.json")
 IMPACTS_PATH = Path(__file__).with_name("regional_impacts.csv")
 NEARBY_WINDOW_DEG = (10.0, 30.0)  # ±10° de latitud, ±30° de longitud
 NEARBY_Z_WARN = 2.0  # desde acá, el control local avisa que el hielo puede estar más somero
+# Herramientas precursoras (no van con la tripulación), alcance en metros. SkyFall (NASA,
+# lanzamiento previsto para fines de 2028): radar en helicóptero que detecta hielo a 0.5-3 m
+# (https://science.nasa.gov/mission/skyfall/). En la tarjeta llevan "precursor": true.
+PRECURSOR_TOOLS = {"skyfall_radar": 3.0}
 EXCAVATION_RATIO = 0.1  # supuesto: profundidad excavada / diámetro
 LAT_REF_DEG = 40.0  # centro de la variable: (lat - 40) / 10
 LAT_SCALE_DEG = 10.0

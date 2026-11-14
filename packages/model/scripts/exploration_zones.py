@@ -23,7 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from gp.regional import site_assessment  # noqa: E402
+from gp.regional import PRECURSOR_TOOLS, site_assessment  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[3]
 CONTRACTS = ROOT / "packages" / "contracts"
@@ -34,7 +34,16 @@ TREK_QUERY = {
     "where": "1=1", "outFields": "name,lat,lon,elev", "returnGeometry": "false", "f": "json"
 }
 MIN_P = 0.5  # el mismo umbral de las STM de ejemplo (supuesto, docs/SOURCES.md)
-HYPOTHETICAL = {"drill_3m": 3.0}  # no está en el catálogo: muestra qué cambia con más alcance
+# SkyFall: sitio de referencia AP-105 y regiones evaluadas (paquete de información de NASA,
+# sep. 2026, p. 8-9: https://science.nasa.gov/wp-content/uploads/2026/09/skyfall-mission-information-package-final.pdf)
+SKYFALL = {
+    "source": "NASA SkyFall mission information package (Sep 2026), p. 8-9; "
+              "https://science.nasa.gov/mission/skyfall/",
+    "reference": {"name": "SkyFall reference site AP-105 (Arcadia Planitia)", "lat_deg": 43.33,
+                  "lon_e_deg": 198.52, "elevation_m": None},
+    "candidate_regions": ["Arcadia", "Deuteronilus", "Utopia", "Phlegra", "Erebus"],
+    "site_proposals_due": "2026-12-01",
+}
 
 
 def fetch(offline: bool) -> list[dict]:
@@ -84,6 +93,9 @@ def _round(value):
 
 def card(zone: dict, tools: dict[str, float]) -> dict:
     sa = site_assessment(zone["lat_deg"], tools, min_p=MIN_P, lon_e_deg=zone["lon_e_deg"])
+    for tool_id in PRECURSOR_TOOLS:
+        if tool_id in sa["tools"]:
+            sa["tools"][tool_id]["precursor"] = True
     return _round({**zone, "site_assessment": sa})
 
 
@@ -92,7 +104,7 @@ def main() -> None:
     ap.add_argument("--offline", action="store_true", help="usar la capa ya bajada")
     args = ap.parse_args()
 
-    tools = {**catalog_tools(), **HYPOTHETICAL}
+    tools = {**catalog_tools(), **PRECURSOR_TOOLS}
     grid = json.loads((CONTRACTS / "grid.json").read_text(encoding="utf-8"))["crs"]
     reference = {"name": "S1094b (IceWalk demo site)", "lat_deg": grid["center_lat_deg"],
                  "lon_e_deg": grid["center_lon_east_deg"], "elevation_m": None}
@@ -104,14 +116,20 @@ def main() -> None:
                   "sur de 39.1°N, extrapolado. Control local: impactos de Daubar 2022 a ±10° de "
                   "latitud y ±30° de longitud",
         "generated_on": date.today().isoformat(),
-        "tools": {k: {"depth_m": v, **({"hypothetical": True} if k in HYPOTHETICAL else {})}
+        "tools": {k: {"depth_m": v, **({"precursor": True} if k in PRECURSOR_TOOLS else {})}
                   for k, v in tools.items()},
         "min_p": MIN_P,
         "reference_site": card(reference, tools),
         "zones": [card(z, tools) for z in fetch(args.offline)],
+        "skyfall": {
+            "source": SKYFALL["source"],
+            "reference_site": card(SKYFALL["reference"], tools),
+            "candidate_regions": SKYFALL["candidate_regions"],
+            "site_proposals_due": SKYFALL["site_proposals_due"],
+        },
     }
     OUT.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    for z in [result["reference_site"], *result["zones"]]:
+    for z in [result["reference_site"], result["skyfall"]["reference_site"], *result["zones"]]:
         sa = z["site_assessment"]
         if sa["status"] == "no_data":
             continue
@@ -119,7 +137,7 @@ def main() -> None:
         loc = sa.get("nearby_impacts", {})
         print(f"{z['lat_deg']:6.2f} {z['name'][:26]:26s} {sa['status'][:5]} "
               f"drill1 {t['core_drill']['p_ice']:.2f} {t['core_drill']['verdict'][:4]} "
-              f"drill3 {t['drill_3m']['p_ice']:.2f} {t['drill_3m']['verdict'][:4]} "
+              f"skyfall {t['skyfall_radar']['p_ice']:.2f} {t['skyfall_radar']['verdict'][:4]} "
               f"gpr {t['gpr']['verdict'][:4]} | local {loc.get('ice')}/{loc.get('expected_ice')}")
     n_data = sum(z["site_assessment"]["status"] != "no_data" for z in result["zones"])
     print(f"{len(result['zones'])} zonas, {n_data} con datos -> {OUT}")

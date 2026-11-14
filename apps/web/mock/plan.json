@@ -549,6 +549,16 @@
           0.149
         ],
         "verdict": "NO_GO"
+      },
+      "skyfall_radar": {
+        "depth_m": 3.0,
+        "p_ice": 0.5229,
+        "p_ice_90": [
+          0.2735,
+          0.7661
+        ],
+        "verdict": "CONDITIONAL",
+        "precursor": true
       }
     },
     "nearby_impacts": {

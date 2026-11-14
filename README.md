@@ -1,70 +1,74 @@
-# IceWalk (nombre provisorio)
+# IceWalk
 
-**NASA already plans routes. We plan what to learn.**
+**Every Mars EVA tool tells the crew where to walk. IceWalk tells them whether the walk is worth it, and with which instrument.**
 
-Planificador de EVAs de prospección de hielo en Marte. Combina datos de varias misiones de NASA en mapas de probabilidad e incertidumbre de hielo a ≤ 1 m, elige dónde medir para aprender más y re-planifica la caminata con cada medición.
+IceWalk plans ice-prospecting EVAs for the first crews on Mars. At crater S1094b (Amazonis Planitia, 35.11°N, 189.83°E), the lowest-latitude ice exposure ever seen on Mars, it does four things:
 
-NASA Space Apps Challenge 2026 · Sitio de demostración: cráter S1094b, Amazonis Planitia (35.11°N, 189.83°E).
+- estimates the probability of ice within each tool's reach, with its uncertainty, from 349 real craters and a regional model calibrated on 383 fresh impacts;
+- recommends which instrument to take (site card: GO / CONDITIONAL / NO_GO);
+- plans a safe two-person traverse with NASA constraints (slope ≤ 20°, walk-back margin, EVA window, live space weather from NASA DONKI);
+- re-plans after every measurement.
 
-**Guía del proyecto:** [`docs/PRD.md`](docs/PRD.md). Para Claude Code: [`CLAUDE.md`](CLAUDE.md).
+NASA Space Apps Challenge 2026, challenge *Interplanetary Survival Guide: Martian Map*. Team Darionautas, Buenos Aires.
 
-## Estructura
+## Key results
 
-`apps/` tiene lo que se ejecuta y `packages/` lo que se comparte; una app puede usar packages, pero nunca otra app.
-
-| Carpeta | Dueño | Qué hay |
+| Result | Value | Where |
 | --- | --- | --- |
-| `apps/web/` | Frontend | Next.js + Cesium; `apps/web/mock/` tiene JSON para arrancar sin API |
-| `apps/planner/` | Planificador y backend | API FastAPI (hoy con respuestas de ejemplo) |
-| `packages/ui/` | Frontend | Sistema de diseño visionOS, compartido por las apps web |
-| `packages/model/` | IA y modelo | Prior regional, unidades, anomalías, GP local, bloques, validación |
-| `packages/contracts/` | Todos (cambios en un solo PR) | `grid.json`, esquemas JSON y ejemplos |
-| `data/` | Datos | Registro de capas (`layers.yaml`) y scripts de descarga |
-| `design/` | Diseño | Exports de Figma y assets |
-| `docs/` | Producto | Fuentes citadas y decisiones |
+| Site card at S1094b | 1 m drill NO_GO (6 %); SkyFall-class 3 m radar CONDITIONAL (52 %); 10 m GPR GO (97 %) | `packages/model/gp/regional.py` |
+| Radar first, then drill | 8.7× more hits per drill station; about 2.9× fewer EVAs to confirm ice | `packages/model/gp/tool_strategy.py` |
+| Out-of-sample calibration | Brier 0.033 vs 0.087 (constant rate); 36.2 expected vs 37 observed ice exposures | `packages/model/gp/regional_validation.py` |
+| Phoenix ground truth (never seen by the model) | Measured 4.6 cm; predicted 7 cm (90 %: 2-22 cm) | same |
+| NASA Exploration Zones and SkyFall reference site AP-105 | Site card for 51 zones; AP-105: 3 m radar GO (93 %) | `packages/contracts/examples/exploration_zones.json` |
+| What does not work | Neighbouring craters do not predict ice at site scale, so we show uncertainty instead of promising where the ice is | `docs/EXPERIMENTS.md` |
 
-## Monorepo con moon
+## Structure
 
-Las tareas de todas las carpetas se corren con [moon](https://moonrepo.dev), instalado **dentro del repo** como devDependency de Bun (nada global). Siempre con `bun run moon ...`, así su store queda en `.moon/home`.
+`apps/` holds what runs; `packages/` holds what is shared.
 
-```bash
-bun install                       # en la raíz: instala moon (requiere Bun 1.4.2)
-bun run moon projects             # web, planner, ui, model, contracts
-bun run moon tasks                # tareas de cada proyecto
-bun run moon run web:dev          # web en :3000
-bun run moon run planner:dev      # API en :8000
-bun run moon run :lint :test      # lint y tests de todos los proyectos
-bun run moon run web:build        # cachea: si nada cambió, no vuelve a correr
-bun run moon ci                   # lo mismo que CI: solo lo afectado por los cambios
-```
+| Folder | What it contains |
+| --- | --- |
+| `apps/web/` | Next.js + CesiumJS (Mars ellipsoid); `apps/web/mock/` lets it run without the API |
+| `apps/planner/` | FastAPI planner: `/plan`, `/replan`, `/maps`, `/eva-window`, `/spaceweather` |
+| `packages/model/` | Ice model: censored Gaussian process (EP), regional prior, validation, tool strategy |
+| `packages/contracts/` | Grid, JSON Schemas and examples that connect the modules (`validate.py`) |
+| `packages/ui/` | visionOS-style design system |
+| `data/` | Layer registry (`layers.yaml`) and download scripts; data itself is not in Git |
+| `docs/` | Sources, decisions, experiments (including failures), research and daily log. Internal docs are in Spanish |
 
-Configuración: `.moon/workspace.yml` (proyectos, Git), `.moon/toolchains.yml` (Bun) y un `moon.yml` en cada proyecto con sus tareas. Las tareas de Python usan el Python del sistema: antes hay que instalar el entorno de cada proyecto (abajo).
-
-## Arranque rápido
+## Quick start
 
 ```bash
-# API con respuestas de ejemplo
-cd apps/planner
-uv sync            # o: pip install -e ".[dev]"
-uv run uvicorn app.main:app --reload
-# http://127.0.0.1:8000/docs
+bun install                       # installs moon (monorepo task runner)
+bun run moon run :lint :test      # lint and tests for every project
+bun run moon run web:dev          # web on :3000
+bun run moon run planner:dev      # API on :8000
 
-# Tests
-uv run pytest
-
-# Datos (bajan a data/raw/, que no se sube a Git)
-python data/download.py --list
-python data/download.py --only hirise_dtm
+cd apps/planner && uv sync && uv run uvicorn app.main:app --reload   # API docs at /docs
+cd packages/model && uv sync --extra dev && uv run pytest -q         # ice model tests
+python packages/contracts/validate.py                                # contracts
+python data/download.py --list                                       # data layers and links
 ```
 
-## Reglas del repo
+## Data and credits
 
-- Ramas `rol/tarea`, PR con al menos una revisión, `main` siempre desplegable.
-- Cambiar un contrato = un solo PR que actualiza esquema, ejemplos y usos.
-- Datos pesados **no van a Git**: se publican como assets de GitHub Releases.
-- Toda fuente usada se cita en `docs/SOURCES.md` (las reglas de Space Apps lo exigen).
-- Valores sin fuente se marcan como `"assumption": true`.
+NASA:
+- HiRISE (NASA/JPL-Caltech/UArizona), via the USGS Astrogeology STAC;
+- JPL Mars Trek (Exploration Zones, Viking MDIM 2.1);
+- USGS-NASA Geologic Map of Mars (SIM 3292);
+- NASA CCMC DONKI;
+- Viking Lander 2, Phoenix, MOLA and THEMIS.
 
-## Licencia
+Space Agency Partners: ESA/DLR (Mars Express HRSC, in the MOLA-HRSC DEM) and ASI (SHARAD, in the SWIM maps).
 
-Apache 2.0. Los datos de NASA/JPL/USGS son de dominio público; ver créditos en `docs/SOURCES.md`.
+Science: Dundas et al. 2023 (CC BY-NC-ND 4.0, not redistributed), Daubar et al. 2022 (CC BY 4.0), SWIM (PSI/JPL), Mellon et al. 2009, Courville et al. 2026, Sizemore et al. 2026.
+
+Every value and its source: [`docs/SOURCES.md`](docs/SOURCES.md).
+
+## Use of Super Intelligence (SI)
+
+We used Claude (Anthropic) as a coding and research assistant (code and tests, literature search, documentation drafts). The concept, scientific choices and product decisions are the team's. Each AI-assisted commit carries a `Co-Authored-By: Claude` trailer. No SI-generated images, video or audio are used.
+
+## License
+
+Apache 2.0. NASA/JPL/USGS data are public domain; third-party data keep their own licenses (see `docs/SOURCES.md`).
