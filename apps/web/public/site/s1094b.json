@@ -4,7 +4,7 @@
   "source": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/",
   "license": "USGS Astrogeology ARD copy, CC0; HiRISE NASA/JPL-Caltech/UArizona",
   "grid_crs": "+proj=eqc +lat_ts=35.1105 +lat_0=35.1105 +lon_0=189.8273 +x_0=0 +y_0=0 +R=3389574.3490888 +units=m +no_defs",
-  "generated": "2026-11-10T19:45:12+00:00",
+  "generated": "2026-11-14T20:08:52+00:00",
   "generator": "apps/web/scripts/build-site-imagery.py",
   "resampling": "lanczos",
   "stretch": {
@@ -16,8 +16,8 @@
     "dn_low": 190.62,
     "dn_high": 238.99,
     "detail_own_dn": [
-      194.22,
-      238.53
+      194.47,
+      239.04
     ]
   },
   "images": {
@@ -41,15 +41,15 @@
       "product": "ESP_073578_2155_RED_A_01_ORTHO",
       "box_m": {
         "xmin": -100.0,
-        "ymin": -2650.0,
+        "ymin": -2800.0,
         "xmax": 800.0,
         "ymax": -1900.0
       },
       "m_per_px": 0.25,
       "width_px": 3600,
-      "height_px": 3000,
+      "height_px": 3600,
       "valid_fraction": 1.0,
-      "bytes": 1093488
+      "bytes": 1304650
     }
   },
   "registration": {
