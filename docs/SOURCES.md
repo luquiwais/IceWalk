@@ -74,6 +74,15 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Hielo en el sitio de Phoenix (68.2°N) a 4.6 cm de profundidad media, con variación de más de 10 veces entre zanjas (control del prior regional) | Mellon et al. (2009) JGR 114, E00E07, doi:10.1029/2009JE003417 |
 | Viking Lander 2 (48°N): zanja de 10-15 cm sin hielo; Byrne et al. estiman que un poco más abajo habría llegado al hielo | NASA/JPL PIA12214, https://www.jpl.nasa.gov/images/pia12214-expected-depths-to-ice-mid-latitude-northern-mars/; Byrne et al. (2009) Science 325:1674, doi:10.1126/science.1175307 |
 | Enunciado oficial del desafío 2026 (leído el 2026-11-12) | https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/ |
+| SkyFall: helicópteros con radar para hielo a 0.5-3 m, restricciones de sitio, sitio de referencia AP-105 (43.33°N, 198.52°E) y calendario | NASA, https://science.nasa.gov/mission/skyfall/ ; paquete de información (sep. 2026), https://science.nasa.gov/wp-content/uploads/2026/09/skyfall-mission-information-package-final.pdf |
+| Probabilidad bayesiana de hielo (Arcadia 51 %; hielo somero al norte de ~45°) | Courville et al. (2026) PSJ 7:183, doi:10.3847/PSJ/ae8904, CC BY 4.0 |
+| Detección térmica de hielo y control de Phoenix (SWIM23: 4.4 cm frente a 4.6 cm medidos) | Sizemore et al. (2026) PSJ 7:175, doi:10.3847/PSJ/ae7b38, CC BY 4.0 |
+| Unidad geológica del sitio: `lAv`, Late Amazonian volcanic unit | Tanaka et al. (2014) Geologic Map of Mars, USGS SIM 3292, doi:10.3133/sim3292 |
+| Análogo de superficie para la vista en primera persona (Viking Lander 2, 48°N) | NASA/JPL, PIA00399, PIA00568, PIA00569, PIA00571 |
+| HRSC dentro del DEM MOLA-HRSC (agencia socia) | ESA/DLR/FU Berlin, Mars Express; CC BY-SA 3.0 IGO |
+| SHARAD dentro de SWIM (agencia socia) | ASI / NASA, MRO |
+| Prebreathe, navegación a blancos designados por ciencia, decisión con información local | Surface EVA Architectural Drivers (2023), NTRS 20230014957 |
+| Retraso de comunicación de hasta 22 min y decisiones sin soporte inmediato de Tierra | Human Health and Performance (2023), NTRS 20230015521 |
 | Kriging y expectation propagation para el GP | Rasmussen y Williams (2006), Gaussian Processes for Machine Learning, caps. 2 y 3, https://gaussianprocess.org/gpml/chapters/RW3.pdf |
 
 ## Supuestos del GP
