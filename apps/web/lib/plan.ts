@@ -53,6 +53,8 @@ export type PlanSummary = {
   distance_km: number;
   max_distance_from_habitat_km?: number;
   min_walkback_margin_min?: number;
+  /** Caution threshold for the walkback margin, from the STM. */
+  walkback_caution_min?: number;
   dose_estimate_msv?: number;
   expected_uncertainty_reduction: number;
   crew?: number;

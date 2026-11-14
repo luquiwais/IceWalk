@@ -1,0 +1,41 @@
+{
+  "beta": [
+    0.5078733611273207,
+    -1.1294502380544997
+  ],
+  "sigma_log": 0.6218410515206094,
+  "beta_cov": [
+    [
+      0.034141452313045946,
+      -0.02256458765638318
+    ],
+    [
+      -0.02256458765638318,
+      0.028551097602227377
+    ]
+  ],
+  "lat_range_deg": [
+    20.005,
+    74.6373
+  ],
+  "ratio": 0.1,
+  "n_craters": 383,
+  "n_ice": 37,
+  "ice_lat_min_deg": 39.1091,
+  "source": "Daubar et al. (2022) JGR Planets, doi:10.1029/2021JE007145, tabla S1 (CC BY 4.0, https://zenodo.org/record/6604912)",
+  "model": "log d ~ N(beta0 + beta1 * (lat - 40) / 10, sigma_log^2); hielo: d < ratio * D",
+  "selection": "hemisferio norte, lat > 20, sin 'possible'",
+  "assumption": true,
+  "assumption_notes": "ratio = 0.1 sin fuente directa (docs/SOURCES.md)",
+  "n_boot": 500,
+  "cv_logloss_by_60deg_longitude": {
+    "latitude": 0.1072,
+    "constant_rate": 0.3176
+  },
+  "sensitivity_ratio_0_2": {
+    "s1094b_median_m": 5.77,
+    "sigma_log": 0.622
+  },
+  "fitted_on": "2026-11-12",
+  "script": "packages/model/scripts/fit_regional.py"
+}

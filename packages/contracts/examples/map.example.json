@@ -1,0 +1,151 @@
+{
+  "site_id": "s1094b",
+  "plan_id": null,
+  "threshold_m": 3.0,
+  "cell_size_m": 25.0,
+  "width": 40,
+  "height": 40,
+  "bounds_xy_m": {
+    "xmin": -200.0,
+    "xmax": 800.0,
+    "ymin": -2700.0,
+    "ymax": -1700.0
+  },
+  "bounds_lonlat": {
+    "west": 189.823167,
+    "south": 35.06486,
+    "east": 189.843831,
+    "north": 35.081764
+  },
+  "prior_probability": 0.6687,
+  "layers": {
+    "probability": {
+      "encoding": "uint8-base64",
+      "min": 0.0,
+      "max": 1.0,
+      "nodata": 255,
+      "data": "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6urq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrq6ysrKyrq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrq62vsLCvraurqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq62wtbm5tbCtq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6yvtcDLy8C1r6yrqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqussLnL4uLLubCsq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrrLC5y+Liy7mwrKuqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6yvtcDLy8C1r6yrqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrrbC1ubm1sK2rqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6utr7Cwr62rq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrq6ysrKyrq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrq6urqqqqqqqqqqqqqqqqqqqqqqqqqqmpqampqaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmpqKioqKmpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmpp6alpaanqamqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmpp6WgnJygpaepqaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqKaglouLlqCmqKmqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqailnItwcIucpaipqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmopZyLcHCLnKWoqaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqKaglouLlqCmqKmqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqamnpaCcnKClp6mpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqaempaWmp6mpqqqqqqqrq6urqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmpqKioqKmpqqqqqqurrK2trKurqqqqqqqqqqqqqqqqqqqqqqqqqqqqqampqampqqqqqqqrra+xsa+tq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrrK+1u7u1r6yrqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq62xu8nJu7Gtq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqutsbvJybuxrauqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrrK+1u7u1r6yrqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqutr7Gxr62rqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrq6ytrayrq6qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrq6urqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg=="
+    },
+    "uncertainty": {
+      "encoding": "uint8-base64",
+      "min": 0.0,
+      "max": 1.0,
+      "nodata": 255,
+      "data": "/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/f3+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v79/Pr6/P3+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/PXn5/X8/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/frnp6fn+v3+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v3656en5/r9/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/PXn5/X8/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v38+vr8/f7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v39/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v79/f7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v38+vr8/f7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v789urq9vz+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v79+uq2tur6/f7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/frqtrbq+v3+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v789urq9vz+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/fz6+vz9/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/f3+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v39/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/fz7+/z9/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/vz37e33/P7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v377cHB7fv9/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v79++3Bwe37/f7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/vz37e33/P7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v79/Pv7/P3+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v79/f7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/g=="
+    }
+  },
+  "palettes": {
+    "probability": {
+      "label": "P(ice within 3 m)",
+      "units": "probability",
+      "min": 0.0,
+      "max": 1.0,
+      "stops": [
+        {
+          "value": 0.0,
+          "color": "#f4f8fd"
+        },
+        {
+          "value": 0.2,
+          "color": "#cde2fb"
+        },
+        {
+          "value": 0.4,
+          "color": "#86b6ef"
+        },
+        {
+          "value": 0.6,
+          "color": "#3987e5"
+        },
+        {
+          "value": 0.8,
+          "color": "#1c5cab"
+        },
+        {
+          "value": 1.0,
+          "color": "#0d366b"
+        }
+      ]
+    },
+    "uncertainty": {
+      "label": "Uncertainty left (1 = prior only)",
+      "units": "fraction_of_prior",
+      "min": 0.0,
+      "max": 1.0,
+      "stops": [
+        {
+          "value": 0.0,
+          "color": "#f4f8fd"
+        },
+        {
+          "value": 0.2,
+          "color": "#cde2fb"
+        },
+        {
+          "value": 0.4,
+          "color": "#86b6ef"
+        },
+        {
+          "value": 0.6,
+          "color": "#3987e5"
+        },
+        {
+          "value": 0.8,
+          "color": "#1c5cab"
+        },
+        {
+          "value": 1.0,
+          "color": "#0d366b"
+        }
+      ]
+    },
+    "change": {
+      "label": "Change vs. prior: deeper (-) / shallower (+)",
+      "units": "probability",
+      "min": -0.5,
+      "max": 0.5,
+      "stops": [
+        {
+          "value": -0.5,
+          "color": "#3e4a56"
+        },
+        {
+          "value": -0.3333,
+          "color": "#8a96a3"
+        },
+        {
+          "value": -0.1667,
+          "color": "#c9ced4"
+        },
+        {
+          "value": 0.0,
+          "color": "#e6e6e6"
+        },
+        {
+          "value": 0.1667,
+          "color": "#cde2fb"
+        },
+        {
+          "value": 0.3333,
+          "color": "#3987e5"
+        },
+        {
+          "value": 0.5,
+          "color": "#0d366b"
+        }
+      ]
+    },
+    "potential": {
+      "label": "Ice potential within 3 m (grey = unknown)",
+      "base": "probability",
+      "suppress_by": "uncertainty",
+      "fog_color": "#d4d8dd",
+      "formula": "color = mix(probability_color(p), fog, u), with u = uncertainty in [0, 1]"
+    }
+  },
+  "is_prior_only": false,
+  "craters_in_model": 2,
+  "measurements_in_model": 1,
+  "is_mock": true,
+  "notes": "Synthetic example: fitted S1094b prior plus three invented observations."
+}

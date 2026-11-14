@@ -25,6 +25,6 @@
   "dtype": "float32",
   "formats": {
     "analysis": "Cloud Optimized GeoTIFF",
-    "web": "PNG + JSON con bounds lat/lon y escala de colores"
+    "web": "JSON con la grilla de valores por celda, bounds lat/lon y paletas (map.schema.json); el front dibuja"
   }
 }

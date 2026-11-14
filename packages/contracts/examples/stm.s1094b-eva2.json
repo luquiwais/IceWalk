@@ -6,9 +6,11 @@
     "reserve": 0.2,
     "max_slope_deg": 20,
     "walkback_max_km": 10,
+    "walkback_caution_min": 15,
     "crew": 2,
     "mass_budget_kg": null,
-    "walking_speed_kmh": 2.0
+    "walking_speed_kmh": 2.0,
+    "site_min_p": 0.5
   },
   "objectives": [
     {

@@ -1,0 +1,87 @@
+# Umbrales de la ventana de EVA (cuándo salir). No hay umbrales oficiales de NASA para una EVA en
+# Marte (docs/research/factibilidad.md): todo límite es un supuesto, con su razón, y va en
+# docs/SOURCES.md. Niveles: advisory < caution < warning. Un límite en null no se usa.
+
+light:
+  warning_below_deg:
+    value: 0
+    source: Sol bajo el horizonte. EVAs de día, como en Apollo; sin regla escrita para Marte
+    assumption: true
+  caution_below_deg:
+    value: 10
+    source: >-
+      Sombras largas que esconden el terreno y los puntos de referencia (factibilidad.md, "Luz").
+      Sin umbral publicado
+    assumption: true
+
+temperature:
+  # Se compara el p10 del aire (1 de cada 10 soles es más frío) de la climatología del VL2.
+  advisory_below_k:
+    value: 203
+    source: Sin fuente (-70 °C). Más frío que casi toda la mañana de verano del VL2
+    assumption: true
+  caution_below_k:
+    value: 173
+    source: Sin fuente (-100 °C). Típico de las tardes de invierno del VL2
+    assumption: true
+
+wind:
+  # p95 del viento medio horario de la climatología del VL2 (no incluye ráfagas).
+  advisory_above_mps:
+    value: 15
+    source: Sin fuente. Lo más ventoso de la temporada de polvo en el VL2 (p95 de 15-17 m/s)
+    assumption: true
+  caution_above_mps:
+    value: 25
+    source: >-
+      Umbral de saltación a la altura de los sensores del Viking, 25-30 m/s: el viento empieza a
+      levantar arena y polvo (tormenta local en el Viking Lander 1; Ryan, Sharman y Lucich
+      1981, GRL 8, 899, doi:10.1029/GL008i008p00899). El empuje no importa: 20 m/s
+      empujan ~1 % del peso (factibilidad.md)
+    assumption: true
+
+dust:
+  # Opacidad (tau) que reporta la tripulación o el equipo científico (PRD, "Polvo").
+  default_tau:
+    value: 0.5
+    source: >-
+      Fondo típico fuera de tormentas (tau ~0.5). Se usa si nadie reporta la opacidad; la
+      respuesta lo marca como supuesto
+    assumption: true
+  advisory_above_tau:
+    value: 1.0
+    source: Sin fuente. Atmósfera polvorienta, visibilidad reducida
+    assumption: true
+  caution_above_tau:
+    value: 2.0
+    source: Sin fuente. Tormenta regional
+    assumption: true
+  warning_above_tau:
+    value: 4.0
+    source: Sin fuente. Tormenta de escala global (en 2018, tau > 8 en Opportunity)
+    assumption: true
+
+space_weather:
+  sep_warning_h:
+    value: 48
+    source: >-
+      Desde el comienzo de un evento de partículas solares (DONKI SEP), volver o no salir (PRD,
+      "Radiación y clima espacial"). Duración sin fuente: los eventos suelen durar de horas a
+      unos días
+    assumption: true
+  cme_window_h:
+    value: 12
+    source: >-
+      Margen alrededor de la llegada prevista de una CME a Marte (WSA-Enlil). El error típico de
+      llegada del modelo es de ~10 h; sin fuente citada todavía
+    assumption: true
+
+search:
+  sols:
+    value: 3
+    source: Soles a revisar para encontrar ventana (incluido el pedido)
+    assumption: true
+  step_min:
+    value: 15
+    source: Paso de la búsqueda de la hora de salida
+    assumption: true

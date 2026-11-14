@@ -8,14 +8,16 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | --- | --- | --- |
 | HiRISE DTM y ortoimágenes de S1094b | https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155 | NASA/JPL-Caltech/UArizona |
 | HiRISE DTM, copia COG controlada (CC0), la que lee el planificador | https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.tif | NASA/JPL-Caltech/UArizona; USGS Astrogeology |
-| Mapas de consistencia de hielo SWIM | https://swim.psi.edu/SWIM4MIMProducts.php | Morgan et al. (2021) Nature Astronomy; SWIM (PSI/JPL) |
+| Mapas de consistencia de hielo SWIM (Ci 0-1 m y 1-5 m, GeoTIFF del 2025-08-04; licencia no declarada, cuestión 56) | https://swim.psi.edu/SWIM4MIMProducts.php | Morgan et al. (2021) Nature Astronomy; SWIM (PSI/JPL) |
 | Mosaico global CTX | https://murray-lab.caltech.edu/CTX/ | Dickson et al. (2024) Earth and Space Science; NASA/JPL/MSSS/The Murray Lab |
 | Inercia térmica THEMIS | https://astrogeology.usgs.gov | Fergason et al. (2006) JGR; USGS / ASU |
 | MOLA-HRSC 200 m | https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m | Fergason, Hare & Laura (2018) USGS |
-| Catálogo de cráteres nuevos | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets |
+| Catálogo de cráteres nuevos (tabla S1, CC BY 4.0; los encabezados de latitud y longitud están cruzados en el original) | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets |
 | Exposiciones de hielo | https://doi.org/10.5066/P9Y8FR1R | Dundas et al. (2021) USGS |
 | Clima espacial | https://ccmc.gsfc.nasa.gov/tools/DONKI | NASA CCMC DONKI (acreditar a CCMC) |
 | Mosaico Viking MDIM 2.1 colorizado, 232 m/px (fondo del globo sin token) | https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml | NASA/USGS Astrogeology Science Center, vía NASA Trek |
+| Zonas de exploración para misiones humanas (51 zonas, capa EZMars; las usa `scripts/exploration_zones.py`) | https://trek.nasa.gov/mars/trekarcgis/rest/services/EZMars/MapServer | NASA Mars Trek (NASA/JPL-Caltech); First Landing Site/Exploration Zone Workshop for Human Missions to the Surface of Mars (2015) |
+| Impactos de Daubar 2022 al norte de 20°N (lat, lon, D, hielo), copia en `packages/model/gp/regional_impacts.csv` para el control local de la tarjeta | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets, CC BY 4.0 |
 | Cesium Mars (con token de ion; asset 3644333) | https://cesium.com/platform/cesium-ion/content/cesium-mars/ | NASA/USGS Astrogeology (Viking MDIM 2.1 y MOLA-HRSC 200 m); Cesium |
 
 ## Ciencia y operación
@@ -54,7 +56,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Regiones especiales | Kminek et al. (2010) Advances in Space Research (COSPAR) |
 | Playbook, SUITS, NASA-STD-3001 | Ver sección Interfaz del PRD |
 | Cota de cráteres sin fondo plano: `d > 0.2 × diámetro`. El paper presenta 0.1 y 0.2; se usa 0.2 porque es coherente con su tabla | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
-| Tabla de 349 cráteres: `X, Y, D_crater, D_resistant` (suplemento, `2022GL100747-sup-0002-Table SI-S01.csv`). Licencia sin confirmar | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
+| Tabla de 349 cráteres: `X, Y, D_crater, D_resistant` (suplemento, `2022GL100747-sup-0002-Table SI-S01.csv`). Artículo y suplemento **CC BY-NC-ND 4.0** (leído en la página de Wiley el 2026-11-12): se puede compartir el original sin modificar, sin fines comerciales y citando; no una versión adaptada | Dundas et al. (2023) GRL, doi:10.1029/2022GL100747 |
 | Get Aheads, borrado, Cribsheet, flight rules | Kagey (2024), https://ntrs.nasa.gov/api/citations/20240005248/downloads/EVA%20Ops%20101%20for%20Artemis%203%20External%20Teams.pdf |
 | Science Officer y SER | Young (2025), https://ntrs.nasa.gov/api/citations/20250004322/downloads/Young_LSSWMay2025_ScienceOpsOverview_v2.pdf; Bell et al. (2023) LPSC #2460, https://www.hou.usra.edu/meetings/lpsc2023/pdf/2460.pdf |
 | BASALT: ConOps, capacidades, decisión táctica, soporte científico y replanificación | Beaton et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442238/ y https://pmc.ncbi.nlm.nih.gov/articles/PMC6442237/; Stevens et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282/; Payler et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442258/; Marquez et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442304/ |
@@ -68,6 +70,19 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Viabilidad: ISRU, misiones de agua, instrumentos, variables orbitales y evaluación de sitios (unas 90 fuentes) | Tabla "Fuentes para docs/SOURCES.md" en `docs/research/viabilidad-expediciones.md` |
 | DTM y ortos de HiRISE en COG | USGS Astrogeology, STAC, CC0: https://stac.astrogeology.usgs.gov/api |
 | Inercia térmica THEMIS, tesela 30N180E, 100 m | Fergason et al. (2006) JGR; USGS, https://astrogeology.usgs.gov/search/map/themis_thermal_inertia_mosaic_quantitative_30n180e_100mpp |
+| Profundidad local de 97 cm en S1094b (de Dundas 2023) y modelos térmicos sin hielo en el sitio | Sizemore et al. (2026) PSJ 7:175, tabla 4 y §4.1.3, CC BY 4.0, https://doi.org/10.3847/PSJ/ae7b38 |
+| Hielo en el sitio de Phoenix (68.2°N) a 4.6 cm de profundidad media, con variación de más de 10 veces entre zanjas (control del prior regional) | Mellon et al. (2009) JGR 114, E00E07, doi:10.1029/2009JE003417 |
+| Viking Lander 2 (48°N): zanja de 10-15 cm sin hielo; Byrne et al. estiman que un poco más abajo habría llegado al hielo | NASA/JPL PIA12214, https://www.jpl.nasa.gov/images/pia12214-expected-depths-to-ice-mid-latitude-northern-mars/; Byrne et al. (2009) Science 325:1674, doi:10.1126/science.1175307 |
+| Enunciado oficial del desafío 2026 (leído el 2026-11-12) | https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/ |
+| SkyFall: helicópteros con radar para hielo a 0.5-3 m, restricciones de sitio, sitio de referencia AP-105 (43.33°N, 198.52°E) y calendario | NASA, https://science.nasa.gov/mission/skyfall/ ; paquete de información (sep. 2026), https://science.nasa.gov/wp-content/uploads/2026/09/skyfall-mission-information-package-final.pdf |
+| Probabilidad bayesiana de hielo (Arcadia 51 %; hielo somero al norte de ~45°) | Courville et al. (2026) PSJ 7:183, doi:10.3847/PSJ/ae8904, CC BY 4.0 |
+| Detección térmica de hielo y control de Phoenix (SWIM23: 4.4 cm frente a 4.6 cm medidos) | Sizemore et al. (2026) PSJ 7:175, doi:10.3847/PSJ/ae7b38, CC BY 4.0 |
+| Unidad geológica del sitio: `lAv`, Late Amazonian volcanic unit | Tanaka et al. (2014) Geologic Map of Mars, USGS SIM 3292, doi:10.3133/sim3292 |
+| Análogo de superficie para la vista en primera persona (Viking Lander 2, 48°N) | NASA/JPL, PIA00399, PIA00568, PIA00569, PIA00571 |
+| HRSC dentro del DEM MOLA-HRSC (agencia socia) | ESA/DLR/FU Berlin, Mars Express; CC BY-SA 3.0 IGO |
+| SHARAD dentro de SWIM (agencia socia) | ASI / NASA, MRO |
+| Prebreathe, navegación a blancos designados por ciencia, decisión con información local | Surface EVA Architectural Drivers (2023), NTRS 20230014957 |
+| Retraso de comunicación de hasta 22 min y decisiones sin soporte inmediato de Tierra | Human Health and Performance (2023), NTRS 20230015521 |
 | Kriging y expectation propagation para el GP | Rasmussen y Williams (2006), Gaussian Processes for Machine Learning, caps. 2 y 3, https://gaussianprocess.org/gpml/chapters/RW3.pdf |
 
 ## Supuestos del GP
@@ -82,6 +97,24 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | `RADAR_NO_REFLECTOR_SIGMA_LOG = 0.5` | "Sin reflector" como cota débil | Atenuación o poco contraste; P(no detecta) ~0.30 en hielo poroso, sin tasa publicada |
 | `NEUTRON_SIGMA_LOG = 0.3` | Alcance gradual del espectrómetro | ~0.4-1 m alrededor de 0.6 m (`research/viabilidad-expediciones.md`) |
 | `CRATER_ERROR_M = 0.15`, usado en un taladro | Error de un taladro que no informa el suyo | Se reutiliza el valor de cráteres: 1 px en Dundas et al. (2023). Para taladro, sin fuente |
+| Profundidad excavada = 0.1 × diámetro (prior regional) | Hasta dónde "ve" un cráter nuevo de Daubar 2022: con hielo, d < 0.1·D; sin hielo, d > 0.1·D | Sin fuente directa. Byrne et al. 2009 describe cráteres con hielo de pocos metros y decímetros de profundidad (~0.1; resumen en [Dundas et al. 2014, USGS](https://pubs.usgs.gov/publication/70073409)); el DTM de S1094b da ~0.14 ([HiRISE](https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155)). Con 0.2 el regional no coincide con el sitio (`EXPERIMENTS.md`, 2026-11-10). Fuente posible: cuestión 57 |
+| 50 sondeos de radar independientes por EVA (`gp.tool_strategy`) | Cuántos lugares puede marcar el radar en una EVA | Uno cada ~40 m en 2 km. El radar mide de forma continua, pero los sondeos cercanos no son independientes; sin fuente |
+| Reflector falso a una profundidad sacada de la distribución del sitio (`gp.tool_strategy`) | Dónde aparece un reflector que no es hielo | Es la mezcla que EP aproxima ensanchando el error (`gp/observations.py`); sin fuente |
+| Taladro hipotético de 3 m (`exploration_zones.json`) | Qué cambia en cada zona con más alcance | No está en el catálogo de herramientas; ilustrativo |
+| Alcance de 100 m y reparto 50/50 fuera de S1094b | Alcance del kernel y parte espacial de la varianza en un sitio sin catálogo (`gp.planning.regional_prior`) | Se toman los ajustados en S1094b; sin fuente para otros sitios |
+
+## Supuestos del planificador
+
+Valores sin fuente en `apps/planner/config/eva.yaml` (marcados `assumption: true`) y en las STM de ejemplo.
+
+| Valor | Qué es | Por qué ese valor |
+| --- | --- | --- |
+| `map_half_m = 1500` | Medio lado del mapa de hielo (`GET /maps`) alrededor del hábitat | 3 × 3 km a 10 m: ~1 s una vez y ~21 kB comprimido. Lo alcanzable en 8 h es casi todo el sitio (~6.5 s); la ventana crece si el plan va más lejos |
+| Umbrales de la ventana de EVA (`config/eva_window.yaml`): Sol bajo 0° y 10°; aire p10 bajo 203 K y 173 K; viento 15 y 25 m/s; polvo tau 1, 2 y 4 (0.5 sin reporte); 48 h tras un SEP; ±12 h de una CME | Cuándo dan advisory, caution o warning | No hay umbrales oficiales para una EVA en Marte (`research/factibilidad.md`). Solo el de viento tiene apoyo: saltación a 25-30 m/s (Ryan et al. 1981). Cuestión 59 |
+| Temperatura y viento del Viking Lander 2 como análogo de S1094b | Climatología por estación y hora | El VL2 está a 48°N y −3.6 km; S1094b a 35°N y −3.9 km: más cálido. Cuestión 60 |
+| `map_margin_m = 300` | Borde del mapa alrededor de estaciones, opciones y mediciones | 3 alcances del GP (100 m): más allá una medición no cambia el mapa (`gp.maps.UPDATE_REACH_RANGES`) |
+| `walkback_caution_min = 15` (STM de ejemplo) | Margen de regreso bajo el cual el plan avisa (caution) y no suma Get Aheads | Sin valor publicado: Apollo usó el walkback como límite duro (ALSJ, Apollo 17, Estación 4, https://apollojournals.org/alsj/a17/a17.sta4.html). 15 min es el ejemplo de `research/diseno-interfaz.md` y ~500 m de caminata a 2 km/h |
+| `site_min_p = 0.5` (STM de ejemplo) | Probabilidad mínima de hielo al alcance para ir con una herramienta (tarjeta de sitio) | Ni NASA (M-WIP, talleres de sitios de aterrizaje humano) ni la literatura publican un umbral (`research/viabilidad-expediciones.md`; búsqueda del 2026-11-11). En prospección, la práctica es decidir por valor esperado: ir si p > C / (C + R) (Rose 2001, *Risk Analysis and Management of Petroleum Exploration Ventures*, AAPG; Peel 2015, AAPG Bulletin, https://eprints.soton.ac.uk/381953/). 0.5 equivale a C = R, y coincide con el "hielo probable" de `sensitive_p_ice` |
 
 ## Software
 
@@ -164,3 +197,8 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 - Fluid Kit [Morph](https://fluidkit.mogilnikov.dev/morph/): hook React, más de dos estados, montaje antes de volar, cierre al terminar, foco, refs estables, límites de transform y Reduce Motion. Se consultó también el código instalado de `@fluidkit/core` 2.0.0 para distinguir seguimiento de tamaño durante un vuelo de un nuevo cambio de estado.
 - Tailwind: [Utility classes](https://tailwindcss.com/docs/styling-with-utility-classes), [Theme variables](https://tailwindcss.com/docs/theme), [Responsive design](https://tailwindcss.com/docs/responsive-design) y [Custom styles](https://tailwindcss.com/docs/adding-custom-styles): utilidades, componentes reutilizables, variantes mobile-first y `@theme static` para tokens usados por muestras dinámicas.
 - [Ejemplo Next.js con Vitest](https://github.com/vercel/next.js/tree/canary/examples/with-vitest): React Testing Library y tests por comportamiento.
+| Hora solar en Marte y posición del Sol (Mars24) | Allison y McEwen (2000), Planetary and Space Science 48, 215-235; algoritmo y ejemplos: https://www.giss.nasa.gov/tools/mars24/help/algorithm.html |
+| Meteorología del Viking Lander 2: presión, temperatura y viento en 25 bins por sol (sols 1-1050) | NASA PDS Atmospheres, VL1/VL2-M-MET-4-BINNED-P-T-V-V1.0 (Tillman et al.), https://atmos.nmsu.edu/PDS/data/vl_1001/data/vl_tbin.dat |
+| Umbral de saltación en Marte: 25-30 m/s a la altura de los sensores del Viking | Ryan, Sharman y Lucich (1981), Local Mars dust storm generation mechanism, GRL 8(8), 899-901, doi:10.1029/GL008i008p00899 |
+| DONKI: eventos SEP y simulaciones WSA-Enlil con llegada a Marte | NASA CCMC, https://ccmc.gsfc.nasa.gov/DONKI-API/get/SEP y /WSAEnlilSimulations |
+| Mars Climate Database: uso de la web "moderado"; la versión completa no se puede pasar a terceros | https://www-mars.lmd.jussieu.fr/mars/access.html |

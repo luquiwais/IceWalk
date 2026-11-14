@@ -1,11 +1,13 @@
-"""Genera apps/web/mock/plan.json, replan.json y measurement.json pasando por la API.
+"""Genera apps/web/mock/plan.json, replan.json, measurement.json y map.json pasando por la API.
 
 Usa los mismos `POST /plan` y `POST /replan` que la web, así que sale el planificador real si están
 las capas del terreno (y el GP con los cráteres si está el catálogo), o el mock si no.
 
 La medición de ejemplo se adapta a la primera estación de hielo: su herramienta de hielo llega a
 su alcance sin encontrar hielo, que es lo más probable con 1 m en S1094b (P ~ 0.06,
-`docs/EXPERIMENTS.md`). Es la escena clave de la demo: un "no" que re-planifica.
+`docs/EXPERIMENTS.md`). Es la escena clave de la demo: un "no" que re-planifica, a tiempo.
+
+`map.json` es `GET /maps` del re-plan: cráteres, prior y la medición de la demo.
 
 Uso (desde apps/planner/): python scripts/export_mocks.py
 """
@@ -43,11 +45,18 @@ meas = {
     "position": first["position"],
     "notes": f"Demo scenario: no ice down to {reach:g} m at the first station; triggers replan.",
 }
+# Al día: la medición llega cuando el plan dice que termina la estación. Antes era el minuto 120
+# fijo, 35 min tarde, y el re-plan quedaba con 2.2 min de margen (cuestión 46).
+elapsed = next(e["t_end_min"] for e in plan["timeline"]
+               if e["kind"] == "station" and e["station_id"] == first["id"])
 replan = client.post(
-    "/replan", json={"plan_id": plan["plan_id"], "measurement": meas, "elapsed_min": 120}
+    "/replan", json={"plan_id": plan["plan_id"], "measurement": meas, "elapsed_min": elapsed}
 ).json()
 
+ice_map = client.get("/maps", params={"plan_id": replan["plan_id"]}).json()
+
 plan["plan_id"], replan["plan_id"] = "plan-demo0001", "plan-demo0002"
+ice_map["plan_id"] = "plan-demo0002"
 replan["replanned_from"] = "plan-demo0001"
 
 out = ROOT / "apps" / "web" / "mock"
@@ -55,4 +64,5 @@ out.mkdir(parents=True, exist_ok=True)
 (out / "plan.json").write_text(json.dumps(plan, indent=2))
 (out / "replan.json").write_text(json.dumps(replan, indent=2))
 (out / "measurement.json").write_text(json.dumps(meas, indent=2))
+(out / "map.json").write_text(json.dumps(ice_map))  # ~250 kB: sin sangría
 print("ok:", [p.name for p in out.iterdir()], "| planner:", client.get("/health").json())

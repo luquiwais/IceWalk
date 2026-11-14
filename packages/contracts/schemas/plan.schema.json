@@ -129,7 +129,8 @@
         "max_distance_from_habitat_km": { "type": "number" },
         "min_walkback_margin_min": { "type": "number" },
         "dose_estimate_msv": { "type": "number" },
-        "expected_uncertainty_reduction": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fracción de la ambigüedad total (entropía) de la zona alcanzable que se espera reducir" },
+        "expected_uncertainty_reduction": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fracción de la incertidumbre espacial de la zona alcanzable (la capa uncertainty de map.schema.json, sumada sobre las candidatas) que el plan espera sacar, con cada estación supuesta medida en su valor esperado. Chica por construcción: una estación informa ~100 m alrededor" },
+        "walkback_caution_min": { "type": "number", "minimum": 0, "description": "Umbral de caution del margen de regreso, copiado de la STM; la web lo dibuja en la curva de walkback margin" },
         "ice_threshold_m": { "type": "number", "exclusiveMinimum": 0, "description": "Umbral de profundidad de la STM para P(hielo)" },
         "craters_in_model": { "type": "integer", "minimum": 0, "description": "Cráteres del catálogo en el GP; 0 = solo el prior" },
         "crew": { "type": "integer" },
@@ -146,6 +147,39 @@
           "message": { "type": "string" },
           "source": { "type": "string" }
         }
+      }
+    },
+    "site_assessment": {
+      "type": "object",
+      "description": "Tarjeta de sitio, nivel región: P(hielo al alcance) por herramienta antes de ir, con el prior regional por latitud (gp.regional.site_assessment, Daubar 2022). No usa los cráteres del sitio ni las mediciones. Veredicto solo si la STM declara constraints.site_min_p: GO si todo el intervalo del 90 % la supera, NO_GO si queda todo debajo, CONDITIONAL si la cruza; el sitio toma el de la mejor herramienta. Sin datos regionales, INSUFFICIENT_DATA",
+      "required": ["lat_deg", "status", "warnings", "tools"],
+      "additionalProperties": false,
+      "properties": {
+        "lat_deg": { "type": "number" },
+        "status": { "enum": ["ok", "extrapolated", "no_data"] },
+        "median_depth_m": { "type": "number", "exclusiveMinimum": 0, "description": "Mediana regional de la profundidad a la tabla de hielo" },
+        "median_depth_90_m": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+        "sd_log_total": { "type": "number", "minimum": 0 },
+        "warnings": { "type": "array", "items": { "type": "string" } },
+        "tools": {
+          "type": "object",
+          "description": "Por id de herramienta del catálogo (las que miden bajo la superficie)",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["depth_m", "p_ice", "p_ice_90"],
+            "additionalProperties": false,
+            "properties": {
+              "depth_m": { "type": "number", "exclusiveMinimum": 0 },
+              "p_ice": { "type": "number", "minimum": 0, "maximum": 1 },
+              "p_ice_90": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 1 }, "minItems": 2, "maxItems": 2 },
+              "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO"] },
+              "precursor": { "type": "boolean", "description": "Herramienta precursora (radar aéreo de SkyFall), no de la EVA" }
+            }
+          }
+        },
+        "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO", "INSUFFICIENT_DATA"] },
+        "min_p": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "nearby_impacts": {"type": "object", "description": "Control local: impactos nuevos de Daubar 2022 a ±10° de latitud y ±30° de longitud, con hielo observado contra esperado por el prior de latitud (dentro de la muestra). Si sobran (z >= 2), warnings avisa que el hielo probablemente está más somero", "required": ["window_deg", "n", "ice", "expected_ice", "z"], "additionalProperties": false, "properties": {"window_deg": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}, "n": {"type": "integer", "minimum": 0}, "ice": {"type": "integer", "minimum": 0}, "expected_ice": {"type": "number", "minimum": 0}, "z": {"type": ["number", "null"]}}}
       }
     }
   }

@@ -31,6 +31,23 @@ min_station_separation_m:
   assumption: true
   notes: Evita dos estaciones en el mismo punto (por ejemplo, un objetivo fijo y una candidata).
 
+map_half_m:
+  value: 1500
+  source: >-
+    Sin fuente: tamaño de la ventana del mapa de hielo (GET /maps) alrededor del hábitat. 3 × 3 km
+    a 10 m son 90 000 celdas, ~1 s y ~120 kB por capa (docs/plans/planner.md pedía ~3 × 3.5 km)
+  assumption: true
+  notes: >-
+    Lo alcanzable en una EVA de 8 h es casi todo el sitio (~590 000 celdas, ~6.5 s): la ventana se
+    amplía solo si el plan pone estaciones más lejos (map_margin_m).
+
+map_margin_m:
+  value: 300
+  source: >-
+    Sin fuente: borde del mapa alrededor de cada estación, opción de decisión o medición, 3 alcances
+    del GP (100 m), donde una medición deja de cambiar el mapa (gp.maps.UPDATE_REACH_RANGES)
+  assumption: true
+
 believer_error_m:
   value: 0.15
   source: >-

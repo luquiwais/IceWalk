@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "icewalk/map.schema.json",
+  "title": "Mapa de hielo para la web (respuesta de GET /maps)",
+  "description": "Grilla de valores por celda que el front dibuja (decisión del 2026-11-10). Trae dos capas de datos (probability, uncertainty); el front deriva change y potential con las paletas y la fórmula incluidas. Lo genera gp.maps.map_payload (packages/model) y lo sirve el planificador. Colores en tonos de azul.",
+  "type": "object",
+  "required": ["site_id", "threshold_m", "cell_size_m", "width", "height", "bounds_xy_m", "bounds_lonlat", "prior_probability", "layers", "palettes", "is_prior_only"],
+  "additionalProperties": false,
+  "$defs": {
+    "layer": {
+      "type": "object",
+      "required": ["encoding", "min", "max", "nodata", "data"],
+      "additionalProperties": false,
+      "description": "width × height bytes por filas, la fila 0 es el borde norte y la columna 0 el oeste. valor = min + q / 254 × (max − min); q = nodata: sin dato",
+      "properties": {
+        "encoding": { "const": "uint8-base64" },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "nodata": { "const": 255 },
+        "data": { "type": "string", "contentEncoding": "base64" }
+      }
+    },
+    "scale": {
+      "type": "object",
+      "required": ["label", "units", "min", "max", "stops"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string" },
+        "units": { "enum": ["probability", "fraction_of_prior"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "stops": {
+          "type": "array",
+          "minItems": 2,
+          "description": "Interpolación lineal en RGB entre paradas; fuera de [min, max] se recorta",
+          "items": {
+            "type": "object",
+            "required": ["value", "color"],
+            "additionalProperties": false,
+            "properties": {
+              "value": { "type": "number" },
+              "color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "site_id": { "type": "string" },
+    "plan_id": { "type": ["string", "null"], "description": "Plan cuyas mediciones incluye el mapa; null = solo cráteres y prior" },
+    "threshold_m": { "type": "number", "exclusiveMinimum": 0, "description": "Umbral de profundidad de la STM" },
+    "cell_size_m": { "type": "number", "exclusiveMinimum": 0 },
+    "width": { "type": "integer", "minimum": 1, "description": "Columnas" },
+    "height": { "type": "integer", "minimum": 1, "description": "Filas; la fila 0 es el borde norte" },
+    "bounds_xy_m": {
+      "type": "object",
+      "required": ["xmin", "xmax", "ymin", "ymax"],
+      "additionalProperties": false,
+      "description": "Bordes de la grilla (no centros de celda) en metros de la grilla del sitio",
+      "properties": {
+        "xmin": { "type": "number" }, "xmax": { "type": "number" },
+        "ymin": { "type": "number" }, "ymax": { "type": "number" }
+      }
+    },
+    "bounds_lonlat": {
+      "type": "object",
+      "required": ["west", "south", "east", "north"],
+      "additionalProperties": false,
+      "description": "Bordes en grados: longitud este de 0 a 360, como lonlat en plan.schema.json (app/contracts.py:xy_to_lonlat)",
+      "properties": {
+        "west": { "type": "number", "minimum": 0, "maximum": 360 },
+        "east": { "type": "number", "minimum": 0, "maximum": 360 },
+        "south": { "type": "number", "minimum": -90, "maximum": 90 },
+        "north": { "type": "number", "minimum": -90, "maximum": 90 }
+      }
+    },
+    "prior_probability": { "type": "number", "minimum": 0, "maximum": 1, "description": "P(hielo <= umbral) sin datos cerca: el fondo del mapa. change = probability − prior_probability" },
+    "layers": {
+      "type": "object",
+      "required": ["probability", "uncertainty"],
+      "additionalProperties": false,
+      "properties": {
+        "probability": { "$ref": "#/$defs/layer", "description": "P(profundidad del hielo <= umbral), del GP" },
+        "uncertainty": { "$ref": "#/$defs/layer", "description": "Duda que queda respecto del prior: desvío de log d de la parte espacial del GP sobre el del prior. 1 = sin datos cerca, 0 = medido. No es la entropía en bits de las estaciones del plan" }
+      }
+    },
+    "palettes": {
+      "type": "object",
+      "required": ["probability", "uncertainty", "change", "potential"],
+      "additionalProperties": false,
+      "properties": {
+        "probability": { "$ref": "#/$defs/scale" },
+        "uncertainty": { "$ref": "#/$defs/scale" },
+        "change": { "$ref": "#/$defs/scale", "description": "Divergente: gris neutro en 0 (sin información)" },
+        "potential": {
+          "type": "object",
+          "required": ["label", "base", "suppress_by", "fog_color", "formula"],
+          "additionalProperties": false,
+          "description": "Capa por defecto (cuestión 49): potencial con supresión por incertidumbre",
+          "properties": {
+            "label": { "type": "string" },
+            "base": { "const": "probability" },
+            "suppress_by": { "const": "uncertainty" },
+            "fog_color": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+            "formula": { "type": "string" }
+          }
+        }
+      }
+    },
+    "is_prior_only": { "type": "boolean", "description": "true si no hay cráteres ni mediciones en el modelo" },
+    "craters_in_model": { "type": "integer", "minimum": 0 },
+    "measurements_in_model": { "type": "integer", "minimum": 0 },
+    "is_mock": { "type": "boolean", "description": "true si los datos son ilustrativos" },
+    "notes": { "type": "string" }
+  }
+}

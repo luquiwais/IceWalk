@@ -21,14 +21,17 @@ Recibe la STM, el catálogo y los mapas del GP, y devuelve el plan de EVA del co
 | `/replan` con las mediciones acumuladas en el GP | Hecho | `app/main.py` |
 | Reordenar la ruta para caminar menos (2-opt, mover una estación) | Hecho | `EvaPlanner.improve` |
 | Timeline, tareas EV1/EV2, equipo con masa | Hecho (masas del catálogo, casi todas null) | `app/eva_planner.py` |
-| Ramas | Sobre la primera estación de hielo, re-planificando con el resultado simulado; forma final abierta (cuestión 23) | `app/eva_planner.py` |
-| Ventana de EVA y DONKI en vivo | Pendiente | `app/main.py` |
+| Puntos de decisión (`decision_points`) en las dos primeras estaciones de hielo | Hecho (cuestión 23 cerrada) | `app/eva_planner.py` |
+| Mapa de hielo `GET /maps?plan_id=` (`map.schema.json`), con caché y gzip | Hecho el 2026-11-11 | `app/maps.py`, `app/main.py` |
+| Margen de regreso: umbral de caution de la STM, Get Aheads que lo respetan, alertas caution/warning, re-plan tarde sin estaciones | Hecho el 2026-11-11 (cuestiones 46 y 55) | `app/eva_planner.py`, `app/mock_planner.py` |
+| Ventana de EVA (`GET /eva-window`) y DONKI en vivo (`GET /spaceweather`) | Hecho el 2026-11-11 | `app/eva_window.py`, `app/marstime.py`, `app/donki.py` |
+| Tarjeta de sitio (`site_assessment` en el plan, umbral `site_min_p` de la STM) | Hecho el 2026-11-11 (cuestión 58), por GP | `app/site_card.py`, `app/main.py:_store` |
 
 ## Próximos pasos
 
-1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui.
-2. Fijar `uncertainty`, `value` y los campos nuevos en el esquema (cuestión 41).
-3. Costo metabólico en el resumen (cuestión 39); ventana de EVA y DONKI en vivo.
+1. Correr con el catálogo real de cráteres (cuestión 42) y revisar el plan con Luqui; regenerar `apps/web/mock/` (ahora con `map.json`).
+2. Ventana de EVA: umbrales con un experto (cuestión 59) y clima en el sitio (cuestión 60).
+3. Costo metabólico en el resumen (cuestión 39).
 4. Capas en GitHub Releases y carga al arrancar la API en el deploy.
 
 ## Cómo se corre
@@ -81,17 +84,65 @@ Lo que ya existe en `packages/model/gp/`:
 | `add_measurement(post, medicion, herramienta)` | `(posterior nuevo, observación o None)`. Usa los contratos tal cual |
 | `simulate_outcome(post, x, y, threshold_m, "ice"/"no_ice")` | Posterior para cada rama |
 | `tool_yield(post, x, y, herramientas)` | Por herramienta: P por estación, mejor estación y estaciones esperadas hasta un hallazgo. Es el número de "con qué herramienta ir" |
+| `MapGrid`, `ice_maps(post, grid, threshold_m)`, `update_window(maps, post, puntos)` | Probabilidad e incertidumbre sobre una grilla, y su actualización alrededor de mediciones nuevas |
+| `map_payload(maps, site_id=..., bounds_lonlat=..., ...)` | La respuesta de `GET /maps` según `map.schema.json` |
 
 En el sitio real, con el hábitat por defecto: espectrómetro ~165 estaciones por hallazgo, taladro ~17 y radar ~1. El radar es optimista hasta la cuestión 30. Ver `EXPERIMENTS.md`.
+
+## Mapas de hielo (`GET /maps`), cuestiones 49 y 52 cerradas
+
+**API hecha el 2026-11-11** (`app/maps.py`). `GET /maps` sin parámetros: cráteres y prior en el hábitat ± `map_half_m` (1.5 km). `GET /maps?plan_id=...`: además las mediciones de ese plan, y la ventana se amplía hasta `map_margin_m` (300 m) alrededor de cada estación, opción de decisión y medición; 404 si el plan no existe. Después de `/replan`, pedirlo con el `plan_id` nuevo. El mapa base se arma al arrancar (~1 s) y queda en caché; el de un plan tarda ~0.11 s y queda guardado con el plan. Respuesta comprimida: ~21 kB. `scripts/export_mocks.py` escribe `apps/web/mock/map.json` (el del re-plan de la demo). Las celdas coinciden con las de 10 m del terreno. Lo que sigue es la guía original:
+
+El GP ya da todo lo del mapa (`gp/maps.py`, re-exportado en `gp.planning`); falta servirlo y dibujarlo. Contrato: `packages/contracts/schemas/map.schema.json`, con ejemplo en `examples/map.example.json` (regenerar con `python packages/model/scripts/export_map_example.py`). **Se manda la grilla de valores, no una imagen:** el front pinta.
+
+**API (Planificador):**
+
+1. Al arrancar, armar el mapa base de la zona de la EVA y cachearlo por umbral: `MapGrid.around(*habitat_xy, half_m, 10)` con `ice_maps(post, grid, threshold_m)`. Con 3 × 3.5 km a 10 m tarda ~1.7 s, una vez.
+2. `GET /maps?plan_id=...` devuelve todas las capas en una respuesta (hoy existe `GET /maps/{kind}` en `pending`: reemplazarlo). Con `plan_id`, aplicar al mapa base `update_window(maps, post_del_plan, posiciones_de_las_mediciones)` (~0.04 s) y cachear por plan. Sin `plan_id`, el mapa base.
+3. Respuesta: `map_payload(maps, site_id=..., bounds_lonlat=..., plan_id=..., craters_in_model=..., measurements_in_model=...)`. `bounds_lonlat` sale de `xy_to_lonlat` en las esquinas de `payload["bounds_xy_m"]`.
+4. No aceptar tamaños de grilla del cliente sin tope: `MapGrid` ya rechaza más de 2 millones de celdas. La zona de la EVA pesa ~275 kB; conviene comprimir la respuesta (`GZipMiddleware` de FastAPI).
+
+**Web (Frontend):**
+
+1. Decodificar cada capa: base64 a bytes, `valor = min + q / 254 × (max − min)`, `q = 255` sin dato. Fila 0 al norte, columna 0 al oeste.
+2. Pintar en un `canvas` (`ImageData`, un píxel por celda) con las paradas de `palettes[capa].stops`, interpolando en RGB, y apoyarlo en Cesium con `SingleTileImageryProvider` y `Rectangle.fromDegrees(west, south, east, north)` (longitud este de 0 a 360).
+3. Capas: **"Ice potential"** por defecto (`palettes.potential`: color de la probabilidad mezclado con `fog_color` en proporción a `uncertainty`), "Ice probability", "Uncertainty" y "Change vs. prior" (`probability − prior_probability`). Las dos últimas se calculan en el navegador: cambiar de capa no pide nada al back.
+4. Leyenda desde `palettes` y valor de la celda al pasar el mouse (por ejemplo "P(ice ≤ 3 m) 67 % · uncertainty 0.95"). Sin contornos duros (`research/diseno-interfaz.md` §5.1).
+5. Colores en tonos de azul (DECISIONS 2026-11-10); `gp.maps.to_rgba` y `potential_rgba` son la referencia para comparar.
+
+## Ventana de EVA (`GET /eva-window`)
+
+Decide cuándo salir. `GET /eva-window?plan_id=&date=&dust_tau=&demo=` devuelve `eva_window.schema.json`: una fila por hora local en 3 soles (luz, temperatura, viento, polvo y clima espacial, cada uno con nivel y motivo), la salida recomendada (`go: false` si toda salida tiene un warning) y, con `plan_id`, las condiciones en cada estación. Sin `date`, ahora; con `demo=true`, el 8 de agosto de 2023 con el evento de partículas real (sin red).
+
+- Luz: `app/marstime.py` (Mars24).
+- Temperatura y viento: `data/vl2_climatology.json`, armado con `scripts/build_climatology.py` desde el PDS.
+- Clima espacial: `app/donki.py`; demo en `data/donki_demo_2023-08.json`. `GET /spaceweather?demo=false` usa DONKI en vivo.
+- Umbrales: `config/eva_window.yaml`, todos supuestos (cuestión 59).
+- Ejemplo del contrato y mock de la web: `scripts/export_window.py`.
+
+Para Frontend: barra de estado y Brief pueden mostrar `recommended` (hora local y UTC, nivel, motivos); la timeline del día puede pintar `hours[].level`; la ficha de estación, `stations[]`.
+
+## Tarjeta de sitio (`site_assessment`), cuestión 58
+
+Responde «¿vale ir, y con qué herramienta?» antes de bajar (nivel región). Viene en cada respuesta de `/plan` y `/replan`: P(hielo al alcance) por herramienta del catálogo que mide bajo la superficie, con intervalo del 90 %, a partir del prior regional por latitud (`gp.regional.site_assessment`). No usa los cráteres del sitio ni las mediciones. Con `constraints.site_min_p` en la STM (0.5 en los ejemplos, supuesto: `SOURCES.md`), cada herramienta y el sitio llevan `verdict`: `GO`, `CONDITIONAL`, `NO_GO` o `INSUFFICIENT_DATA`.
+
+En S1094b: espectrómetro `NO_GO` (1 %), taladro `NO_GO` (6 %), radar `GO` (97 %); sitio `GO`. Ya está en `apps/web/mock/plan.json` y `replan.json`.
+
+Para Frontend: una tarjeta en el Brief de Planning, con una fila por herramienta (`p_ice` como porcentaje, `p_ice_90` como rango y `verdict`), la mediana de profundidad con su rango y los `warnings`. Color solo en el veredicto (alerta). Aclarar que es «regional prior, before landing».
+
+**Cambios del 2026-11-12:**
+- S1094b sale `status: "extrapolated"`, porque queda al sur del impacto con hielo más austral (39.1°N). Los veredictos no cambian.
+- `nearby_impacts` es el control local: impactos con hielo observados contra esperados alrededor del sitio. Va como una línea chica ("Nearby fresh impacts: 7 with ice vs 3.4 expected"); el aviso ya viene en `warnings`.
+- **Zonas de NASA en el globo** (`packages/contracts/examples/exploration_zones.json`, esquema `exploration_zones.schema.json`): las 51 zonas de exploración propuestas en 2015, cada una con su tarjeta. Sirve para mostrar que la herramienta funciona en otros lugares: un punto por zona, con el veredicto de la mejor herramienta, y la misma tarjeta al tocarla. `skyfall_radar` (y su fila en la tarjeta del plan) es el radar precursor de SkyFall (NASA, helicópteros, hielo a 0.5-3 m) y lleva `precursor: true`: rotularlo «SkyFall radar (2030 precursor)», no como herramienta de la EVA. El bloque `skyfall` trae la tarjeta del sitio de referencia AP-105 (Arcadia) y las 5 regiones candidatas. Sin datos (sur o debajo de 20°N): gris, `INSUFFICIENT_DATA`. Es un complemento: el centro de la demo sigue siendo S1094b.
 
 ## Datos y despliegue
 
 - El catálogo de cráteres (`data/processed/s1094b/craters_dundas2023.csv`) y el DTM están **fuera de Git**.
-- **La licencia de la tabla de Dundas 2023 está sin confirmar (cuestión 26):** no se puede subir al repo ni publicar hasta saberla.
+- **La tabla de Dundas 2023 es CC BY-NC-ND 4.0 (cuestión 26, cerrada el 12/11):** el original se puede compartir sin modificar (cuestión 65, Release público a decidir por Luqui); el CSV llevado a la grilla es una adaptación y va solo por privado (equipo y servidor del deploy).
 - **Plan aprobado:**
   1. Un script genera un paquete chico del sitio (cráteres en la grilla y máscara de pendiente de las candidatas) en `data/processed/`.
   2. La API lo usa si está; si no, cae al mock.
-  3. Para desplegar va como GitHub Release, según `CLAUDE.md`, después de confirmar la licencia.
+  3. Para desplegar, las capas del terreno van como GitHub Release (CC0) y el catálogo convertido como archivo privado del servidor.
 - **Cómo regenerar el catálogo:** necesita la imagen RED y el orto en `data/raw/`, y se corre `python -m gp.craters` desde `packages/model`. Pedile los archivos al dueño del GP.
 - **Hábitat por defecto:** (300, -2200) m en la grilla, marcado como supuesto (decisión del 2026-11-08). Es uno de los hábitats de la simulación con muchos cráteres cerca. Cuando se toque el contrato de la STM, sumar `habitat_xy`.
 
@@ -103,7 +154,7 @@ En el sitio real, con el hábitat por defecto: espectrómetro ~165 estaciones po
 | 41 | Qué son `uncertainty`, `value` y los campos nuevos de estación | **Hecho** en el mismo PR |
 | 33 | Catálogo: `evidence`, análogos NSS, RIMFAX y ALSD, masas, fuente de la resolución del radar | **Hecho** en el mismo PR |
 | 30 | Observaciones blandas para espectrómetro y radar | Hecho por el GP |
-| 15 | Licencia de Mars Climate Database | Sin averiguar |
+| 15 | Licencia de Mars Climate Database | Cerrada: no se usa (DECISIONS 2026-11-11). Contrato nuevo `eva_window.schema.json` |
 | - | `habitat_xy` en la STM | Pendiente: próximo cambio de la STM |
 
 Un cambio de contrato es un solo PR que actualiza esquema, ejemplos, mocks y usos, y `python packages/contracts/validate.py` tiene que pasar.

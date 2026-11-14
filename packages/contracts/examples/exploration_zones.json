@@ -1,0 +1,1778 @@
+{
+  "source": "NASA Mars Trek, capa EZMars (First Landing Site/Exploration Zone Workshop for Human Missions to the Surface of Mars, 2015); prior regional de Daubar et al. (2022), CC BY 4.0",
+  "method": "Prior regional por latitud (gp.regional). Solo hemisferio norte desde 20°N; al sur de 39.1°N, extrapolado. Control local: impactos de Daubar 2022 a ±10° de latitud y ±30° de longitud",
+  "generated_on": "2026-11-14",
+  "tools": {
+    "neutron_spectrometer": {
+      "depth_m": 0.6
+    },
+    "gpr": {
+      "depth_m": 10.0
+    },
+    "core_drill": {
+      "depth_m": 1.0
+    },
+    "skyfall_radar": {
+      "depth_m": 3.0,
+      "precursor": true
+    }
+  },
+  "min_p": 0.5,
+  "reference_site": {
+    "name": "S1094b (IceWalk demo site)",
+    "lat_deg": 35.1105,
+    "lon_e_deg": 189.8273,
+    "elevation_m": null,
+    "site_assessment": {
+      "lat_deg": 35.1105,
+      "status": "extrapolated",
+      "median_depth_m": 2.8867,
+      "median_depth_90_m": [
+        1.9101,
+        4.3627
+      ],
+      "sd_log_total": 0.6706,
+      "warnings": [
+        "Assumes excavation depth = 0.1 x crater diameter",
+        "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend",
+        "Nearby fresh impacts show more ice than the latitude trend predicts (7 vs 3.4): ice is likely shallower here"
+      ],
+      "tools": {
+        "neutron_spectrometer": {
+          "depth_m": 0.6,
+          "p_ice": 0.0096,
+          "p_ice_90": [
+            0.0007,
+            0.0313
+          ],
+          "verdict": "NO_GO"
+        },
+        "gpr": {
+          "depth_m": 10.0,
+          "p_ice": 0.968,
+          "p_ice_90": [
+            0.9089,
+            0.9961
+          ],
+          "verdict": "GO"
+        },
+        "core_drill": {
+          "depth_m": 1.0,
+          "p_ice": 0.057,
+          "p_ice_90": [
+            0.0089,
+            0.149
+          ],
+          "verdict": "NO_GO"
+        },
+        "skyfall_radar": {
+          "depth_m": 3.0,
+          "p_ice": 0.5229,
+          "p_ice_90": [
+            0.2735,
+            0.7661
+          ],
+          "verdict": "CONDITIONAL",
+          "precursor": true
+        }
+      },
+      "nearby_impacts": {
+        "window_deg": [
+          10.0,
+          30.0
+        ],
+        "n": 35,
+        "ice": 7,
+        "expected_ice": 3.4484,
+        "z": 2.6745
+      },
+      "verdict": "GO",
+      "min_p": 0.5
+    }
+  },
+  "zones": [
+    {
+      "name": "Amazonis Planitia",
+      "lat_deg": 46.16,
+      "lon_e_deg": 188.8,
+      "elevation_m": -3.9,
+      "site_assessment": {
+        "lat_deg": 46.16,
+        "status": "ok",
+        "median_depth_m": 0.8287,
+        "median_depth_90_m": [
+          0.668,
+          1.0281
+        ],
+        "sd_log_total": 0.6355,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "Nearby fresh impacts show more ice than the latitude trend predicts (12 vs 6.9): ice is likely shallower here"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.3057,
+            "p_ice_90": [
+              0.1932,
+              0.4314
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 1.0,
+            "p_ice_90": [
+              0.9999,
+              1.0
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.6162,
+            "p_ice_90": [
+              0.4822,
+              0.7418
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.9785,
+            "p_ice_90": [
+              0.9575,
+              0.9921
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 36,
+          "ice": 12,
+          "expected_ice": 6.8921,
+          "z": 2.7349
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Protonilus Mensae",
+      "lat_deg": 42.187,
+      "lon_e_deg": 48.062,
+      "elevation_m": -1.48,
+      "site_assessment": {
+        "lat_deg": 42.187,
+        "status": "ok",
+        "median_depth_m": 1.298,
+        "median_depth_90_m": [
+          0.9975,
+          1.6892
+        ],
+        "sd_log_total": 0.6421,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.1147,
+            "p_ice_90": [
+              0.048,
+              0.2068
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.9993,
+            "p_ice_90": [
+              0.9979,
+              0.9999
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.3423,
+            "p_ice_90": [
+              0.1996,
+              0.5016
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.904,
+            "p_ice_90": [
+              0.8222,
+              0.9617
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 23,
+          "ice": 2,
+          "expected_ice": 2.1194,
+          "z": -0.1404
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Tempe Terra",
+      "lat_deg": 41.628,
+      "lon_e_deg": 271.079,
+      "elevation_m": 0.61,
+      "site_assessment": {
+        "lat_deg": 41.628,
+        "status": "ok",
+        "median_depth_m": 1.3826,
+        "median_depth_90_m": [
+          1.0523,
+          1.8167
+        ],
+        "sd_log_total": 0.6436,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0973,
+            "p_ice_90": [
+              0.0374,
+              0.1831
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.9989,
+            "p_ice_90": [
+              0.997,
+              0.9999
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.3073,
+            "p_ice_90": [
+              0.1685,
+              0.4673
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.8856,
+            "p_ice_90": [
+              0.7901,
+              0.954
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 17,
+          "ice": 2,
+          "expected_ice": 2.0773,
+          "z": -0.0729
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Deuteronilus Mensae",
+      "lat_deg": 41.0,
+      "lon_e_deg": 22.0,
+      "elevation_m": -2.313,
+      "site_assessment": {
+        "lat_deg": 41.0,
+        "status": "ok",
+        "median_depth_m": 1.4843,
+        "median_depth_90_m": [
+          1.1168,
+          1.9727
+        ],
+        "sd_log_total": 0.6454,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0803,
+            "p_ice_90": [
+              0.0278,
+              0.1589
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.9984,
+            "p_ice_90": [
+              0.9955,
+              0.9998
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.2703,
+            "p_ice_90": [
+              0.1373,
+              0.4295
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.8622,
+            "p_ice_90": [
+              0.7499,
+              0.944
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 21,
+          "ice": 2,
+          "expected_ice": 2.9968,
+          "z": -1.0679
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Erberus Montes",
+      "lat_deg": 40.0,
+      "lon_e_deg": 220.5,
+      "elevation_m": -3.121,
+      "site_assessment": {
+        "lat_deg": 40.0,
+        "status": "ok",
+        "median_depth_m": 1.6618,
+        "median_depth_90_m": [
+          1.2262,
+          2.252
+        ],
+        "sd_log_total": 0.6487,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0582,
+            "p_ice_90": [
+              0.0167,
+              0.1252
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.9972,
+            "p_ice_90": [
+              0.9917,
+              0.9996
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.2168,
+            "p_ice_90": [
+              0.0959,
+              0.3715
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.8188,
+            "p_ice_90": [
+              0.6777,
+              0.9249
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 40,
+          "ice": 3,
+          "expected_ice": 3.1141,
+          "z": -0.0782
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Deuteronilus Mensae",
+      "lat_deg": 39.11,
+      "lon_e_deg": 23.199,
+      "elevation_m": -3.565,
+      "site_assessment": {
+        "lat_deg": 39.11,
+        "status": "ok",
+        "median_depth_m": 1.8375,
+        "median_depth_90_m": [
+          1.3313,
+          2.5362
+        ],
+        "sd_log_total": 0.652,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.043,
+            "p_ice_90": [
+              0.0102,
+              0.1
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.9953,
+            "p_ice_90": [
+              0.9863,
+              0.9994
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.1754,
+            "p_ice_90": [
+              0.0672,
+              0.3227
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.7739,
+            "p_ice_90": [
+              0.6065,
+              0.9043
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 27,
+          "ice": 2,
+          "expected_ice": 2.2541,
+          "z": -0.2759
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Phlegra Dorsa",
+      "lat_deg": 39.0,
+      "lon_e_deg": 172.0,
+      "elevation_m": -3.968,
+      "site_assessment": {
+        "lat_deg": 39.0,
+        "status": "extrapolated",
+        "median_depth_m": 1.8604,
+        "median_depth_90_m": [
+          1.3448,
+          2.5738
+        ],
+        "sd_log_total": 0.6524,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend",
+          "Nearby fresh impacts show more ice than the latitude trend predicts (10 vs 5.1): ice is likely shallower here"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0414,
+            "p_ice_90": [
+              0.0096,
+              0.0972
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.995,
+            "p_ice_90": [
+              0.9855,
+              0.9994
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.1707,
+            "p_ice_90": [
+              0.0642,
+              0.3169
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.768,
+            "p_ice_90": [
+              0.5973,
+              0.9015
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 36,
+          "ice": 10,
+          "expected_ice": 5.13,
+          "z": 3.0475
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Acheron Fossae",
+      "lat_deg": 39.0,
+      "lon_e_deg": 192.0,
+      "elevation_m": -3.979,
+      "site_assessment": {
+        "lat_deg": 39.0,
+        "status": "extrapolated",
+        "median_depth_m": 1.8604,
+        "median_depth_90_m": [
+          1.3448,
+          2.5738
+        ],
+        "sd_log_total": 0.6524,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend",
+          "Nearby fresh impacts show more ice than the latitude trend predicts (11 vs 5.4): ice is likely shallower here"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0414,
+            "p_ice_90": [
+              0.0096,
+              0.0972
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.995,
+            "p_ice_90": [
+              0.9855,
+              0.9994
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.1707,
+            "p_ice_90": [
+              0.0642,
+              0.3169
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.768,
+            "p_ice_90": [
+              0.5973,
+              0.9015
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 40,
+          "ice": 11,
+          "expected_ice": 5.4203,
+          "z": 3.3377
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Ismenius Cavus",
+      "lat_deg": 33.5,
+      "lon_e_deg": 17.0,
+      "elevation_m": -3.1,
+      "site_assessment": {
+        "lat_deg": 33.5,
+        "status": "extrapolated",
+        "median_depth_m": 3.4626,
+        "median_depth_90_m": [
+          2.2033,
+          5.4417
+        ],
+        "sd_log_total": 0.6799,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.005,
+            "p_ice_90": [
+              0.0002,
+              0.0182
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.9406,
+            "p_ice_90": [
+              0.8361,
+              0.9925
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.0339,
+            "p_ice_90": [
+              0.0032,
+              0.102
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.4165,
+            "p_ice_90": [
+              0.1691,
+              0.6902
+            ],
+            "verdict": "CONDITIONAL",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 57,
+          "ice": 1,
+          "expected_ice": 2.0729,
+          "z": -1.131
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Kasei Valles",
+      "lat_deg": 25.0,
+      "lon_e_deg": 288.0,
+      "elevation_m": 0.394,
+      "site_assessment": {
+        "lat_deg": 25.0,
+        "status": "extrapolated",
+        "median_depth_m": 9.0435,
+        "median_depth_90_m": [
+          4.6262,
+          17.6788
+        ],
+        "sd_log_total": 0.7435,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0001,
+            "p_ice_90": [
+              0.0,
+              0.0005
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.5538,
+            "p_ice_90": [
+              0.1798,
+              0.8924
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.0015,
+            "p_ice_90": [
+              0.0,
+              0.0069
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.0689,
+            "p_ice_90": [
+              0.0022,
+              0.2431
+            ],
+            "verdict": "NO_GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 66,
+          "ice": 0,
+          "expected_ice": 0.178,
+          "z": -0.44
+        },
+        "verdict": "CONDITIONAL",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Mawrth Vallis",
+      "lat_deg": 24.802,
+      "lon_e_deg": 340.317,
+      "elevation_m": -0.52,
+      "site_assessment": {
+        "lat_deg": 24.802,
+        "status": "extrapolated",
+        "median_depth_m": 9.248,
+        "median_depth_90_m": [
+          4.7061,
+          18.1733
+        ],
+        "sd_log_total": 0.7452,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0001,
+            "p_ice_90": [
+              0.0,
+              0.0005
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.5418,
+            "p_ice_90": [
+              0.1684,
+              0.8873
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.0014,
+            "p_ice_90": [
+              0.0,
+              0.0064
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.0654,
+            "p_ice_90": [
+              0.0019,
+              0.2345
+            ],
+            "verdict": "NO_GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 9,
+          "ice": 0,
+          "expected_ice": 0.9106,
+          "z": -2.1452
+        },
+        "verdict": "CONDITIONAL",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Chryse - Viking",
+      "lat_deg": 22.5,
+      "lon_e_deg": 311.5,
+      "elevation_m": -3.607,
+      "site_assessment": {
+        "lat_deg": 22.5,
+        "status": "extrapolated",
+        "median_depth_m": 11.9941,
+        "median_depth_90_m": [
+          5.7419,
+          25.054
+        ],
+        "sd_log_total": 0.7663,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0,
+            "p_ice_90": [
+              0.0,
+              0.0001
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.4062,
+            "p_ice_90": [
+              0.0698,
+              0.8139
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.0006,
+            "p_ice_90": [
+              0.0,
+              0.0025
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.0353,
+            "p_ice_90": [
+              0.0003,
+              0.1483
+            ],
+            "verdict": "NO_GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 5,
+          "ice": 0,
+          "expected_ice": 0.002,
+          "z": -0.0448
+        },
+        "verdict": "CONDITIONAL",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "McLaughlin Crater",
+      "lat_deg": 21.9,
+      "lon_e_deg": 337.6,
+      "elevation_m": -5.057,
+      "site_assessment": {
+        "lat_deg": 21.9,
+        "status": "extrapolated",
+        "median_depth_m": 12.835,
+        "median_depth_90_m": [
+          6.047,
+          27.243
+        ],
+        "sd_log_total": 0.772,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0,
+            "p_ice_90": [
+              0.0,
+              0.0001
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.3732,
+            "p_ice_90": [
+              0.0535,
+              0.7907
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.0005,
+            "p_ice_90": [
+              0.0,
+              0.0019
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.0299,
+            "p_ice_90": [
+              0.0002,
+              0.1298
+            ],
+            "verdict": "NO_GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 6,
+          "ice": 0,
+          "expected_ice": 0.0011,
+          "z": -0.0334
+        },
+        "verdict": "CONDITIONAL",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Nili Fossae",
+      "lat_deg": 21.506,
+      "lon_e_deg": 76.948,
+      "elevation_m": -0.611,
+      "site_assessment": {
+        "lat_deg": 21.506,
+        "status": "extrapolated",
+        "median_depth_m": 13.4191,
+        "median_depth_90_m": [
+          6.256,
+          28.784
+        ],
+        "sd_log_total": 0.7758,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0,
+            "p_ice_90": [
+              0.0,
+              0.0001
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.3523,
+            "p_ice_90": [
+              0.0445,
+              0.7747
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.0004,
+            "p_ice_90": [
+              0.0,
+              0.0016
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.0267,
+            "p_ice_90": [
+              0.0001,
+              0.1186
+            ],
+            "verdict": "NO_GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 15,
+          "ice": 0,
+          "expected_ice": 0.1065,
+          "z": -0.3382
+        },
+        "verdict": "CONDITIONAL",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Hebrus Valles",
+      "lat_deg": 20.083,
+      "lon_e_deg": 126.633,
+      "elevation_m": -3.608,
+      "site_assessment": {
+        "lat_deg": 20.083,
+        "status": "extrapolated",
+        "median_depth_m": 15.7588,
+        "median_depth_90_m": [
+          7.0721,
+          35.1153
+        ],
+        "sd_log_total": 0.7899,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter",
+          "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.0,
+            "p_ice_90": [
+              0.0,
+              0.0
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.2824,
+            "p_ice_90": [
+              0.0217,
+              0.7113
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.0002,
+            "p_ice_90": [
+              0.0,
+              0.0008
+            ],
+            "verdict": "NO_GO"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.0179,
+            "p_ice_90": [
+              0.0,
+              0.0839
+            ],
+            "verdict": "NO_GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 17,
+          "ice": 0,
+          "expected_ice": 0.0179,
+          "z": -0.1344
+        },
+        "verdict": "CONDITIONAL",
+        "min_p": 0.5
+      }
+    },
+    {
+      "name": "Chryse (Vallis Marineris)",
+      "lat_deg": 20.0,
+      "lon_e_deg": 320.0,
+      "elevation_m": -3.739,
+      "site_assessment": {
+        "lat_deg": 20.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 20.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Jezero Crater",
+      "lat_deg": 17.5,
+      "lon_e_deg": 77.0,
+      "elevation_m": -2.421,
+      "site_assessment": {
+        "lat_deg": 17.5,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 17.50°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Hypanis",
+      "lat_deg": 11.7,
+      "lon_e_deg": 314.7,
+      "elevation_m": -2.7,
+      "site_assessment": {
+        "lat_deg": 11.7,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 11.70°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Cerberus",
+      "lat_deg": 9.7,
+      "lon_e_deg": 161.9,
+      "elevation_m": -2.731,
+      "site_assessment": {
+        "lat_deg": 9.7,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 9.70°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Aram Chaos",
+      "lat_deg": 2.44,
+      "lon_e_deg": 340.27,
+      "elevation_m": -3400.0,
+      "site_assessment": {
+        "lat_deg": 2.44,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 2.44°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Meridiani Planum",
+      "lat_deg": 0.5,
+      "lon_e_deg": 355.5,
+      "elevation_m": -1.306,
+      "site_assessment": {
+        "lat_deg": 0.5,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 0.50°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Firsoff Crater",
+      "lat_deg": 0.0,
+      "lon_e_deg": 352.0,
+      "elevation_m": -1.846,
+      "site_assessment": {
+        "lat_deg": 0.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 0.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "(No site location) Martian Halite",
+      "lat_deg": 0.0,
+      "lon_e_deg": 0.0,
+      "elevation_m": 0.0,
+      "site_assessment": {
+        "lat_deg": 0.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 0.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "(Method) Holden Crater & Eberswalde",
+      "lat_deg": 0.0,
+      "lon_e_deg": 0.0,
+      "elevation_m": 0.0,
+      "site_assessment": {
+        "lat_deg": 0.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 0.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "(Method)  Gale & Jezero & Eberswalde",
+      "lat_deg": 0.0,
+      "lon_e_deg": 0.0,
+      "elevation_m": 0.0,
+      "site_assessment": {
+        "lat_deg": 0.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at 0.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Hills Zephyria Planum",
+      "lat_deg": -1.37,
+      "lon_e_deg": 157.135,
+      "elevation_m": -2.674,
+      "site_assessment": {
+        "lat_deg": -1.37,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -1.37°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Sinus Meridiani",
+      "lat_deg": -2.3,
+      "lon_e_deg": 353.6,
+      "elevation_m": -0.991,
+      "site_assessment": {
+        "lat_deg": -2.3,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -2.30°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Meridiani Planum",
+      "lat_deg": -3.08,
+      "lon_e_deg": 354.46,
+      "elevation_m": -1574.0,
+      "site_assessment": {
+        "lat_deg": -3.08,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -3.08°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Eastern Valles Marineris",
+      "lat_deg": -3.95,
+      "lon_e_deg": 324.8,
+      "elevation_m": -3.9,
+      "site_assessment": {
+        "lat_deg": -3.95,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -3.95°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Gale Crater",
+      "lat_deg": -4.5,
+      "lon_e_deg": 137.5,
+      "elevation_m": -4.519,
+      "site_assessment": {
+        "lat_deg": -4.5,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -4.50°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Gale Crater",
+      "lat_deg": -4.64,
+      "lon_e_deg": 137.12,
+      "elevation_m": -2.0,
+      "site_assessment": {
+        "lat_deg": -4.64,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -4.64°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Gale Crater",
+      "lat_deg": -4.74,
+      "lon_e_deg": 137.087,
+      "elevation_m": -4.519,
+      "site_assessment": {
+        "lat_deg": -4.74,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -4.74°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Noctis Landing",
+      "lat_deg": -6.45,
+      "lon_e_deg": 267.398,
+      "elevation_m": 7.971,
+      "site_assessment": {
+        "lat_deg": -6.45,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -6.45°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Coprates Chasma",
+      "lat_deg": -11.76,
+      "lon_e_deg": 293.4,
+      "elevation_m": -4.744,
+      "site_assessment": {
+        "lat_deg": -11.76,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -11.76°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Melas Chasma",
+      "lat_deg": -12.0,
+      "lon_e_deg": 290.0,
+      "elevation_m": -4.788,
+      "site_assessment": {
+        "lat_deg": -12.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -12.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Apollinaris Sulci",
+      "lat_deg": -12.623,
+      "lon_e_deg": 177.021,
+      "elevation_m": -2142.0,
+      "site_assessment": {
+        "lat_deg": -12.623,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -12.62°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Apollinaris Sulci",
+      "lat_deg": -13.0,
+      "lon_e_deg": 175.0,
+      "elevation_m": -1.361,
+      "site_assessment": {
+        "lat_deg": -13.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -13.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Huygens Crater",
+      "lat_deg": -13.5,
+      "lon_e_deg": 55.5,
+      "elevation_m": 1.319,
+      "site_assessment": {
+        "lat_deg": -13.5,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -13.50°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Gusev Crater",
+      "lat_deg": -14.574,
+      "lon_e_deg": 175.462,
+      "elevation_m": -1.5,
+      "site_assessment": {
+        "lat_deg": -14.574,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -14.57°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Equatorial Vallis Marineris",
+      "lat_deg": -18.83,
+      "lon_e_deg": 310.79,
+      "elevation_m": 1.218,
+      "site_assessment": {
+        "lat_deg": -18.83,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -18.83°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Hadriacus Palus",
+      "lat_deg": -26.84,
+      "lon_e_deg": 77.47,
+      "elevation_m": -2.649,
+      "site_assessment": {
+        "lat_deg": -26.84,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -26.84°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Southern Nectaris Fossae",
+      "lat_deg": -28.88,
+      "lon_e_deg": 300.29,
+      "elevation_m": 1.9,
+      "site_assessment": {
+        "lat_deg": -28.88,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -28.88°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Columbus Crater",
+      "lat_deg": -29.0,
+      "lon_e_deg": 194.0,
+      "elevation_m": 0.902,
+      "site_assessment": {
+        "lat_deg": -29.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -29.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Ausonia Cavus",
+      "lat_deg": -32.0,
+      "lon_e_deg": 96.5,
+      "elevation_m": -2.71,
+      "site_assessment": {
+        "lat_deg": -32.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -32.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Hellas Basin",
+      "lat_deg": -35.5,
+      "lon_e_deg": 94.0,
+      "elevation_m": -2.594,
+      "site_assessment": {
+        "lat_deg": -35.5,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -35.50°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Hale Crater",
+      "lat_deg": -35.548,
+      "lon_e_deg": 323.466,
+      "elevation_m": -1.941,
+      "site_assessment": {
+        "lat_deg": -35.548,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -35.55°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Noachis Terra",
+      "lat_deg": -37.33,
+      "lon_e_deg": 350.648,
+      "elevation_m": 1.21,
+      "site_assessment": {
+        "lat_deg": -37.33,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -37.33°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Hellas Rim",
+      "lat_deg": -39.0,
+      "lon_e_deg": 102.0,
+      "elevation_m": -0.381,
+      "site_assessment": {
+        "lat_deg": -39.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -39.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Eastern Hellas",
+      "lat_deg": -40.0,
+      "lon_e_deg": 104.0,
+      "elevation_m": 0.471,
+      "site_assessment": {
+        "lat_deg": -40.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -40.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Newton Crater",
+      "lat_deg": -40.5,
+      "lon_e_deg": 200.5,
+      "elevation_m": -1.088,
+      "site_assessment": {
+        "lat_deg": -40.5,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -40.50°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    },
+    {
+      "name": "Copernicus Crater",
+      "lat_deg": -49.0,
+      "lon_e_deg": 191.0,
+      "elevation_m": 0.2,
+      "site_assessment": {
+        "lat_deg": -49.0,
+        "status": "no_data",
+        "verdict": "INSUFFICIENT_DATA",
+        "warnings": [
+          "No regional data at -49.00°: the fit covers northern latitudes from 20°N only"
+        ],
+        "tools": {}
+      }
+    }
+  ],
+  "skyfall": {
+    "source": "NASA SkyFall mission information package (Sep 2026), p. 8-9; https://science.nasa.gov/mission/skyfall/",
+    "reference_site": {
+      "name": "SkyFall reference site AP-105 (Arcadia Planitia)",
+      "lat_deg": 43.33,
+      "lon_e_deg": 198.52,
+      "elevation_m": null,
+      "site_assessment": {
+        "lat_deg": 43.33,
+        "status": "ok",
+        "median_depth_m": 1.1408,
+        "median_depth_90_m": [
+          0.8925,
+          1.4583
+        ],
+        "sd_log_total": 0.6395,
+        "warnings": [
+          "Assumes excavation depth = 0.1 x crater diameter"
+        ],
+        "tools": {
+          "neutron_spectrometer": {
+            "depth_m": 0.6,
+            "p_ice": 0.1575,
+            "p_ice_90": [
+              0.0766,
+              0.2616
+            ],
+            "verdict": "NO_GO"
+          },
+          "gpr": {
+            "depth_m": 10.0,
+            "p_ice": 0.9997,
+            "p_ice_90": [
+              0.999,
+              0.9999
+            ],
+            "verdict": "GO"
+          },
+          "core_drill": {
+            "depth_m": 1.0,
+            "p_ice": 0.4184,
+            "p_ice_90": [
+              0.272,
+              0.5726
+            ],
+            "verdict": "CONDITIONAL"
+          },
+          "skyfall_radar": {
+            "depth_m": 3.0,
+            "p_ice": 0.9347,
+            "p_ice_90": [
+              0.877,
+              0.9744
+            ],
+            "verdict": "GO",
+            "precursor": true
+          }
+        },
+        "nearby_impacts": {
+          "window_deg": [
+            10.0,
+            30.0
+          ],
+          "n": 37,
+          "ice": 10,
+          "expected_ice": 6.3293,
+          "z": 1.9758
+        },
+        "verdict": "GO",
+        "min_p": 0.5
+      }
+    },
+    "candidate_regions": [
+      "Arcadia",
+      "Deuteronilus",
+      "Utopia",
+      "Phlegra",
+      "Erebus"
+    ],
+    "site_proposals_due": "2026-12-01"
+  }
+}
