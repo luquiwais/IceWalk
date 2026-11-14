@@ -10,10 +10,10 @@ import { SiteScene, type SiteSceneHandle, type SiteLayers, type SiteProjection, 
 import { type Insets } from "@/components/site/camera";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
 import { useIceMap } from "@/lib/use-ice-map";
-import { ICE_MAP_MODES, renderDataUrl, type IceMapMode } from "@/lib/ice-map";
+import { ICE_MAP_MODES, renderDataUrl, type IceMap, type IceMapMode } from "@/lib/ice-map";
 import { IceLegend } from "./ice-legend";
-import { bearing, demoPlan, demoReplan, evaName, measuringTool, nextStation, stationBlock, stationById, toolName, traverseHeading, type Measurement, type Plan, type Station } from "@/lib/plan";
-import { formatOdds } from "@/lib/format";
+import { bearing, demoPlan, highestAlert, timelineViolations, demoReplan, evaName, measuringTool, nextStation, stationBlock, stationById, toolName, traverseHeading, type Measurement, type Plan, type Station } from "@/lib/plan";
+import { formatNumber, formatOdds } from "@/lib/format";
 import { MissionBrief } from "./mission-brief";
 import { MissionStatus } from "./mission-status";
 import { PlanTimeline } from "./plan-timeline";
@@ -23,11 +23,12 @@ import { ScienceView } from "./science-view";
 import { ReplanSummary } from "./replan-summary";
 import { sceneInsets } from "./layout";
 import { GlobeEntry } from "./globe-entry";
+import { SiteBrief } from "./site-brief";
 import { TraverseMinimap } from "./traverse-minimap";
 import { HABITAT_XY } from "@/components/site/site-data";
 
-type View = "planning" | "ev" | "science";
-const VIEWS = [{ value: "planning", label: "Planning", icon: <MapIcon /> }, { value: "ev", label: "EV", icon: <Footprints /> }, { value: "science", label: "Science", icon: <FlaskConical /> }];
+type View = "site" | "planning" | "ev" | "science";
+const VIEWS = [{ value: "site", label: "Site", icon: <Globe /> }, { value: "planning", label: "Planning", icon: <MapIcon /> }, { value: "ev", label: "EV", icon: <Footprints /> }, { value: "science", label: "Science", icon: <FlaskConical /> }];
 const COMPACT_QUERY = "(max-width: 759px)";
 /** EV looks along the leg ahead; web-design.md, "EV y Science": rotateX(58deg). */
 const EV_PITCH_DEG = 58;
@@ -40,10 +41,10 @@ function subscribeCompact(listener: () => void) {
 export function PlanningView() {
   const compact = useSyncExternalStore(subscribeCompact, () => window.matchMedia?.(COMPACT_QUERY).matches ?? false, () => false);
   const [view, setView] = useState<View>("planning");
+  const globe = view === "site";
   const [stationId, setStationId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [mapFocus, setMapFocus] = useState(false);
-  const [globe, setGlobe] = useState(false);
   const [layers, setLayers] = useState<SiteLayers>({ grid: false, rings: false });
   const [mapMode, setMapMode] = useState<IceMapMode | null>("potential");
   const [approved, setApproved] = useState(false);
@@ -123,7 +124,7 @@ export function PlanningView() {
     if (hadFocus) requestAnimationFrame(() => { const target = panelOrigin.current; if (target?.isConnected) target.focus(); else contentRef.current?.focus(); panelOrigin.current = null; });
   }
   function switchView(value: string) { setView(value as View); setMapFocus(false); panelOrigin.current = null; if (value === "science") sceneRef.current?.fit(); }
-  const enterSite = useCallback(() => { setGlobe(false); requestAnimationFrame(() => globeButtonRef.current?.focus()); }, []);
+  const enterSite = useCallback(() => { setView("planning"); requestAnimationFrame(() => globeButtonRef.current?.focus()); }, []);
   function reset() { session.reset(); setStationId(null); setApproved(false); setAnnouncement("Session reset to the nominal plan."); }
   async function logMeasurement(target: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") {
     if (pending) return;
@@ -134,30 +135,32 @@ export function PlanningView() {
     setApproved(false); setStationId(null);
     setAnnouncement(`${result === "no_ice" ? "No ice" : result === "ice" ? "Ice" : "Inconclusive"} recorded at ${target.id}. ${outcome === "replanned" ? "Replanned traverse ready for review." : "Nominal traverse retained."}`);
   }
-  const title = view === "ev" ? "Surface operations" : view === "science" ? "Science review" : station ? `Station ${station.id}` : evaName(plan);
+  const title = view === "site" ? "Site" : view === "ev" ? "Surface operations" : view === "science" ? "Science review" : station ? `Station ${station.id}` : evaName(plan);
   return <main ref={rootRef} className="mission-app" data-view={view} data-focused={mapFocus} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToBrief(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
     <div className="mission-scene" inert={globe}><SiteScene ref={sceneRef} plan={plan} previousPlan={session.previous ?? undefined} measurements={session.measurements} projection={projection} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} /></div>
-    {globe ? <GlobeEntry plan={plan} onEnter={enterSite} /> : <>
+    {globe ? <div className="mission-site-globe"><GlobeEntry plan={plan} onEnter={enterSite} /></div> : null}
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
-    <div className="mission-status-position" ref={statusRef}><Window className="mission-status-window"><MissionStatus plan={plan} elapsedMin={view === "planning" ? 0 : elapsedMin} execution={view !== "planning"} session={session} /></Window></div>
+    {globe ? null : <div className="mission-status-position" ref={statusRef}><Window className="mission-status-window"><MissionStatus plan={plan} elapsedMin={view === "planning" ? 0 : elapsedMin} execution={view !== "planning"} session={session} /></Window></div>}
     <div className="mission-tabs" ref={tabsRef}><TabBar label="Mission view" layout={compact ? "compact" : "regular"} value={view} tabs={VIEWS} onValueChange={switchView} /></div>
-    <div className="mission-camera"><IconButton ref={globeButtonRef} variant="glass" label="View Mars" onClick={() => setGlobe(true)}><Globe /></IconButton>{view !== "ev" ? <><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></> : null}</div>
+    <div className="mission-camera"><IconButton ref={globeButtonRef} variant="glass" label="View Mars" onClick={() => switchView("site")}><Globe /></IconButton>{view !== "ev" && !globe ? <><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></> : null}</div>
     <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Contextual planning window">
       <header className="mission-panel-heading">{station && view === "planning" ? <IconButton label="Back to brief" variant="plain" onClick={backToBrief}><ArrowLeft /></IconButton> : null}<Title2 as="h2">{title}</Title2><IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton></header>
       <div className="mission-panel-scroll" tabIndex={-1} ref={contentRef}>
         <WindowContent contentKey={view === "planning" ? stationId ?? "brief" : view} direction={station ? "forward" : "back"}>
-        {session.previous && last ? <ReplanSummary before={session.previous} after={plan} measurement={last} onRevert={reset} /> : null}
+        {view === "site" ? <SiteBrief plan={plan} /> : null}
+        {session.previous && last && !globe ? <ReplanSummary before={session.previous} after={plan} measurement={last} onRevert={reset} /> : null}
         {view === "planning" ? station ? <section className="mission-stack" aria-label="Station detail"><Footnote>{formatOdds(station.p_ice)} chance of ice at the STM threshold</Footnote><StationDetail plan={plan} station={station} /><MeasurementForm key={station.id} compact station={station} pending={pending} onLog={logMeasurement} /></section>
           : <MissionBrief plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} planSource={session.source} onSelect={selectStation} onHover={hoverStation} />
-          : view === "ev" ? <EVView plan={plan} measurements={session.measurements} pending={pending} onLog={logMeasurement} onReview={() => switchView("science")} />
-          : <ScienceView plan={plan} measurements={session.measurements} approved={approved} onApprove={() => { setApproved(true); setAnnouncement("Plan approved locally in this session."); }} onReset={reset} />}
+          : view === "site" ? null : view === "ev" ? <EVView plan={plan} measurements={session.measurements} pending={pending} onLog={logMeasurement} onReview={() => switchView("science")} />
+          : <>{iceMap.map ? <UncertaintyPair map={iceMap.map} /> : null}<ScienceView plan={plan} measurements={session.measurements} approved={approved} onApprove={() => { setApproved(true); setAnnouncement("Plan approved locally in this session."); }} onReset={reset} /></>}
         </WindowContent>
       </div>
     </Window></div></WindowMotion>
     {mapFocus ? <Button ref={reopenRef} variant="glass" className="mission-show-panel" onClick={() => setMapFocus(false)}>Show planning window</Button> : null}
-    {view === "ev" && !compact && next && direction ? <div className="mission-destination"><Footnote>Next station · {next.order} · {next.id}</Footnote><Title2>{direction.distanceM >= 1 ? `${Math.round(direction.distanceM)} m · ${direction.label}` : "On station"}</Title2><Footnote>{toolName(measuringTool(next))}</Footnote><Footnote>Simulated position · heading-up oblique of the flat ortho</Footnote></div> : null}
-    <div className="mission-map-tools" ref={toolsRef}>
+    {view === "ev" && !compact && next && direction ? <div className="mission-destination"><Footnote>Next station · {next.order} · {next.id}</Footnote><div className="mission-hud-row"><span className="mission-compass" aria-hidden style={{ "--hud-rot": `${direction.deg - (heading ?? 0)}deg` } as React.CSSProperties}><i /></span><Title2>{direction.distanceM >= 1 ? `${Math.round(direction.distanceM)} m · ${direction.label}` : "On station"}</Title2></div><Footnote>{toolName(measuringTool(next))}</Footnote>{plan.summary.min_walkback_margin_min != null ? <p className="mission-turnback"><span>Turn back in</span><strong>{formatNumber(plan.summary.min_walkback_margin_min, 0)} min</strong><span>min walkback margin, planned</span></p> : null}<Footnote>Simulated position · heading-up oblique of the flat ortho</Footnote></div> : null}
+    {view === "ev" && !compact ? <EvAlert plan={plan} /> : null}
+    {globe ? null : <><div className="mission-map-tools" ref={toolsRef}>
       {view === "ev" ? <TraverseMinimap plan={plan} measurements={session.measurements} position={position} headingDeg={heading} />
         : <section className="mission-layer-position" aria-label="Map layers"><Window className="mission-layer-window"><Button variant="plain" size="small" disabled>HiRISE imagery</Button><Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button><Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button>{iceMap.map ? ICE_MAP_MODES.map((m) => <Button key={m.value} variant="plain" size="small" aria-pressed={mapMode === m.value} onClick={() => setMapMode((cur) => (cur === m.value ? null : m.value))}>{m.label}</Button>) : <Button variant="plain" size="small" disabled>{iceMap.loading ? "Ice map · loading" : "Ice map unavailable"}</Button>}</Window></section>}
       <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
@@ -167,7 +170,23 @@ export function PlanningView() {
         <span>Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>
       </div>
     </div>
-    <div className="mission-timeline-position" ref={timelineRef}><Window className="mission-timeline-window"><PlanTimeline plan={plan} previousPlan={session.previous ?? undefined} stationId={sceneStationId} hoveredId={hoveredId} elapsedMin={view === "planning" ? undefined : elapsedMin} onSelectStation={selectStation} onHoverStation={hoverStation} /></Window></div>
-    </>}
+    <div className="mission-timeline-position" ref={timelineRef}><Window className="mission-timeline-window"><PlanTimeline plan={plan} previousPlan={session.previous ?? undefined} stationId={sceneStationId} hoveredId={hoveredId} elapsedMin={view === "planning" ? undefined : elapsedMin} onSelectStation={selectStation} onHoverStation={hoverStation} /></Window></div></>}
   </main>;
+}
+
+/** EV alert band (design EVA tab): the highest plan alert, or nominal. Color only for alert levels. */
+function EvAlert({ plan }: { plan: Plan }) {
+  const alert = highestAlert([...(plan.alerts ?? []), ...timelineViolations(plan)]);
+  return <div className="mission-ev-alert" data-level={alert?.level ?? "nominal"}><strong>{alert?.level ?? "nominal"}</strong><span>{alert?.message ?? "No active alerts"}</span></div>;
+}
+
+/** Review (design REVIEW tab): the model's uncertainty now and how this session's data moved the map. */
+function UncertaintyPair({ map }: { map: IceMap }) {
+  const panes = (["uncertainty", "change"] as const).map((mode) => ({ mode, url: renderDataUrl(map, mode), label: ICE_MAP_MODES.find((m) => m.value === mode)?.label }));
+  return <section aria-label="Site uncertainty" className="mission-uncertainty">
+    {panes.map((p) => p.url ? <figure key={p.mode}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- data URL raster, nothing to optimize */}
+      <img src={p.url} alt={`${p.label} map of the site`} />
+      <figcaption>{p.label}</figcaption></figure> : null)}
+  </section>;
 }

@@ -177,3 +177,43 @@
 /* EV: glove-sized targets for results and checklist (design README: operable with gloves). */
 .mission-app[data-view=ev] .mission-result-buttons button { min-height: 64px; font-size: 1.125rem; font-weight: 800; letter-spacing: .02em; border-radius: 6px; }
 .mission-app[data-view=ev] .mission-checklist > * { min-height: 48px; padding: 8px 12px; border-radius: 6px; background: var(--dc-raised); box-shadow: inset 0 0 0 1px var(--dc-line); }
+
+/* SITE view: the globe on the left, the site brief in the right column (design SITE tab). */
+.mission-site-globe { position: absolute; inset: 0; }
+.mission-site-globe .mission-heading { display: none; }
+.mission-site-globe .mission-globe-layers { top: 20px; left: 20px; }
+.mission-site-globe .mission-globe { background: radial-gradient(circle at 50% 50%, #1d1916 0%, var(--dc-bg) 70%); }
+@media (min-width: 760px) {
+  .mission-app .mission-site-globe { top: var(--dc-header); right: var(--dc-col); }
+  .mission-app[data-view=site] .mission-panel-presence { top: var(--dc-header); bottom: 0; }
+  .mission-app[data-view=site] .mission-panel-heading { display: none; }
+}
+.mission-app .mission-kicker { font-family: var(--font-mono); font-size: .625rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dc-muted); }
+.mission-site-title { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+.mission-site-name { font-family: var(--font-display); font-size: 3.5rem; font-weight: 750; font-stretch: 72%; line-height: 1; letter-spacing: -0.01em; }
+.mission-finding { display: flex; flex-direction: column; gap: 12px; padding-top: 18px; border-top: 1px solid var(--dc-line); }
+.mission-finding > div { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.mission-finding > div > span { display: flex; flex-direction: column; gap: 4px; color: var(--dc-muted); line-height: 1.4; font-size: .875rem; }
+.mission-finding strong { font-family: var(--font-display); font-size: 2.75rem; font-weight: 750; font-stretch: 72%; line-height: 1; color: var(--color-advisory); }
+.mission-limits { display: flex; flex-direction: column; gap: 8px; padding: 16px; background: var(--dc-panel); border: 1px dashed var(--dc-line-strong); border-radius: 4px; }
+.mission-limits > .mission-kicker { color: var(--color-caution); }
+.mission-limits [data-text-style=body] { font-size: .875rem; line-height: 1.5; color: var(--dc-ink-2); }
+@media (min-width: 760px) { .mission-app[data-view=site] .mission-camera { display: none; } }
+
+/* EVA HUD (design EVA tab): alert band, compass toward the next station, turn-back margin. */
+.mission-ev-alert { position: absolute; top: calc(var(--dc-header, 64px) + 1rem); right: calc(var(--dc-col, 400px) + var(--mission-edge)); max-width: 30rem; display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 6px; background: #1a2420; color: #8fd694; font-size: 1.05rem; font-weight: 700; }
+.mission-ev-alert > strong { font-family: var(--font-mono); font-size: .8125rem; letter-spacing: .08em; text-transform: uppercase; }
+.mission-ev-alert[data-level=advisory] { background: var(--color-advisory); color: var(--dc-bg); }
+.mission-ev-alert[data-level=caution] { background: var(--color-caution); color: var(--dc-bg); }
+.mission-ev-alert[data-level=warning] { background: var(--color-warning); color: var(--dc-bg); }
+.mission-hud-row { display: flex; align-items: center; gap: 16px; }
+.mission-compass { position: relative; flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--dc-line-strong); background: color-mix(in srgb, var(--dc-bg) 70%, transparent); }
+.mission-compass > i { position: absolute; inset: 8px; rotate: var(--hud-rot, 0deg); background: var(--dc-ink); clip-path: polygon(50% 0, 78% 55%, 58% 55%, 58% 100%, 42% 100%, 42% 55%, 22% 55%); }
+.mission-turnback { margin: 8px 0 0; display: flex; flex-direction: column; gap: 2px; }
+.mission-turnback > span { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--dc-ink-2); }
+.mission-turnback > strong { font-family: var(--font-mono); font-size: 2.5rem; line-height: 1; font-weight: 700; color: var(--dc-ink); }
+@media (min-width: 760px) { .mission-app .mission-destination > :last-child { display: none; } }
+.mission-uncertainty { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mission-uncertainty figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.mission-uncertainty img { width: 100%; aspect-ratio: 1; object-fit: cover; image-rendering: pixelated; border: 1px solid var(--dc-line); border-radius: 4px; background: var(--dc-panel); }
+.mission-uncertainty figcaption { font-family: var(--font-mono); font-size: .625rem; letter-spacing: .12em; text-transform: uppercase; color: var(--dc-muted); }
