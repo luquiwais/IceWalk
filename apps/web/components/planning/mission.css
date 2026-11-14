@@ -253,3 +253,6 @@
 .mission-verdict { font-weight: 600; }
 .mission-verdict[data-verdict="CONDITIONAL"] { color: var(--color-caution, #d9a400); }
 .mission-verdict[data-verdict="NO_GO"], .mission-verdict[data-verdict="INSUFFICIENT_DATA"] { color: var(--color-warning, #e5484d); }
+
+/* Globe layer controls: top left, under the heading. */
+.mission-globe-layers { position: absolute; top: 96px; left: 24px; display: flex; flex-wrap: wrap; gap: 8px; max-width: min(560px, calc(100% - 48px)); align-items: center; }

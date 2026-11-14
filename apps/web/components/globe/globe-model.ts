@@ -45,6 +45,29 @@ export const CESIUM_MARS_CREDIT =
 export const TREK_MARS_CREDIT =
   "Imagery: NASA/USGS Astrogeology Science Center, Viking MDIM 2.1 colorized mosaic via NASA Trek";
 
+/**
+ * NASA Mars Trek overlays (official challenge resource), same WMTS grid as the basemap.
+ * Verified tile URLs on 2026-11-14 (docs/research/hackaton-2026.md).
+ */
+export type GlobeOverlay = "none" | "themis_day" | "mola_shade";
+export const TREK_OVERLAYS: Record<Exclude<GlobeOverlay, "none">, { label: string; url: string; maximumLevel: number; credit: string }> = {
+  themis_day: {
+    label: "THEMIS day IR",
+    url: "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/{z}/{y}/{x}.png",
+    maximumLevel: 9,
+    credit: "THEMIS Day IR 100 m controlled mosaic: NASA/JPL-Caltech/ASU, via NASA Mars Trek",
+  },
+  mola_shade: {
+    label: "MOLA relief",
+    url: "https://trek.nasa.gov/tiles/Mars/EQ/Mars_MGS_MOLA_ClrShade_merge_global_463m/1.0.0/default/default028mm/{z}/{y}/{x}.jpg",
+    maximumLevel: 7,
+    credit: "MOLA color shaded relief 463 m: NASA/JPL/GSFC, via NASA Mars Trek",
+  },
+};
+
+/** A NASA Exploration Zone or reference site, with the probability that drives its shade. */
+export type GlobeZone = { id: string; lonlat: LonLat; label: string; p?: number; highlight?: boolean };
+
 export const DEFAULT_FOCUS_HEIGHT_M = 12_000;
 /** Camera height that frames the whole planet (radius ~3.39e6 m). */
 export const GLOBE_OVERVIEW_HEIGHT_M = 14_000_000;
