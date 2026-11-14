@@ -23,10 +23,10 @@
       ],
       "tasks": {
         "EV1": [
-          "Run Hand core drill"
+          "Run Powered hand core drill"
         ],
         "EV2": [
-          "Assist Hand core drill",
+          "Assist Powered hand core drill",
           "Monitor consumables and walkback margin"
         ]
       },
@@ -60,10 +60,10 @@
       ],
       "tasks": {
         "EV1": [
-          "Run Hand core drill"
+          "Run Powered hand core drill"
         ],
         "EV2": [
-          "Assist Hand core drill",
+          "Assist Powered hand core drill",
           "Monitor consumables and walkback margin"
         ]
       },
@@ -101,11 +101,11 @@
       ],
       "tasks": {
         "EV1": [
-          "Run Hand core drill",
+          "Run Powered hand core drill",
           "Run Handheld camera / spectrometer"
         ],
         "EV2": [
-          "Assist Hand core drill",
+          "Assist Powered hand core drill",
           "Run Clean sample containers",
           "Monitor consumables and walkback margin"
         ]
@@ -140,10 +140,10 @@
       ],
       "tasks": {
         "EV1": [
-          "Run Hand core drill"
+          "Run Powered hand core drill"
         ],
         "EV2": [
-          "Assist Hand core drill",
+          "Assist Powered hand core drill",
           "Monitor consumables and walkback margin"
         ]
       },
@@ -177,10 +177,10 @@
       ],
       "tasks": {
         "EV1": [
-          "Run Hand core drill"
+          "Run Powered hand core drill"
         ],
         "EV2": [
-          "Assist Hand core drill",
+          "Assist Powered hand core drill",
           "Monitor consumables and walkback margin"
         ]
       },
@@ -214,10 +214,10 @@
       ],
       "tasks": {
         "EV1": [
-          "Run Hand core drill"
+          "Run Powered hand core drill"
         ],
         "EV2": [
-          "Assist Hand core drill",
+          "Assist Powered hand core drill",
           "Monitor consumables and walkback margin"
         ]
       },
@@ -457,7 +457,27 @@
             "E02S23",
             "E01S23"
           ],
-          "rationale": "Any Hand core drill result to 1 m leads to the same next stations: this measurement barely moves the ice map where they are."
+          "rationale": "Any Powered hand core drill result to 1 m leads to the same next stations: this measurement barely moves the ice map where they are."
+        }
+      ]
+    },
+    {
+      "station_id": "E04S22",
+      "decide_by_min": 350.9,
+      "hard_stop": "Return to the habitat if the walkback margin reaches 0, on a solar particle event warning (DONKI), or at the decide-by time.",
+      "default_option": 1,
+      "options": [
+        {
+          "rank": 1,
+          "if_result": "any",
+          "probability": null,
+          "next_station_ids": [
+            "E04S23",
+            "E03S23",
+            "E02S23",
+            "E01S23"
+          ],
+          "rationale": "Any Powered hand core drill result to 1 m leads to the same next stations: this measurement barely moves the ice map where they are."
         }
       ]
     }
@@ -466,13 +486,13 @@
     {
       "tool": "core_drill",
       "count": 1,
-      "mass_kg": null,
+      "mass_kg": 13.6,
       "justification": "Objectives 1, 2, 3"
     },
     {
       "tool": "camera_spectrometer",
       "count": 1,
-      "mass_kg": null,
+      "mass_kg": 2.5,
       "justification": "Objectives 1, 2, 3"
     },
     {
@@ -484,7 +504,7 @@
     {
       "tool": "gpr",
       "count": 1,
-      "mass_kg": 3,
+      "mass_kg": 3.455,
       "justification": "Objective 1: measures ice_presence while walking"
     }
   ],
@@ -494,12 +514,12 @@
     "max_distance_from_habitat_km": 0.22,
     "min_walkback_margin_min": 33.0,
     "dose_estimate_msv": 0.163,
-    "expected_uncertainty_reduction": 0.0,
-    "walkback_caution_min": 15.0,
+    "expected_uncertainty_reduction": 0.0011,
     "crew": 2,
     "is_mock": false,
     "ice_threshold_m": 3.0,
-    "craters_in_model": 349
+    "craters_in_model": 349,
+    "walkback_caution_min": 15.0
   },
   "alerts": [
     {
@@ -519,7 +539,7 @@
     "sd_log_total": 0.6706,
     "warnings": [
       "Assumes excavation depth = 0.1 x crater diameter",
-      "No ice-exposing impact south of 39.1°N: depth extrapolated from the latitude trend",
+      "No ice-exposing impact south of 39.1\u00b0N: depth extrapolated from the latitude trend",
       "Nearby fresh impacts show more ice than the latitude trend predicts (7 vs 3.4): ice is likely shallower here"
     ],
     "tools": {

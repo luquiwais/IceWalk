@@ -87,7 +87,9 @@ describe("mission framing", () => {
   });
 
   it("finds the next bingo and the planned window of a station", () => {
-    expect(nextBingo(demoPlan)).toMatchObject({ station_id: first.id, decide_by_min: 354 });
+    // The earliest decision point of the plan, whatever the planner exported.
+    const earliest = [...(demoPlan.decision_points ?? [])].sort((x, y) => x.decide_by_min - y.decide_by_min)[0];
+    expect(nextBingo(demoPlan)).toMatchObject({ station_id: earliest.station_id, decide_by_min: earliest.decide_by_min });
     expect(nextBingo(demoPlan, 400)).toBeUndefined();
     expect(stationBlock(demoPlan, first.id)).toMatchObject({ t_start_min: 45, t_end_min: 85 });
   });

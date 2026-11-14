@@ -33,7 +33,8 @@ OUT = ROOT / "apps" / "web" / "mock"
 if "--maps-only" in sys.argv:
     from app.main import DEFAULT_STM, _map  # noqa: E402
 
-    mock = {n: json.loads((OUT / f"{n}.json").read_text()) for n in ("plan", "replan", "measurement")}
+    names = ("plan", "replan", "measurement")
+    mock = {n: json.loads((OUT / f"{n}.json").read_text()) for n in names}
     nominal = _map(DEFAULT_STM, {"plan": mock["plan"], "measurements": []})
     after = _map(DEFAULT_STM, {"plan": mock["replan"], "measurements": [mock["measurement"]]})
     (OUT / "map.json").write_text(json.dumps(nominal))  # sin sangría: cientos de kB

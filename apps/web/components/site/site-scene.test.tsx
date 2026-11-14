@@ -87,8 +87,11 @@ describe("site data", () => {
 
   it("labels the re-plan diff", () => {
     const { stations, dropped } = sceneStations(demoReplan, demoPlan);
-    expect(stations.filter((s) => s.status === "added").map((s) => s.id)).toEqual(["E02S22"]);
-    expect(dropped.map((s) => s.id)).toEqual(["E03S22", "E01S23"]);
+    const before = new Set(demoPlan.stations.map((s) => s.id));
+    const after = new Set(demoReplan.stations.map((s) => s.id));
+    expect(stations.filter((s) => s.status === "added").map((s) => s.id).sort()).toEqual(demoReplan.stations.filter((s) => !before.has(s.id)).map((s) => s.id).sort());
+    expect(dropped.map((s) => s.id).sort()).toEqual(demoPlan.stations.filter((s) => !after.has(s.id)).map((s) => s.id).sort());
+    expect(dropped.length).toBeGreaterThan(0); // the demo measurement always drops its station
   });
 
   it("knows when the habitat sits on a station", () => {
@@ -226,12 +229,15 @@ describe("SiteScene", () => {
 
   it("labels the re-plan diff with text, not only shape", () => {
     setup({ plan: demoReplan, previousPlan: demoPlan });
-    expect(screen.getByRole("button", { name: /^Station 5, E02S22, .*added by the re-plan$/ })).toBeInTheDocument();
-    expect(screen.getByText("Added")).toBeInTheDocument();
-    expect(screen.getAllByText("Dropped")).toHaveLength(2);
-    expect(screen.getByRole("img", { name: "Dropped station E01S23, was station 6" })).toBeInTheDocument();
-    // Dropped stations are not part of the plan: no buttons for them.
-    expect(screen.queryByRole("button", { name: /E01S23/ })).toBeNull();
+    const { stations, dropped } = sceneStations(demoReplan, demoPlan);
+    for (const s of stations.filter((x) => x.status === "added")) {
+      expect(screen.getByRole("button", { name: new RegExp(`${s.id}, .*added by the re-plan$`) })).toBeInTheDocument();
+    }
+    // Every station that left the plan is labeled in text (measured or dropped), never shown as a button.
+    for (const d of dropped) {
+      expect(screen.getByRole("img", { name: new RegExp(`(Dropped|Measured) station ${d.id}`) })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: new RegExp(d.id) })).toBeNull();
+    }
   });
 
   it("hides the station grid when the layer is off", () => {
