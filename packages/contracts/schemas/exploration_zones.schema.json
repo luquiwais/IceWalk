@@ -39,6 +39,9 @@
           },
           "hypothetical": {
             "type": "boolean"
+          },
+          "precursor": {
+            "type": "boolean"
           }
         }
       }
@@ -55,6 +58,34 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/zone"
+      }
+    },
+    "skyfall": {
+      "type": "object",
+      "description": "SkyFall (NASA): helicópteros con radar para hielo a 0.5-3 m; sitio de aterrizaje a definir en talleres. Tarjeta en su sitio de referencia y regiones evaluadas",
+      "required": [
+        "source",
+        "reference_site",
+        "candidate_regions"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "reference_site": {
+          "$ref": "#/$defs/zone"
+        },
+        "candidate_regions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "site_proposals_due": {
+          "type": "string",
+          "format": "date"
+        }
       }
     }
   },
@@ -172,6 +203,9 @@
                   "CONDITIONAL",
                   "NO_GO"
                 ]
+              },
+              "precursor": {
+                "type": "boolean"
               }
             }
           }

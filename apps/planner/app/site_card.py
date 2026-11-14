@@ -13,7 +13,7 @@ import copy
 from functools import lru_cache
 from typing import Any
 
-from gp.regional import site_assessment
+from gp.regional import PRECURSOR_TOOLS, site_assessment
 
 from .contracts import grid, tool_catalog
 
@@ -36,7 +36,12 @@ def subsurface_tools() -> dict[str, float]:
 
 @lru_cache(maxsize=8)
 def _card(lat_deg: float, lon_e_deg: float, min_p: float | None) -> dict[str, Any]:
-    return _round(site_assessment(lat_deg, subsurface_tools(), min_p=min_p, lon_e_deg=lon_e_deg))
+    tools = {**subsurface_tools(), **PRECURSOR_TOOLS}
+    card = site_assessment(lat_deg, tools, min_p=min_p, lon_e_deg=lon_e_deg)
+    for tool_id in PRECURSOR_TOOLS:
+        if tool_id in card["tools"]:
+            card["tools"][tool_id]["precursor"] = True  # radar aéreo previo (SkyFall), no de la EVA
+    return _round(card)
 
 
 def site_card(stm: dict) -> dict[str, Any]:

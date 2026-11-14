@@ -172,7 +172,8 @@
               "depth_m": { "type": "number", "exclusiveMinimum": 0 },
               "p_ice": { "type": "number", "minimum": 0, "maximum": 1 },
               "p_ice_90": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 1 }, "minItems": 2, "maxItems": 2 },
-              "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO"] }
+              "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO"] },
+              "precursor": { "type": "boolean", "description": "Herramienta precursora (radar aéreo de SkyFall), no de la EVA" }
             }
           }
         },
