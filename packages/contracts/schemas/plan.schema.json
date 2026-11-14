@@ -234,6 +234,7 @@
         "margin_before_min": { "type": ["number", "null"] },
         "margin_after_min": { "type": ["number", "null"] },
         "objective_met": { "type": "boolean" },
+        "iv_decision": { "type": "boolean", "description": "Replan grande (mas de la fraccion configurada de estaciones cambia): decide el IV; no es motivo para volver" },
         "recommendation": { "enum": ["continue", "return_to_habitat"] },
         "reasons": { "type": "array", "items": { "type": "string" } },
         "is_assumption": { "type": "boolean" }

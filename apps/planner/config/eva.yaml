@@ -45,9 +45,9 @@ replan_return_changed_fraction:
   value: 0.5
   source: >-
     Sin fuente: si un re-plan cambia más de la mitad de las estaciones (entran o salen, sobre el
-    total de las dos listas), se recomienda volver al hábitat y re-planificar con el IV. NASA
-    re-planifica en tiempo real con el equipo de apoyo (Stevens et al. 2019, BASALT), pero no
-    publica un umbral
+    total de las dos listas), se marca "Large replan: IV decision". No manda a volver: NASA no
+    termina una EVA por un replan grande (Get Aheads, borrado por prioridad, Kagey 2024; replan
+    grande entre EVAs). Stevens et al. 2019 (BASALT) re-planifica con el equipo de apoyo
   assumption: true
 
 map_half_m:

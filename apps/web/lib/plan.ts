@@ -145,6 +145,8 @@ export type ReplanAssessment = {
   margin_before_min?: number | null;
   margin_after_min?: number | null;
   objective_met?: boolean;
+  /** Large replan: the IV decides before going on (not a reason to return). */
+  iv_decision?: boolean;
   recommendation: "continue" | "return_to_habitat";
   reasons: string[];
   is_assumption?: boolean;

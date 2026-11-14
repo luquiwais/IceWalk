@@ -25,7 +25,7 @@ def test_small_change_continues():
 def test_big_change_low_margin_or_warning_returns():
     old = plan(["A", "B", "C", "D"])
     big = replan_check.assess(old, plan(["X", "Y", "Z"]), meas(), STM)
-    assert big["recommendation"] == "return_to_habitat"
+    assert big["recommendation"] == "continue" and big["iv_decision"]  # el IV decide, no se vuelve
     assert big["stations_dropped"] == ["B", "C", "D"] and big["changed_fraction"] == 1.0
     low = replan_check.assess(old, plan(["B", "C"], margin=8), meas(), STM)
     assert low["recommendation"] == "return_to_habitat" and "caution" in low["reasons"][0]

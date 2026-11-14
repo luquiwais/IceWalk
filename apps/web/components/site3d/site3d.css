@@ -145,3 +145,11 @@
   display: flex;
   gap: 8px;
 }
+
+/* Inline rehearsal view (site-3d-stage.tsx), inside the mission layout. */
+.site3d-stage { position: absolute; inset: 0; background: #1a120c; color: #fff; touch-action: none; }
+.site3d-stage .site3d-toolbar { top: calc(var(--dc-header, 5rem) + .75rem); left: var(--mission-edge, 1rem); right: auto; }
+.site3d-stage .site3d-hud { left: var(--mission-edge, 1rem); right: auto; }
+.site3d-stage .site3d-credit { left: var(--mission-edge, 1rem); right: calc(var(--dc-col, 0px) + 2 * var(--mission-edge, 1rem)); }
+.site3d-stage .site3d-toolbar { padding: 6px; border-radius: 14px; background: rgb(10 10 12 / 0.45); backdrop-filter: blur(8px); z-index: 2; }
+.site3d-stage .site3d-credit { padding: 4px 8px; border-radius: 8px; background: rgb(10 10 12 / 0.4); }
