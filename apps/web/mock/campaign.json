@@ -1,0 +1,60 @@
+{
+  "site": "S1094b",
+  "drill_m": 1.0,
+  "stations_per_eva": 6,
+  "evas": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "series": [
+    {
+      "strategy": "blind_drill",
+      "label": "Drill without radar",
+      "p_eva": 0.301,
+      "evas_to_confirm": 3.32,
+      "p_confirmed": [
+        0.301,
+        0.511,
+        0.658,
+        0.761,
+        0.833,
+        0.883
+      ]
+    },
+    {
+      "strategy": "radar_first_50",
+      "label": "Radar first, 50 soundings/EVA",
+      "p_eva": 0.859,
+      "evas_to_confirm": 1.16,
+      "p_confirmed": [
+        0.859,
+        0.98,
+        0.997,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "strategy": "radar_first_20",
+      "label": "Radar first, 20 soundings/EVA",
+      "p_eva": 0.633,
+      "evas_to_confirm": 1.58,
+      "p_confirmed": [
+        0.633,
+        0.865,
+        0.951,
+        0.982,
+        0.993,
+        0.998
+      ]
+    }
+  ],
+  "speedup": 2.9,
+  "is_assumption": true,
+  "source": "Monte Carlo, gp/tool_strategy.py; EVAs assumed independent"
+}

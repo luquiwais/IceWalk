@@ -603,7 +603,7 @@
     }
   ],
   "replan": {
-    "from_plan_id": "plan-96bd39e2",
+    "from_plan_id": "plan-demo0001",
     "trigger": {
       "station_id": "E03S24",
       "result": "no_ice"
@@ -626,7 +626,8 @@
     "reasons": [
       "Changes are within the briefed plan and the walkback margin holds."
     ],
-    "is_assumption": true
+    "is_assumption": true,
+    "iv_decision": false
   },
   "site_assessment": {
     "lat_deg": 35.1105,

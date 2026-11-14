@@ -262,3 +262,43 @@
 
 .mission-cuff-link { align-self: start; font-size: .8125rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; }
 .mission-cuff-link:hover { color: var(--color-label); }
+
+/* Phase flow (phases.tsx): the panel title is the phase question, the footer the next step. */
+.mission-panel-title { display: flex; flex-direction: column; gap: .125rem; min-width: 0; flex: 1; }
+.mission-panel-title [data-text-style=title-2] { font-size: 1.125rem; line-height: 1.25; }
+.mission-next { display: flex; flex-direction: column; gap: .5rem; padding-top: .75rem; margin-top: .25rem; border-top: 1px solid var(--color-separator); }
+.mission-next > button { width: 100%; }
+.mission-text-link { align-self: start; font-size: .8125rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 0; cursor: pointer; }
+.mission-text-link:hover { color: var(--color-label); }
+.mission-check { display: flex; justify-content: space-between; gap: .75rem; width: 100%; }
+.mission-check > strong { font-weight: 600; color: var(--color-label-secondary); font-size: .875rem; white-space: nowrap; }
+.mission-jumps { display: flex; flex-wrap: wrap; gap: .375rem; }
+.mission-reasons { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .25rem; font-size: .875rem; color: var(--color-label-secondary); list-style: square; }
+.mission-sim { align-self: center; font: 700 .6875rem/1 ui-monospace, monospace; letter-spacing: .12em; padding: .25rem .4rem; border-radius: 4px; border: 1px solid var(--color-caution, #f0bf4f); color: var(--color-caution, #f0bf4f); text-shadow: none; }
+
+/* Ice map legend (ice-view-legend.tsx): marks drawn like the map's own. */
+.mission-ice-legend { display: flex; flex-direction: column; gap: .25rem; }
+.mission-ice-title { font-weight: 600; color: var(--color-label); }
+.mission-ice-keys { display: flex; flex-wrap: wrap; gap: .25rem .75rem; align-items: center; }
+.mission-ice-keys > span { display: inline-flex; align-items: center; gap: .375rem; }
+.mission-ice-known { color: var(--color-label-secondary); }
+.mission-key-dot { width: .75rem; height: .75rem; border-radius: 50%; border: 1px solid rgb(255 255 255 / .5); display: inline-block; }
+.mission-key-dot[data-filled] { background: #4f9cf0; border: 1.5px solid #fff; }
+.mission-key-zone { width: .9rem; height: .9rem; border-radius: 50%; border: 2px dashed #fff; display: inline-block; }
+.mission-key-fog { width: .9rem; height: .9rem; border-radius: 3px; background: rgb(232 235 240 / .6); display: inline-block; }
+.mission-key-clear { width: .9rem; height: .9rem; border-radius: 3px; border: 1px solid rgb(255 255 255 / .5); display: inline-block; }
+
+/* Campaign chart (campaign-chart.tsx). */
+.mission-campaign { display: flex; flex-direction: column; gap: .5rem; margin: 0; }
+.mission-campaign-hero { font-size: .9375rem; color: var(--color-label-secondary); }
+.mission-campaign-hero > strong { font-size: 1.5rem; color: var(--color-label); margin-right: .25rem; font-variant-numeric: tabular-nums; }
+.mission-campaign svg { width: 100%; height: auto; overflow: visible; }
+.mission-campaign-grid { stroke: rgb(255 255 255 / .12); stroke-width: 1; }
+.mission-campaign-axis { fill: var(--color-label-secondary); font-size: 10px; font-variant-numeric: tabular-nums; }
+.mission-campaign-cross { stroke: rgb(255 255 255 / .4); stroke-width: 1; }
+.mission-campaign-tip { font-size: .75rem; color: var(--color-label-secondary); min-height: 2.2em; }
+.mission-campaign-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .25rem; font-size: .8125rem; color: var(--color-label-secondary); }
+.mission-campaign-legend li { display: flex; align-items: center; gap: .5rem; }
+
+/* The globe and the 3D terrain fill the scene like the map does. */
+.mission-scene > .mission-globe, .mission-scene > .site3d-stage { position: absolute; inset: 0; }

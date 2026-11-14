@@ -7,25 +7,46 @@ import { CRATER_XY, HABITAT_XY } from "@/components/site/site-data";
 import { orderedStations, type Plan } from "@/lib/plan";
 import { circle, Heightfield, iceColor, pointAt, type Box, type PathPoint, type Site3DData, type Site3DLevelName } from "@/lib/site3d";
 
-const SKY = "#d8b08a";
+/**
+ * Illustrative sky: no calibrated value is citable. Pathfinder saw a yellowish-brown daytime sky,
+ * redder away from the Sun and toward the horizon (Maki et al. 1999; Thomas et al. 1999).
+ */
+const SKY = "#c9a88a";
 /** Sun of the HiRISE ortho ESP_073578_2155 (azimuth 238.45°, incidence 67.7°): the photographed shadows match. */
 const SUN_AZIMUTH_DEG = 238.45;
 const SUN_ELEVATION_DEG = 90 - 67.71;
 const EYE_M = 1.7;
 const WALKBACK_M = 1800;
+/** Free walk: rehearsal speed (faster than a suited walk so the whole site is reachable), Shift runs. */
+const FREE_MPS = 6;
+const FREE_FAST = 4;
+const MOVE_KEYS: Record<string, [number, number]> = {
+  KeyW: [0, 1], ArrowUp: [0, 1], KeyS: [0, -1], ArrowDown: [0, -1],
+  KeyA: [-1, 0], ArrowLeft: [-1, 0], KeyD: [1, 0], ArrowRight: [1, 0],
+};
+
+/** Where the free-walk camera stands: grid meters and heading (degrees clockwise from north). */
+export type FreePose = { x: number; y: number; headingDeg: number };
 
 export type Site3DProps = {
   data: Site3DData;
   level: Site3DLevelName;
   plan: Plan;
   path: PathPoint[];
-  /** "orbit" lets the user fly around; "walk" puts the camera at eye height on the route at `progressM`. */
-  mode: "orbit" | "walk";
+  /**
+   * "orbit" flies around; "walk" puts the camera at eye height on the route at `progressM`;
+   * "free" walks anywhere at eye height (drag to look, WASD or arrows to move, Shift to run).
+   */
+  mode: "orbit" | "walk" | "free";
   progressM: number;
   exaggeration: number;
   /** Ice map raster (data URL) and its bounds in grid meters, draped on the terrain. */
   ice?: { url: string; bounds: Box } | null;
   onError?: (message: string) => void;
+  /** Free walk: a new `key` moves the camera to this pose (jump to a station). */
+  teleport?: FreePose & { key: number };
+  /** Free walk: the camera pose, about 6 times a second, for the HUD. */
+  onMove?: (pose: FreePose) => void;
 };
 
 type SceneContext = { scene: THREE.Scene; terrain: THREE.BufferGeometry; cx: number; cy: number };
@@ -33,13 +54,62 @@ type SceneContext = { scene: THREE.Scene; terrain: THREE.BufferGeometry; cx: num
 type Label = { el: HTMLDivElement; pos: THREE.Vector3 };
 
 /** Real S1094b terrain (HiRISE DTM + ortho), real boulders, the plan route and stations, in WebGL. */
-export function Site3D({ data, level, plan, path, mode, progressM, exaggeration, ice, onError }: Site3DProps) {
+export function Site3D({ data, level, plan, path, mode, progressM, exaggeration, ice, onError, teleport, onMove }: Site3DProps) {
   const host = useRef<HTMLDivElement>(null);
   const labelsHost = useRef<HTMLDivElement>(null);
   const walk = useRef({ mode, progressM });
   const [ready, setReady] = useState(false);
   const ctx = useRef<SceneContext | null>(null);
+  const keys = useRef(new Set<string>());
+  const [hx0, hy0] = HABITAT_XY;
+  const free = useRef({ x: hx0, y: hy0, yaw: 0, pitch: -0.08 });
+  const moveCb = useRef(onMove);
   useEffect(() => { walk.current = { mode, progressM }; }, [mode, progressM]);
+  useEffect(() => { moveCb.current = onMove; }, [onMove]);
+  useEffect(() => {
+    if (teleport) free.current = { ...free.current, x: teleport.x, y: teleport.y, yaw: (teleport.headingDeg * Math.PI) / 180 };
+  }, [teleport]);
+
+  // Free walk input: keys held (ignored while typing in a field) and drag to look.
+  useEffect(() => {
+    if (mode !== "free") return;
+    const el = host.current;
+    const held = keys.current;
+    const typing = (e: KeyboardEvent) => e.target instanceof HTMLElement && e.target.closest("input, textarea, select, [contenteditable]");
+    const down = (e: KeyboardEvent) => {
+      if (typing(e)) return;
+      if (MOVE_KEYS[e.code] || e.code.startsWith("Shift")) { held.add(e.code); if (MOVE_KEYS[e.code]) e.preventDefault(); }
+    };
+    const up = (e: KeyboardEvent) => held.delete(e.code);
+    const blur = () => held.clear();
+    let drag: { x: number; y: number } | null = null;
+    const pdown = (e: PointerEvent) => { drag = { x: e.clientX, y: e.clientY }; el?.setPointerCapture(e.pointerId); };
+    const pmove = (e: PointerEvent) => {
+      if (!drag) return;
+      const f = free.current;
+      f.yaw -= (e.clientX - drag.x) * 0.004;
+      f.pitch = Math.max(-1.2, Math.min(0.9, f.pitch - (e.clientY - drag.y) * 0.004));
+      drag = { x: e.clientX, y: e.clientY };
+    };
+    const pup = () => { drag = null; };
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    window.addEventListener("blur", blur);
+    el?.addEventListener("pointerdown", pdown);
+    el?.addEventListener("pointermove", pmove);
+    el?.addEventListener("pointerup", pup);
+    el?.addEventListener("pointercancel", pup);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+      window.removeEventListener("blur", blur);
+      el?.removeEventListener("pointerdown", pdown);
+      el?.removeEventListener("pointermove", pmove);
+      el?.removeEventListener("pointerup", pup);
+      el?.removeEventListener("pointercancel", pup);
+      held.clear();
+    };
+  }, [mode]);
 
   useEffect(() => {
     const el = host.current;
@@ -110,7 +180,8 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       geo.computeVertexNormals();
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-      const terrainMat = new THREE.MeshStandardMaterial({ map: texture, color: "#f0c49a", roughness: 1, metalness: 0 });
+      // The HiRISE RED ortho as acquired (grayscale): no color is invented (docs/EXPERIMENTS.md, 2026-11-14).
+      const terrainMat = new THREE.MeshStandardMaterial({ map: texture, color: "#ffffff", roughness: 1, metalness: 0 });
       scene.add(new THREE.Mesh(geo, terrainMat));
       geometries.push(geo); materials.push(terrainMat); textures.push(texture);
       ctx.current = { scene, terrain: geo, cx, cy };
@@ -122,7 +193,7 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       for (const form of ["b", "i"] as const) {
         const set = lv.boulders.filter((b) => b[4] === form);
         if (!set.length) continue;
-        const mat = new THREE.MeshStandardMaterial({ color: form === "b" ? "#4a3b32" : "#7a6656", roughness: 0.95, transparent: form === "i", opacity: form === "i" ? 0.7 : 1 });
+        const mat = new THREE.MeshStandardMaterial({ color: form === "b" ? "#545454" : "#7a7a7a", roughness: 0.95, transparent: form === "i", opacity: form === "i" ? 0.7 : 1 });
         const mesh = new THREE.InstancedMesh(rock, mat, set.length);
         set.forEach(([x, y, d, hgt], i) => {
           const visual = level === "overview" ? 2.5 : 1; // small rocks stay visible from the site view
@@ -147,11 +218,12 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       }
 
       // Stations: pillars colored by P(ice), with labels.
-      const pillarH = level === "overview" ? 40 : 8;
+      // Overview: a tall marker to find the station from kilometers away. Walk: a 2.5 m survey pole.
+      const pillarH = level === "overview" ? 40 : 2.5;
       for (const st of orderedStations(plan)) {
         const [x, y] = st.position;
         if (!inBox(x, y)) continue;
-        const g = new THREE.CylinderGeometry(level === "overview" ? 6 : 1.2, level === "overview" ? 6 : 1.2, pillarH, 16);
+        const g = new THREE.CylinderGeometry(level === "overview" ? 6 : 0.06, level === "overview" ? 6 : 0.06, pillarH, 12);
         const m = new THREE.MeshStandardMaterial({ color: iceColor(st.p_ice), emissive: iceColor(st.p_ice), emissiveIntensity: 0.35 });
         const mesh = new THREE.Mesh(g, m);
         mesh.position.copy(toWorld(x, y, pillarH / 2));
@@ -214,10 +286,33 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       setReady(true);
 
       const v = new THREE.Vector3();
+      let lastT = performance.now();
+      let lastReport = 0;
       const tick = () => {
         if (disposed) return;
+        const now = performance.now();
+        const dt = Math.min((now - lastT) / 1000, 0.1);
+        lastT = now;
         const { mode: m, progressM: s } = walk.current;
-        if (m === "walk" && path.length > 1) {
+        if (m === "free") {
+          const f = free.current;
+          let fwd = 0, side = 0;
+          for (const code of keys.current) { const k = MOVE_KEYS[code]; if (k) { side += k[0]; fwd += k[1]; } }
+          const fast = keys.current.has("ShiftLeft") || keys.current.has("ShiftRight");
+          if (fwd || side) {
+            const step = FREE_MPS * (fast ? FREE_FAST : 1) * dt / Math.hypot(fwd, side);
+            const sx = Math.sin(f.yaw), sy = Math.cos(f.yaw);
+            f.x = Math.max(lv.box_m.xmin + 5, Math.min(lv.box_m.xmax - 5, f.x + (sx * fwd + sy * side) * step));
+            f.y = Math.max(lv.box_m.ymin + 5, Math.min(lv.box_m.ymax - 5, f.y + (sy * fwd - sx * side) * step));
+          }
+          camera.position.copy(toWorld(f.x, f.y, EYE_M));
+          camera.rotation.set(f.pitch, -f.yaw, 0, "YXZ");
+          controls.enabled = false;
+          if (now - lastReport > 160) {
+            lastReport = now;
+            moveCb.current?.({ x: f.x, y: f.y, headingDeg: (((f.yaw * 180) / Math.PI) % 360 + 360) % 360 });
+          }
+        } else if (m === "walk" && path.length > 1) {
           const p = pointAt(path, s), q = pointAt(path, s + 12);
           camera.position.copy(toWorld(p.x, p.y, EYE_M));
           const look = toWorld(q.x, q.y, EYE_M * 0.6);

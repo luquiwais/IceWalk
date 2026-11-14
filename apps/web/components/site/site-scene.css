@@ -12,7 +12,8 @@
   --site-brightness: 0.5;
   --site-contrast: 1.15;
   --site-tint: rgb(168 132 112);
-  --site-tint-opacity: 0.55;
+  /* No invented color: HiRISE RED is a grayscale band and is shown as acquired. */
+  --site-tint-opacity: 0;
   --site-vignette: rgb(0 0 0 / 0.45);
   --site-void: oklch(0.14 0.006 50);
 
@@ -133,7 +134,6 @@
 .site-imagery {
   position: absolute;
   inset: 0;
-  filter: brightness(var(--site-brightness)) contrast(var(--site-contrast));
   opacity: 0;
   transition: opacity 500ms var(--ease-settle, ease-out);
 }
@@ -620,3 +620,14 @@
     transition: none;
   }
 }
+
+/* The HiRISE overview fades into the background at its edges: no hard rectangle. */
+.site-image[data-kind="overview"] {
+  mask-image:
+    linear-gradient(to right, transparent, #000 7%, #000 93%, transparent),
+    linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
+  mask-composite: intersect;
+}
+
+/* Only the photo is dimmed for legibility; the ice layer keeps its own colors. */
+.site-image:not([data-kind="raster"]) { filter: brightness(var(--site-brightness)) contrast(var(--site-contrast)); }

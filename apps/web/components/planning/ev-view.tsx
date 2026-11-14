@@ -1,16 +1,12 @@
 "use client";
 import { Button } from "@icewalk/ui/button";
 import { TextField } from "@icewalk/ui/fields";
-import { ListRow, ListSection } from "@icewalk/ui/list";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
 import { Checkbox } from "@icewalk/ui/selection-controls";
 import { Body, Footnote, Title3 } from "@icewalk/ui/text";
 import { useState } from "react";
-import { bearing, measurementSummary, measuringTool, nextStation, toolName, toolReachM, type Measurement, type Plan, type Station } from "@/lib/plan";
-import { HABITAT_XY } from "@/components/site/site-data";
-import { RESULT_LABEL, RowLabel, Value } from "./parts";
-import { SurfaceAnalog } from "./surface-analog";
-import { Site3DButton } from "@/components/site3d/site-3d-button";
+import { measuringTool, toolName, toolReachM, type Measurement, type Station } from "@/lib/plan";
+import { RESULT_LABEL } from "./parts";
 
 export function MeasurementForm({ station, pending, onLog, compact = false }: {
   station: Station; pending: boolean; compact?: boolean;
@@ -43,25 +39,4 @@ export function MeasurementForm({ station, pending, onLog, compact = false }: {
       : <div className="mission-result-buttons">{(["ice", "no_ice", "inconclusive"] as const).map((value) => <Button key={value} disabled={pending || !tool} onClick={() => submit(value)}>{RESULT_LABEL[value]}</Button>)}</div>}
     <Footnote tone="secondary">Execution is simulated. Results update this session.</Footnote>
   </section>;
-}
-
-export function EVView({ plan, measurements, pending, onLog, onReview }: {
-  plan: Plan; measurements: Measurement[]; pending: boolean;
-  onLog: (station: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") => void; onReview: () => void;
-}) {
-  const station = nextStation(plan, measurements);
-  const last = measurements.at(-1);
-  const origin = last?.position ?? HABITAT_XY;
-  const direction = station ? bearing(origin, station.position) : undefined;
-  return <div className="mission-stack">
-    <Footnote tone="secondary">Simulated position · heading-up oblique of the flat HiRISE ortho.</Footnote>
-    <Site3DButton plan={plan} measurements={measurements} initial="walk" onLog={onLog} pending={pending}>3D walk · helmet view</Site3DButton>
-    {station ? <ListSection header={last ? "Next station" : "Current station"} headerId="ev-station">
-      <ListRow trailing={<Value>{String(station.order).padStart(2, "0")}</Value>}><RowLabel title={station.id} detail={station.tools.map(toolName).join(" · ")} /></ListRow>
-      <ListRow trailing={<Value>{Math.round(direction!.distanceM)} m</Value>}><RowLabel title={direction!.distanceM ? direction!.label : "At habitat"} detail="Straight-line grid distance · simulated position" /></ListRow>
-    </ListSection> : <Body>All planned stations measured. Return to habitat.</Body>}
-    {last ? <section className="mission-last-result" aria-label="Last measurement"><Footnote>Measured {last.station_id} · {measurementSummary(last)}</Footnote><Button size="small" variant="plain" onClick={onReview}>Review in Science</Button></section> : null}
-    {station ? <MeasurementForm key={station.id} station={station} pending={pending} onLog={onLog} /> : null}
-    <SurfaceAnalog />
-  </div>;
 }

@@ -1,14 +1,16 @@
 """Qué cambió con un re-plan y si conviene seguir o volver al hábitat.
 
 Compara las estaciones que faltaban en el plan anterior con las del nuevo, el margen de regreso
-antes y después, y las alertas del plan nuevo. Recomienda `return_to_habitat` cuando:
+antes y después, y las alertas del plan nuevo. Recomienda `return_to_habitat` (en la interfaz,
+"EVA TERMINATE": vuelta ordenada, nunca ABORT; xEVA Con Ops 9.3) cuando:
 
 - no queda ninguna estación alcanzable con margen de regreso;
-- el margen nuevo queda bajo el umbral de caution de la STM;
-- el plan nuevo trae una alerta de nivel warning (por ejemplo, un evento de partículas de DONKI);
-- cambió más de la fracción configurada de las estaciones (`config/eva.yaml`, supuesto): la
-  tripulación estaría ejecutando un plan que nadie repasó, y en NASA un cambio grande se
-  re-planifica con el equipo de apoyo (IV y tierra) antes de seguir.
+- el margen nuevo queda bajo el umbral de caution de la STM (empezar el walkback);
+- el plan nuevo trae una alerta de nivel warning (por ejemplo, un evento de partículas de DONKI).
+
+Si cambió más de la fracción configurada de las estaciones (`config/eva.yaml`, supuesto), no manda
+a volver: NASA no termina una EVA por un replan grande, lo decide el IV (Get Aheads, tareas borradas
+por prioridad; el replan grande va entre EVAs). Marca `iv_decision`.
 
 Si la medición encontró hielo, lo marca como objetivo cumplido (informativo: el resto de las
 estaciones sirve para acotar su extensión). La decisión final es de la tripulación.
@@ -59,19 +61,19 @@ def assess(previous: dict, new: dict, measurement: dict, stm: dict,
         reasons.append("No station is left within the walkback limit.")
     if new_ids and after is not None and after < caution:
         reasons.append(f"Walkback margin drops to {after:.0f} min, below the {caution:g} min "
-                       "caution limit.")
+                       "caution limit: begin the walkback.")
     reasons.extend(f"Warning: {a['message']}" for a in new.get("alerts", [])
                    if a.get("level") == "warning")
-    if old and new_ids and changed > limit:
-        reasons.append(f"{len(added) + len(dropped)} station changes ({changed:.0%} of the plan, "
-                       f"limit {limit:.0%}): the plan the crew briefed no longer holds. Re-plan "
-                       "with IV before going on.")
     recommendation = "return_to_habitat" if reasons else "continue"
+    iv_decision = bool(old and new_ids and changed > limit)
+    if iv_decision:
+        reasons.append(f"Large replan: {len(added) + len(dropped)} station changes ({changed:.0%} "
+                       f"of the plan, above {limit:.0%}). IV decision before going on.")
     objective_met = measurement.get("result") == "ice"
     if objective_met:
         reasons.append(f"Ice found at {sid}: primary objective met. The remaining stations bound "
                        "its extent.")
-    if recommendation == "continue" and not objective_met:
+    if recommendation == "continue" and not objective_met and not iv_decision:
         reasons.append("Changes are within the briefed plan and the walkback margin holds.")
     return {
         "from_plan_id": previous.get("plan_id"),
@@ -84,6 +86,7 @@ def assess(previous: dict, new: dict, measurement: dict, stm: dict,
         "margin_before_min": before,
         "margin_after_min": after,
         "objective_met": objective_met,
+        "iv_decision": iv_decision,
         "recommendation": recommendation,
         "reasons": reasons,
         "is_assumption": True,

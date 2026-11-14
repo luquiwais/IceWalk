@@ -15,7 +15,7 @@ export const MissionStatus = memo(function MissionStatus({ plan, elapsedMin, exe
   const mock = session.source === "mock" || session.isMock;
   return <section className="mission-status" aria-label="EVA status">
     <div className="mission-status-values">
-      <div><span title="Phase elapsed time">{execution ? "PET · simulated" : "Plan phase"}</span><strong>{execution ? clock(elapsedMin) : "Pre-egress"}</strong></div>
+      <div><span title="Phase elapsed time">{execution ? <>PET <span className="mission-sim" title="Simulated execution">SIM</span></> : "Plan phase"}</span><strong>{execution ? clock(elapsedMin) : "Pre-egress"}</strong></div>
       <div><span>Min walkback margin</span><strong>{plan.summary.min_walkback_margin_min == null ? "Unavailable" : `${formatNumber(plan.summary.min_walkback_margin_min, 1)} min`}</strong></div>
       <div><span>Bingo · latest departure</span><strong>{bingo ? `${clock(bingo.decide_by_min)} · ${bingo.station_id}` : "None ahead"}</strong></div>
     </div>
