@@ -1,155 +1,30 @@
-/* Claude Design pass (design/IceWalk.dc.html): warm neutral ink, solid panels, Archivo + JetBrains
-   Mono. Scoped to the mission app, so @icewalk/ui and /design keep the visionOS look. Colors keep
-   the NASA rule: neutral chrome, color only for alerts and ice maps. */
-.mission-app {
-  --dc-bg: #121010;
-  --dc-panel: #1a1715;
-  --dc-raised: #221e1b;
-  --dc-line: #332d29;
-  --dc-line-strong: #4a423c;
-  --dc-ink: #efe7dc;
-  --dc-ink-2: #d8cfc4;
-  --dc-muted: #a39889;
-  --dc-faint: #6f665d;
-  --dc-accent: #e2763f;
-
-  --font-sans: var(--font-archivo), system-ui, sans-serif;
-  --font-display: var(--font-archivo), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
-
-  --color-label: var(--dc-ink);
-  --color-label-secondary: var(--dc-muted);
-  --color-label-tertiary: var(--dc-faint);
-  --color-separator: var(--dc-line);
-  --color-accent: var(--dc-accent);
-  --color-surface: var(--dc-bg);
-  --color-surface-secondary: var(--dc-panel);
-  --color-surface-tertiary: var(--dc-raised);
-  --color-advisory: #9fe0f2;
-  --color-caution: #f0bf4f;
-  --color-warning: #f06a5a;
-  --color-system-green: #8fd694;
-
-  --radius-window: 4px;
-  --radius-row: 4px;
-  --radius-sidebar-item: 3px;
-  --radius-tab-bar: 4px;
-  --radius-segment: 3px;
-
-  font-family: var(--font-sans);
-  color: var(--dc-ink);
-  background: var(--dc-bg);
-}
-
-/* Glass becomes a flat, solid panel with a hairline. */
-.mission-app .lb {
-  background: color-mix(in srgb, var(--dc-panel) 94%, transparent) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  box-shadow: inset 0 0 0 1px var(--dc-line) !important;
-  color: var(--dc-ink);
-}
-.mission-app .lb::before, .mission-app .lb::after { display: none !important; }
-.mission-app :is(.mission-status-window, .mission-panel-window, .mission-timeline-window, .mission-layer-window) { border-radius: 4px; }
-.mission-app .vision-vibrancy { --vibrancy-ink: var(--dc-ink-2); }
-
-/* Type: condensed Archivo for titles, mono uppercase for labels and numbers. */
-.mission-app :is(h1, h2, h3, [data-text-style^=title], [data-text-style=large-title]) { font-family: var(--font-display); font-stretch: 78%; font-weight: 750; letter-spacing: -0.01em; }
-.mission-heading > [data-text-style] { font-stretch: 88%; letter-spacing: -0.02em; }
-.mission-heading [data-text-style=footnote], .mission-status-values span, .mission-metrics dt, .mission-station-header > :last-child,
-.mission-time header [data-text-style], .mission-time-axis, .mission-legend, .mission-objective > [data-text-style=footnote]:first-child {
-  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--dc-muted);
-}
-.mission-heading [data-text-style=footnote] { font-size: .6875rem; text-shadow: none; }
-.mission-heading { text-shadow: 0 1px 4px var(--dc-bg); }
-.mission-status-values strong, .mission-metrics dd, .mission-station-probability > strong, .mission-order,
-.mission-time-station, .mission-bingo > span, .mission-time-now > span, .mission-walkback-min { font-family: var(--font-mono); font-weight: 700; }
-.mission-status-values span, .mission-station-copy > span, .mission-station-probability > span, .mission-provenance { color: var(--dc-muted); }
-
-/* Tabs: active tab carries the accent. */
-.mission-app [role=tab][aria-selected=true] { color: var(--dc-accent); }
-.mission-app .ui-thumb { background: var(--dc-raised) !important; box-shadow: inset 0 0 0 1px var(--dc-accent) !important; }
-.mission-app .ui-tabs, .mission-app .ui-well { background: var(--dc-bg); }
-
-/* Controls: hairline buttons; pressed = light fill, dark ink (as the design's segments). */
-.mission-app .ui-fill { background: var(--dc-raised); box-shadow: inset 0 0 0 1px var(--dc-line-strong); }
-.mission-app .lb-tinted { background: var(--dc-accent) !important; color: var(--dc-bg) !important; }
-.mission-layer-window button { border-radius: 3px; font-weight: 600; }
-.mission-layer-window [aria-pressed=true] { background: var(--dc-ink); color: var(--dc-bg); }
-
-/* Station list. */
-.mission-order { border-radius: 50%; border: 2px solid var(--dc-muted); font-size: .75rem; }
-.mission-station-row { border-radius: 4px; }
-.mission-station-row[data-hovered=true] { background: var(--dc-raised); box-shadow: inset 0 0 0 1px var(--dc-accent); }
-
-/* Timeline: neutral blocks, selected station in light ink. */
-.mission-time-station { background-color: var(--dc-line-strong); border-radius: 3px; }
-.mission-time-station[aria-pressed=true] { outline: none; background-color: var(--dc-ink); color: var(--dc-bg); }
-.mission-time-station[data-hovered=true] { background-color: #5a5048; }
-.mission-time-segment { background-color: var(--dc-raised); border-radius: 3px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .06em; }
-.mission-time-segment[data-kind=reserve] { background-image: repeating-linear-gradient(115deg, transparent 0 5px, rgb(239 231 220 / .08) 5px 6px); }
-.mission-time-now { border-left-color: var(--dc-accent); }
-.mission-time-now > span, .mission-bingo > span { background: var(--dc-bg); border-radius: 2px; }
-
-/* Verdicts as filled chips, like the design's tool cards; GO stays neutral (NASA color rule). */
-.mission-verdict { font-family: var(--font-mono); font-size: .75em; font-weight: 700; letter-spacing: .04em; padding: .15em .45em; border-radius: 3px; background: var(--dc-ink); color: var(--dc-bg); }
-.mission-verdict[data-verdict="CONDITIONAL"] { background: var(--color-caution); color: var(--dc-bg); }
-.mission-verdict[data-verdict="NO_GO"], .mission-verdict[data-verdict="INSUFFICIENT_DATA"] { background: var(--color-warning); color: var(--dc-bg); }
-
-.mission-minimap { border-radius: 4px; background: color-mix(in srgb, var(--dc-bg) 88%, transparent); box-shadow: inset 0 0 0 1px var(--dc-line); }
-.mission-analog-image { border-radius: 4px; }
-.mission-globe { background: var(--dc-bg); }
-
-/* Layout from the design (wide screens): header band with the title and the view tabs, a fixed
-   right column (status over the planning window), the timeline as a bottom band, and the map in
-   the remaining area. The scene stays full-bleed; solid bands sit over it, and the camera framing
-   still comes from the measured chrome (layout.ts). Narrow screens keep the bottom-sheet layout. */
+/* Layout from the Claude Design pass (design/IceWalk.dc.html, by Jose) on wide screens, with the
+   team's visionOS glass kept as is: the view tabs sit in a header row beside the title, status and
+   the planning window form a right column, and the timeline is a bottom band. Only positions
+   change; colors, type and materials come from @icewalk/ui. The camera framing still comes from
+   the measured chrome (planning-view.tsx). Narrow screens keep the bottom-sheet layout. */
 @media (min-width: 760px) {
-  .mission-app { --dc-header: 64px; --dc-col: 400px; --mission-edge: 20px; }
-  .mission-app .mission-scene { z-index: 0; }
-  .mission-app > :not(.mission-scene) { z-index: 2; }
-  .mission-app::before, .mission-app::after { content: ""; position: absolute; z-index: 1; background: var(--dc-bg); pointer-events: none; }
-  .mission-app::before { top: 0; left: 0; right: 0; height: var(--dc-header); border-bottom: 1px solid var(--dc-line); }
-  .mission-app::after { top: var(--dc-header); right: 0; bottom: 0; width: var(--dc-col); border-left: 1px solid var(--dc-line); }
-  .mission-app:has(.mission-globe)::before, .mission-app:has(.mission-globe)::after { display: none; }
+  .mission-app { --dc-header: 5rem; --dc-col: 400px; }
 
-  .mission-app .mission-heading { top: 0; height: var(--dc-header); flex-direction: row; align-items: center; gap: 14px; text-shadow: none; }
-  .mission-app .mission-heading > [data-text-style]:first-child { font-size: 1.3rem; }
-  .mission-app .mission-heading > [data-text-style=footnote] { font-size: .6875rem; }
+  .mission-app .mission-heading { top: 0; height: var(--dc-header); flex-direction: row; align-items: center; gap: .875rem; }
+  .mission-app .mission-tabs { top: 0; left: 22rem; height: var(--dc-header); display: flex; align-items: center; }
 
-  .mission-app .mission-tabs { top: 0; left: 24rem; height: var(--dc-header); }
-  .mission-app .mission-tabs > * { height: 100%; }
-  .mission-app .mission-tabs [role=tablist] { height: 100%; padding: 0; gap: 2px; background: none !important; box-shadow: none !important; border-radius: 0; }
-  .mission-app .mission-tabs [role=tablist] > :not([role=tab]) { display: none; }
-  .mission-app .mission-tabs [role=tab] { height: 100%; border-radius: 0; padding: 0 14px; border-bottom: 2px solid transparent; color: var(--dc-muted); font-family: var(--font-mono); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .mission-app .mission-tabs [role=tab] svg { width: 1rem; height: 1rem; }
-  .mission-app .mission-tabs [role=tab][aria-selected=true] { color: var(--dc-ink); border-bottom-color: var(--dc-accent); }
-
-  .mission-app .mission-status-position { top: var(--dc-header); right: 0; width: var(--dc-col); }
-  .mission-app .mission-status-window { border-radius: 0; box-shadow: inset 0 -1px 0 var(--dc-line) !important; background: var(--dc-bg) !important; }
-  .mission-app .mission-status { padding: 14px 20px; }
-  .mission-app .mission-status-values { grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .mission-app .mission-status-position { top: var(--dc-header); right: var(--mission-edge); width: var(--dc-col); }
+  .mission-app .mission-status-values { grid-template-columns: 1fr 1fr; gap: .625rem 1rem; }
   .mission-app .mission-status-values > :last-child { grid-column: 1 / -1; }
   .mission-app .mission-status-source { flex-wrap: wrap; }
 
-  .mission-app .mission-panel-presence { top: calc(var(--mission-panel-top, 200px) - 16px); right: 0; bottom: var(--mission-timeline-y, 9rem); width: var(--dc-col); }
-  .mission-app .mission-panel-window { border-radius: 0; background: var(--dc-bg) !important; box-shadow: none !important; }
-  .mission-app .mission-show-panel { top: calc(var(--dc-header) + 1rem); right: calc(var(--dc-col) + var(--mission-edge)); }
-
-  .mission-app .mission-timeline-position { left: 0; right: 0; bottom: 0; }
-  .mission-app .mission-timeline-window { border-radius: 0; background: var(--dc-bg) !important; box-shadow: inset 0 1px 0 var(--dc-line) !important; }
-  .mission-app .mission-time { padding: 14px 20px 18px; }
+  .mission-app .mission-panel-presence { top: var(--mission-panel-top, 200px); right: var(--mission-edge); bottom: calc(var(--mission-timeline-y, 9rem) + .75rem); width: var(--dc-col); }
+  .mission-app .mission-show-panel { top: calc(var(--dc-header) + 1rem); right: calc(var(--dc-col) + 2 * var(--mission-edge)); }
 
   .mission-app .mission-camera { top: calc(var(--dc-header) + 1rem); }
   .mission-app .mission-map-tools, .mission-app .mission-destination { left: calc(var(--mission-edge) + 4rem); }
   .mission-app .mission-map-tools { max-width: calc(100% - var(--dc-col) - 7rem); }
-  .mission-app[data-focused=true]::after { display: none; }
 }
 @media (max-width: 1100px) and (min-width: 760px) {
   .mission-app { --dc-col: 360px; }
   .mission-app .mission-heading { max-width: none; }
   .mission-app .mission-heading [data-text-style=footnote] { display: none; }
   .mission-app .mission-tabs { left: 9rem; }
-  .mission-app .mission-panel-presence { width: var(--dc-col); bottom: var(--mission-timeline-y, 9rem); }
   .mission-app .mission-map-tools { left: calc(var(--mission-edge) + 3.5rem); max-width: calc(100% - var(--dc-col) - 6rem); }
 }
