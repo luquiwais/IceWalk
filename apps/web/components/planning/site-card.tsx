@@ -11,6 +11,12 @@ function name(id: string) {
   return PRECURSOR_LABEL[id] ?? toolName(id);
 }
 
+/** P(ice) as a tick over its 90 % interval (design: "What to carry"). Decorative: the row says it in text. */
+function IntervalBar({ p, range, verdict }: { p: number; range: [number, number]; verdict?: string }) {
+  const pct = (v: number) => `${Math.min(100, Math.max(0, v * 100))}%`;
+  return <span aria-hidden className="mission-ci" data-verdict={verdict} style={{ "--ci-lo": pct(range[0]), "--ci-hi": pct(range[1]), "--ci-p": pct(p) } as React.CSSProperties}><i /><b /></span>;
+}
+
 /** "Is it worth going, and with which tool?" from plan.site_assessment. */
 export function SiteCard({ card }: { card: SiteAssessment | undefined }) {
   if (!card) return <Footnote tone="secondary">Site card unavailable for this plan.</Footnote>;
@@ -26,7 +32,7 @@ export function SiteCard({ card }: { card: SiteAssessment | undefined }) {
       <ListSection footer={`Probability that ice is within each tool's reach, regional prior before landing.${card.min_p ? ` GO needs the whole 90 % interval above ${formatPercent(card.min_p)} (mission threshold, an assumption).` : ""}`}>
         {rows.map(([id, t]) => (
           <ListRow key={id} trailing={<Value><span className="mission-verdict" data-verdict={t.verdict}>{t.verdict ? VERDICT_LABEL[t.verdict] : ""}</span> {formatPercent(t.p_ice)}</Value>}>
-            <RowLabel title={`${name(id)} · ≤ ${formatNumber(t.depth_m, t.depth_m < 1 ? 1 : 0)} m`} detail={`90 %: ${formatPercent(t.p_ice_90[0])}–${formatPercent(t.p_ice_90[1])}${t.precursor ? " · flies before the EVA" : ""}`} />
+            <RowLabel title={`${name(id)} · ≤ ${formatNumber(t.depth_m, t.depth_m < 1 ? 1 : 0)} m`} detail={<>{`90 %: ${formatPercent(t.p_ice_90[0])}–${formatPercent(t.p_ice_90[1])}${t.precursor ? " · flies before the EVA" : ""}`}<IntervalBar p={t.p_ice} range={t.p_ice_90} verdict={t.verdict} /></>} />
           </ListRow>
         ))}
       </ListSection>

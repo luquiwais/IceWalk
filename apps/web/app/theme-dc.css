@@ -92,9 +92,9 @@
 .mission-time-now > span, .mission-bingo > span { background: var(--dc-bg); border-radius: 2px; }
 
 /* Verdicts as filled chips, like the design's tool cards; GO stays neutral (NASA color rule). */
-.mission-verdict { font-family: var(--font-mono); font-size: .75em; font-weight: 700; letter-spacing: .04em; padding: .15em .45em; border-radius: 3px; background: var(--dc-ink); color: var(--dc-bg); }
-.mission-verdict[data-verdict="CONDITIONAL"] { background: var(--color-caution); color: var(--dc-bg); }
-.mission-verdict[data-verdict="NO_GO"], .mission-verdict[data-verdict="INSUFFICIENT_DATA"] { background: var(--color-warning); color: var(--dc-bg); }
+.mission-app .mission-verdict { font-family: var(--font-mono); font-size: .75em; font-weight: 700; letter-spacing: .04em; padding: .15em .45em; border-radius: 3px; background: var(--dc-ink); color: var(--dc-bg); }
+.mission-app .mission-verdict[data-verdict="CONDITIONAL"] { background: var(--color-caution); color: var(--dc-bg); }
+.mission-app .mission-verdict[data-verdict="NO_GO"], .mission-app .mission-verdict[data-verdict="INSUFFICIENT_DATA"] { background: var(--color-warning); color: var(--dc-bg); }
 
 .mission-minimap { border-radius: 4px; background: color-mix(in srgb, var(--dc-bg) 88%, transparent); box-shadow: inset 0 0 0 1px var(--dc-line); }
 .mission-analog-image { border-radius: 4px; }
@@ -153,3 +153,27 @@
   .mission-app .mission-panel-presence { width: var(--dc-col); bottom: var(--mission-timeline-y, 9rem); }
   .mission-app .mission-map-tools { left: calc(var(--mission-edge) + 3.5rem); max-width: calc(100% - var(--dc-col) - 6rem); }
 }
+
+/* Polish pass. */
+/* Site card: P(ice) tick over its 90 % interval; color only for caution and no-go. */
+.mission-ci { position: relative; display: block; height: 6px; margin: 6px 0 2px; border-radius: 3px; background: var(--dc-raised); --ci-c: var(--dc-ink-2); }
+.mission-ci[data-verdict=CONDITIONAL] { --ci-c: var(--color-caution); }
+.mission-ci[data-verdict=NO_GO] { --ci-c: var(--color-warning); }
+.mission-ci > i { position: absolute; inset-block: 0; left: var(--ci-lo); right: calc(100% - var(--ci-hi)); background: var(--ci-c); opacity: .45; border-radius: 3px; }
+.mission-ci > b { position: absolute; top: -3px; bottom: -3px; left: var(--ci-p); width: 2px; translate: -1px 0; background: var(--ci-c); }
+
+/* Status column: the alert wraps instead of being cut. */
+.mission-app .mission-status-source [data-level] { border-radius: 4px; align-items: flex-start; }
+.mission-app .mission-status-source [data-level] .truncate { white-space: normal; overflow: visible; }
+
+@media (min-width: 760px) {
+  /* EV: the next station reads as a helmet HUD, top left of the map, clear of the minimap. */
+  .mission-app .mission-destination { top: calc(var(--dc-header) + 1rem); text-shadow: 0 1px 6px var(--dc-bg), 0 0 2px var(--dc-bg); }
+  .mission-app .mission-destination > :first-child { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .12em; font-size: .8125rem; color: var(--dc-ink-2); }
+  .mission-app .mission-destination > [data-text-style=title-2] { font-family: var(--font-mono); font-stretch: normal; font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.05; font-weight: 700; }
+  .mission-app .mission-destination > :nth-child(3) { font-size: 1rem; font-weight: 600; }
+}
+
+/* EV: glove-sized targets for results and checklist (design README: operable with gloves). */
+.mission-app[data-view=ev] .mission-result-buttons button { min-height: 64px; font-size: 1.125rem; font-weight: 800; letter-spacing: .02em; border-radius: 6px; }
+.mission-app[data-view=ev] .mission-checklist > * { min-height: 48px; padding: 8px 12px; border-radius: 6px; background: var(--dc-raised); box-shadow: inset 0 0 0 1px var(--dc-line); }

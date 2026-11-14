@@ -884,6 +884,7 @@ export function SiteScene({
           alt=""
           draggable={false}
           decoding="async"
+          fetchPriority="high"
         />
         {detailWanted ? (
           // eslint-disable-next-line @next/next/no-img-element
