@@ -46,9 +46,12 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 79 | ¿Cuánto tiempo sin línea de vista al hábitat se tolera en una EVA? Artemis lo usa como restricción pero no publica el valor; usamos 15 min (supuesto) | Mantener 15 min y decirlo en la demo; buscar las flight rules de Artemis si aparecen | Planificador | 14/11 |
 | 77 | Con bloques reales, la regla del pasillo no prohíbe ninguna celda en la zona de la EVA (mínimo 3.0 m contra 1.02 m): las rutas no cambian. ¿La capa entra además como costo (caminar más lento entre bloques) o queda como está? | Dejarla como está para la demo y mostrar los bloques en el mapa; un costo por densidad no tiene fuente | Planificador + Visión | 13/11 |
 
-| 81 | La caja de detalle del 3D (y de la imagen de 25 cm) termina en y = −2650 y dos estaciones del plan están en −2700: en la caminata no se dibujan. ¿Se amplía la caja a −2800 regenerando `build-site-imagery.py` y `build-site-3d.py`? | Sí, cuando haya red para bajar la ventana de RED_A | Frontend | 14/11 |
 | 82 | Color natural del terreno: el IRB de 8 bits no sirve. ¿Se intenta con el COLOR RDR calibrado (I/F) de ESP_073077, registrado sobre el DTM? | Después del hackatón; mientras, gris | Frontend | 14/11 |
 | 83 | El azul de los mapas de hielo y el cian de los avisos advisory se parecen (el HIDH 10.11.5.5 asocia azul con advisory). ¿Se cambia uno de los dos? | Decide Diseño; hoy los avisos llevan ícono y texto | Diseño | 14/11 |
+
+| 84 | Mapa de hielo: ¿se reemplaza la grilla de puntos por "islas de evidencia" (VSUP con raíz transparente, celdas de 10 m en 7 clases donde U < 0.95, sin modo niebla aparte ni círculo duro)? ¿Y el casco por mástil fino + aro único de 4 m + línea guía + cuña de borde? | Recomendado por `research/visualizacion-hielo-waypoints-2026-11-14.md`; decide Luqui | Luqui + Frontend | 14/11 |
+| 85 | El progreso de la expedición no se entiende (PET simulado que salta, "Now" en el timeline). ¿Una vista única de avance (estaciones hechas / total, adelanto o atraso contra el plan, margen, posición en la ruta) igual en el casco y en la consola del IV? | Sí, próxima tarea de la web | Frontend | 14/11 |
+| 86 | La rama de José (`web/rediseno-dc`) quedó superada por las 5 fases y choca con `main`. ¿Se rescata su "Key finding" del panel de Site y se le pide que parta de `main`? | Sí | Luqui + José | 14/11 |
 
 ## A averiguar
 

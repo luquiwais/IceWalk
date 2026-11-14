@@ -39,7 +39,7 @@ from rasterio.warp import Resampling, reproject, transform_bounds
 from rasterio.windows import Window, from_bounds
 
 ROOT = Path(__file__).resolve().parents[3]
-GRID = json.loads((ROOT / "packages/contracts/grid.json").read_text())
+GRID = json.loads((ROOT / "packages/contracts/grid.json").read_text(encoding="utf-8"))
 OUT = ROOT / "apps/web/public/site"
 
 BASE = (
@@ -60,7 +60,7 @@ ASSETS = {
     },
     "detail": {
         "product": "ESP_073578_2155_RED_A_01_ORTHO",
-        "box": (-100.0, -2650.0, 800.0, -1900.0),
+        "box": (-100.0, -2800.0, 800.0, -1900.0),  # to -2800 so every station of the plan is inside (cuestión 81)
         "m_per_px": 0.25,
         "quality": 78,
     },
@@ -298,7 +298,7 @@ def main() -> int:
             }
             print(f"  wrote {path.relative_to(ROOT)} ({path.stat().st_size / 1024:.0f} kB)")
 
-    (OUT / "s1094b.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n")
+    (OUT / "s1094b.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"wrote {(OUT / 's1094b.json').relative_to(ROOT)}")
     return 0
 

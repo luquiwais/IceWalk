@@ -97,6 +97,8 @@ export type SiteSceneProps = {
   /** Screen px covered by the interface; framing centers in what is left. */
   insets?: Insets;
   raster?: SiteRaster;
+  /** Where the EV is during the EVA (grid meters, heading clockwise from north), for the IV. */
+  crew?: { x: number; y: number; headingDeg: number };
   className?: string;
   ref?: Ref<SiteSceneHandle>;
 };
@@ -201,10 +203,13 @@ export function SiteScene({
   layers,
   insets = NO_INSETS,
   raster,
+  crew,
   className,
   ref,
 }: SiteSceneProps) {
   const helpId = useId();
+  const crewRef = useRef(crew);
+  useEffect(() => { crewRef.current = crew; }, [crew]);
   const { stations, dropped } = useMemo(() => sceneStations(plan, previousPlan), [plan, previousPlan]);
   /** Stations + habitat, and what a re-plan dropped, so the diff stays in frame. */
   const framing = useMemo(
@@ -470,6 +475,9 @@ export function SiteScene({
         if (L.habitatOffset) offset = HAB_OFFSET_PX;
       } else if (id === "@crater") {
         p = toScreen(CRATER_XY[0], CRATER_XY[1]);
+      } else if (id === "@crew") {
+        const c = crewRef.current;
+        if (c) p = toScreen(c.x, c.y);
       } else {
         const w = L.points.get(id);
         if (w) p = toScreen(w[0], w[1]);
@@ -660,7 +668,7 @@ export function SiteScene({
       );
     }
     schedule();
-  }, [plan, framing, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera]);
+  }, [plan, framing, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera, crew]);
 
   // Size, gestures and keys: native listeners, so wheel can be non-passive and
   // nothing goes through React per frame.
@@ -981,6 +989,14 @@ export function SiteScene({
           </div>
         ))}
 
+        {crew ? (
+          <div ref={anchorRef("@crew")} className="site-anchor">
+            <div className="site-crew" role="img" aria-label={`EV1, x ${signed(Math.round(crew.x))} m, y ${signed(Math.round(crew.y))} m, heading ${Math.round(crew.headingDeg)} degrees`} data-site-object>
+              <svg viewBox="0 0 20 20" aria-hidden style={{ transform: `rotate(${crew.headingDeg}deg)` }}><path d="M10 2 L16 17 L10 13 L4 17 Z" /></svg>
+              <span>EV1</span>
+            </div>
+          </div>
+        ) : null}
         <div ref={anchorRef("@habitat")} className="site-anchor">
           <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(HABITAT_XY[0])} m, y ${signed(HABITAT_XY[1])} m`} data-site-object>
             HAB

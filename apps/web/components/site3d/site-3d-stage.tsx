@@ -114,7 +114,7 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
 
       <p className="site3d-credit">
         {ice ? "Dots: P(ice within reach), filled where craters or measurements back it · " : ""}
-        {helmet ? "Rings and light columns are HUD waypoints (NASA SUITS-style AR), not terrain · " : ""}
+        {helmet ? "Rings and light columns: AR waypoint cues (concept), not terrain · " : ""}
         {view === "stand" ? "HiRISE DTM (2 m) and 25 cm ortho, true relief" : "HiRISE DTM (6 m) and 1.5 m ortho, relief ×3"} · HiRISE RED band, grayscale as acquired · boulders sized from their shadows, shapes illustrative · sky color illustrative · NASA/JPL-Caltech/UArizona, USGS
       </p>
     </div>
