@@ -84,7 +84,12 @@ describe("Mission table", () => {
     expect(screen.getByText("S1094b · 35.11°N, 189.83°E", visible)).toBeInTheDocument();
     const brief = screen.getByRole("region", { name: "Mission brief" });
     for (const station of orderedStations(demoPlan)) expect(within(brief).getByRole("button", { name: new RegExp(`Station ${station.order}, ${station.id}`) })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Which tool?" })).toHaveAttribute("aria-expanded", "false");
+    // The site card is open from the start: drill NO_GO, radar GO, SkyFall radar flagged as precursor.
+    expect(screen.getByRole("button", { name: "Is it worth going? · Site card" })).toHaveAttribute("aria-expanded", "true");
+    const card = screen.getByRole("region", { name: "Site card" });
+    expect(card).toHaveTextContent("No-go");
+    expect(card).toHaveTextContent("SkyFall radar");
+    expect(screen.getByRole("button", { name: "Evidence · why trust it" })).toHaveAttribute("aria-expanded", "false");
   });
 
   it("shares selection and hover between map, list and timeline, and returns to Brief", async () => {
@@ -124,14 +129,19 @@ describe("Mission table", () => {
     expect(ev).toHaveFocus();
   });
 
-  it("toggles real geometry layers and keeps unavailable rasters disabled", async () => {
+  it("toggles real geometry layers and the ice map modes from the bundled real-model map", async () => {
     render(<PlanningView />);
     const layers = screen.getByRole("region", { name: "Map layers" });
     const grid = within(layers).getByRole("button", { name: "Grid" });
     await userEvent.click(grid);
     expect(screen.getByTestId("mock-map")).toHaveAttribute("data-grid", "true");
-    expect(within(layers).getByRole("button", { name: /Ice potential/ })).toBeDisabled();
-    expect(layers).toHaveTextContent("Awaiting /maps");
+    // The map loads asynchronously; Ice potential starts on and can be switched off.
+    const potential = await within(layers).findByRole("button", { name: "Ice potential" });
+    expect(potential).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(potential);
+    expect(potential).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(within(layers).getByRole("button", { name: "Uncertainty" }));
+    expect(within(layers).getByRole("button", { name: "Uncertainty" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("keeps the selected station through Map focus", async () => {

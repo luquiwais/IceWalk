@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import mockMap from "@/mock/map.json";
 
 import {
   getHealth,
-  getMap,
+  getIceMap,
   getToolCatalog,
   plannerBaseUrl,
   PlannerApiError,
@@ -96,18 +97,16 @@ describe("planner API client", () => {
     });
   });
 
-  it("reads the tool catalog and the map status", async () => {
+  it("reads the tool catalog and the ice map of a plan", async () => {
     const catalog = vi.fn(async () => json([{ id: "core_drill", name: "Core drill" }]));
     await expect(getToolCatalog({ baseUrl: BASE, fetch: catalog })).resolves.toEqual([
       { id: "core_drill", name: "Core drill" },
     ]);
 
-    const map = vi.fn(async () =>
-      json({ kind: "uncertainty", status: "pending", note: "Raster URL served once the model exists" }),
-    );
-    const result = await getMap("uncertainty", { baseUrl: BASE, fetch: map });
-    expect(result.status).toBe("pending");
-    expect(map).toHaveBeenCalledWith(`${BASE}/maps/uncertainty`, expect.anything());
+    const map = vi.fn(async () => json(mockMap));
+    const result = await getIceMap("plan-demo0001", { baseUrl: BASE, fetch: map });
+    expect(result.width).toBe(mockMap.width);
+    expect(map).toHaveBeenCalledWith(`${BASE}/maps?plan_id=plan-demo0001`, expect.anything());
   });
 
   it.each([404, 500])("reports HTTP %i with its status and the API detail", async (status) => {
@@ -165,7 +164,7 @@ describe("planner API client", () => {
     const health = vi.fn(async () => json({ status: "ok", planner: "maybe" }));
     expect((await failure(getHealth({ baseUrl: BASE, fetch: health }))).kind).toBe("shape");
     const map = vi.fn(async () => json({ kind: "value" }));
-    expect((await failure(getMap("value", { baseUrl: BASE, fetch: map }))).kind).toBe("shape");
+    expect((await failure(getIceMap(undefined, { baseUrl: BASE, fetch: map }))).kind).toBe("shape");
   });
 
   it("fails without a request when no base URL is configured", async () => {

@@ -4,6 +4,7 @@
  * shape the UI relies on, so a wrong or proxy response fails loudly instead of
  * rendering garbage.
  */
+import { isIceMap, type IceMap } from "./ice-map";
 import type { Measurement, Plan } from "./plan";
 
 export type PlannerErrorKind =
@@ -44,9 +45,8 @@ export type ApiOptions = {
 
 export type PlannerHealth = { status: string; planner: "real" | "mock" };
 export type CatalogTool = { id: string; name?: string; [key: string]: unknown };
-export type MapKind = "probability" | "uncertainty" | "value";
-/** GET /maps/{kind}. Today the API answers `status: "pending"` with no raster. */
-export type MapStatus = { kind: string; status: string; note: string };
+/** GET /eva-window (eva_window.schema.json); the UI reads it through lib/eva-window. */
+export type EvaWindowPayload = Record<string, unknown> & { best?: unknown; sols?: unknown };
 
 export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[] };
 export type ReplanRequest = {
@@ -77,8 +77,16 @@ export function getToolCatalog(options?: ApiOptions): Promise<CatalogTool[]> {
   return request("/catalog/tools", { method: "GET" }, isCatalog, options);
 }
 
-export function getMap(kind: MapKind, options?: ApiOptions): Promise<MapStatus> {
-  return request(`/maps/${kind}`, { method: "GET" }, isMapStatus, options);
+/** GET /maps: the ice map, with the measurements of `planId` applied when given. */
+export function getIceMap(planId?: string, options?: ApiOptions): Promise<IceMap> {
+  const query = planId ? `?plan_id=${encodeURIComponent(planId)}` : "";
+  return request(`/maps${query}`, { method: "GET" }, isIceMap, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
+}
+
+/** GET /eva-window: best EVA start in the next sols and conditions at each station. */
+export function getEvaWindow(planId?: string, options?: ApiOptions): Promise<EvaWindowPayload> {
+  const query = planId ? `?plan_id=${encodeURIComponent(planId)}` : "";
+  return request(`/eva-window${query}`, { method: "GET" }, isObject as (b: unknown) => b is EvaWindowPayload, options);
 }
 
 export function postPlan(body: PlanRequest, options?: ApiOptions): Promise<Plan> {
@@ -172,10 +180,6 @@ function isHealth(body: unknown): body is PlannerHealth {
 
 function isCatalog(body: unknown): body is CatalogTool[] {
   return Array.isArray(body) && body.every((t) => isObject(t) && typeof t.id === "string");
-}
-
-function isMapStatus(body: unknown): body is MapStatus {
-  return isObject(body) && typeof body.kind === "string" && typeof body.status === "string" && typeof body.note === "string";
 }
 
 function isPosition(value: unknown): boolean {

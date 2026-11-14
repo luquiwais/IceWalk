@@ -89,6 +89,20 @@ export type DecisionPoint = {
   options: DecisionOption[];
 };
 
+/** plan.site_assessment (plan.schema.json): regional prior per tool, before landing. */
+export type SiteToolCard = { depth_m: number; p_ice: number; p_ice_90: [number, number]; verdict?: "GO" | "CONDITIONAL" | "NO_GO"; precursor?: boolean };
+export type SiteAssessment = {
+  lat_deg: number;
+  status: "ok" | "extrapolated" | "no_data";
+  median_depth_m?: number;
+  median_depth_90_m?: [number, number];
+  warnings: string[];
+  tools: Record<string, SiteToolCard>;
+  verdict?: "GO" | "CONDITIONAL" | "NO_GO" | "INSUFFICIENT_DATA";
+  min_p?: number;
+  nearby_impacts?: { window_deg: [number, number]; n: number; ice: number; expected_ice: number; z: number | null };
+};
+
 export type Plan = {
   mission_id: string;
   plan_id: string;
@@ -100,6 +114,7 @@ export type Plan = {
   equipment?: { tool: string; count: number; mass_kg?: number | null; justification?: string }[];
   summary: PlanSummary;
   alerts?: PlanAlert[];
+  site_assessment?: SiteAssessment;
 };
 
 /** A measurement logged at a station (contracts/schemas/measurement.schema.json). */

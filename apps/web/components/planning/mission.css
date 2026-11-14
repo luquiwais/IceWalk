@@ -243,3 +243,13 @@
   .mission-show-panel { bottom: calc(var(--mission-timeline-y, 8.5rem) + 3rem); }
 }
 @media (prefers-reduced-motion: reduce) { .mission-scene { animation: none; } }
+
+/* Ice map legend: the planner's palette as a gradient (ice maps are the one place color is data). */
+.mission-ice-legend { display: inline-flex; flex-direction: column; gap: 4px; }
+.mission-ice-scale { display: inline-flex; align-items: center; gap: 6px; }
+.mission-ice-scale i { display: inline-block; width: 120px; height: 8px; border-radius: 4px; }
+
+/* Verdicts are alerts (NASA color rule): GO stays neutral, the rest take the alert colors. */
+.mission-verdict { font-weight: 600; }
+.mission-verdict[data-verdict="CONDITIONAL"] { color: var(--color-caution, #d9a400); }
+.mission-verdict[data-verdict="NO_GO"], .mission-verdict[data-verdict="INSUFFICIENT_DATA"] { color: var(--color-warning, #e5484d); }

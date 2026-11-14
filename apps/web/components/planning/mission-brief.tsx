@@ -6,11 +6,14 @@ import { Body, Footnote, Title3 } from "@icewalk/ui/text";
 import { evaLimitMin, evaName, measuringTool, measurementSummary, missionObjective, nextStation, orderedStations, toolName, totalEquipmentMass, type Plan, type Measurement } from "@/lib/plan";
 import { formatDuration, formatNumber, formatPercent } from "@/lib/format";
 import { Disclosure } from "./disclosure";
-import { ToolAssessment } from "./tool-assessment";
+import { RadarFirst, SiteCard } from "./site-card";
+import { BeyondSite, Evidence } from "./evidence";
+import { EvaWindowCard } from "./eva-window-card";
+import type { PlanSource } from "@/lib/use-plan-session";
 import { RowLabel, Value } from "./parts";
 
-export const MissionBrief = memo(function MissionBrief({ plan, measurements, hoveredId, source, onSelect, onHover }: {
-  plan: Plan; measurements: Measurement[]; hoveredId: string | null; source: string;
+export const MissionBrief = memo(function MissionBrief({ plan, measurements, hoveredId, source, planSource = "mock", onSelect, onHover }: {
+  plan: Plan; measurements: Measurement[]; hoveredId: string | null; source: string; planSource?: PlanSource;
   onSelect: (id: string) => void; onHover: (id: string | null) => void;
 }) {
   const limit = evaLimitMin(plan);
@@ -37,7 +40,11 @@ export const MissionBrief = memo(function MissionBrief({ plan, measurements, hov
       })}
     </section>
     <div className="mission-disclosures">
-      <Disclosure title="Which tool?"><ToolAssessment /></Disclosure>
+      <Disclosure title="Is it worth going? · Site card" defaultOpen><SiteCard card={plan.site_assessment} /></Disclosure>
+      <Disclosure title="Radar first, then drill"><RadarFirst /></Disclosure>
+      <Disclosure title="EVA window & weather"><EvaWindowCard planId={plan.plan_id} source={planSource} /></Disclosure>
+      <Disclosure title="Evidence · why trust it"><Evidence /></Disclosure>
+      <Disclosure title="Beyond S1094b · SkyFall & NASA zones"><BeyondSite /></Disclosure>
       <Disclosure title="Decision points"><ListSection footer="Bingo is the latest safe departure, as supplied by the planner.">{(plan.decision_points ?? []).map((p) => <ListRow key={p.station_id} onClick={() => onSelect(p.station_id)}><RowLabel title={p.station_id} detail={`${Math.floor(p.decide_by_min / 60)}:${String(Math.round(p.decide_by_min % 60)).padStart(2, "0")} · ${p.options.length} branches · crew decides`} /></ListRow>)}</ListSection></Disclosure>
       <Disclosure title="Equipment & mass"><ListSection footer={`${formatNumber(mass.known_kg, 1)} kg known${mass.unknown ? ` · ${mass.unknown} items without mass` : ""}`}>{equipment.map((item) => <ListRow key={item.tool} trailing={<Value>{item.count} × {item.mass_kg == null ? "Unknown mass" : `${item.mass_kg} kg`}</Value>}><RowLabel title={toolName(item.tool)} detail={item.justification} /></ListRow>)}</ListSection></Disclosure>
       <Disclosure title="Model & assumptions"><Footnote className="mission-source">{plan.plan_id} · {source}</Footnote><Footnote tone="secondary">{plan.summary.craters_in_model !== undefined ? `${plan.summary.craters_in_model} craters in model. ` : ""}Probabilities are model estimates, not confirmed ice. Habitat position and instrument performance include assumptions; see project sources.</Footnote></Disclosure>

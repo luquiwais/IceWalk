@@ -8,11 +8,13 @@ import { useId, useState, type ReactNode } from "react";
 export function Disclosure({
   title,
   children,
+  defaultOpen = false,
 }: {
   title: ReactNode;
   children: ReactNode;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const id = useId();
   return (
     <div className="mission-disclosure">

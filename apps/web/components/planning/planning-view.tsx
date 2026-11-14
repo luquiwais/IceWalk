@@ -5,10 +5,13 @@ import { Footnote, Title1, Title2 } from "@icewalk/ui/text";
 import { TabBar } from "@icewalk/ui/tab-bar";
 import { Window, WindowContent, WindowMotion } from "@icewalk/ui/window";
 import { ArrowLeft, FlaskConical, Footprints, Globe, Map as MapIcon, Maximize2, Minus, Plus, Scan } from "lucide-react";
-import { useCallback, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { SiteScene, type SiteSceneHandle, type SiteLayers, type SiteProjection } from "@/components/site/site-scene";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { SiteScene, type SiteSceneHandle, type SiteLayers, type SiteProjection, type SiteRaster } from "@/components/site/site-scene";
 import { type Insets } from "@/components/site/camera";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
+import { useIceMap } from "@/lib/use-ice-map";
+import { ICE_MAP_MODES, renderDataUrl, type IceMapMode } from "@/lib/ice-map";
+import { IceLegend } from "./ice-legend";
 import { bearing, demoPlan, demoReplan, evaName, measuringTool, nextStation, stationBlock, stationById, toolName, traverseHeading, type Measurement, type Plan, type Station } from "@/lib/plan";
 import { formatOdds } from "@/lib/format";
 import { MissionBrief } from "./mission-brief";
@@ -42,6 +45,7 @@ export function PlanningView() {
   const [mapFocus, setMapFocus] = useState(false);
   const [globe, setGlobe] = useState(false);
   const [layers, setLayers] = useState<SiteLayers>({ grid: false, rings: false });
+  const [mapMode, setMapMode] = useState<IceMapMode | null>("potential");
   const [approved, setApproved] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [insets, setInsets] = useState<Insets>({ top: 0, right: 0, bottom: 0, left: 0 });
@@ -59,6 +63,12 @@ export function PlanningView() {
   const reopenRef = useRef<HTMLButtonElement | null>(null);
   const session = usePlanSession({ fallback: { plan: demoPlan, replan: demoReplan } });
   const plan: Plan = session.plan;
+  const iceMap = useIceMap(plan.plan_id, session.source);
+  const raster: SiteRaster | undefined = useMemo(() => {
+    if (!iceMap.map || !mapMode) return undefined;
+    const url = renderDataUrl(iceMap.map, mapMode);
+    return url ? { url, bounds: iceMap.map.bounds_xy_m } : undefined;
+  }, [iceMap.map, mapMode]);
   const station = stationId ? stationById(plan, stationId) : undefined;
   const next = nextStation(plan, session.measurements);
   const last = session.measurements.at(-1);
@@ -127,7 +137,7 @@ export function PlanningView() {
   const title = view === "ev" ? "Surface operations" : view === "science" ? "Science review" : station ? `Station ${station.id}` : evaName(plan);
   return <main ref={rootRef} className="mission-app" data-view={view} data-focused={mapFocus} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToBrief(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
-    <div className="mission-scene" inert={globe}><SiteScene ref={sceneRef} plan={plan} previousPlan={session.previous ?? undefined} measurements={session.measurements} projection={projection} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} /></div>
+    <div className="mission-scene" inert={globe}><SiteScene ref={sceneRef} plan={plan} previousPlan={session.previous ?? undefined} measurements={session.measurements} projection={projection} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} /></div>
     {globe ? <GlobeEntry plan={plan} onEnter={enterSite} /> : <>
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
     <div className="mission-status-position" ref={statusRef}><Window className="mission-status-window"><MissionStatus plan={plan} elapsedMin={view === "planning" ? 0 : elapsedMin} execution={view !== "planning"} session={session} /></Window></div>
@@ -139,7 +149,7 @@ export function PlanningView() {
         <WindowContent contentKey={view === "planning" ? stationId ?? "brief" : view} direction={station ? "forward" : "back"}>
         {session.previous && last ? <ReplanSummary before={session.previous} after={plan} measurement={last} onRevert={reset} /> : null}
         {view === "planning" ? station ? <section className="mission-stack" aria-label="Station detail"><Footnote>{formatOdds(station.p_ice)} chance of ice at the STM threshold</Footnote><StationDetail plan={plan} station={station} /><MeasurementForm key={station.id} compact station={station} pending={pending} onLog={logMeasurement} /></section>
-          : <MissionBrief plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} onSelect={selectStation} onHover={hoverStation} />
+          : <MissionBrief plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} planSource={session.source} onSelect={selectStation} onHover={hoverStation} />
           : view === "ev" ? <EVView plan={plan} measurements={session.measurements} pending={pending} onLog={logMeasurement} onReview={() => switchView("science")} />
           : <ScienceView plan={plan} measurements={session.measurements} approved={approved} onApprove={() => { setApproved(true); setAnnouncement("Plan approved locally in this session."); }} onReset={reset} />}
         </WindowContent>
@@ -149,9 +159,10 @@ export function PlanningView() {
     {view === "ev" && !compact && next && direction ? <div className="mission-destination"><Footnote>Next station · {next.order} · {next.id}</Footnote><Title2>{direction.distanceM >= 1 ? `${Math.round(direction.distanceM)} m · ${direction.label}` : "On station"}</Title2><Footnote>{toolName(measuringTool(next))}</Footnote><Footnote>Simulated position · heading-up oblique of the flat ortho</Footnote></div> : null}
     <div className="mission-map-tools" ref={toolsRef}>
       {view === "ev" ? <TraverseMinimap plan={plan} measurements={session.measurements} position={position} headingDeg={heading} />
-        : <section className="mission-layer-position" aria-label="Map layers"><Window className="mission-layer-window"><Button variant="plain" size="small" disabled>HiRISE imagery</Button><Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button><Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button><Button variant="plain" size="small" disabled title="Awaiting /maps">Ice potential · Awaiting /maps</Button></Window></section>}
+        : <section className="mission-layer-position" aria-label="Map layers"><Window className="mission-layer-window"><Button variant="plain" size="small" disabled>HiRISE imagery</Button><Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button><Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button>{iceMap.map ? ICE_MAP_MODES.map((m) => <Button key={m.value} variant="plain" size="small" aria-pressed={mapMode === m.value} onClick={() => setMapMode((cur) => (cur === m.value ? null : m.value))}>{m.label}</Button>) : <Button variant="plain" size="small" disabled>{iceMap.loading ? "Ice map · loading" : "Ice map unavailable"}</Button>}</Window></section>}
       <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
         <span><i data-key="arc" aria-hidden />Arc · P(ice{plan.summary.ice_threshold_m !== undefined ? ` ≤ ${plan.summary.ice_threshold_m} m` : ""})</span><span><i data-key="hab" aria-hidden />HAB · Habitat</span><span><i data-key="route" aria-hidden />Traverse</span>
+        {iceMap.map && mapMode ? <IceLegend map={iceMap.map} mode={mapMode} /> : null}
         {layers.rings && view !== "ev" ? <span><i data-key="ring" aria-hidden />Rings · distance from habitat</span> : null}{session.previous ? <span><i data-key="previous" aria-hidden />Previous plan</span> : null}
         <span>Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>
       </div>

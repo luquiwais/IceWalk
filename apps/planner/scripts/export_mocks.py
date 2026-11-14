@@ -9,7 +9,11 @@ su alcance sin encontrar hielo, que es lo más probable con 1 m en S1094b (P ~ 0
 
 `map.json` es `GET /maps` del re-plan: cráteres, prior y la medición de la demo.
 
-Uso (desde apps/planner/): python scripts/export_mocks.py
+Con `--maps-only` no toca `plan.json` ni `replan.json`: lee los mocks que ya están y escribe
+`map.json` (plan nominal, sin mediciones) y `map-replan.json` (con la medición de la demo). Sirve
+cuando acá no están las capas del terreno y regenerar los planes los dejaría con rutas rectas.
+
+Uso (desde apps/planner/): python scripts/export_mocks.py [--maps-only]
 """
 
 import json
@@ -24,6 +28,19 @@ from app.contracts import CONTRACTS, ROOT, tools_by_id  # noqa: E402
 from app.main import app  # noqa: E402
 
 ICE_TOOLS = ("core_drill", "neutron_spectrometer")
+OUT = ROOT / "apps" / "web" / "mock"
+
+if "--maps-only" in sys.argv:
+    from app.main import DEFAULT_STM, _map  # noqa: E402
+
+    mock = {n: json.loads((OUT / f"{n}.json").read_text()) for n in ("plan", "replan", "measurement")}
+    nominal = _map(DEFAULT_STM, {"plan": mock["plan"], "measurements": []})
+    after = _map(DEFAULT_STM, {"plan": mock["replan"], "measurements": [mock["measurement"]]})
+    (OUT / "map.json").write_text(json.dumps(nominal))  # sin sangría: cientos de kB
+    (OUT / "map-replan.json").write_text(json.dumps(after))
+    print("ok: map.json, map-replan.json", nominal["width"], "x", nominal["height"],
+          "| craters", nominal.get("craters_in_model"), "| prior only", nominal["is_prior_only"])
+    sys.exit(0)
 
 client = TestClient(app)
 example = json.loads((CONTRACTS / "examples" / "measurement.example.json").read_text())
