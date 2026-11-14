@@ -9,6 +9,7 @@ import { Disclosure } from "./disclosure";
 import { RadarFirst, SiteCard } from "./site-card";
 import { BeyondSite, Evidence } from "./evidence";
 import { EvaWindowCard } from "./eva-window-card";
+import { FeasibilityCard } from "./feasibility-card";
 import type { PlanSource } from "@/lib/use-plan-session";
 import { RowLabel, Value } from "./parts";
 
@@ -42,6 +43,7 @@ export const MissionBrief = memo(function MissionBrief({ plan, measurements, hov
     <div className="mission-disclosures">
       <Disclosure title="Is it worth going? · Site card" defaultOpen><SiteCard card={plan.site_assessment} /></Disclosure>
       <Disclosure title="Radar first, then drill"><RadarFirst /></Disclosure>
+      <Disclosure title="Can we walk it? · Feasibility"><FeasibilityCard plan={plan} /></Disclosure>
       <Disclosure title="EVA window & weather"><EvaWindowCard planId={plan.plan_id} source={planSource} /></Disclosure>
       <Disclosure title="Evidence · why trust it"><Evidence /></Disclosure>
       <Disclosure title="Beyond S1094b · SkyFall & NASA zones"><BeyondSite /></Disclosure>

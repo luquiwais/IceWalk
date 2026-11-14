@@ -3,7 +3,8 @@
 Tres zips, porque las licencias son distintas (`docs/SOURCES.md`, cuestiones 26 y 65):
 
 - `icewalk-site-terrain.zip`: capas del terreno de `python -m app.traverse.terrain`, derivadas
-  del DTM de HiRISE (copia controlada de USGS, CC0). Se puede subir a un GitHub Release público.
+  del DTM de HiRISE (copia controlada de USGS, CC0), y la inercia térmica de THEMIS en la grilla
+  (`scripts/build_soil.py`, dominio público). Se puede subir a un GitHub Release público.
 - `icewalk-site-private.zip`: el catálogo de cráteres llevado a la grilla
   (`craters_dundas2023.csv`). Es una adaptación de Dundas et al. 2023 (CC BY-NC-ND 4.0):
   **no se publica**. Va solo al servidor y al equipo, por un canal privado.
@@ -30,12 +31,14 @@ SITE = ROOT / "data" / "processed" / "s1094b"
 RAW = ROOT / "data" / "raw"
 DIST = ROOT / "dist"
 TERRAIN = ["terrain_elevation_m.tif", "terrain_slope_max_deg.tif", "terrain_slope_mean_deg.tif",
-           "terrain_roughness_m.tif", "terrain_valid_fraction.tif"]
+           "terrain_roughness_m.tif", "terrain_valid_fraction.tif", "soil_thermal_inertia.tif"]
 
 TERRAIN_NOTE = """IceWalk site terrain layers (S1094b, 10 m grid of packages/contracts/grid.json).
 Derived with apps/planner/app/traverse/terrain.py from the controlled HiRISE DTM
 DTEEC_073578_2155_073077_2155_A01 (USGS Astrogeology copy, CC0).
 Credit: NASA/JPL-Caltech/UArizona (HiRISE); USGS Astrogeology.
+soil_thermal_inertia.tif: THEMIS thermal inertia mosaic 30N180E, 100 m (Fergason et al. 2006,
+NASA/ASU/USGS, public domain), resampled to the grid by apps/planner/scripts/build_soil.py.
 Unzip into data/processed/s1094b/.
 """
 PRIVATE_NOTE = """PRIVATE - DO NOT PUBLISH.

@@ -38,7 +38,9 @@
       "planetary_protection": "sensitive",
       "kind": "survey",
       "depth_median_m": 2.45,
-      "depth_shallow_m": 1.43
+      "depth_shallow_m": 1.43,
+      "comm_los": true,
+      "soil_ti": 462
     },
     {
       "id": "E04S22",
@@ -75,7 +77,9 @@
       "planetary_protection": "sensitive",
       "kind": "survey",
       "depth_median_m": 2.37,
-      "depth_shallow_m": 1.37
+      "depth_shallow_m": 1.37,
+      "comm_los": true,
+      "soil_ti": 459
     },
     {
       "id": "E04S23",
@@ -118,7 +122,9 @@
       "planetary_protection": "sensitive",
       "kind": "survey",
       "depth_median_m": 2.36,
-      "depth_shallow_m": 1.37
+      "depth_shallow_m": 1.37,
+      "comm_los": true,
+      "soil_ti": 423
     },
     {
       "id": "E03S23",
@@ -155,7 +161,9 @@
       "planetary_protection": "sensitive",
       "kind": "survey",
       "depth_median_m": 2.37,
-      "depth_shallow_m": 1.37
+      "depth_shallow_m": 1.37,
+      "comm_los": true,
+      "soil_ti": 443
     },
     {
       "id": "E02S23",
@@ -192,7 +200,9 @@
       "planetary_protection": "sensitive",
       "kind": "survey",
       "depth_median_m": 2.36,
-      "depth_shallow_m": 1.37
+      "depth_shallow_m": 1.37,
+      "comm_los": true,
+      "soil_ti": 462
     },
     {
       "id": "E01S23",
@@ -229,7 +239,9 @@
       "planetary_protection": "sensitive",
       "kind": "survey",
       "depth_median_m": 2.25,
-      "depth_shallow_m": 1.31
+      "depth_shallow_m": 1.31,
+      "comm_los": true,
+      "soil_ti": 521
     }
   ],
   "route": {
@@ -514,11 +526,53 @@
     "max_distance_from_habitat_km": 0.22,
     "min_walkback_margin_min": 33.0,
     "dose_estimate_msv": 0.163,
-    "expected_uncertainty_reduction": 0.0011,
+    "expected_uncertainty_reduction": 0.0063,
     "crew": 2,
     "is_mock": false,
     "ice_threshold_m": 3.0,
     "craters_in_model": 349,
+    "feasibility": {
+      "mobility": {
+        "mode": "walk",
+        "reasons": [
+          "Effort, load, soil and distance are within walking limits"
+        ]
+      },
+      "effort": {
+        "average_btu_h": 1028,
+        "peak_btu_h": 1430,
+        "average_limit_btu_h": 1200.0,
+        "peak_limit_btu_h": 2000.0,
+        "vo2max_fraction": 0.29,
+        "vo2max_fraction_limit": 0.43,
+        "o2_kg_per_crew": 0.43
+      },
+      "carry": {
+        "per_crew_kg": 9.8,
+        "allowance_kg": 23.0,
+        "heaviest": {
+          "tool": "core_drill",
+          "mass_kg": 13.6
+        },
+        "unknown_mass": [
+          "sample_kit"
+        ]
+      },
+      "soil": {
+        "class": "firm",
+        "thermal_inertia_median": 462,
+        "terrain_coefficient": 1.1,
+        "dust_fraction": 0.0,
+        "source": "THEMIS thermal inertia, 100 m (Fergason et al. 2006)"
+      },
+      "comms": {
+        "route_los_fraction": 1.0,
+        "max_min_without_los": 0.0,
+        "limit_min": 15.0,
+        "stations_without_los": []
+      },
+      "is_assumption": true
+    },
     "walkback_caution_min": 15.0
   },
   "alerts": [

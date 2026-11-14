@@ -37,7 +37,9 @@
           "terrain_unit": { "type": "integer" },
           "kind": { "enum": ["survey", "target"], "description": "survey: elegida por el mapa de hielo; target: posición fija de la STM" },
           "depth_median_m": { "type": "number", "minimum": 0, "description": "Mediana de la profundidad del hielo según el GP" },
-          "depth_shallow_m": { "type": "number", "minimum": 0, "description": "Profundidad optimista: un desvío más somera que la media de log d" }
+          "depth_shallow_m": { "type": "number", "minimum": 0, "description": "Profundidad optimista: un desvío más somera que la media de log d" },
+          "comm_los": { "type": ["boolean", "null"], "description": "Línea de vista entre la antena del hábitat y la del traje sobre el DTM; null sin DTM (app/feasibility.py)" },
+          "soil_ti": { "type": ["number", "null"], "description": "Inercia térmica de THEMIS en la estación (J m-2 K-1 s-1/2); < 100 es polvo" }
         }
       }
     },
@@ -133,6 +135,61 @@
         "walkback_caution_min": { "type": "number", "minimum": 0, "description": "Umbral de caution del margen de regreso, copiado de la STM; la web lo dibuja en la curva de walkback margin" },
         "ice_threshold_m": { "type": "number", "exclusiveMinimum": 0, "description": "Umbral de profundidad de la STM para P(hielo)" },
         "craters_in_model": { "type": "integer", "minimum": 0, "description": "Cráteres del catálogo en el GP; 0 = solo el prior" },
+        "feasibility": {
+          "type": "object",
+          "description": "¿Se puede hacer caminando? Esfuerzo, carga, suelo, comunicaciones y movilidad (app/feasibility.py, config/feasibility.yaml; supuestos)",
+          "required": ["mobility", "effort", "carry", "soil", "comms"],
+          "properties": {
+            "mobility": {
+              "type": "object", "required": ["mode", "reasons"],
+              "properties": {
+                "mode": { "enum": ["walk", "cart", "rover"] },
+                "reasons": { "type": "array", "items": { "type": "string" }, "description": "En inglés, para la interfaz" }
+              }
+            },
+            "effort": {
+              "type": "object", "required": ["average_btu_h", "peak_btu_h"],
+              "properties": {
+                "average_btu_h": { "type": "number", "minimum": 0 },
+                "peak_btu_h": { "type": "number", "minimum": 0 },
+                "average_limit_btu_h": { "type": "number" },
+                "peak_limit_btu_h": { "type": "number" },
+                "vo2max_fraction": { "type": "number", "minimum": 0, "description": "VO2 medio de la EVA sobre el VO2max mínimo de regla de vuelo" },
+                "vo2max_fraction_limit": { "type": "number" },
+                "o2_kg_per_crew": { "type": "number", "minimum": 0 }
+              }
+            },
+            "carry": {
+              "type": "object", "required": ["per_crew_kg"],
+              "properties": {
+                "per_crew_kg": { "type": "number", "minimum": 0 },
+                "allowance_kg": { "type": "number" },
+                "heaviest": { "type": ["object", "null"], "properties": { "tool": { "type": "string" }, "mass_kg": { "type": "number" } } },
+                "unknown_mass": { "type": "array", "items": { "type": "string" } }
+              }
+            },
+            "soil": {
+              "type": "object", "required": ["class"],
+              "properties": {
+                "class": { "enum": ["dust", "loose", "firm", "unknown"] },
+                "thermal_inertia_median": { "type": ["number", "null"] },
+                "terrain_coefficient": { "type": "number", "description": "Coeficiente de terreno de Pandolf (Soule y Goldman 1972)" },
+                "dust_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+                "source": { "type": ["string", "null"] }
+              }
+            },
+            "comms": {
+              "type": "object", "required": ["max_min_without_los"],
+              "properties": {
+                "route_los_fraction": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+                "max_min_without_los": { "type": "number", "minimum": 0 },
+                "limit_min": { "type": "number" },
+                "stations_without_los": { "type": "array", "items": { "type": "string" } }
+              }
+            },
+            "is_assumption": { "type": "boolean" }
+          }
+        },
         "crew": { "type": "integer" },
         "is_mock": { "type": "boolean" }
       }

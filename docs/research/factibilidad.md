@@ -11,6 +11,19 @@
 - Solución adoptada: **regla del pasillo**. Una celda se prohíbe solo si no queda un pasillo que la cruce.
 - El clima define **cuándo** salir, no por dónde: va como ventana de EVA.
 
+## Actualización 2026-11-14 (consulta con un mentor)
+
+El mentor aprobó elegir estaciones por incertidumbre, pero preguntó cómo se evita que esa elección lleve a lugares imposibles (suelo, condiciones físicas) y pidió considerar el largo de la EVA con velocidad, esfuerzo, equipo, contextura y terreno, la señal de retorno, los rastros de ríos y un rover.
+
+- **Incertidumbre y terreno:** la incertidumbre es sobre el hielo. Las estaciones se eligen solo entre celdas transitables (pendiente, pasillo entre bloques de visión, ruta de ida y vuelta, duración, regreso), `eva_planner.py:_candidates`.
+- **Largo de la EVA (ICES-2026-127, NASA JSC 2026):** regreso a pie de 30 min o 1 h a 2.2 mph, radio de 1.1 o 2.2 millas; para Marte se prefiere 30 min por la masa del traje (máximo de 104 kg contra 170 kg del xEMU). Metabolismo: 1000 BTU/h en la ISS, 1200 de diseño, 1700 de regreso (2300 en el percentil 95). VO2max mínimo de 36 ml/min/kg y ~43 % sostenido en una EVA. El traje suma ~14 ml/min/kg. Carga supuesta de 50 lbm; NIOSH 51 lbf. Desacondicionamiento: −15 a 25 % de VO2max. En Marte, con el traje del ensayo, se llega a VO2max a 3.5 mph.
+- **Artemis (Kostak, Caswell y Young 2025):** restricciones de FOD: distancia máxima, distancia al módulo, iluminación, pendiente, tiempo máximo sin línea de vista al módulo, consumibles. El Map Book incluye cobertura de comunicaciones y vistas del horizonte.
+- **Suelo:** la inercia térmica separa polvo (< ~100, sin capacidad portante segura) de suelo firme; la usaron MER y MSL. Coeficientes de terreno de Soule y Goldman (1972).
+- **Ríos:** S1094b está en la unidad `lAv` (lavas amazónicas); no hay canales en el sitio. El hielo de latitudes medias es depositado desde la atmósfera, no fluvial. Los canales más cercanos (Marte Vallis) quedan cientos de km al sur.
+- **Video sugerido:** "Seven Minutes of Terror" (NASA/JPL, 2012) trata la entrada y el aterrizaje de Curiosity, no la EVA. Sirve como argumento de autonomía por la demora de la señal.
+
+Aplicado en `app/feasibility.py` y `config/feasibility.yaml` (DECISIONS, 2026-11-14).
+
 ## Método de NASA
 
 | Criterio | Valor | Condición | Fuente |

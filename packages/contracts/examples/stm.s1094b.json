@@ -5,7 +5,7 @@
     "eva_max_h": 8,
     "reserve": 0.2,
     "max_slope_deg": 20,
-    "walkback_max_km": 10,
+    "walkback_max_km": 1.8,
     "walkback_caution_min": 15,
     "crew": 2,
     "mass_budget_kg": null,

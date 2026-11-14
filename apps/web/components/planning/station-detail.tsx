@@ -72,6 +72,17 @@ export function StationDetail({
         ) : null}
       </MetricList>
 
+      {station.comm_los !== undefined || station.soil_ti !== undefined ? (
+        <ListSection header="Comms & soil" headerId="station-comms-soil">
+          <ListRow trailing={<Value>{station.comm_los == null ? "Unknown" : station.comm_los ? "In view" : "Blocked"}</Value>}>
+            <RowLabel title="Line of sight to habitat" detail={station.comm_los === false ? "Relay through the EV partner" : "Habitat antenna over the DTM"} />
+          </ListRow>
+          <ListRow trailing={<Value>{station.soil_ti == null ? "Unknown" : formatNumber(station.soil_ti, 0)}</Value>}>
+            <RowLabel title="Soil thermal inertia" detail={station.soil_ti == null ? "THEMIS, 100 m" : station.soil_ti < 100 ? "Dust: may not bear weight" : station.soil_ti < 200 ? "Loose soil" : "Firm soil · THEMIS, 100 m"} />
+          </ListRow>
+        </ListSection>
+      ) : null}
+
       <ListSection header="Hypothesis" headerId="station-hypothesis">
         <ListRow>
           <RowLabel

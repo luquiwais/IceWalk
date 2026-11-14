@@ -30,6 +30,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+from . import feasibility
 from .contracts import grid as grid_contract
 from .contracts import tools_by_id, xy_to_lonlat
 from .ice import IceModel
@@ -547,10 +548,13 @@ def build(
     coords = [list(xy_to_lonlat(*tmap.xy(planner.start_cell)))]
     distance_m, prev = 0.0, planner.start_cell
     max_slope = 0.0
+    legs: list[dict] = []  # tramos de caminata, para la factibilidad
     for sid, visit in zip(ids, sched.visits, strict=True):
         route = tmap.route(tmap.xy(prev), (visit.stop.x, visit.stop.y))
         coords.extend(list(xy_to_lonlat(*p)) for p in route.xy[1:])
         distance_m += route.distance_m
+        legs.append({"xy": route.xy, "distance_m": route.distance_m,
+                     "minutes": visit.arrive_min - visit.depart_min})
         max_slope = max(max_slope, route.max_slope_deg)
         timeline.append({"t_start_min": round(visit.depart_min, 1),
                          "t_end_min": round(visit.arrive_min, 1), "kind": "traverse",
@@ -564,6 +568,8 @@ def build(
     coords.extend(list(xy_to_lonlat(*p)) for p in back.xy[1:])
     distance_m += back.distance_m
     max_slope = max(max_slope, back.max_slope_deg)
+    legs.append({"xy": back.xy, "distance_m": back.distance_m,
+                 "minutes": sched.return_end_min - sched.return_start_min})
     timeline.append({"t_start_min": round(sched.return_start_min, 1),
                      "t_end_min": round(sched.return_end_min, 1), "kind": "traverse",
                      "label": "Return to habitat", "station_id": None})
@@ -602,6 +608,14 @@ def build(
     reduction = float((before - after) / before) if before > 0 else 0.0
 
     hab = planner.habitat_xy
+    segments = [{"minutes": t["t_end_min"] - t["t_start_min"]} for t in timeline
+                if t["kind"] in ("egress", "station", "ingress")]
+    feas, feas_alerts, per_station = feasibility.assess(
+        legs=legs, segments=segments, stations=stations, equipment=equipment,
+        crew=planner.crew, habitat_xy=tuple(hab), elevation=tmap.elevation, grid=tmap.grid)
+    for st in stations:
+        st.update(per_station.get(st["id"], {}))
+    alerts.extend(feas_alerts)
     plan = {
         "mission_id": stm["mission_id"],
         "plan_id": f"plan-{uuid.uuid4().hex[:8]}",
@@ -629,6 +643,7 @@ def build(
             "is_mock": False,
             "ice_threshold_m": model.threshold_m,
             "craters_in_model": model.craters,
+            "feasibility": feas,
         },
         "alerts": alerts,
     }
