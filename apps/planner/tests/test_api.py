@@ -46,6 +46,22 @@ def test_replan_after_negative_measurement():
     assert new["replanned_from"] == plan["plan_id"]
     assert first["id"] not in [st["id"] for st in new["stations"]]
     assert any(a["level"] == "advisory" for a in new["alerts"])
+    r = new["replan"]
+    assert r["from_plan_id"] == plan["plan_id"] and r["trigger"]["station_id"] == first["id"]
+    assert r["recommendation"] in ("continue", "return_to_habitat") and r["reasons"]
+
+
+def test_get_plan_and_campaign():
+    plan = client.post("/plan", json={}).json()
+    assert client.get(f"/plan/{plan['plan_id']}").json()["plan_id"] == plan["plan_id"]
+    assert client.get("/plan/plan-missing").status_code == 404
+    assert client.get("/plan/not a plan").status_code == 422
+    c = client.get("/campaign").json()
+    blind, radar = c["series"][0], c["series"][1]
+    assert blind["strategy"] == "blind_drill" and radar["strategy"] == "radar_first_50"
+    assert all(r > b for r, b in zip(radar["p_confirmed"], blind["p_confirmed"], strict=True))
+    assert c["speedup"] > 2
+    assert client.get("/campaign?evas=0").status_code == 422
 
 
 def test_spaceweather_demo():

@@ -694,3 +694,10 @@ Errores que se ven: faltan bloques grandes y brillantes, y sobran pozos chicos y
 
 Siguiente paso recomendado: un detector aprendido (CNN chica o BoulderNet) entrenado con este dataset, sumando los recortes lunares para tener más datos. Hay que decidirlo con Luqui (`plans/vision.md`).
 
+## 2026-11-14: pendiente en el esfuerzo, exclusión del hábitat y regla de volver
+
+- **Plan nominal de S1094b** con la exclusión de 150 m: la estación 1 pasa de 0 m (encima del hábitat) a 200 m; 6 estaciones entre 200 y 510 m, 1.14 km, margen mínimo 20.6 min. Sube 19 m en total: media 1050 BTU/h, pico 1617 (tope 2000), VO2 30 % del máximo (límite 43 %): sigue siendo a pie.
+- **Rampa sintética de 30 m** (`test_feasibility.py`): el pico sube más de 300 BTU/h respecto del llano; en bajada queda igual que en el llano (bajar no descuenta).
+- **Regla de volver** (re-plan tras la estación 2, sin hielo): a los 150 min, `continue` (margen 46.8 min, 3 estaciones); a los 300 min, `return_to_habitat` (margen 0.4 min, bajo los 15 de caution); a los 330 min, `return_to_habitat` (no queda estación alcanzable).
+- **Lo que no cambia:** con las estaciones repartidas por tercios de inercia térmica, una medición casi no mueve las estaciones siguientes (la medición de la demo da 0 % de cambio). La regla del 50 % se activa por tiempo y margen, no por el resultado. Es coherente con lo medido el 08/11: el mapa a escala de sitio casi no cambia con una medición.
+- **Campaña** (`GET /campaign`, taladro de 1 m, 6 estaciones por EVA): a ciegas, P(confirmar) por EVA 0.30 y 3.3 EVAs esperadas; radar primero con 50 sondeos, 0.86 y 1.16 (×2.9); con 20 sondeos, 0.63 y 1.58. Tras 2 EVAs: 51 % contra 98 %.

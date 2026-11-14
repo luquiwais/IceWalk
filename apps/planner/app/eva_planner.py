@@ -50,6 +50,7 @@ class EvaConfig:
     sensitive_p_ice: float
     min_station_separation_m: float
     believer_error_m: float
+    habitat_exclusion_m: float = 0.0
 
 
 @lru_cache
@@ -62,6 +63,7 @@ def eva_config(path: Path = CONFIG) -> EvaConfig:
         sensitive_p_ice=float(raw["sensitive_p_ice"]["value"]),
         min_station_separation_m=float(raw["min_station_separation_m"]["value"]),
         believer_error_m=float(raw["believer_error_m"]["value"]),
+        habitat_exclusion_m=float(raw.get("habitat_exclusion_m", {}).get("value", 0.0)),
     )
 
 
@@ -240,6 +242,8 @@ class EvaPlanner:
         ok = self.tmap.passable.flat[cells] & np.isfinite(back)
         ok &= back * speed_mpm / 1000 <= walkback_km  # tiempo de regreso en km de llano
         ok &= back * 2 + self.cfg.ingress_min <= self.budget_min  # alcanzable ida y vuelta
+        hx, hy = self.habitat_xy
+        ok &= np.hypot(gx - hx, gy - hy) >= self.cfg.habitat_exclusion_m  # suelo del aterrizaje
         self.cx, self.cy, self.ccell = gx[ok], gy[ok], cells[ok]
         self._terrain_units()
         done = np.zeros(self.cx.size, bool)

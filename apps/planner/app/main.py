@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 from contextlib import asynccontextmanager
 from datetime import timedelta
@@ -20,7 +21,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from gp.observations import Observation, from_measurement
 from pydantic import BaseModel
 
-from . import donki, eva_planner, eva_window, maps, mock_planner
+from . import campaign, donki, eva_planner, eva_window, maps, mock_planner, replan_check
 from .contracts import CONTRACTS, ROOT, tool_catalog, tools_by_id
 from .ice import IceModel
 from .marstime import utc
@@ -29,6 +30,7 @@ from .traverse.params import default_params
 from .traverse.route import TraverseMap, cached_map
 
 DEFAULT_STM = json.loads((CONTRACTS / "examples" / "stm.s1094b.json").read_text())
+PLAN_ID = re.compile(r"plan-[A-Za-z0-9_-]{1,64}")
 _PLANS: dict[str, dict] = {}  # plan_id -> {"plan", "stm", "measurements", "completed", "map"}
 
 
@@ -176,6 +178,7 @@ def replan(req: ReplanRequest) -> dict:
     tmap = _traverse_map(stm)
     if tmap is None or current["summary"].get("is_mock"):
         p = mock_planner.replan(stm, current, meas, req.elapsed_min)
+        p["replan"] = replan_check.assess(current, p, meas, stm)
         return _store(p, stm, measurements, entry["completed"])
 
     # Hechas: las estaciones del plan hasta la medida, inclusive (o el punto medido).
@@ -194,7 +197,27 @@ def replan(req: ReplanRequest) -> dict:
     p["alerts"].insert(0, {"level": "advisory", "source": "planner",
                            "message": f"{result[meas['result']]} at {meas['station_id']}. "
                                       "EVA replanned."})
+    p["replan"] = replan_check.assess(current, p, meas, stm)
     return _store(p, stm, measurements, completed)
+
+
+@app.get("/plan/{plan_id}")
+def get_plan(plan_id: str) -> dict:
+    """Un plan ya armado en esta sesión del servidor (para la lista de puño imprimible)."""
+    if not PLAN_ID.fullmatch(plan_id):
+        raise HTTPException(422, "Invalid plan_id")
+    entry = _PLANS.get(plan_id)
+    if entry is None:
+        raise HTTPException(404, "Unknown plan_id")
+    return entry["plan"]
+
+
+@app.get("/campaign")
+def campaign_endpoint(drill_m: float = 1.0, evas: int = 6) -> dict:
+    """P(hielo confirmado) tras 1..N EVAs: perforar a ciegas contra radar primero."""
+    if not (0.1 <= drill_m <= 10) or not (1 <= evas <= 12):
+        raise HTTPException(422, "drill_m in [0.1, 10] and evas in [1, 12]")
+    return campaign.curves(drill_m=drill_m, evas=evas)
 
 
 @app.get("/eva-window")

@@ -46,7 +46,7 @@ export type Station = {
 /** "Can we walk it?" from app/feasibility.py (all values are planning assumptions). */
 export type Feasibility = {
   mobility: { mode: "walk" | "cart" | "rover"; reasons: string[] };
-  effort: { average_btu_h: number; peak_btu_h: number; average_limit_btu_h?: number; peak_limit_btu_h?: number; vo2max_fraction?: number; vo2max_fraction_limit?: number; o2_kg_per_crew?: number };
+  effort: { average_btu_h: number; peak_btu_h: number; average_limit_btu_h?: number; peak_limit_btu_h?: number; vo2max_fraction?: number; vo2max_fraction_limit?: number; o2_kg_per_crew?: number; climb_m?: number; moved_mass_kg?: number };
   carry: { per_crew_kg: number; allowance_kg?: number; heaviest?: { tool: string; mass_kg: number } | null; unknown_mass?: string[] };
   soil: { class: "dust" | "loose" | "firm" | "unknown"; thermal_inertia_median?: number | null; terrain_coefficient?: number; dust_fraction?: number; source?: string | null };
   comms: { route_los_fraction?: number | null; max_min_without_los: number; limit_min?: number; stations_without_los?: string[] };
@@ -130,6 +130,24 @@ export type Plan = {
   summary: PlanSummary;
   alerts?: PlanAlert[];
   site_assessment?: SiteAssessment;
+  replan?: ReplanAssessment;
+};
+
+/** plan.replan (plan.schema.json): what a replan changed and whether to go on or head back. */
+export type ReplanAssessment = {
+  from_plan_id?: string | null;
+  trigger?: { station_id: string; result: "ice" | "no_ice" | "inconclusive" };
+  stations_kept: string[];
+  stations_added: string[];
+  stations_dropped: string[];
+  changed_fraction?: number;
+  changed_fraction_limit?: number;
+  margin_before_min?: number | null;
+  margin_after_min?: number | null;
+  objective_met?: boolean;
+  recommendation: "continue" | "return_to_habitat";
+  reasons: string[];
+  is_assumption?: boolean;
 };
 
 /** A measurement logged at a station (contracts/schemas/measurement.schema.json). */

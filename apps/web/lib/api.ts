@@ -97,6 +97,23 @@ export function postReplan(body: ReplanRequest, options?: ApiOptions): Promise<P
   return request("/replan", post(body), isPlan, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
 }
 
+/** GET /plan/{id}: a plan already built in this server session (the cuff checklist reads it). */
+export function getPlan(planId: string, options?: ApiOptions): Promise<Plan> {
+  return request(`/plan/${encodeURIComponent(planId)}`, { method: "GET" }, isPlan, options);
+}
+
+/** GET /campaign: P(ice confirmed) after 1..N EVAs, drilling blind against radar first. */
+export type CampaignSeries = { strategy: string; label: string; p_eva: number; evas_to_confirm: number; p_confirmed: number[] };
+export type Campaign = { site: string; drill_m: number; stations_per_eva: number; evas: number[]; series: CampaignSeries[]; speedup: number; is_assumption?: boolean; source?: string };
+
+export function getCampaign(options?: ApiOptions): Promise<Campaign> {
+  return request("/campaign", { method: "GET" }, isCampaign, options);
+}
+
+function isCampaign(body: unknown): body is Campaign {
+  return isObject(body) && Array.isArray(body.evas) && Array.isArray(body.series) && typeof body.speedup === "number";
+}
+
 function post(body: unknown): RequestInit {
   return { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) };
 }

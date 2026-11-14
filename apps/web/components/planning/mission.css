@@ -259,3 +259,6 @@
 
 /* First-person analogue photo: full width of the window, rounded like the kit's media. */
 .mission-analog-image { width: 100%; height: auto; border-radius: 12px; }
+
+.mission-cuff-link { align-self: start; font-size: .8125rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; }
+.mission-cuff-link:hover { color: var(--color-label); }

@@ -1,0 +1,27 @@
+/* Cuff checklist: a paper card, black on white, mono for times. Prints on one or two pages. */
+.cuff-page { min-height: 100dvh; background: #f4f2ee; color: #111; font-family: var(--font-inter), system-ui, sans-serif; padding: 24px 16px 48px; }
+.cuff-page > * { max-width: 46rem; margin-inline: auto; }
+.cuff-head { display: flex; justify-content: space-between; align-items: start; gap: 16px; border-bottom: 3px solid #111; padding-bottom: 10px; }
+.cuff-head h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: .06em; }
+.cuff-head p { font: 500 .75rem/1.4 ui-monospace, monospace; color: #444; margin-top: 2px; word-break: break-all; }
+.cuff-print { border: 1.5px solid #111; border-radius: 6px; padding: 6px 14px; font-weight: 700; background: #fff; cursor: pointer; }
+.cuff-note { margin-top: 10px; font-size: .8rem; color: #8a5a00; }
+.cuff-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 6px 16px; margin-top: 12px; }
+.cuff-facts dt { font-size: .65rem; text-transform: uppercase; letter-spacing: .08em; color: #555; }
+.cuff-facts dd { font: 700 .95rem/1.3 ui-monospace, monospace; }
+.cuff-steps { list-style: none; margin-top: 16px; padding: 0; border-top: 1px solid #111; }
+.cuff-steps > li { display: grid; grid-template-columns: 3.5rem 1fr 1.1rem; gap: 10px; align-items: start; padding: 8px 0; border-bottom: 1px solid #c9c4bb; break-inside: avoid; }
+.cuff-steps > li[data-decision] { background: #fff; border-left: 4px solid #111; padding-left: 8px; }
+.cuff-pet { font: 700 .9rem/1.4 ui-monospace, monospace; }
+.cuff-steps strong { font-size: .85rem; letter-spacing: .04em; }
+.cuff-steps p { font-size: .8rem; line-height: 1.35; color: #222; }
+.cuff-box { width: 1.1rem; height: 1.1rem; border: 1.5px solid #111; border-radius: 3px; margin-top: 2px; }
+.cuff-stops { margin-top: 18px; }
+.cuff-stops h2 { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; margin-top: 10px; }
+.cuff-stops ul { margin-top: 4px; padding-left: 1.1rem; list-style: square; font-size: .8rem; line-height: 1.45; }
+.cuff-foot { margin-top: 20px; font-size: .7rem; color: #666; }
+@media print {
+  .cuff-page { background: #fff; padding: 0; }
+  .cuff-print, .cuff-note { display: none; }
+  @page { margin: 12mm; }
+}
