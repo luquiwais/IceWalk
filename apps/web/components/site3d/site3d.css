@@ -132,3 +132,16 @@
     min-width: 0;
   }
 }
+
+.site3d-hud-measure {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgb(180 220 255 / 0.35);
+  display: grid;
+  gap: 8px;
+}
+
+.site3d-hud-actions {
+  display: flex;
+  gap: 8px;
+}

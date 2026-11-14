@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { CRATER_XY, HABITAT_XY } from "@/components/site/site-data";
 import { orderedStations, type Plan } from "@/lib/plan";
-import { circle, Heightfield, iceColor, pointAt, type PathPoint, type Site3DData, type Site3DLevelName } from "@/lib/site3d";
+import { circle, Heightfield, iceColor, pointAt, type Box, type PathPoint, type Site3DData, type Site3DLevelName } from "@/lib/site3d";
 
 const SKY = "#d8b08a";
 /** Sun of the HiRISE ortho ESP_073578_2155 (azimuth 238.45°, incidence 67.7°): the photographed shadows match. */
@@ -23,17 +23,22 @@ export type Site3DProps = {
   mode: "orbit" | "walk";
   progressM: number;
   exaggeration: number;
+  /** Ice map raster (data URL) and its bounds in grid meters, draped on the terrain. */
+  ice?: { url: string; bounds: Box } | null;
   onError?: (message: string) => void;
 };
+
+type SceneContext = { scene: THREE.Scene; terrain: THREE.BufferGeometry; cx: number; cy: number };
 
 type Label = { el: HTMLDivElement; pos: THREE.Vector3 };
 
 /** Real S1094b terrain (HiRISE DTM + ortho), real boulders, the plan route and stations, in WebGL. */
-export function Site3D({ data, level, plan, path, mode, progressM, exaggeration, onError }: Site3DProps) {
+export function Site3D({ data, level, plan, path, mode, progressM, exaggeration, ice, onError }: Site3DProps) {
   const host = useRef<HTMLDivElement>(null);
   const labelsHost = useRef<HTMLDivElement>(null);
   const walk = useRef({ mode, progressM });
   const [ready, setReady] = useState(false);
+  const ctx = useRef<SceneContext | null>(null);
   useEffect(() => { walk.current = { mode, progressM }; }, [mode, progressM]);
 
   useEffect(() => {
@@ -108,6 +113,7 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       const terrainMat = new THREE.MeshStandardMaterial({ map: texture, color: "#f0c49a", roughness: 1, metalness: 0 });
       scene.add(new THREE.Mesh(geo, terrainMat));
       geometries.push(geo); materials.push(terrainMat); textures.push(texture);
+      ctx.current = { scene, terrain: geo, cx, cy };
 
       // Boulders: real detections, sized by shadow-measured diameter and height.
       const rock = new THREE.DodecahedronGeometry(0.5, 0);
@@ -132,9 +138,9 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
 
       // Route: a tube a little above the ground.
       const inBox = (x: number, y: number) => x >= lv.box_m.xmin && x <= lv.box_m.xmax && y >= lv.box_m.ymin && y <= lv.box_m.ymax;
-      const routePts = path.filter((p) => inBox(p.x, p.y)).map((p) => toWorld(p.x, p.y, level === "overview" ? 1.5 : 0.06));
+      const routePts = path.filter((p) => inBox(p.x, p.y)).map((p) => toWorld(p.x, p.y, level === "overview" ? 1.5 : 0.04));
       if (routePts.length > 1) {
-        const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(routePts, false, "catmullrom", 0), routePts.length * 2, level === "overview" ? 2.2 : 0.1, 6, false);
+        const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(routePts, false, "catmullrom", 0), routePts.length * 2, level === "overview" ? 2.2 : 0.05, 6, false);
         const tubeMat = new THREE.MeshBasicMaterial({ color: "#f5f8ff", transparent: true, opacity: level === "overview" ? 0.95 : 0.75 });
         scene.add(new THREE.Mesh(tube, tubeMat));
         geometries.push(tube); materials.push(tubeMat);
@@ -251,9 +257,57 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       renderer.dispose();
       renderer.domElement.remove();
       labelsEl.replaceChildren();
+      ctx.current = null;
       setReady(false);
     };
   }, [data, level, plan, path, exaggeration, onError]);
+
+  // Ice map draped on the terrain: a copy of the terrain mesh with UVs in the raster's bounds.
+  useEffect(() => {
+    const c = ctx.current;
+    if (!ready || !c || !ice) return;
+    let mesh: THREE.Mesh | undefined;
+    let texture: THREE.CanvasTexture | undefined;
+    let geo: THREE.BufferGeometry | undefined;
+    let mat: THREE.Material | undefined;
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (cancelled) return;
+      // One transparent pixel around the image so that clamped UVs outside the bounds are empty.
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width + 2;
+      canvas.height = img.height + 2;
+      canvas.getContext("2d")?.drawImage(img, 1, 1);
+      texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.magFilter = THREE.NearestFilter;
+      geo = c.terrain.clone();
+      const pos = geo.getAttribute("position") as THREE.BufferAttribute;
+      const uv = new Float32Array(pos.count * 2);
+      const b = ice.bounds;
+      const W = img.width, H = img.height;
+      for (let i = 0; i < pos.count; i++) {
+        const gx = pos.getX(i) + c.cx;
+        const gy = -pos.getZ(i) + c.cy;
+        uv[i * 2] = (1 + ((gx - b.xmin) / (b.xmax - b.xmin)) * W) / (W + 2);
+        uv[i * 2 + 1] = (1 + ((gy - b.ymin) / (b.ymax - b.ymin)) * H) / (H + 2);
+      }
+      geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+      mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+      mesh = new THREE.Mesh(geo, mat);
+      mesh.renderOrder = 1;
+      c.scene.add(mesh);
+    };
+    img.src = ice.url;
+    return () => {
+      cancelled = true;
+      if (mesh) c.scene.remove(mesh);
+      geo?.dispose();
+      mat?.dispose();
+      texture?.dispose();
+    };
+  }, [ice, ready]);
 
   return (
     <div className="site3d" data-ready={ready}>

@@ -107,7 +107,8 @@ export function hudAt(plan: Plan, measurements: readonly Measurement[], path: re
   const here = pointAt(path, s);
   const measured = new Set(measurements.map((m) => m.station_id));
   const marks = stationMarks(path, orderedStations(plan));
-  const ahead = marks.find((m) => m.s >= s - 1 && !measured.has(m.station.id));
+  // The first unmeasured station in visit order, even if the walk already passed it.
+  const ahead = marks.find((m) => !measured.has(m.station.id));
   const total = path.length ? path[path.length - 1].s : 0;
   const base = { elapsedMin: s / WALK_MPS / 60, remainingKm: Math.max(total - s, 0) / 1000 };
   if (!ahead) return { ...base, returning: true };
@@ -118,7 +119,7 @@ export function hudAt(plan: Plan, measurements: readonly Measurement[], path: re
     ...base,
     returning: false,
     next: {
-      id: st.id, order: st.order, distanceM: Math.max(ahead.s - s, 0), heading: dir.label,
+      id: st.id, order: st.order, distanceM: Math.abs(ahead.s - s), heading: dir.label,
       tool: toolName(measuringTool(st)), pIce: st.p_ice, commLos: st.comm_los, walkbackMarginMin: margin,
     },
   };

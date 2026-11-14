@@ -49,3 +49,12 @@ describe("site3d", () => {
     expect(iceColor(1)).toBe("#0d366b");
   });
 });
+
+describe("site3d HUD order", () => {
+  it("keeps the first unmeasured station as next even after walking past it", () => {
+    const path = walkPath(demoPlan, 2);
+    const first = orderedStations(demoPlan)[0];
+    const later = hudAt(demoPlan, [], path, path[path.length - 1].s / 2);
+    expect(later.next?.id).toBe(first.id);
+  });
+});
