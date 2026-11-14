@@ -3,7 +3,7 @@
  * path along the planned route and what the helmet HUD shows at each point.
  * Data comes from apps/web/scripts/build-site-3d.py (public/site/s1094b-3d.json).
  */
-import { routeLines } from "@/components/site/site-data";
+import { HABITAT_XY, routeLines } from "@/components/site/site-data";
 import { bearing, measuringTool, orderedStations, toolName, type Measurement, type Plan, type Station } from "./plan";
 
 export type Box = { xmin: number; ymin: number; xmax: number; ymax: number };
@@ -138,4 +138,23 @@ export function iceColor(p: number): string {
   const lerp = (a: number, b: number) => Math.round(a + (b - a) * Math.min(Math.max(p, 0), 1));
   const [r, g, b] = [lerp(0xcd, 0x0d), lerp(0xe2, 0x36), lerp(0xfb, 0x6b)];
   return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** HUD for a free-moving crewmember at grid (x, y): the first unmeasured station in visit order. */
+export function hudFrom(plan: Plan, measurements: readonly Measurement[], x: number, y: number): HudState {
+  const measured = new Set(measurements.map((m) => m.station_id));
+  const st = orderedStations(plan).find((s) => !measured.has(s.id));
+  const base = { elapsedMin: 0, remainingKm: 0 };
+  if (!st) {
+    const back = bearing([x, y], HABITAT_XY);
+    return { ...base, returning: true, remainingKm: back.distanceM / 1000 };
+  }
+  const dir = bearing([x, y], st.position);
+  const margin = plan.timeline.find((t) => t.kind === "station" && t.station_id === st.id)?.walkback_margin_min;
+  return {
+    ...base,
+    returning: false,
+    remainingKm: dir.distanceM / 1000,
+    next: { id: st.id, order: st.order, distanceM: dir.distanceM, heading: dir.label, tool: toolName(measuringTool(st)), pIce: st.p_ice, commLos: st.comm_los, walkbackMarginMin: margin },
+  };
 }
