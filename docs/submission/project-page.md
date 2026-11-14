@@ -76,6 +76,7 @@ The project concept, the scientific choices (what to model, which validations to
 **Space Agency Partner data:**
 - **ESA/DLR:** Mars Express HRSC, inside the MOLA-HRSC blended DEM (CC BY-SA 3.0 IGO).
 - **ASI:** SHARAD radar, inside the SWIM ice consistency maps.
+- **UAE Space Agency / MBRSC (Emirates Mars Mission, Hope):** EMIRS L3 gridded dust optical depth over the site region, used as the background dust opacity of the EVA window (Edwards et al. 2021, Space Sci. Rev. 217, 77).
 
 **Data and papers:**
 - Dundas et al. (2023) GRL, doi:10.1029/2022GL100747: crater table, CC BY-NC-ND 4.0, used unmodified and not redistributed in adapted form.

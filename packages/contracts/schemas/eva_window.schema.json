@@ -36,8 +36,11 @@
       "required": ["tau", "reported"],
       "additionalProperties": false,
       "properties": {
-        "tau": { "type": "number", "minimum": 0, "description": "Opacidad del polvo" },
-        "reported": { "type": "boolean", "description": "false: no se reportó y se usa el fondo típico (supuesto)" }
+        "tau": { "type": "number", "minimum": 0, "description": "Opacidad del polvo, visible" },
+        "reported": { "type": "boolean", "description": "false: no la informó la tripulación; ver source" },
+        "source": { "enum": ["crew", "hope_emirs", "default"], "description": "crew: la tripulación; hope_emirs: mapas EMIRS de la sonda Hope, interpolados por Ls y pasados a visible; default: fondo típico (supuesto)" },
+        "ls_deg": { "type": "number", "minimum": 0, "maximum": 360, "description": "Ls con la que se interpolaron los mapas de Hope" },
+        "note": { "type": "string", "description": "Aviso si no hay un mapa de Hope cerca en Ls" }
       }
     },
     "space_weather": {

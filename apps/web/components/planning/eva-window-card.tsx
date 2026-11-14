@@ -14,12 +14,22 @@ type StationConditions = { station_id: string; arrival_ltst: string; sun_elevati
 type EvaWindow = {
   mode?: string;
   recommended?: { sol: number; start_ltst: string; end_ltst: string; level: Level; go: boolean; reasons: string[] } | null;
-  dust?: { tau: number; reported: boolean };
+  dust?: { tau: number; reported: boolean; source?: "crew" | "hope_emirs" | "default"; ls_deg?: number; note?: string };
   space_weather?: { source: string; status: string; events: { kind: string; time_utc: string }[] };
   stations?: StationConditions[];
   climate_source?: string;
   notes?: string;
 };
+
+function dustDetail(dust: EvaWindow["dust"]): string {
+  if (!dust) return "Unavailable";
+  if (dust.reported) return "Reported by the crew";
+  if (dust.source === "hope_emirs") {
+    const where = `Hope EMIRS (UAE) · site region${dust.ls_deg !== undefined ? `, Ls ${formatNumber(dust.ls_deg, 0)}°` : ""}`;
+    return dust.note ? `${where} · interpolated across a data gap` : where;
+  }
+  return "Not reported · assumed";
+}
 
 const LEVEL_LABEL: Record<Level, string> = { none: "Nominal", advisory: "Advisory", caution: "Caution", warning: "Warning" };
 
@@ -47,7 +57,7 @@ export function EvaWindowCard({ planId, source }: { planId: string; source: Plan
           <RowLabel title="Space weather · NASA DONKI" detail={sw ? `${sw.events.map((e) => e.kind.toUpperCase()).join(", ") || "Quiet"}${data.mode === "demo" ? " · demo period Aug 2023" : " · live"}` : "Unavailable"} />
         </ListRow>
         <ListRow trailing={<Value>τ {data.dust ? formatNumber(data.dust.tau, 1) : "—"}</Value>}>
-          <RowLabel title="Dust opacity" detail={data.dust?.reported ? "Reported by the crew" : "Not reported · assumed"} />
+          <RowLabel title="Dust opacity" detail={dustDetail(data.dust)} />
         </ListRow>
         {(data.stations ?? []).slice(0, 6).map((s) => (
           <ListRow key={s.station_id} trailing={<Value>{LEVEL_LABEL[s.level]}</Value>}>

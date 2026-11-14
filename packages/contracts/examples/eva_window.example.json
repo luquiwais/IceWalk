@@ -9,8 +9,11 @@
  "plan_id": "plan-demo0001",
  "eva_duration_min": 351.0,
  "dust": {
-  "tau": 0.5,
-  "reported": false
+  "tau": 0.27,
+  "reported": false,
+  "source": "hope_emirs",
+  "ls_deg": 101.8,
+  "note": "No Hope map within 20 deg of Ls; interpolated between Ls 54 and 123"
  },
  "space_weather": {
   "source": "NASA CCMC DONKI",
@@ -1646,5 +1649,5 @@
  ],
  "climate_source": "Viking Lander 2 meteorology, PDS VL1/VL2-M-MET-4-BINNED-P-T-V-V1.0 (Tillman et al.), https://atmos.nmsu.edu/PDS/data/vl_1001/data/vl_tbin.dat",
  "is_assumption": true,
- "notes": "All thresholds are assumptions (no official Mars EVA limits). Temperature and wind are a Viking Lander 2 climatology (48N), an analogue for the site."
+ "notes": "All thresholds are assumptions (no official Mars EVA limits). Temperature and wind are a Viking Lander 2 climatology (48N), an analogue for the site. Unreported dust comes from Hope/EMIRS maps of the site region."
 }
