@@ -5,6 +5,7 @@ import { useState, type ReactElement, type ReactNode } from "react";
 import { Button } from "./button";
 import { ListRow, ListSection } from "./list";
 import { Material, SurfaceScroll } from "./material";
+import { Presence } from "./motion";
 import { SystemDialog } from "./system-surfaces";
 import { Text } from "./text";
 import { cn } from "./utils";
@@ -72,9 +73,9 @@ function ShareSheet({
                 disabled={contact.disabled}
                 aria-pressed={selected === contact.id}
                 onClick={() => setSelected(contact.id)}
-                className="flex w-21 shrink-0 flex-col items-center gap-1 rounded-2xl p-2 outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:opacity-30"
+                className="flex w-21 shrink-0 flex-col items-center gap-1 rounded-2xl p-2 outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:opacity-30"
               >
-                <span className="relative flex size-13 items-center justify-center rounded-full bg-white/15 [&_svg]:size-6">
+                <span className="relative flex size-13 items-center justify-center rounded-full bg-fill-tertiary [&_svg]:size-6">
                   {contact.icon}
                   {selected === contact.id ? (
                     <span className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full bg-accent">
@@ -93,11 +94,11 @@ function ShareSheet({
             ))}
           </div>
         </SurfaceScroll>
-        {selected ? (
-          <Button onClick={() => onShare(selected)}>
+        <Presence present={Boolean(selected)}>
+          <Button onClick={() => { if (selected) onShare(selected); }}>
             Share with {contacts.find((c) => c.id === selected)?.name}
           </Button>
-        ) : null}
+        </Presence>
         <ListSection>
           <>
             {destinations.map((destination) => (

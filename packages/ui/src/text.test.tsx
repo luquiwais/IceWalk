@@ -19,7 +19,7 @@ describe("Text", () => {
     expect(heading).toHaveClass("text-title-3");
   });
 
-  it("uses vibrancy for secondary and tertiary tones", () => {
+  it("uses the secondary and tertiary label colors", () => {
     render(
       <>
         <Footnote tone="secondary">s1094b-eva1</Footnote>
@@ -27,8 +27,8 @@ describe("Text", () => {
       </>,
     );
 
-    expect(screen.getByText("s1094b-eva1")).toHaveClass("vibrant-secondary");
-    expect(screen.getByText("draft")).toHaveClass("vibrant-tertiary");
+    expect(screen.getByText("s1094b-eva1")).toHaveClass("text-label-secondary");
+    expect(screen.getByText("draft")).toHaveClass("text-label-tertiary");
   });
 
   it("lets a weight override the style's weight", () => {

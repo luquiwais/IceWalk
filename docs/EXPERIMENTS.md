@@ -380,6 +380,80 @@ Terreno real, 349 cráteres sintéticos, STM con umbral de 3 m.
 | Escaneo de contornos de foco recortados en `/design` (antes/después del arreglo de `Alert`) | Antes: campo y última acción de la alerta recortados; después: ninguno | Arreglado |
 
 
+## 2026-11-09: composición inmersiva y movimiento (Codex)
+
+Ver `research/diseno-inmersivo-y-motion.md` y `research/motion-audit-2026-11-09.json`.
+
+- Dos composiciones previas (panel lateral / workspace dividido) rechazadas por Eitan: densidad, espacios y componentes inconsistentes. La actual usa escena completa y ventanas contextuales.
+- Red→green en selección/disclosure de listas, hit area de campos, orientación compacta de tabs y presencia con salida/interrupción/Reduce Motion. UI 74 y web 38 tests; lint/tipos pasan.
+- Auditoría anterior a motion: 35 estados, 680 observaciones de controles, 320/390/1024/1440 px. Detectó y corrigió dock recortado, nav cubierta por panel, zoom sin fondo, Targets sin representación y estaciones que saltaban al replan.
+- Primera implementación motion con blur animado y geometría por cuadro: Eitan reportó lag y poco parecido con Apple. Retirada. Se detectó selección duplicada y portal que desaparecía antes de terminar: corregidos.
+- 36 acciones en producción con animaciones observadas; p95 habitual 16.7–16.8 ms, sin long tasks. Picos fríos de hasta 100 ms; repetir menú y time picker dio 16.7–16.8 ms. No equivale a garantizar 60 fps ni a validar Safari.
+- Alerta real retiene salida y recupera foco. Último cambio de rueda pasó checks, aún sin QA visual final.
+- Una última captura se atascó en agent-browser al cambiar viewport; no se confirmó defecto de aplicación. `web:test` simultáneo con `web:build` falló por recopia de Cesium; ejecutados secuencialmente pasan.
+
+
+## 2026-11-10: imágenes reales del sitio para la web
+
+- Lectura por ventanas de los ortos HiRISE en la copia COG de USGS (`/vsicurl/` con `rasterio`, vía `uv run --with rasterio`), sin bajar los `.tif` (50 a 700 MB): funciona y tarda segundos. `RED_C` (1.06 m/px) para el contexto y `RED_A` (0.27 m/px) para el detalle.
+- Los ortos están en equirectangular con `lat_ts=0` y `R=3396190`; la grilla usa `lat_ts=35.1105` y `R=3389574.349`. Un recorte sin reproyectar deja el píxel estirado ~22 % en x y el cráter corrido ~150 m en x respecto de (0, 0). Hay que reproyectar a la grilla. El registro final (≤ 20 m) lo mide el script `apps/web/scripts/build-site-imagery.py`.
+- La zona de las estaciones (x 100…400, y −2300…−2200) es terreno picado sin rasgos grandes; el cráter queda a 2.2 km al norte. Las dos líneas oscuras del orto son artefactos del sensor.
+- `gdal` no está instalado en la máquina de Eitan; `rasterio` por `uv` alcanza.
+
+## 2026-11-10: recuperación y envío de mediciones (Codex)
+
+- Estado inicial recuperado: UI lint/tipos y89tests pasan. Web falla por11helpers ausentes de etapa2 (12tests nuevos de Claude), no por los cambios heredados de motion; el worker de diseño continúa ese rojo.
+- #58 reproducida: dos llamadas de `logMeasurement` sin esperar a la primera generan dos `/replan` desde el mismo plan_id; el segundo aborta el primero. El test espera un solo request y falla con2 antes del arreglo.
+- Guard síncrono en sesión API devuelve `busy` mientras hay replan pendiente; no cancela ni registra segundo envío. Después del primer resultado, la siguiente medición usa el plan_id nuevo. Reset conserva invalidación de respuestas anteriores.22tests de sesión pasan; ESLint de los dos archivos pasa.
+- El test anterior de supersesión por segundo envío se adapta al comportamiento aprobado de bloqueo; la supersesión por reset se conserva con su propio escenario. No se eliminó cobertura de respuestas viejas.
+
+## 2026-11-11: verificación de Claude recuperada e integración Codex
+
+Evidencia histórica del transcript `bfbd54aa-2f00-438b-9990-e0a9c35d7f86`, informes de inputs y motion del 11/11 a las 11:07 UTC. No confundir con una corrida nueva de Codex.
+
+- UI: lint y tipos limpios, 163 tests en 35 archivos; motion 46 tests. Se corrigieron con rojo → verde el doble settle de TimeWheel (salto de 25.6 px al soltar una fila), la marca inactiva de Collapse, vidrio de ventana sin fade inicial y backdrop de diálogo desmontado antes de terminar su fade.
+- Chromium dev 1440×900, según el agente: apertura 347–391 ms, salida 131–149 ms, selección 280 ms; p95 de cuadro 16.7–16.8 ms. Reduce Motion: cero animaciones visuales en las superficies recorridas. No prueba rendimiento de producción, GPU ni Safari.
+- Inputs: QA a 1440×900 y 390×844; Select/Combobox posicionados, foco de 2 px, validación/disabled y sin desborde horizontal. Corregidos banda vacía de Combobox y TokenField que saltaba de línea con `min-w-32` (se reduce a `min-w-24`). La mitad inferior normal a 390 no tuvo captura visual; se midió el ancho.
+- Evidencia auxiliar original: `/tmp/icewalk-inputs/` y `/tmp/icewalk-motion/verify/`. Los informes describen las limitaciones: notificaciones/share sheet/tooltips sin recorrido nuevo, Safari/WebKit sin validar y percepción estética pendiente del usuario.
+- Entrada Codex: `bun run moon run ui:lint ui:typecheck ui:test` recupera caché válida para esos mismos archivos (163 tests). Se registra como caché, no como ejecución nueva. Diseño se cortó después de 20 tests puntuales verdes y ediciones de layout, sin QA final; se continúa antes del build integrado.
+
+## 2026-11-11: fidelidad visionOS y cierre de vistas
+
+- Investigación nueva con clips primarios de visionOS, método de medición y límites en [visionos-motion-fidelity-2026-11-11.md](research/visionos-motion-fidelity-2026-11-11.md). La referencia anterior de Liquid Glass iOS/macOS no demostraba el movimiento del sistema espacial.
+- Pixel-test del shader SVG: Chromium desplaza el patrón detrás del panel y deja el exterior idéntico. Safari nativo (CUA, mismo HTML local) muestra patrón continuo sin efecto visible. Resultado técnico por motor, sin inferir soporte desde la sintaxis ni identidad con el material nativo.
+- QA de vistas final Chromium: 1440/1024/390, sin desborde horizontal; guía/minimapa EV, encuadre de la próxima estación y Map focus compacto corregidos con tests rojos → verdes. Web 149 tests; QA incluyó replan negativo, Science y vuelo Cesium real. Build y API vivo no probados por ese worker.
+
+## 2026-11-12: Fluid Kit y Liquid Glass iOS 27
+
+- Morph de Fluid Kit sobre popups de Base UI (Chromium, a 0.08× con `SpringAnimator.timeScale`): el botón se convierte en el menú en un trazo continuo con un leve rebote y vuelve a él al cerrar; asentado en ~450 ms a velocidad normal.
+- Falló: registrar el popup en el morph al montarlo. Quedaba `visibility: hidden` dos cuadros y Base UI no podía enfocar el primer ítem al abrir con teclado (test rojo de foco). Se registra recién al volar, con `opacity: 0` antes, que sí admite foco.
+- Falló: con Reduce Motion el morph restauraba ese `opacity: 0` propio y la ventana quedaba invisible (test rojo en el playbook). Se limpia antes de entregarla al morph.
+- Falló: el vidrio de los `<button>` salía sin relleno (solo blur, color del fondo). Causa: preflight de Tailwind en `base` después de `liquid-blur`. Resuelto con el orden de capas.
+- jsdom no tiene `matchMedia` ni `ResizeObserver`, y Fluid Kit los usa: se agregaron stubs en los `vitest.setup.ts`, con movimiento reducido (morph e indicator instantáneos).
+- Checks: UI 125/125, web 149/149, lint y tipos limpios. QA visual en Chromium de `/lab`, `/` y `/design`. Safari y build de producción sin probar en esta unidad.
+
+## 2026-11-12: cierre del playbook HIG y Morph (continuación Codex)
+
+- Revalidación nueva, sin depender solo del handoff: 129 tests UI (31 archivos), 150 web (12 archivos), lint y tipos de ambas áreas; build de producción pasa. Referencia de tests: ejemplo oficial `vercel/next.js/examples/with-vitest` y guía de Vitest de Next.js 16.4.5 instalada.
+- Rojo → verde: DatePicker/TimePicker ignoraban `side`/`align`; ahora los transmiten al positioner, conservan el botón y devuelven el foco. Test nuevo de apariencia comprueba claro/oscuro y restauración al desmontar. Tests nuevos de ventana verifican montaje/cierre, foco y reversión. El test del playbook comprueba navegación al detalle y Escape.
+- Falló la primera composición multiestado: callbacks de ref inline volvían a registrar los estados al actualizarse el motor. Corregido con `useMergedRefs`, manteniendo refs estables; se revalidaron el test y el navegador.
+- Morph real de resumen a detalle en Chromium: 21 cuadros muestreados con transform animado; destino 400 × 288 px a viewport 1440 × 900. El invocador permanece visible. Escape devuelve el foco. No es una medición de rendimiento ni identidad píxel a píxel con UIKit.
+- Fecha y hora: apertura/cierre real de sus pickers con Morph, teclado y sin errores de consola en el recorrido. Reduce Motion: estado detalle visible (`opacity: 1`) y sin transform al cambiar entre estados.
+- Layout: capturas a 1440, 390 y 320 px; ancho del documento igual al viewport en los recorridos pequeños. Apertura/cierre de sidebar móvil y devolución de foco comprobados. Cero fondos con URL en el playbook recorrido.
+- axe sobre la portada clara: al principio detectó 6 pares de texto secundarios con contraste insuficiente; se refuerza el token claro y se corrige el fondo de lista. Recorrido posterior: cero violaciones detectadas, 19 comprobaciones de contraste sobre vidrio indeterminadas por sus gradientes (requieren revisión visual). No equivale a auditoría integral WCAG de todas las familias.
+- Safari nativo no se considera validado: CUA agotó el tiempo y luego informó cambio de ventana durante uso del usuario; se cerró ese recorrido sin interferir. El kit de Figma de iOS 27 sigue sin medición. Evidencia temporal: `/tmp/icewalk-hig-*`, `/tmp/icewalk-morph-*`, `/tmp/icewalk-release-checks.log`.
+- QA final de portada móvil: la grilla implícita y el mínimo automático del slider ensanchaban las tarjetas aunque el scroller ocultaba el exceso. Corregidos con `grid-cols-1`, tracks `minmax(0, …)` y `min-w-0`, sin CSS de layout adicional.
+- Reduce Motion necesitó mover el foco también en `onRest`: en un cambio instantáneo `onStart` ocurre antes de mostrar el estado nuevo. Se mantiene el foco dentro de la ventana y se devuelve al botón al cerrar.
+
+## 2026-11-12: escala compacta y consistente
+
+- Feedback de Eitan: revisar paddings, tamaños, anchos, altos, márgenes y gaps. Marco compartido de 960 px, sidebar de 256 px, título de 22 px y muestras con padding de 16 px; gaps internos de 12/16 px y separación de 24 px. Sin zoom ni cambio de fuente raíz.
+- Medición Chromium: filas de portada de 44 px de alto y 358 px de ancho a viewport 390; ningún descendiente de la portada fuera del viewport después de asentarse el layout. Calendario de 340 px en escritorio, adaptable a 320 px; dígitos seleccionados de hora de 22 px.
+- Morph: eliminada la reserva de 528 px; el ejemplo cerrado mide 120 px incluyendo encabezado y stage de 92 px. Resumen de 288 px y detalle de 352 px, limitados al espacio disponible; altura según contenido. Se conservan los estados medibles de Fluid Kit.
+- Recorrido de portada y 30 familias a 390 px: ancho del documento igual al viewport en todas. Se detectaron descendientes anchos en los ejemplos de tabs de iPad, toolbar con overflow y teclado. Los dos primeros disponen de scroll horizontal explícito. El teclado se ajustó a su contenedor: a viewport 320 mide 256 px, teclas de 44 px de alto y ningún descendiente fuera del viewport; ya no exige scroll lateral para escribir.
+- Morph móvil a 320 px: apertura, cambio a detalle de 256 × 352 px sin overflow y cierre con Escape; foco devuelto al botón invocador.
+- Lint/tipos de UI y web, 129 tests UI, 150 tests web y build pasan. Una ejecución intermedia falló por `pointer-events: none` en la prueba existente de accesorios del menú; la ejecución posterior completa pasó sin cambios en menú. Evidencia temporal: `/tmp/icewalk-scale-recheck.log`, `/tmp/icewalk-scale-families-mobile.json`, `/tmp/icewalk-scale-*.png`. Son medidas web y QA Chromium; Safari y comparación contra Figma continúan pendientes.
+
 ## 2026-11-10: prior regional con Daubar 2022 y mapa de calor (GP)
 
 Datos: tabla S1 de Daubar et al. 2022 (1203 cráteres nuevos, CC BY 4.0, checksum de Zenodo comprobado) y SWIM 4 MIM Ci 0-1 m y 1-5 m (GeoTIFF del 2025-08-04). Todo en `data/raw/` y `data/processed/daubar2022/`, fuera de Git; scripts en `data/processed/daubar2022/analysis/`. **En la tabla original, los encabezados de latitud y longitud están cruzados**: "Latitude (deg E)" trae valores de -82 a 75 (es la latitud) y "Longitude (deg N)" de 0 a 360 (es la longitud este).

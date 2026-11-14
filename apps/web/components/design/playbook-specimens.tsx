@@ -39,7 +39,6 @@ import { Tooltip } from "@icewalk/ui/tooltip";
 import { NavigationBar, Window, WindowControls } from "@icewalk/ui/window";
 import {
   Airplay,
-  Check,
   ChevronLeft,
   Copy,
   Download,
@@ -85,8 +84,8 @@ export function Specimen({
 }) {
   return (
     <section className={`playbook-specimen relative min-w-0 ${className}`}>
-      <div className="mb-5 flex items-baseline justify-between gap-4">
-        <Text as="h3" variant="headline">
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4">
+        <Text as="h3" variant="subheadline" weight="semibold">
           {title}
         </Text>
         {detail ? (
@@ -95,7 +94,7 @@ export function Specimen({
           </Text>
         ) : null}
       </div>
-      <div className="relative flex min-w-0 flex-wrap items-center gap-4">
+      <div className="playbook-stage relative flex w-full min-w-0 flex-wrap items-center gap-3 rounded-2xl bg-grouped-secondary p-4 [&>*]:max-w-full">
         {children}
       </div>
     </section>
@@ -118,33 +117,29 @@ const TYPE_STYLES: TextVariant[] = [
   "caption-2",
 ];
 const PALETTE = [
-  ["Red", "#ff4245"],
-  ["Orange", "#ff9230"],
-  ["Yellow", "#ffd600"],
-  ["Green", "#30d158"],
-  ["Mint", "#00dac3"],
-  ["Teal", "#00d2e0"],
-  ["Cyan", "#3cd3fe"],
-  ["Blue", "#0091ff"],
-  ["Indigo", "#6d7cff"],
-  ["Purple", "#db34f2"],
-  ["Pink", "#ff375f"],
-  ["Brown", "#b78a66"],
-  ["Gray", "#98989d"],
+  ["Red", "var(--color-system-red)"],
+  ["Orange", "var(--color-system-orange)"],
+  ["Yellow", "var(--color-system-yellow)"],
+  ["Green", "var(--color-system-green)"],
+  ["Mint", "var(--color-system-mint)"],
+  ["Teal", "var(--color-system-teal)"],
+  ["Cyan", "var(--color-system-cyan)"],
+  ["Blue", "var(--color-system-blue)"],
+  ["Indigo", "var(--color-system-indigo)"],
+  ["Purple", "var(--color-system-purple)"],
+  ["Pink", "var(--color-system-pink)"],
+  ["Brown", "var(--color-system-brown)"],
+  ["Gray", "var(--color-system-gray)"],
 ];
 
 export function FamilySpecimens({
   family,
   disabled,
   notify,
-  scene,
-  onSceneChange,
 }: {
   family: string;
   disabled: boolean;
   notify: (text: string) => void;
-  scene: string;
-  onSceneChange: (scene: string) => void;
 }) {
   const [value, setValue] = useState(50);
   const [selected, setSelected] = useState("first");
@@ -201,15 +196,9 @@ export function FamilySpecimens({
     },
   ];
   const tabs = [
-    { value: "library", label: "Library", icon: <Grid2X2 />, disabled },
-    { value: "favorites", label: "Favorites", icon: <Heart />, disabled },
-    { value: "shared", label: "Shared", icon: <Users />, disabled },
-    {
-      value: "unavailable",
-      label: "Unavailable",
-      icon: <Folder />,
-      disabled: true,
-    },
+    { value: "library", label: "Library", icon: <Grid2X2 /> },
+    { value: "favorites", label: "Favorites", icon: <Heart /> },
+    { value: "shared", label: "Shared", icon: <Users /> },
   ];
   const click = (name: string) => () => notify(`${name} selected`);
   const title = (
@@ -226,29 +215,29 @@ export function FamilySpecimens({
   switch (family) {
     case "colors":
       return (
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {title(
             "System colors",
-            "Dark appearance",
-            <div className="grid w-full grid-cols-4 gap-5">
+            "Adapts to appearance",
+            <div className="grid w-full grid-cols-3 gap-4 sm:grid-cols-4 @3xl:grid-cols-7">
               {PALETTE.map(([name, fill]) => (
                 <div key={name}>
                   <span
-                    className="mb-2 block aspect-[1.5] rounded-2xl"
+                    className="mb-2 block h-12 rounded-xl"
                     style={{ background: fill }}
                   />
                   <Text variant="callout">{name}</Text>
                   <Text variant="caption-1" tone="secondary">
-                    {fill.toUpperCase()}
+                    {`system${name}`}
                   </Text>
                 </div>
               ))}
             </div>,
-            "lg:col-span-2",
+            "@3xl:col-span-2",
           )}
           {title(
-            "Vibrant labels",
-            "Composited over glass",
+            "Semantic labels",
+            "Primary content and supporting information",
             <div className="space-y-4">
               {(["primary", "secondary", "tertiary", "disabled"] as const).map(
                 (tone) => (
@@ -276,30 +265,62 @@ export function FamilySpecimens({
       );
     case "materials":
       return (
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {(["glass", "regular", "recessed", "platter"] as MaterialKind[]).map(
             (kind) => (
               <Specimen
                 key={kind}
-                title={kind[0].toUpperCase() + kind.slice(1)}
-                detail="Real layered material"
+                title={
+                  kind === "glass"
+                    ? "Floating navigation"
+                    : kind[0].toUpperCase() + kind.slice(1)
+                }
+                detail={
+                  kind === "glass"
+                    ? "Liquid Glass for controls"
+                    : "Standard surface in the content layer"
+                }
               >
-                <Material
-                  kind={kind}
-                  className="flex h-48 w-full flex-col justify-between rounded-[2rem] p-6"
-                >
-                  <Text variant="title-2">Light, depth, context.</Text>
-                  <Text tone="secondary">
-                    The environment remains part of the surface.
-                  </Text>
-                  <Button
-                    disabled={disabled}
-                    onClick={click(kind)}
-                    className="self-start"
+                {kind === "glass" ? (
+                  <div className="flex min-h-40 w-full flex-col justify-between gap-4 rounded-2xl bg-surface p-4">
+                    <Text variant="title-2">Station library</Text>
+                    <Ornament aria-label="Station actions">
+                      <IconButton
+                        label="Add station"
+                        variant="plain"
+                        disabled={disabled}
+                        onClick={click("Add station")}
+                      >
+                        <Plus aria-hidden />
+                      </IconButton>
+                      <IconButton
+                        label="Share stations"
+                        variant="plain"
+                        disabled={disabled}
+                        onClick={click("Share stations")}
+                      >
+                        <Share2 aria-hidden />
+                      </IconButton>
+                    </Ornament>
+                  </div>
+                ) : (
+                  <Material
+                    kind={kind}
+                    className="flex min-h-40 w-full flex-col justify-between gap-4 rounded-2xl p-4"
                   >
-                    Explore
-                  </Button>
-                </Material>
+                    <Text variant="title-2">Content comes first.</Text>
+                    <Text tone="secondary">
+                      Labels and fills follow the current appearance.
+                    </Text>
+                    <Button
+                      disabled={disabled}
+                      onClick={click(kind)}
+                      className="self-start"
+                    >
+                      Explore
+                    </Button>
+                  </Material>
+                )}
               </Specimen>
             ),
           )}
@@ -311,19 +332,19 @@ export function FamilySpecimens({
               scrollable="vertical"
               className="h-48 w-full rounded-[2rem]"
             >
-              <div className="space-y-4 p-6">
+              <div className="space-y-3 p-4">
                 {Array.from({ length: 12 }, (_, i) => (
                   <Text key={i}>Stationary material · Row {i + 1}</Text>
                 ))}
               </div>
             </Material>,
-            "lg:col-span-2",
+            "@3xl:col-span-2",
           )}
         </div>
       );
     case "typography":
       return (
-        <div className="grid gap-7 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {TYPE_STYLES.map((style) => (
             <Specimen key={style} title={style.replaceAll("-", " ")}>
               <Text variant={style}>A new point of view.</Text>
@@ -333,7 +354,7 @@ export function FamilySpecimens({
       );
     case "app-icons":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Layered app icons",
             "44 / 52 / 88 / 128 pt",
@@ -355,7 +376,7 @@ export function FamilySpecimens({
           {title(
             "Home view",
             "Lucide artwork",
-            <div className="flex w-full flex-wrap justify-center gap-10 py-8">
+            <div className="flex w-full flex-wrap justify-center gap-6 py-4">
               {[
                 { label: "Music", Icon: Music2, color: "#e94069" },
                 { label: "Library", Icon: Folder, color: "#0a84ff" },
@@ -367,9 +388,9 @@ export function FamilySpecimens({
                   type="button"
                   disabled={disabled}
                   onClick={click(label)}
-                  className="flex flex-col items-center gap-4 rounded-full outline-none focus-visible:outline-2 focus-visible:outline-white disabled:opacity-40"
+                  className="flex flex-col items-center gap-2 rounded-full outline-none focus-visible:outline-2 focus-visible:outline-label disabled:opacity-40"
                 >
-                  <AppIcon label={label} size="large" color={color}>
+                  <AppIcon label={label} size="medium" color={color}>
                     <Icon />
                   </AppIcon>
                   <Text as="span">{label}</Text>
@@ -379,54 +400,12 @@ export function FamilySpecimens({
           )}
         </div>
       );
-    case "backgrounds":
-      return (
-        <div className="grid gap-8 lg:grid-cols-2">
-          {["night", "day"].map((mode) => (
-            <Specimen
-              key={mode}
-              title={`Paris room · ${mode}`}
-              detail={
-                scene === mode ? "Current environment" : "Original kit resource"
-              }
-            >
-              <button
-                type="button"
-                disabled={disabled}
-                aria-pressed={scene === mode}
-                onClick={() => onSceneChange(mode)}
-                className="relative aspect-video w-full overflow-hidden rounded-[2rem] outline-none focus-visible:outline-2 focus-visible:outline-white disabled:opacity-40"
-              >
-                <Image
-                  unoptimized
-                  width={2992}
-                  height={1684}
-                  src={
-                    mode === "day"
-                      ? "/reference/room-day.png"
-                      : "/reference/visionos-room.jpg"
-                  }
-                  alt={`Paris room in the ${mode}`}
-                  className="size-full object-cover"
-                />
-                <span className="absolute right-4 bottom-4 rounded-full bg-black/40 p-2">
-                  {scene === mode ? (
-                    <Check className="size-5" />
-                  ) : (
-                    <Plus className="size-5" />
-                  )}
-                </span>
-              </button>
-            </Specimen>
-          ))}
-        </div>
-      );
     case "buttons":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Text buttons",
-            "32 / 44 / 52 pt",
+            "34 / 44 / 50 pt",
             <>
               {(["small", "regular", "large"] as const).map((size) => (
                 <Button
@@ -442,7 +421,7 @@ export function FamilySpecimens({
           )}
           {title(
             "Text with symbol",
-            "32 / 44 / 52 pt · symbol 18 / 20 / 24",
+            "34 / 44 / 50 pt · symbols 16 / 20 / 24 pt",
             <>
               {(["small", "regular", "large"] as const).map((size) => (
                 <Button
@@ -459,7 +438,7 @@ export function FamilySpecimens({
           )}
           {title(
             "Symbol buttons",
-            "28 / 32 / 44 / 52 / 64 pt",
+            "28 / 34 / 44 / 50 / 56 pt",
             <>
               {(
                 ["mini", "small", "regular", "large", "extra-large"] as const
@@ -524,7 +503,7 @@ export function FamilySpecimens({
       );
     case "fields":
       return (
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {title(
             "Text field",
             "Capsule · 305 × 44 pt",
@@ -536,7 +515,7 @@ export function FamilySpecimens({
             <TextField
               label="Project"
               shape="rounded"
-              defaultValue="Spatial library"
+              defaultValue="Traverse library"
               disabled={disabled}
             />,
           )}
@@ -557,7 +536,7 @@ export function FamilySpecimens({
             <TextField
               kind="secure"
               label="Password"
-              defaultValue="spatial"
+              defaultValue="traverse"
               disabled={disabled}
             />,
           )}
@@ -584,16 +563,12 @@ export function FamilySpecimens({
       );
     case "selection":
       return (
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {title(
             "Switches",
-            "56 × 32 pt",
+            "64 × 30 pt",
             <div className="flex flex-col gap-4">
-              <Switch
-                label="Spatial audio"
-                disabled={disabled}
-                defaultChecked
-              />
+              <Switch label="Radar audio" disabled={disabled} defaultChecked />
               <Switch label="Show captions" disabled={disabled} />
               <Switch label="Unavailable" disabled />
               <Switch label="On, disabled" defaultChecked disabled />
@@ -621,11 +596,11 @@ export function FamilySpecimens({
       );
     case "sliders":
       return (
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {title(
             "Default",
-            "16 / 20 / 28 / 44 pt",
-            <div className="flex w-full flex-col gap-8 py-2">
+            "6 pt track · 34 × 22 pt thumb",
+            <div className="flex w-full flex-col gap-6 py-2">
               {(["mini", "small", "regular", "large"] as const).map((size) => (
                 <Slider
                   key={size}
@@ -642,7 +617,7 @@ export function FamilySpecimens({
           {title(
             "Variants",
             `${value}%`,
-            <div className="flex w-full flex-col gap-8 py-2">
+            <div className="flex w-full flex-col gap-6 py-2">
               <Slider
                 label="Segmented volume"
                 variant="segmented"
@@ -682,7 +657,7 @@ export function FamilySpecimens({
       );
     case "segments":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Three segments",
             "44 pt track · 36 pt segments",
@@ -739,10 +714,10 @@ export function FamilySpecimens({
       );
     case "pickers":
       return (
-        <div className="grid items-start gap-8 xl:grid-cols-[1.3fr_1fr]">
+        <div className="grid items-start gap-6 @3xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           {title(
             "Calendar",
-            "436 pt · keyboard arrows / Page Up / Page Down",
+            "340 pt · keyboard arrows / Page Up / Page Down",
             <Calendar
               label="Choose a date"
               value={date}
@@ -750,7 +725,7 @@ export function FamilySpecimens({
               disabled={disabled}
             />,
           )}
-          <div className="space-y-8">
+          <div className="space-y-6">
             {title(
               "Collapsed",
               "Popover pickers",
@@ -803,7 +778,7 @@ export function FamilySpecimens({
       );
     case "color-pickers":
       return (
-        <div className="flex flex-wrap items-start gap-8">
+        <div className="flex flex-wrap items-start gap-6">
           <ColorPicker
             value={color}
             onValueChange={setColor}
@@ -826,7 +801,7 @@ export function FamilySpecimens({
       );
     case "progress":
       return (
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {title(
             "Determinate",
             "288 × 4 pt",
@@ -874,29 +849,34 @@ export function FamilySpecimens({
                 className="w-full"
               />
             </div>,
-            "lg:col-span-2",
+            "@3xl:col-span-2",
           )}
         </div>
       );
     case "tokens":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Search tokens",
             "32 pt · filter actions",
             <>
-              {tokens.map((token) => (
-                <SearchToken
-                  key={token}
-                  selected={token === "Favorites"}
-                  disabled={disabled}
-                  category={token === "Design" ? "Type" : undefined}
-                  onClick={click(token)}
-                  onRemove={() => setTokens(tokens.filter((t) => t !== token))}
-                >
-                  {token}
-                </SearchToken>
-              ))}
+              {["Design", "Favorites", "This week"]
+                .filter((token) => tokens.includes(token))
+                .map((token) => (
+                  <span key={token} className="inline-flex">
+                    <SearchToken
+                      selected={token === "Favorites"}
+                      disabled={disabled}
+                      category={token === "Design" ? "Type" : undefined}
+                      onClick={click(token)}
+                      onRemove={() =>
+                        setTokens(tokens.filter((t) => t !== token))
+                      }
+                    >
+                      {token}
+                    </SearchToken>
+                  </span>
+                ))}
               <Button
                 size="small"
                 variant="plain"
@@ -918,7 +898,7 @@ export function FamilySpecimens({
       );
     case "pages":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Page indicator",
             "Select a page",
@@ -927,7 +907,9 @@ export function FamilySpecimens({
                 kind="regular"
                 className="flex h-56 items-center justify-center rounded-[2rem]"
               >
-                <Text variant="xl-title-2">A new perspective. {page + 1}</Text>
+                <Text key={page} className="ui-swap" variant="xl-title-2">
+                  A new perspective. {page + 1}
+                </Text>
               </Material>
               <PageControl
                 label="Preview pages"
@@ -960,10 +942,10 @@ export function FamilySpecimens({
       );
     case "lists":
       return (
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-6 @3xl:grid-cols-2">
           {title(
             "Inset grouped",
-            "60 pt rows · 16 pt radius",
+            "44 pt minimum rows · 16 pt inset",
             <ListSection
               header="Library"
               headerId="library-list"
@@ -1044,18 +1026,38 @@ export function FamilySpecimens({
     case "menus":
     case "dropdowns":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Context menu",
-            "280 pt · nested actions",
+            "248 pt · nested actions",
             <DropdownMenu
               label="Library"
               header="Library actions"
               accessories={[
-                { id: "cut", label: "Cut", icon: <Scissors />, onSelect: () => notify("Cut selected") },
-                { id: "copy", label: "Copy", icon: <Copy />, onSelect: () => notify("Copy selected") },
-                { id: "share", label: "Share", icon: <Share2 />, onSelect: () => notify("Share selected") },
-                { id: "delete", label: "Delete", icon: <Trash2 />, onSelect: () => notify("Delete selected") },
+                {
+                  id: "cut",
+                  label: "Cut",
+                  icon: <Scissors />,
+                  onSelect: () => notify("Cut selected"),
+                },
+                {
+                  id: "copy",
+                  label: "Copy",
+                  icon: <Copy />,
+                  onSelect: () => notify("Copy selected"),
+                },
+                {
+                  id: "share",
+                  label: "Share",
+                  icon: <Share2 />,
+                  onSelect: () => notify("Share selected"),
+                },
+                {
+                  id: "delete",
+                  label: "Delete",
+                  icon: <Trash2 />,
+                  onSelect: () => notify("Delete selected"),
+                },
               ]}
               items={actions}
               disabled={disabled}
@@ -1095,7 +1097,7 @@ export function FamilySpecimens({
                   key={label}
                   variant="footnote"
                   tone="secondary"
-                  className="rounded-full border border-white/10 px-3 py-2"
+                  className="rounded-full border border-separator px-3 py-2"
                 >
                   {label}
                 </Text>
@@ -1106,14 +1108,18 @@ export function FamilySpecimens({
       );
     case "navigation":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {["center", "leading"].map((align) => (
             <Specimen
               key={align}
               title={`${align === "center" ? "Centered" : "Leading"} title`}
-              detail="92 pt navigation bar"
+              detail={
+                align === "center"
+                  ? "44 pt bar · inline title"
+                  : "44 pt bar · large title below"
+              }
             >
-              <Window className="h-44 w-full flex-col">
+              <Window className="min-h-32 w-full flex-col pb-4">
                 <NavigationBar
                   title="Library"
                   titleAlign={align as "center" | "leading"}
@@ -1147,10 +1153,11 @@ export function FamilySpecimens({
       );
     case "sidebars":
       return (
-        <Specimen title="Sidebar" detail="320 pt · persistent material">
-          <Window className="h-[34rem] w-full">
+        <Specimen title="Sidebar" detail="256 pt sidebar · scrolling content">
+          <Window className="h-96 w-full">
             <Sidebar
               label="Sidebar example"
+              className="w-64"
               title="Library"
               action={
                 <Button disabled={disabled} onClick={click("Edit")}>
@@ -1191,7 +1198,7 @@ export function FamilySpecimens({
                 ))}
               </SidebarSection>
             </Sidebar>
-            <div className="hidden flex-1 flex-col justify-center gap-3 p-8 sm:flex">
+            <div className="hidden flex-1 flex-col justify-center gap-3 p-4 sm:flex">
               <Text variant="title-1">Room to explore.</Text>
               <Text tone="secondary">
                 Scroll the sidebar. Its material stays attached to the window.
@@ -1202,40 +1209,59 @@ export function FamilySpecimens({
       );
     case "tabs":
       return (
-        <Specimen title="Vertical tab bar" detail="Collapsed 68 pt · expanded 150 pt · 44 pt targets">
-          <div className="flex w-full items-center gap-8">
-            <div className="flex items-start gap-4">
+        <div className="space-y-6">
+          <Specimen title="iPhone" detail="Persistent navigation at the bottom">
+            <div className="flex min-h-64 w-full max-w-80 flex-col rounded-3xl bg-surface p-3">
+              <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-4">
+                <Text variant="title-2" className="capitalize">
+                  {tab}
+                </Text>
+                <Text tone="secondary">
+                  {tab === "shared"
+                    ? "No shared stations yet. Stations you share appear here."
+                    : "Select a tab to browse this section."}
+                </Text>
+              </div>
               <TabBar
-                label="Example tabs"
+                label="iPhone sections"
                 tabs={tabs}
                 value={tab}
                 onValueChange={setTab}
-              />
-              <TabBar
-                label="Example tabs, expanded"
-                tabs={tabs}
-                value={tab}
-                onValueChange={setTab}
-                expanded
+                className="self-center"
               />
             </div>
-            <Material
-              kind="regular"
-              className="flex min-h-72 flex-1 flex-col justify-center gap-3 rounded-[2rem] p-8"
-            >
-              <Text variant="title-1" className="capitalize">
-                {tab}
-              </Text>
-              <Text tone="secondary">Select a tab or use the arrow keys.</Text>
-            </Material>
-          </div>
-        </Specimen>
+          </Specimen>
+          <Specimen
+            title="iPad"
+            detail="Navigation near the top · symbols beside labels"
+          >
+            <div className="flex min-h-56 w-full flex-col items-center gap-4 rounded-3xl bg-surface p-3 sm:p-5">
+              <div className="max-w-full overflow-x-auto">
+                <TabBar
+                  label="iPad sections"
+                  tabs={tabs}
+                  value={tab}
+                  onValueChange={setTab}
+                  layout="regular"
+                />
+              </div>
+              <div className="w-full px-4 py-6">
+                <Text variant="title-2" className="mb-2 capitalize">
+                  {tab}
+                </Text>
+                <Text tone="secondary">
+                  Navigation stays available even when a section is empty.
+                </Text>
+              </div>
+            </div>
+          </Specimen>
+        </div>
       );
     case "toolbars":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
-            "Floating ornament",
+            "Floating toolbar",
             "Glass · 12 pt padding · 8 pt gap",
             <Ornament aria-label="Editing toolbar">
               <OrnamentItem
@@ -1283,7 +1309,7 @@ export function FamilySpecimens({
             </Ornament>,
           )}
           {title(
-            "Vertical & overflow",
+            "Additional tools",
             "Scroll inside the material",
             <>
               <Ornament orientation="vertical" aria-label="Vertical tools">
@@ -1335,7 +1361,7 @@ export function FamilySpecimens({
     case "tooltips":
       return (
         <Specimen title="Tooltips" detail="600 ms dwell · keyboard focus">
-          <div className="flex w-full flex-wrap items-center justify-center gap-8 py-20">
+          <div className="flex w-full flex-wrap items-center justify-center gap-6 py-10">
             {(["top", "right", "bottom", "left"] as const).map((side) => (
               <Tooltip key={side} label={`Tooltip on ${side}`} side={side}>
                 <Button
@@ -1352,9 +1378,9 @@ export function FamilySpecimens({
       );
     case "windows":
       return (
-        <Specimen title="Spatial window" detail="46 pt corner · window grabber">
+        <Specimen title="Glass panel" detail="34 pt corner · navigation bar">
           <div className="w-full">
-            <Window className="h-80 w-full flex-col">
+            <Window className="min-h-48 w-full flex-col">
               <NavigationBar
                 title="A place for your ideas"
                 level={3}
@@ -1368,11 +1394,11 @@ export function FamilySpecimens({
                   </IconButton>
                 }
               />
-              <div className="flex flex-1 items-center justify-center gap-5 p-6">
-                <AppIcon label="Library" size="large">
+              <div className="flex flex-1 flex-wrap items-center justify-center gap-4 p-4">
+                <AppIcon label="Library" size="medium">
                   <Layers />
                 </AppIcon>
-                <Text variant="title-2">Content lives on glass.</Text>
+                <Text variant="headline">A contextual panel.</Text>
               </div>
             </Window>
             <WindowControls />
@@ -1381,7 +1407,7 @@ export function FamilySpecimens({
       );
     case "alerts":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Alerts",
             "Modal · Escape · focus return",
@@ -1454,7 +1480,7 @@ export function FamilySpecimens({
       );
     case "notifications":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "Notification",
             "436 pt · system material",
@@ -1549,7 +1575,7 @@ export function FamilySpecimens({
                 Share a collection
               </Button>
             }
-            title="Spatial collection"
+            title="Station collection"
             subtitle="8 items"
             contacts={[
               { id: "alex", name: "Alex", icon: <UserRound /> },
@@ -1573,7 +1599,7 @@ export function FamilySpecimens({
       );
     case "shareplay":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
             "System activity",
             "436 pt · 52 pt app icon",
@@ -1636,10 +1662,10 @@ export function FamilySpecimens({
       );
     case "keyboard":
       return (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {title(
-            "Spatial keyboard",
-            "544 pt · 44 pt keys",
+            "Keyboard",
+            "Up to 544 pt · 44 pt key height",
             <Keyboard
               value={text}
               onValueChange={setText}
@@ -1661,56 +1687,6 @@ export function FamilySpecimens({
           )}
         </div>
       );
-    case "gestures":
-      return (
-        <div className="grid gap-8 lg:grid-cols-2">
-          {[
-            {
-              name: "Pinch",
-              file: "pinch",
-              description:
-                "Bring your thumb and index finger together to select.",
-            },
-            {
-              name: "Point",
-              file: "point",
-              description: "Reach out to interact with content directly.",
-            },
-            {
-              name: "Two hands",
-              file: "two-hands",
-              description:
-                "Use two hands to scale and manipulate spatial content.",
-            },
-          ].map(({ name, file, description }) => (
-            <Specimen
-              key={name}
-              title={name}
-              detail="Original kit illustration"
-            >
-              <Image
-                unoptimized
-                loading="eager"
-                width={608}
-                height={685}
-                src={`/reference/${file}.png`}
-                alt={`${name} hand gesture`}
-                className="mx-auto h-72 w-auto object-contain"
-              />
-              <Text tone="secondary">{description}</Text>
-            </Specimen>
-          ))}
-          {title(
-            "Spatial input",
-            "Platform reference",
-            <Text tone="secondary">
-              These are platform gesture illustrations. In this web playbook,
-              use a pointer, touch or the keyboard to operate the components.
-            </Text>,
-            "lg:col-span-2",
-          )}
-        </div>
-      );
     default:
       return null;
   }
@@ -1729,14 +1705,15 @@ export function OverviewSpecimens({
 }) {
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(65);
+  const [display, setDisplay] = useState("map");
   return (
-    <div className="grid gap-6 xl:grid-cols-[1.15fr_1fr]">
+    <div className="grid min-w-0 grid-cols-1 gap-4 @3xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
       <Material
         kind="regular"
-        className="relative flex min-h-80 flex-col justify-between rounded-[2rem] p-7"
+        className="bg-grouped-secondary relative flex min-w-0 flex-col gap-4 rounded-2xl p-4"
       >
         <div className="flex items-start justify-between">
-          <AppIcon label="Music" size="large" color="#d9547a">
+          <AppIcon label="Music" size="medium" color="#d9547a">
             <Music2 />
           </AppIcon>
           <IconButton
@@ -1748,14 +1725,15 @@ export function OverviewSpecimens({
             <Heart aria-hidden />
           </IconButton>
         </div>
-        <div className="my-6">
-          <Text variant="title-1">A little atmosphere.</Text>
-          <Text tone="secondary">Sound for your space</Text>
+        <div className="space-y-1">
+          <Text variant="title-3">Radar pass, station 2.</Text>
+          <Text variant="subheadline" tone="secondary">
+            Playback of the last sounding
+          </Text>
         </div>
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3">
           <IconButton
             label={playing ? "Pause preview" : "Play preview"}
-            size="large"
             disabled={disabled}
             onClick={() => setPlaying(!playing)}
           >
@@ -1767,26 +1745,26 @@ export function OverviewSpecimens({
             onValueChange={setVolume}
             disabled={disabled}
             leading={<Volume1 />}
-            className="flex-1"
+            className="min-w-0 flex-1"
           />
         </div>
       </Material>
-      <div className="flex flex-col gap-6">
+      <div className="flex min-w-0 flex-col gap-4">
         <Material
           kind="regular"
-          className="flex flex-1 items-center gap-5 rounded-[2rem] p-6"
+          className="bg-grouped-secondary flex min-w-0 flex-1 items-center gap-3 rounded-2xl p-4"
         >
-          <span className="flex size-14 items-center justify-center rounded-full bg-white/10">
-            <Sparkles aria-hidden className="size-7" />
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-fill-tertiary">
+            <Sparkles aria-hidden className="size-5" />
           </span>
-          <div className="flex-1">
-            <Text variant="title-3">Comfortably familiar.</Text>
+          <div className="min-w-0 flex-1">
+            <Text variant="headline">Range rings</Text>
             <Text variant="subheadline" tone="secondary">
-              Made for a different dimension.
+              Walkback limits on the map.
             </Text>
           </div>
           <Switch
-            label="Spatial appearance"
+            label="Range rings"
             showLabel={false}
             defaultChecked
             disabled={disabled}
@@ -1794,21 +1772,26 @@ export function OverviewSpecimens({
         </Material>
         <Material
           kind="recessed"
-          className="flex flex-1 flex-col justify-center gap-4 rounded-[2rem] p-6"
+          className="bg-grouped-secondary flex flex-1 flex-col justify-center gap-3 rounded-2xl p-4"
         >
           <div className="flex items-center justify-between">
-            <Text variant="headline">All the small details.</Text>
-            <ActivityIndicator size="small" />
+            <Text variant="headline">Display</Text>
           </div>
+          <SegmentedControl
+            label="Display mode"
+            value={display}
+            onValueChange={setDisplay}
+            disabled={disabled}
+            options={[
+              { value: "map", label: "Map" },
+              { value: "list", label: "List" },
+            ]}
+          />
           <Text variant="subheadline" tone="secondary">
-            Materials, states and interaction. Together.
+            {display === "map"
+              ? "Show stations on the map."
+              : "Show stations in a list."}
           </Text>
-          <div className="flex items-center gap-3">
-            <SearchToken>visionOS 26</SearchToken>
-            <Text variant="footnote" tone="secondary">
-              Dark appearance
-            </Text>
-          </div>
         </Material>
       </div>
     </div>

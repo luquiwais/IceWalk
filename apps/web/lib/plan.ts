@@ -8,6 +8,7 @@ import mockMeasurement from "@/mock/measurement.json";
 import mockPlan from "@/mock/plan.json";
 import mockReplan from "@/mock/replan.json";
 import toolsCatalog from "../../../packages/contracts/examples/tools.catalog.json";
+import defaultStm from "../../../packages/contracts/examples/stm.s1094b.json";
 
 export type Priority = "high" | "medium" | "low";
 
@@ -88,6 +89,20 @@ export type DecisionPoint = {
   options: DecisionOption[];
 };
 
+/** plan.site_assessment (plan.schema.json): regional prior per tool, before landing. */
+export type SiteToolCard = { depth_m: number; p_ice: number; p_ice_90: [number, number]; verdict?: "GO" | "CONDITIONAL" | "NO_GO"; precursor?: boolean };
+export type SiteAssessment = {
+  lat_deg: number;
+  status: "ok" | "extrapolated" | "no_data";
+  median_depth_m?: number;
+  median_depth_90_m?: [number, number];
+  warnings: string[];
+  tools: Record<string, SiteToolCard>;
+  verdict?: "GO" | "CONDITIONAL" | "NO_GO" | "INSUFFICIENT_DATA";
+  min_p?: number;
+  nearby_impacts?: { window_deg: [number, number]; n: number; ice: number; expected_ice: number; z: number | null };
+};
+
 export type Plan = {
   mission_id: string;
   plan_id: string;
@@ -99,6 +114,7 @@ export type Plan = {
   equipment?: { tool: string; count: number; mass_kg?: number | null; justification?: string }[];
   summary: PlanSummary;
   alerts?: PlanAlert[];
+  site_assessment?: SiteAssessment;
 };
 
 /** A measurement logged at a station (contracts/schemas/measurement.schema.json). */
@@ -187,12 +203,82 @@ export function diffPlans(before: Plan, after: Plan): PlanDiff {
   };
 }
 
-type CatalogTool = { id: string; name: string; mass_kg?: number | null };
+type CatalogTool = { id: string; name: string; mass_kg?: number | null; depth_m?: number; measures?: string[] };
 const TOOLS = new Map((toolsCatalog as CatalogTool[]).map((t) => [t.id, t]));
 
 /** Tool name from the certified catalog (contracts/examples/tools.catalog.json). */
 export function toolName(id: string): string {
   return TOOLS.get(id)?.name ?? id.replaceAll("_", " ");
+}
+
+/** First remaining station, independent of whether a result caused a re-plan. */
+export function nextStation(plan: Plan, measurements: readonly Measurement[]): Station | undefined {
+  const measured = new Set(measurements.map((m) => m.station_id));
+  return orderedStations(plan).find((s) => !measured.has(s.id));
+}
+
+export function toolReachM(id: string): number | undefined {
+  return TOOLS.get(id)?.depth_m;
+}
+
+/** Prefer an assigned ice-presence instrument; never substitute an unassigned tool. */
+export function measuringTool(station: Station): string {
+  return station.tools.find((id) => TOOLS.get(id)?.measures?.includes("ice_presence")) ?? station.tools[0] ?? "";
+}
+
+export function measurementSummary(measurement: Measurement): string {
+  if (measurement.result === "inconclusive") return "inconclusive";
+  const depth = measurement.depth_m;
+  const label = measurement.result === "ice" ? "ice" : "no ice";
+  return depth == null ? label : `${label} ${measurement.result === "ice" ? "at" : "to"} ${depth.toFixed(1)} m`;
+}
+
+/** Grid bearing, clockwise from north; positions are meters in the common grid. */
+export function bearing(from: readonly number[], to: readonly number[]) {
+  const dx = to[0] - from[0];
+  const dy = to[1] - from[1];
+  const deg = (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360;
+  const point = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(deg / 45) % 8];
+  return { deg, point, distanceM: Math.hypot(dx, dy), label: `${String(Math.round(deg) % 360).padStart(3, "0")}° ${point}` };
+}
+
+/**
+ * Heading of the leg ahead, in grid degrees: toward the next unmeasured station,
+ * or along the route after it when the crew already stands on that station.
+ */
+export function traverseHeading(plan: Plan, measurements: readonly Measurement[], from: readonly number[]): number | undefined {
+  const measured = new Set(measurements.map((m) => m.station_id));
+  const remaining = orderedStations(plan).filter((s) => !measured.has(s.id));
+  const ahead = remaining.find((s) => bearing(from, s.position).distanceM >= 1);
+  return remaining.length && ahead ? bearing(from, ahead.position).deg : undefined;
+}
+
+/** The planner's default STM is known only for this mission id (main.py DEFAULT_STM). */
+export function evaLimitMin(plan: Plan): number | undefined {
+  return plan.mission_id === defaultStm.mission_id ? defaultStm.constraints.eva_max_h * 60 : undefined;
+}
+
+export function missionObjective(plan: Plan): string | undefined {
+  return plan.mission_id === defaultStm.mission_id ? defaultStm.objectives[0].title : undefined;
+}
+
+export function evaName(plan: Plan): string {
+  const match = plan.mission_id.match(/(?:^|-)eva(\d+)$/i);
+  return match ? `EVA ${Number(match[1])}` : plan.mission_id;
+}
+
+export function nextBingo(plan: Plan, elapsedMin = 0): DecisionPoint | undefined {
+  return [...(plan.decision_points ?? [])].filter((p) => p.decide_by_min >= elapsedMin)
+    .sort((a, b) => a.decide_by_min - b.decide_by_min)[0];
+}
+
+export function stationBlock(plan: Plan, id: string): TimelineItem | undefined {
+  return plan.timeline.find((t) => t.kind === "station" && t.station_id === id);
+}
+
+export function highestAlert(alerts: readonly PlanAlert[]): PlanAlert | undefined {
+  const rank = { advisory: 1, caution: 2, warning: 3 };
+  return [...alerts].sort((a, b) => rank[b.level] - rank[a.level])[0];
 }
 
 /** Total of the known masses; tools without a mass in the catalog are counted apart. */

@@ -11,20 +11,26 @@ const tabs = [
 ];
 
 describe("TabBar", () => {
-  it("is a vertical tab list with named icon tabs", () => {
+  it("is a horizontal tab list (the iOS tab bar) with named tabs", () => {
     render(<TabBar label="Views" tabs={tabs} defaultValue="planning" />);
 
-    expect(screen.getByRole("tablist", { name: "Views" })).toHaveAttribute(
-      "aria-orientation",
-      "vertical",
+    expect(screen.getByRole("tablist", { name: "Views" })).not.toHaveAttribute("aria-orientation", "vertical");
+    expect(screen.getByRole("tab", { name: "Planning" })).toHaveAttribute(
+      "aria-selected",
+      "true",
     );
-    expect(screen.getByRole("tab", { name: "Planning" })).toHaveAttribute("aria-selected", "true");
   });
 
   it("moves with the up and down arrows and reports the selection", async () => {
     const onValueChange = vi.fn();
     render(
-      <TabBar label="Views" tabs={tabs} defaultValue="planning" onValueChange={onValueChange} />,
+      <TabBar
+        label="Views"
+        tabs={tabs}
+        defaultValue="planning"
+        onValueChange={onValueChange}
+        orientation="vertical"
+      />,
     );
 
     await userEvent.click(screen.getByRole("tab", { name: "Planning" }));
@@ -35,9 +41,31 @@ describe("TabBar", () => {
     expect(onValueChange).toHaveBeenLastCalledWith("science");
   });
 
+  it("uses left and right arrows in the compact horizontal web layout", async () => {
+    render(
+      <TabBar
+        label="Views"
+        tabs={tabs}
+        defaultValue="planning"
+        orientation="horizontal"
+      />,
+    );
+    await userEvent.click(screen.getByRole("tab", { name: "Planning" }));
+    await userEvent.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "EV" })).toHaveFocus();
+  });
+
   it("keeps a disabled view unavailable to pointer and keyboard activation", async () => {
     const onValueChange = vi.fn();
-    render(<TabBar label="Views" tabs={[tabs[0], { ...tabs[1], disabled: true }, tabs[2]]} defaultValue="planning" onValueChange={onValueChange} />);
+    render(
+      <TabBar
+        label="Views"
+        tabs={[tabs[0], { ...tabs[1], disabled: true }, tabs[2]]}
+        defaultValue="planning"
+        onValueChange={onValueChange}
+        orientation="vertical"
+      />,
+    );
     const disabledTab = screen.getByRole("tab", { name: "EV" });
     expect(disabledTab).toHaveAttribute("aria-disabled", "true");
     await userEvent.click(disabledTab);
@@ -47,25 +75,29 @@ describe("TabBar", () => {
     // Base UI leaves disabled tabs discoverable, while blocking activation.
     expect(disabledTab).toHaveFocus();
     await userEvent.keyboard("{Enter}");
-    expect(screen.getByRole("tab", { name: "Planning" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "Planning" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     expect(onValueChange).not.toHaveBeenCalled();
     await userEvent.keyboard("{ArrowDown}");
     expect(screen.getByRole("tab", { name: "Science" })).toHaveFocus();
   });
 
   it("expanded shows each label next to its symbol and keeps names and selection", async () => {
-    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" expanded />);
+    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" orientation="vertical" expanded />);
 
     const tab = screen.getByRole("tab", { name: "EV" });
     expect(tab).toHaveAttribute("aria-selected", "true");
     expect(tab).toHaveTextContent("EV");
-    expect(screen.getByRole("tab", { name: "Planning" })).toHaveTextContent("Planning");
-    expect(screen.getByRole("tablist", { name: "Views" })).toHaveAttribute("data-expanded");
+    expect(screen.getByRole("tab", { name: "Planning" })).toHaveTextContent(
+      "Planning",
+    );
+
   });
 
-  it("collapsed hides the labels (they live in tooltips)", () => {
-    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" />);
-    expect(screen.getByRole("tab", { name: "EV" })).not.toHaveTextContent("EV");
-    expect(screen.getByRole("tablist", { name: "Views" })).not.toHaveAttribute("data-expanded");
+  it("collapsed and vertical, names each symbol-only tab by its label", () => {
+    render(<TabBar label="Views" tabs={tabs} defaultValue="ev" orientation="vertical" />);
+    expect(screen.getByRole("tab", { name: "EV" })).toHaveAttribute("aria-selected", "true");
   });
 });

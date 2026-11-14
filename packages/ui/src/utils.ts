@@ -26,6 +26,8 @@ const twMerge = extendTailwindMerge({
       ],
       color: [
         "label",
+        "label-secondary",
+        "label-tertiary",
         "label-disabled",
         "selected",
         "on-selected",

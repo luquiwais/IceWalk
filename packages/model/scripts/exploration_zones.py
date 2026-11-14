@@ -29,6 +29,7 @@ ROOT = Path(__file__).resolve().parents[3]
 CONTRACTS = ROOT / "packages" / "contracts"
 RAW = ROOT / "data" / "raw" / "trek_ez" / "ez.json"
 OUT = CONTRACTS / "examples" / "exploration_zones.json"
+WEB_COPY = ROOT / "apps" / "web" / "mock" / "exploration-zones.json"  # lo lee el globo
 TREK_URL = "https://trek.nasa.gov/mars/trekarcgis/rest/services/EZMars/MapServer/0/query"
 TREK_QUERY = {
     "where": "1=1", "outFields": "name,lat,lon,elev", "returnGeometry": "false", "f": "json"
@@ -129,6 +130,7 @@ def main() -> None:
         },
     }
     OUT.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    WEB_COPY.write_text(json.dumps(result, ensure_ascii=False), encoding="utf-8")
     for z in [result["reference_site"], result["skyfall"]["reference_site"], *result["zones"]]:
         sa = z["site_assessment"]
         if sa["status"] == "no_data":

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 import { cn } from "./utils";
+import { SpringAnimator } from "@fluidkit/react";
 
 type TimeWheelProps = {
   label: string;
@@ -21,21 +22,109 @@ function TimeWheel({
 }: TimeWheelProps) {
   const root = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const reel = useRef<HTMLDivElement>(null);
+  // The settle/step animation and where it started, to retarget without
+  // reading computed styles.
+  const motion = useRef<SpringAnimator<"y"> | null>(null);
   const drag = useRef<{
     y: number;
     index: number;
+    raw: number;
+    step: number;
     lastY: number;
     time: number;
     velocity: number;
     moved: boolean;
   } | null>(null);
+  const frame = useRef<number | undefined>(undefined);
+  const height = useRef(0);
   const cancelled = useRef(false);
-  const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
   const numeric = values.every((item) => /^\d+$/.test(item));
   const current = Math.max(0, values.indexOf(value));
+  const previous = useRef(current);
+  /** Row pitch, measured once and kept current by a ResizeObserver. */
+  function stepHeight() {
+    if (!height.current)
+      height.current = root.current?.getBoundingClientRect().height || 204;
+    return (height.current * 32) / 204;
+  }
+  useEffect(() => {
+    const element = root.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      height.current = entry.contentRect.height;
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  /** Signed distance in rows from `from` to `to`, the short way round. */
+  function rows(to: number, from: number) {
+    let delta = to - from;
+    if (numeric && Math.abs(delta) > values.length / 2)
+      delta -= Math.sign(delta) * values.length;
+    return delta;
+  }
+  /** The reel offset that keeps the rendered rows under the finger. */
+  function dragOffset(rendered: number) {
+    const state = drag.current;
+    if (!state) return 0;
+    const nearest = Math.round(state.raw);
+    return (nearest + rows(rendered, normalized(nearest)) - state.raw) * state.step;
+  }
+  function apply() {
+    if (drag.current?.moved && reel.current)
+      reel.current.style.transform = `translateY(${dragOffset(previous.current)}px)`;
+  }
+  function paint() {
+    frame.current = undefined;
+    apply();
+  }
+  /** Eases the reel from `from` px to rest, unless reduced motion is on. */
+  function settle(from: number, velocity = 0) {
+    const node = reel.current;
+    if (!node) return;
+    motion.current?.stop();
+    motion.current = null;
+    node.style.transform = "translateY(0px)";
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (!from || reduced) return;
+    // Fluid Kit's spring keeps its speed when retargeted: a quick second step flows on
+    const spring = new SpringAnimator({ y: from }, { duration: 0.16, bounce: 0 }, ({ y }) => {
+      node.style.transform = `translateY(${y}px)`;
+    }, () => { if (motion.current === spring) motion.current = null; });
+    motion.current = spring;
+    spring.to({ y: 0 }, undefined, { y: velocity });
+
+  }
+  /** Where an interrupted settle currently shows the reel. */
+  function visibleOffset() {
+    return motion.current?.values().y ?? 0;
+  }
+  useLayoutEffect(() => {
+    const delta = rows(current, previous.current);
+    previous.current = current;
+    if (!delta || editing) return;
+    // Mid-drag: re-anchor the reel to the new rows in the same frame.
+    if (drag.current?.moved) {
+      apply();
+      return;
+    }
+    const step = stepHeight();
+    const incoming = motion.current?.velocities().y ?? 0;
+    // Home/End across most of the wheel are immediate; nearby steps retain
+    // physical motion and the visible position/velocity of an interrupted step.
+    settle(Math.abs(delta) > 5 ? 0 : visibleOffset() + delta * step, incoming);
+  }, [current, editing, numeric, values.length]);
+  useEffect(
+    () => () => {
+      motion.current?.stop();
+      if (frame.current !== undefined) cancelAnimationFrame(frame.current);
+    },
+    [],
+  );
   const indexRef = useRef(current);
   useEffect(() => {
     indexRef.current = current;
@@ -47,12 +136,10 @@ function TimeWheel({
   }
   function choose(index: number) {
     const next = normalized(index);
+    if (next === indexRef.current) return;
     indexRef.current = next;
     onChange(values[next]);
     setDraft(values[next]);
-  }
-  function stepHeight() {
-    return ((root.current?.getBoundingClientRect().height || 204) * 32) / 204;
   }
   function commit() {
     if (cancelled.current) {
@@ -108,11 +195,23 @@ function TimeWheel({
     )
       return;
     event.preventDefault();
-    event.currentTarget.setPointerCapture?.(event.pointerId);
+    const shown = visibleOffset();
+    motion.current?.stop();
+    motion.current = null;
+    try {
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    } catch {
+      // Synthetic or already released pointers can't be captured.
+    }
     input.current?.blur();
+    const step = stepHeight();
+    // Pick up the reel where an interrupted settle left it.
+    const raw = current - shown / step;
     drag.current = {
       y: event.clientY,
-      index: current,
+      index: raw,
+      raw,
+      step,
       lastY: event.clientY,
       time: event.timeStamp,
       velocity: 0,
@@ -123,7 +222,7 @@ function TimeWheel({
     const state = drag.current;
     if (!state) return;
     const distance = state.y - event.clientY;
-    if (Math.abs(distance) > 4) {
+    if (!state.moved && Math.abs(distance) > 4) {
       state.moved = true;
       setDragging(true);
     }
@@ -132,26 +231,35 @@ function TimeWheel({
     if (elapsed > 0) state.velocity = (state.lastY - event.clientY) / elapsed;
     state.lastY = event.clientY;
     state.time = event.timeStamp;
-    const raw = state.index + distance / stepHeight();
-    choose(Math.round(raw));
-    setOffset((Math.round(raw) - raw) * stepHeight());
+    state.raw = state.index + distance / state.step;
+    if (!numeric) state.raw = Math.max(0, Math.min(values.length - 1, state.raw));
+    // Only a new value re-renders; the reel itself moves once per frame.
+    choose(Math.round(state.raw));
+    if (frame.current === undefined) frame.current = requestAnimationFrame(paint);
   }
   function finish(event: PointerEvent<HTMLDivElement>) {
     const state = drag.current;
     if (!state) return;
-    drag.current = null;
-    setDragging(false);
-    setOffset(0);
+    if (frame.current !== undefined) cancelAnimationFrame(frame.current);
+    frame.current = undefined;
     if (state.moved) {
       const velocity = event.timeStamp - state.time < 80 ? state.velocity : 0;
-      choose(
-        Math.round(
-          state.index +
-            (state.y - event.clientY) / stepHeight() +
-            Math.max(-5, Math.min(5, (velocity * 90) / stepHeight())),
-        ),
+      let target = Math.round(
+        state.raw + Math.max(-5, Math.min(5, (velocity * 90) / state.step)),
       );
+      if (!numeric) target = Math.max(0, Math.min(values.length - 1, target));
+      const from = (target - state.raw) * state.step;
+      drag.current = null;
+      setDragging(false);
+      // This settle already covers the rows the fling adds: mark them rendered
+      // so the value effect doesn't restart it one row further away.
+      previous.current = normalized(target);
+      choose(target);
+      // Glide from where the finger left the reel to the chosen row.
+      settle(from, -velocity * 1000);
     } else {
+      drag.current = null;
+      setDragging(false);
       setDraft(value);
       setEditing(true);
       input.current?.focus();
@@ -169,30 +277,28 @@ function TimeWheel({
       onPointerMove={move}
       onPointerUp={finish}
       onPointerCancel={() => {
+        const state = drag.current;
         drag.current = null;
         setDragging(false);
-        setOffset(0);
+        if (state?.moved) settle((previous.current - state.raw) * state.step);
       }}
     >
       <div
+        ref={reel}
         aria-hidden
-        className={cn(
-          "absolute inset-0 flex flex-col items-center justify-center",
-          !dragging &&
-            "transition-transform duration-150 ease-out motion-reduce:transition-none",
-        )}
-        style={{ transform: `translateY(${offset}px)` }}
+        className="absolute inset-0 flex flex-col items-center justify-center"
       >
-        {[-3, -2, -1, 0, 1, 2, 3].map((delta) => (
+        {Array.from({ length: 17 }, (_, i) => i - 8).map((delta) => (
           <span
             key={delta}
             className={cn(
-              "flex w-full shrink-0 items-center justify-center",
+              "flex h-8 w-full shrink-0 items-center justify-center",
               delta === 0
-                ? "h-11 text-large-title font-semibold"
-                : "h-8 text-title-2 text-white/40",
+                ? "text-title-2 font-semibold"
+                : "text-title-3 text-label-secondary",
               delta === 0 && editing && "invisible",
             )}
+            style={{ transform: `perspective(14rem) rotateX(${Math.max(-85, Math.min(85, -delta * 16))}deg)` }}
           >
             {!numeric &&
             (current + delta < 0 || current + delta >= values.length)
@@ -261,7 +367,7 @@ function TimeWheel({
           }
         }}
         className={cn(
-          "absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 rounded-lg bg-transparent text-center text-large-title font-semibold outline-none focus:bg-white/10 focus:ring-2 focus:ring-inset focus:ring-white/40",
+          "absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 rounded-lg bg-transparent text-center text-title-2 font-semibold outline-none focus:bg-fill-tertiary focus:ring-2 focus:ring-inset focus:ring-label",
           !editing && "opacity-0",
         )}
       />

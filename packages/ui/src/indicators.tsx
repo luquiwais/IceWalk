@@ -1,7 +1,6 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { MaterialLayers } from "./material";
 import { cn } from "./utils";
 
 function ProgressBar({
@@ -24,14 +23,13 @@ function ProgressBar({
       aria-valuemax={max}
       aria-valuenow={clamped}
       className={cn(
-        "vision-surface vision-progress relative h-1 w-72 max-w-full overflow-clip rounded-full",
+        "ui-well relative h-1 w-72 max-w-full overflow-clip rounded-full",
         className,
       )}
     >
-      <MaterialLayers kind="platter" />
       <span
         aria-hidden
-        className="relative block h-full rounded-full bg-white/60 transition-[width] duration-150 motion-reduce:transition-none"
+        className="relative block h-full rounded-full bg-label-secondary transition-[width] duration-150 motion-reduce:transition-none"
         style={{ width: `${max > 0 ? (clamped / max) * 100 : 0}%` }}
       />
     </div>
@@ -52,7 +50,7 @@ function ActivityIndicator({
     <span
       role="status"
       className={cn(
-        "vision-activity relative inline-block shrink-0",
+        "relative inline-block shrink-0",
         size === "small"
           ? "size-3.5"
           : size === "large"
@@ -66,7 +64,7 @@ function ActivityIndicator({
         <span
           key={i}
           aria-hidden
-          className="vision-activity-bar absolute left-[45%] top-0 h-[28%] w-[10%] origin-[50%_178.57%] rounded-full bg-white"
+          className="ui-activity-bar absolute left-[45%] top-0 h-[28%] w-[10%] origin-[50%_178.57%] rounded-full bg-label"
           style={
             {
               transform: `rotate(${i * 45}deg)`,
@@ -111,14 +109,14 @@ function PageControl({
         >
           <span
             aria-hidden
+            data-slot="page-dot"
+            data-current={i === value}
             className={cn(
-              "relative h-2 rounded-full bg-white/30",
-              i === value ? "w-4" : "w-2 group-hover:bg-white/60",
+              "relative h-2 rounded-full bg-label/30",
+              i === value ? "w-4" : "w-2 group-hover:bg-label-secondary",
             )}
           >
-            {i === value ? (
-              <span className="absolute right-0 size-2 rounded-full bg-white" />
-            ) : null}
+            <span className="absolute right-0 size-2 rounded-full bg-label" />
           </span>
         </button>
       ))}

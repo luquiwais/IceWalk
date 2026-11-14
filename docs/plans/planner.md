@@ -146,6 +146,16 @@ Para Frontend: una tarjeta en el Brief de Planning, con una fila por herramienta
 - **Cómo regenerar el catálogo:** necesita la imagen RED y el orto en `data/raw/`, y se corre `python -m gp.craters` desde `packages/model`. Pedile los archivos al dueño del GP.
 - **Hábitat por defecto:** (300, -2200) m en la grilla, marcado como supuesto (decisión del 2026-11-08). Es uno de los hábitats de la simulación con muchos cráteres cerca. Cuando se toque el contrato de la STM, sumar `habitat_xy`.
 
+## Datos para el deploy (14/11)
+
+1. `cd apps/planner && python -m app.traverse.terrain`: capas del terreno desde el DTM de `data/raw/` (15 s).
+2. `python scripts/pack_site_data.py` arma tres zips en `dist/` (fuera de Git), con `SHA256SUMS.txt`:
+   - `icewalk-site-terrain.zip` (10.4 MB): público, va al GitHub Release;
+   - `icewalk-site-private.zip`: catálogo en la grilla, **solo privado** (variable o volumen del servidor, nunca público);
+   - `icewalk-dundas2023-original.zip`: tabla original sin modificar (cuestión 65).
+3. En el servidor, descomprimir los dos primeros en `data/processed/s1094b/`; `/health` tiene que decir `planner: real`.
+4. Web: `NEXT_PUBLIC_PLANNER_API_URL` apunta a la API. Sin ella, la web usa los mocks del modelo real.
+
 ## Contrato y cambios pendientes
 
 | Cuestión | Qué | Estado |

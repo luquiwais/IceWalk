@@ -4,14 +4,13 @@ import { Menu } from "@base-ui/react/menu";
 import { Check, ChevronDown, ChevronRight } from "lucide-react";
 import { Fragment, type ReactNode } from "react";
 import { Button } from "./button";
-import { MaterialLayers } from "./material";
-import { cn } from "./utils";
+import { MorphOrigin, useMorphPopup } from "./morph-popup";
+import { Highlight } from "./selection";
 import { Text } from "./text";
-import { Vibrancy } from "./vibrancy";
+import { cn } from "./utils";
 
-/** Figma Context Menu: 280 wide, radius 28, 12 pt padding, 8 pt between rows. */
-const POPUP =
-  "vision-surface vision-popup-glass relative flex w-70 flex-col gap-2 rounded-[1.75rem] p-3 text-label outline-none [--glass-stroke-width:1.4px] [--glass-stroke-angle:150.286deg] [--glass-stroke-start:0%] [--glass-stroke-fade:40.569%] [--glass-stroke-rise:57.437%] [--glass-stroke-end:100%]";
+/** Fluid Kit's menu example: glass, 248 wide, radius 32, padding 8. */
+const POPUP = "lb relative flex w-[min(15.5rem,calc(100vw-2rem))] flex-col rounded-[2rem] p-2 text-label outline-none select-none";
 
 type MenuAction = {
   id: string;
@@ -27,6 +26,29 @@ type MenuAction = {
   section?: string;
 };
 
+/** Where a popup opens from its button. */
+type PopupPlacement = {
+  /** Side of the button it opens on. Default: bottom. */
+  side?: "top" | "bottom" | "left" | "right";
+  /** Alignment along that side. Default: start. */
+  align?: "start" | "center" | "end";
+  /** Gap from the button, pt. Default: 8. */
+  sideOffset?: number;
+  /** Open over the button instead of beside it (the button stays underneath). */
+  cover?: boolean;
+};
+
+/** Base UI positioner props for a placement. */
+function placement({ side = "bottom", align = "start", sideOffset = 8, cover = false }: PopupPlacement) {
+  return {
+    side,
+    align,
+    sideOffset: cover
+      ? ({ anchor }: { anchor: { width: number; height: number } }) => -(side === "top" || side === "bottom" ? anchor.height : anchor.width)
+      : sideOffset,
+  };
+}
+
 /** Icon-only action in the accessory bar above a context menu's rows. */
 type MenuAccessory = {
   id: string;
@@ -36,67 +58,47 @@ type MenuAccessory = {
   onSelect?: () => void;
 };
 
-/*
- * Menu Item (Figma 487:11315 and siblings): 256x56, radius 16, 12 pt side
- * padding (20 leading without a checkmark column). Idle has no platter; hover,
- * highlight and pinch paints live in theme.css under [data-slot="menu-item"].
- */
-const ITEM =
-  "vision-control vision-surface relative flex min-h-14 w-full items-center rounded-2xl pr-3 text-body outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label";
+/** A row: a 44pt capsule; the highlight moving between rows is one Highlight. */
+const ITEM = "flex min-h-11 w-full items-center gap-3 rounded-full pr-[1.125rem] text-body outline-none data-disabled:opacity-40";
 
 function ActionContent({ item, selectable }: { item: MenuAction; selectable: boolean }) {
   return (
     <>
       {selectable ? (
-        <span data-slot="menu-check" className="menu-item-main flex w-[1.4375rem] shrink-0 items-center">
-          {item.checked ? (
-            <Check aria-hidden strokeWidth={2.5} className="size-[1.0625rem]" />
-          ) : null}
+        <span data-slot="menu-check" className="flex w-[1.4375rem] shrink-0 items-center">
+          {item.checked ? <Check aria-hidden strokeWidth={2.5} className="size-[1.0625rem]" /> : null}
         </span>
       ) : null}
-      <span className="menu-item-main min-w-0 flex-1 py-[0.6875rem]">
+      <span className="min-w-0 flex-1 py-2">
         <span className="block truncate">{item.label}</span>
         {item.subtitle ? (
-          <Text
-            as="span"
-            variant="footnote"
-            tone="secondary"
-            className="block truncate"
-          >
+          <Text as="span" variant="footnote" tone="secondary" className="block truncate">
             {item.subtitle}
           </Text>
         ) : null}
       </span>
       {item.icon ? (
-        <span
-          aria-hidden
-          className="menu-item-main flex w-[1.625rem] shrink-0 items-center justify-center [&_svg]:size-[1.125rem]"
-        >
+        <span aria-hidden className="flex w-[1.625rem] shrink-0 items-center justify-center [&_svg]:size-[1.125rem]">
           {item.icon}
         </span>
       ) : null}
       {item.items ? (
-        <span aria-hidden className="flex w-3 shrink-0 items-center justify-center">
-          <Vibrancy tone="tertiary"><ChevronRight strokeWidth={2.25} className="size-[1.1875rem]" /></Vibrancy>
-        </span>
+        <ChevronRight aria-hidden strokeWidth={2.25} className="size-[1.1875rem] shrink-0 text-label-tertiary" />
       ) : null}
     </>
   );
 }
 
-/** The kit's Section Header: a hairline, then a 13 pt bold secondary label. */
+/** The kit's Section Header: a hairline, then a 13pt bold secondary label. */
 function SectionHeader({ children }: { children: ReactNode }) {
   return (
-    <div role="presentation" data-slot="menu-section" className="flex h-[2.9375rem] shrink-0 px-2 pt-2">
-      <Text variant="footnote" weight="bold" tone="secondary" className="w-full border-t border-separator px-3 pt-[1.25rem]">
+    <div role="presentation" data-slot="menu-section" className="shrink-0 px-3 pt-1">
+      <hr className="my-1 border-separator" />
+      <Text variant="footnote" weight="semibold" tone="secondary" className="px-1 py-1.5">
         {children}
       </Text>
     </div>
   );
-}
-
-function ItemSurface() {
-  return <MaterialLayers kind="platter" />;
 }
 
 function MenuActions({ items }: { items: MenuAction[] }) {
@@ -106,18 +108,13 @@ function MenuActions({ items }: { items: MenuAction[] }) {
       {item.section ? <SectionHeader>{item.section}</SectionHeader> : null}
       {item.items ? (
         <Menu.SubmenuRoot>
-          <Menu.SubmenuTrigger
-            data-slot="menu-item"
-            data-platter="false"
-            className={cn(ITEM, selectable ? "pl-3" : "pl-5")}
-          >
-            <ItemSurface />
+          <Menu.SubmenuTrigger data-slot="menu-item" className={cn(ITEM, selectable ? "pl-3" : "pl-4")}>
             <ActionContent item={item} selectable={selectable} />
           </Menu.SubmenuTrigger>
           <Menu.Portal>
             <Menu.Positioner sideOffset={8} className="z-50">
-              <Menu.Popup className={POPUP}>
-                <MaterialLayers kind="glass" />
+              <Menu.Popup className={cn(POPUP, "ui-pop")}>
+                <Highlight items="[role^=menuitem]:not([data-disabled])" />
                 <MenuActions items={item.items} />
               </Menu.Popup>
             </Menu.Positioner>
@@ -126,12 +123,10 @@ function MenuActions({ items }: { items: MenuAction[] }) {
       ) : (
         <Menu.Item
           data-slot="menu-item"
-          data-platter="false"
           disabled={item.disabled}
           onClick={item.onSelect}
-          className={cn(ITEM, selectable ? "pl-3" : "pl-5", item.destructive && "text-red-400")}
+          className={cn(ITEM, selectable ? "pl-3" : "pl-4", item.destructive && "text-warning")}
         >
-          <ItemSurface />
           <ActionContent item={item} selectable={selectable} />
         </Menu.Item>
       )}
@@ -142,29 +137,27 @@ function MenuActions({ items }: { items: MenuAction[] }) {
 /** Figma "Context Menu - Accessory Items": 64pt bar of 44pt circular symbol buttons. */
 function AccessoryBar({ accessories }: { accessories: MenuAccessory[] }) {
   return (
-    <div
-      data-slot="menu-accessories"
-      className="flex h-16 shrink-0 items-start justify-between border-b border-separator px-4 pt-1 pb-4"
-    >
+    <div data-slot="menu-accessories" className="flex h-16 shrink-0 items-start justify-between border-b border-separator px-4 pt-1 pb-4">
       {accessories.map((accessory) => (
         <Menu.Item
           key={accessory.id}
           data-slot="menu-item"
-          data-platter="false"
           aria-label={accessory.label}
           disabled={accessory.disabled}
           onClick={accessory.onSelect}
-          className="vision-control vision-surface relative flex size-11 items-center justify-center rounded-full outline-none focus-visible:outline-2 focus-visible:outline-label [&_svg]:size-5"
+          className="flex size-11 items-center justify-center rounded-full outline-none data-disabled:opacity-40 [&_svg]:size-5"
         >
-          <ItemSurface />
-          <span aria-hidden className="menu-item-main">{accessory.icon}</span>
+          <span aria-hidden>{accessory.icon}</span>
         </Menu.Item>
       ))}
     </div>
   );
 }
 
-/** Figma dropdown + context menu: 280pt, 28pt corners, 56pt rows. */
+/**
+ * A pull-down menu: its glass grows out of the button (Fluid Kit Morph) and the button stays.
+ * Where it opens is set with `side`, `align`, `sideOffset` and `cover`.
+ */
 function DropdownMenu({
   label,
   items,
@@ -173,7 +166,8 @@ function DropdownMenu({
   disabled = false,
   size = "regular",
   className,
-}: {
+  ...position
+}: PopupPlacement & {
   label: string;
   items: MenuAction[];
   header?: string;
@@ -182,22 +176,20 @@ function DropdownMenu({
   size?: "small" | "regular";
   className?: string;
 }) {
+  const popup = useMorphPopup();
   return (
-    <Menu.Root>
+    <Menu.Root {...popup.root}>
       <Menu.Trigger
         disabled={disabled}
         render={
           <Button
             variant="plain"
             size={size}
-            className={cn(
-              "gap-[0.3125rem]",
-              size === "regular" && "px-[1.125rem] text-title-2 font-bold",
-              className,
-            )}
+            className={cn("gap-[0.3125rem]", size === "regular" && "px-[1.125rem] text-title-2 font-bold", className)}
           />
         }
       >
+        <MorphOrigin ref={popup.trigger} />
         {label}
         <ChevronDown
           aria-hidden
@@ -206,16 +198,12 @@ function DropdownMenu({
         />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner sideOffset={8} align="start" className="z-50">
-          <Menu.Popup className={cn(POPUP, "max-w-[calc(100vw-2rem)] shadow-2xl")}>
-            <MaterialLayers kind="glass" />
+        <Menu.Positioner {...placement(position)} className="z-50">
+          <Menu.Popup ref={popup.popup} className={POPUP}>
+            <Highlight items="[role^=menuitem]:not([data-disabled])" />
             {accessories?.length ? <AccessoryBar accessories={accessories} /> : null}
             {header ? (
-              <Text
-                variant="footnote"
-                tone="secondary"
-                className="mx-5 flex h-[3.125rem] items-center justify-center border-b border-separator"
-              >
+              <Text variant="footnote" tone="secondary" className="mx-5 flex h-[3.125rem] items-center justify-center border-b border-separator">
                 {header}
               </Text>
             ) : null}
@@ -227,5 +215,5 @@ function DropdownMenu({
   );
 }
 
-export { DropdownMenu };
-export type { MenuAccessory, MenuAction };
+export { DropdownMenu, placement };
+export type { MenuAccessory, MenuAction, PopupPlacement };

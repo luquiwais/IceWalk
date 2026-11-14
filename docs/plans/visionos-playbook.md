@@ -137,3 +137,20 @@ recortado por el `SurfaceScroll` de `Alert`, que tiene `overflow-x: hidden`. Se 
 margen interno compensado (`-m-1.5 p-1.5`), sin cambiar el ancho visible. Verificado en
 Chromium con un escaneo de contornos recortados en `/design` (ninguno) y captura.
 
+
+## Avance guardado: motion e inputs (2026-11-09)
+
+Implementados en el kit: presencia con salida/interrupción, collapse medido, selección deslizante/deformación, estados de controles y page control, menús/submenús/pickers/alertas/tooltip/share sheet, toolbar, notificaciones/avisos, calendario, teclado, títulos, métricas y rueda. `ListRow` distingue selección, disclosure real y acción; field hit area completa; tab bar compacta horizontal web; cursores semánticos.
+
+**No dar motion por cerrado.** Primero revisar picos fríos, Safari, Reduce Motion y rueda final; contrastar demos Apple con Eitan y completar estados faltantes. Evidencia y límites: `../research/diseno-inmersivo-y-motion.md`. Después, por pedido explícito de Eitan, ampliar inputs numéricos y demás tipos faltantes. No comenzar ese inventario en lugar de cerrar motion.
+
+## Objetivo seleccionado el 11/11: fidelidad de movimiento visionOS
+
+Eitan rechaza las transiciones actuales por simples y pide investigar a fondo el original, con deformaciones, shaders y optimización. Este pedido reemplaza considerar suficiente la verificación anterior de fades y tiempos. Inputs ya tiene entrega verificada; el nuevo foco es el movimiento del kit.
+
+- Referencia primaria de esta ronda: videos y APIs de visionOS, distinguidos de Liquid Glass de iOS/macOS. Investigación por familia y evidencia en `../research/visionos-motion-fidelity-2026-11-11.md`.
+- Comparar forma, anclaje, revelado del contenido, respuesta óptica y continuidad de posición/velocidad durante interrupciones. Un cambio de opacidad o una curva spring compartida no bastan para aceptar todas las familias.
+- Evaluar shaders/filtros acotados según la referencia y su costo real; no suponer que un canvas WebGL puede leer el DOM o el backdrop del navegador.
+- Verificar estados de controles, lentes, popups, ventanas, navegación y rueda en movimiento normal y ralentizado; medir frío/caliente y CPU normal/4×, cancelación y reposo sin trabajo residual.
+- Reduce Motion debe conservar estados y semántica sin movimiento visual. Safari nativo se vuelve a incluir cuando el cambio esté estable.
+- No declarar igualdad exacta con el compositor privado de visionOS a partir de tests o capturas estáticas. Cada diferencia sin evidencia queda identificada.

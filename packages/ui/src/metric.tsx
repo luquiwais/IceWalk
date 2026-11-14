@@ -31,7 +31,7 @@ function Metric({ label, value, unit, className }: MetricProps) {
         {label}
       </Footnote>
       <Title2 as="dd" className="whitespace-nowrap">
-        <span className="tabular-nums">{value}</span>
+        <span key={value} className="ui-swap inline-block tabular-nums">{value}</span>
         {unit ? (
           <>
             {" "}

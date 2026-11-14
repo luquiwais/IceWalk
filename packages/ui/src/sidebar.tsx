@@ -5,11 +5,13 @@ import { Collapsible } from "@base-ui/react/collapsible";
 import { ChevronDown } from "lucide-react";
 import type * as React from "react";
 
-import { MaterialLayers, SurfaceScroll } from "./material";
+import { SurfaceScroll } from "./material";
+import { Highlight } from "./selection";
 import { Body } from "./text";
 import { cn } from "./utils";
 
 type SidebarProps = {
+  id?: string;
   /** Accessible name of the navigation landmark. */
   label: string;
   /** Large title at the top (Figma: Sidebar > Header). */
@@ -19,30 +21,31 @@ type SidebarProps = {
   action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  inert?: boolean;
+  "aria-hidden"?: boolean;
 };
 
 /*
- * visionOS sidebar (Figma: Sidebars): 320pt wide, Regular material with a
- * 0.5pt hairline on its trailing edge (rgb 84 84 88 / 65%).
- * Header (Figma: Header): 92pt, 28/20 side margins, Large Title in white.
- * Items: 56pt with 4pt between them.
+ * iPadOS 26/27 sidebar: a floating glass panel. The chosen row sits on a thumb that glides between
+ * rows (Fluid Kit Indicator).
  */
-function Sidebar({ label, title, titleId, action, children, className }: SidebarProps) {
+function Sidebar({ label, title, titleId, action, children, className, ...props }: SidebarProps) {
   return (
     <nav
+      {...props}
       aria-label={label}
       data-slot="sidebar"
       className={cn(
-        "vision-surface relative flex min-h-0 w-80 shrink-0 flex-col overflow-clip shadow-[0.5px_0_0_0_rgb(84_84_88/0.65)]",
+        "lb ui-panel relative flex min-h-0 w-80 shrink-0 flex-col overflow-clip",
         className,
       )}
     >
-      <MaterialLayers kind="regular" />
-      <SurfaceScroll className="flex-1">
-      <div className="flex h-23 shrink-0 items-center pr-5 pl-7">
+      <SurfaceScroll className="relative isolate flex-1">
+      <Highlight variant="tabs" items="[data-slot='sidebar-item']:not(:disabled)" rest="[aria-current='page']" />
+      <div className="flex min-h-16 shrink-0 items-center gap-2 px-5 pt-3 pb-2">
         <h2
           id={titleId}
-          className="min-w-0 flex-1 truncate font-display text-large-title leading-normal text-white"
+          className="min-w-0 flex-1 truncate font-display text-title-2 text-label"
         >
           {title}
         </h2>
@@ -69,10 +72,10 @@ type SidebarSectionProps = {
  */
 function SidebarSection({ heading, children, defaultOpen = true, disclosureIcon }: SidebarSectionProps) {
   return (
-    <li className="-mt-1">
+    <li className="pt-3">
       <Collapsible.Root defaultOpen={defaultOpen} className="flex flex-col gap-1">
-        <Collapsible.Trigger className="group flex h-[4.125rem] w-full items-center px-6 pt-3 text-left outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label">
-          <span className="min-w-0 flex-1 truncate text-[1.25rem] leading-[1.5625rem] font-semibold tracking-[-0.025rem] text-white">
+        <Collapsible.Trigger className="group flex min-h-11 w-full items-center px-5 text-left outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label">
+          <span className="min-w-0 flex-1 truncate text-footnote font-semibold text-label-secondary">
             {heading}
           </span>
           <span className="flex size-8 shrink-0 items-center justify-center text-label transition-transform duration-200 ease-(--ease-spring) group-not-data-panel-open:-rotate-90">
@@ -83,7 +86,7 @@ function SidebarSection({ heading, children, defaultOpen = true, disclosureIcon 
             />}
           </span>
         </Collapsible.Trigger>
-        <Collapsible.Panel render={<ul />} className="flex flex-col gap-1">
+        <Collapsible.Panel render={<ul />} className="ui-collapse flex flex-col gap-1">
           {children}
         </Collapsible.Panel>
       </Collapsible.Root>
@@ -111,53 +114,25 @@ type SidebarItemProps = {
  */
 function SidebarItem({ children, icon, counter, current = false, disabled = false, onSelect }: SidebarItemProps) {
   return (
-    <li>
+    <li className="px-3">
       <ButtonPrimitive
+        data-slot="sidebar-item"
         onClick={onSelect}
         disabled={disabled}
         aria-current={current ? "page" : undefined}
-        className="group flex h-14 w-full px-3 text-left outline-none"
+        className="relative flex min-h-11 w-full items-center gap-2 rounded-sidebar-item py-2 pr-3 pl-2 text-left outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-label disabled:text-label-disabled"
       >
-        <span
-          data-platter="false"
-          data-disabled={disabled ? "" : undefined}
-          className={cn(
-            "vision-control vision-surface relative flex h-full flex-1 items-center gap-2 rounded-sidebar-item pr-[1.1875rem] pl-2",
-            "group-focus-visible:outline-2 group-focus-visible:outline-label",
-            current && !disabled
-              ? "vision-selected"
-              : [
-                  "hover:not-data-disabled:[--fill-lighten:rgb(255_255_255/0.06)] hover:not-data-disabled:[--fill-dodge:rgb(94_94_94/0.18)]",
-                  "hover:not-data-disabled:[--fill-glow:radial-gradient(50%_164%_at_50%_100%,rgb(255_255_255/0.07),transparent_60.3%)]",
-                  "hover:not-data-disabled:[--fill-glow-dodge:radial-gradient(34%_137%_at_50%_100%,rgb(94_94_94/0.14),transparent_73.8%)]",
-                ],
-          )}
-        >
-          <MaterialLayers kind="platter" />
-          {icon ? (
-            <span className="flex h-14 w-8 shrink-0 items-center justify-center text-accent group-data-disabled:text-label-disabled [&_svg]:size-6">
-              {icon}
-            </span>
-          ) : null}
-          {/* Label: Body in regular, line 19, tracking -0.4. */}
-          <Body
-            as="span"
-            weight="regular"
-            className="min-w-0 flex-1 truncate leading-[1.1875rem] tracking-[-0.025rem] group-data-disabled:text-label-disabled"
-          >
-            {children}
+        {icon ? (
+          <span className={cn("flex w-7 shrink-0 items-center justify-center [&_svg]:size-5", current ? "text-accent" : "text-label-secondary", disabled && "text-label-disabled")}>{icon}</span>
+        ) : null}
+        <Body as="span" weight="regular" className="min-w-0 flex-1 truncate leading-[1.1875rem] tracking-[-0.025rem] text-inherit">
+          {children}
+        </Body>
+        {counter !== undefined ? (
+          <Body as="span" tone="secondary" weight="regular" className="leading-[1.1875rem] tracking-[-0.025rem] tabular-nums">
+            {counter}
           </Body>
-          {counter !== undefined ? (
-            <Body
-              as="span"
-              tone="secondary"
-              weight="regular"
-              className="leading-[1.1875rem] tracking-[-0.025rem] tabular-nums group-data-disabled:text-label-disabled group-data-disabled:mix-blend-normal"
-            >
-              {counter}
-            </Body>
-          ) : null}
-        </span>
+        ) : null}
       </ButtonPrimitive>
     </li>
   );

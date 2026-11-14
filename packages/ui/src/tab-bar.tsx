@@ -1,13 +1,10 @@
 "use client";
 
 import { Tabs } from "@base-ui/react/tabs";
-import { Fragment } from "react";
 import type * as React from "react";
 
-import { MaterialLayers } from "./material";
-import { Tooltip } from "./tooltip";
+import { Highlight } from "./selection";
 import { cn } from "./utils";
-import { Vibrancy } from "./vibrancy";
 
 type TabBarTab = {
   value: string;
@@ -23,74 +20,69 @@ type TabBarProps = {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** Figma "Expanded=True": 150pt wide, 126x44 tabs with the label (19 Medium) after the symbol. */
+  /** Vertical only: show the labels beside the symbols. */
   expanded?: boolean;
+  /** Horizontal: the iOS tab bar. Vertical: a column of the same tabs, for wide layouts. */
+  orientation?: "vertical" | "horizontal";
+  /** Regular-width iPad layout puts labels beside symbols. */
+  layout?: "compact" | "regular";
   className?: string;
 };
 
 /*
- * visionOS tab bar (Figma: Tab Bars, collapsed): a vertical glass ornament on
- * the leading side of a window. 68pt wide, radius 34, padding 12, gap 12,
- * tabs of 44, symbols of 19pt.
- *   Unselected idle: no fill, secondary symbol.
- *   Unselected hover: white 7% + #5E5E5E 18% color-dodge, glow, primary symbol.
- *   Selected: white 7% + #5E5E5E 18% color-dodge, primary symbol (+ glow on hover).
- * Collapsed, the label shows as a tooltip. Expanded (Figma Tabs=N, Expanded=True):
- * 150pt wide, tabs 126x44 (symbol slot 44, gap 4, trailing padding 28), label
- * 19pt Medium in the same vibrancy as the symbol. Height is 56N+12 either way.
+ * iOS 26/27 tab bar: a floating glass capsule; each tab a symbol over its caption. The chosen tab is
+ * tinted and sits on a fill that glides between tabs (Fluid Kit Indicator), never a second glass.
  */
-function TabBar({ label, tabs, value, defaultValue, onValueChange, expanded = false, className }: TabBarProps) {
+function TabBar({
+  label,
+  tabs,
+  value,
+  defaultValue,
+  onValueChange,
+  expanded = false,
+  orientation = "horizontal",
+  layout = "compact",
+  className,
+}: TabBarProps) {
+  const vertical = orientation === "vertical";
   return (
     <Tabs.Root
-      orientation="vertical"
+      orientation={orientation}
       value={value}
-      defaultValue={defaultValue}
+      defaultValue={defaultValue ?? tabs[0]?.value}
       onValueChange={(next) => onValueChange?.(String(next))}
       className={className}
     >
       <Tabs.List
         aria-label={label}
-        data-expanded={expanded ? "" : undefined}
-        className={cn("vision-surface relative flex flex-col gap-3 rounded-tab-bar p-3", expanded ? "min-w-[9.375rem] items-stretch" : "w-[4.25rem] items-center", "[--glass-stroke-width:1.4px] [--glass-stroke-angle:155.104deg] [--glass-stroke-start:4.8235%] [--glass-stroke-fade:38.0778%] [--glass-stroke-rise:56.677%] [--glass-stroke-end:95.1021%]")}
+        className={cn(
+          "lb relative isolate flex gap-0.5 rounded-full p-1 touch-none select-none",
+          vertical && "flex-col",
+        )}
       >
-        <MaterialLayers kind="glass" />
-        {tabs.map((tab) => {
-          const item = (
-            <Tabs.Tab
-              value={tab.value}
-              disabled={tab.disabled}
-              aria-label={tab.label}
-              data-platter="false"
-              className={cn(
-                "vision-control vision-surface group relative flex h-11 items-center rounded-full outline-none",
-                expanded ? "min-w-[7.875rem] justify-start gap-1 pr-7" : "w-11 justify-center",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-label",
-                "data-active:not-data-disabled:vision-selected hover:not-data-disabled:vision-selected",
-                "hover:not-data-disabled:[--fill-glow:radial-gradient(50%_50%_at_50%_100%,rgb(255_255_255/0.06),transparent)]",
-                "hover:not-data-disabled:[--fill-glow-dodge:radial-gradient(50%_50%_at_50%_100%,rgb(94_94_94/0.16),transparent)]",
-              )}
-            >
-              <MaterialLayers kind="platter" />
-              {expanded ? (
-                <>
-                  <Vibrancy className="size-11 shrink-0 place-items-center [&_svg]:size-5">{tab.icon}</Vibrancy>
-                  <Vibrancy className="text-left text-[1.1875rem] leading-6 font-medium whitespace-nowrap">
-                    {tab.label}
-                  </Vibrancy>
-                </>
-              ) : (
-                <Vibrancy className="[&_svg]:size-5">{tab.icon}</Vibrancy>
-              )}
-            </Tabs.Tab>
-          );
-          return expanded ? (
-            <Fragment key={tab.value}>{item}</Fragment>
-          ) : (
-            <Tooltip key={tab.value} label={tab.label} side="right">
-              {item}
-            </Tooltip>
-          );
-        })}
+        <Highlight variant="tabs" items="[role=tab]" rest="[data-active]" />
+        {tabs.map((tab) => (
+          <Tabs.Tab
+            key={tab.value}
+            value={tab.value}
+            disabled={tab.disabled}
+            className={cn(
+              "flex items-center justify-center rounded-full text-label outline-none data-active:text-accent [&_svg]:size-6",
+              (vertical && expanded) || (!vertical && layout === "regular")
+                ? "h-12 gap-2 px-4 text-subheadline font-medium"
+                : "min-h-13 min-w-16 flex-col gap-0.5 px-3 text-caption-2 font-medium",
+            )}
+          >
+            <span aria-hidden className="flex">
+              {tab.icon}
+            </span>
+            {!vertical || expanded ? (
+              tab.label
+            ) : (
+              <span className="sr-only">{tab.label}</span>
+            )}
+          </Tabs.Tab>
+        ))}
       </Tabs.List>
     </Tabs.Root>
   );

@@ -1,0 +1,223 @@
+{
+  "date": "2026-11-11",
+  "scope": "Isolated package evaluation; no application bundle, DOM/GPU performance or native-fidelity claim.",
+  "versions": {
+    "motion": "14.12.0",
+    "@react-spring/web": "10.1.2",
+    "gsap": "3.15.1",
+    "flubber": "0.4.2",
+    "bun": "1.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "registrySources": {
+    "motion": "https://registry.npmjs.org/motion/14.12.0",
+    "@react-spring/web": "https://registry.npmjs.org/@react-spring%2fweb/10.1.2",
+    "gsap": "https://registry.npmjs.org/gsap/3.15.1",
+    "flubber": "https://registry.npmjs.org/flubber/0.4.2"
+  },
+  "method": {
+    "install": "bun install --cwd TEMP --ignore-scripts",
+    "build": [
+      "bun",
+      "build",
+      "ENTRY",
+      "--target",
+      "browser",
+      "--minify",
+      "--format",
+      "esm",
+      "--external",
+      "react",
+      "--external",
+      "react-dom",
+      "--outfile",
+      "OUTPUT"
+    ],
+    "retention": "Each named imported API is assigned to window.lib to prevent removal as unused.",
+    "gzip": "Python gzip.compress(bundleBytes,mtime=0)",
+    "measurementBoundary": "Includes tree-shaken transitive package code for listed imports; excludes React/ReactDOM. Not npm unpacked size and not final Next chunk size."
+  },
+  "bundleSizes": [
+    {
+      "entry": "motion-spring",
+      "minifiedBytes": 4482,
+      "gzipBytes": 2150
+    },
+    {
+      "entry": "motion-mini",
+      "minifiedBytes": 9222,
+      "gzipBytes": 3523
+    },
+    {
+      "entry": "motion-mini-spring",
+      "minifiedBytes": 13307,
+      "gzipBytes": 5353
+    },
+    {
+      "entry": "motion-hybrid-values",
+      "minifiedBytes": 80043,
+      "gzipBytes": 28820
+    },
+    {
+      "entry": "react-spring-values",
+      "minifiedBytes": 37726,
+      "gzipBytes": 15098
+    },
+    {
+      "entry": "react-spring-hooks",
+      "minifiedBytes": 44088,
+      "gzipBytes": 17269
+    },
+    {
+      "entry": "gsap-morph",
+      "minifiedBytes": 92789,
+      "gzipBytes": 36805
+    },
+    {
+      "entry": "flubber-interpolate",
+      "minifiedBytes": 54835,
+      "gzipBytes": 18855
+    },
+    {
+      "entry": "motion-spring-values",
+      "minifiedBytes": 19805,
+      "gzipBytes": 7680
+    },
+    {
+      "entry": "motion-values-animate",
+      "minifiedBytes": 77079,
+      "gzipBytes": 27834
+    }
+  ],
+  "imports": {
+    "react-spring-values": "import {SpringValue} from \"@react-spring/web\"; window.lib={SpringValue};",
+    "motion-mini-spring": "import {animate} from \"motion/mini\"; import {spring} from \"motion\"; window.lib={animate,spring};",
+    "motion-values-animate": "import {animate,motionValue,styleEffect} from \"motion\"; window.lib={animate,motionValue,styleEffect};",
+    "motion-hybrid-values": "import {animate,motionValue,springValue,styleEffect,transformValue,frame,cancelFrame} from \"motion\"; window.lib={animate,motionValue,springValue,styleEffect,transformValue,frame,cancelFrame};",
+    "gsap-morph": "import {gsap} from \"gsap\"; import {MorphSVGPlugin} from \"gsap/MorphSVGPlugin\"; gsap.registerPlugin(MorphSVGPlugin); window.lib={gsap,MorphSVGPlugin};",
+    "motion-spring": "import {spring} from \"motion\"; window.lib={spring};",
+    "motion-spring-values": "import {springValue,styleEffect,transformValue} from \"motion\"; window.lib={springValue,styleEffect,transformValue};",
+    "flubber-interpolate": "import {interpolate} from \"flubber\"; window.lib={interpolate};",
+    "react-spring-hooks": "import {animated,useSpring} from \"@react-spring/web\"; window.lib={animated,useSpring};",
+    "motion-mini": "import {animate} from \"motion/mini\"; window.lib={animate};"
+  },
+  "springProbe": {
+    "version": "14.12.0",
+    "retarget": {
+      "x": 1214.8689069040106,
+      "y": 1214.8689069040106,
+      "v": 9788.509103159951,
+      "w": 9788.509103159953,
+      "C0Error": 0,
+      "C1Error": 1.8189894035458565e-12,
+      "finiteBefore": 9788.548000869923,
+      "finiteAfter": 9788.20145815007
+    },
+    "rest": [
+      {
+        "delta": 1,
+        "doneMs": 572,
+        "lastValue": 1.000756142897071,
+        "finalValue": 1,
+        "snap": 0.0007561428970710438,
+        "velocityBefore": -0.010279543327280209
+      },
+      {
+        "delta": 100,
+        "doneMs": 820,
+        "lastValue": 99.99954078541812,
+        "finalValue": 100,
+        "snap": 0.0004592145818804738,
+        "velocityBefore": -0.010520166680451458
+      },
+      {
+        "delta": 2000,
+        "doneMs": 1120,
+        "lastValue": 1999.9995241379258,
+        "finalValue": 2000,
+        "snap": 0.00047586207415406534,
+        "velocityBefore": 0.01048773210161272
+      }
+    ],
+    "visualDuration": [
+      {
+        "options": {
+          "visualDuration": 0.36
+        },
+        "v0": 1000,
+        "at100": 87.38070417229912,
+        "calculatedDuration": null
+      },
+      {
+        "options": {
+          "visualDuration": 0.36,
+          "bounce": 0
+        },
+        "v0": 1000,
+        "at100": 66.03431307913525,
+        "calculatedDuration": null
+      },
+      {
+        "options": {
+          "duration": 360,
+          "bounce": 0
+        },
+        "v0": 0,
+        "at100": 72.57509721879079,
+        "calculatedDuration": 360
+      }
+    ]
+  },
+  "springProbeMethod": {
+    "config": {
+      "stiffness": 250,
+      "damping": 28,
+      "mass": 1,
+      "restDelta": 0.001,
+      "restSpeed": 0.01
+    },
+    "retarget": {
+      "initialKeyframes": [
+        0,
+        2000
+      ],
+      "initialVelocity": 0,
+      "retargetTimeMs": 120,
+      "retargetTo": -150,
+      "finiteDifferenceDeltaMs": 0.001
+    },
+    "completionSamplingStepMs": 4,
+    "maxProbeMs": 10000,
+    "resultMeaning": "Analytical generator continuity and fine rest threshold, not rendered UI measurement."
+  },
+  "decision": {
+    "chosen": "Motion spring generator with WAAPI playback",
+    "reason": "Replace custom physics/termination while preserving geometry/material separation and avoiding a JS style write loop per frame.",
+    "deferred": "MotionValues/styleEffect only for a concrete live-value use case; Flubber or MorphSVG only for a concrete mismatched-topology morph.",
+    "generatorCaveats": [
+      "next and direct duration use milliseconds; visualDuration uses seconds.",
+      "Physics/visualDuration preserve supplied velocity; duration springs discard it.",
+      "Pass bounce:0 explicitly with visualDuration in direct generator version14.12.0.",
+      "next reuses a mutable state object; snapshot primitive values.",
+      "velocity and retarget are optional on exported KeyframeGenerator type and present on tested spring.",
+      "Set precise rest thresholds and sample until done instead of truncating at a fixed visual duration."
+    ]
+  },
+  "primaryDocumentation": [
+    "https://motion.dev/docs/spring",
+    "https://motion.dev/docs/spring-value",
+    "https://motion.dev/docs/motion-value",
+    "https://motion.dev/docs/style-effect",
+    "https://motion.dev/docs/frame",
+    "https://motion.dev/docs/svg-animation",
+    "https://motion.dev/docs/react-layout-animations",
+    "https://motion.dev/docs/performance",
+    "https://www.react-spring.dev/docs/advanced/spring-value",
+    "https://www.react-spring.dev/docs/concepts/imperative-api",
+    "https://gsap.com/docs/v3/Plugins/MorphSVGPlugin/",
+    "https://gsap.com/docs/v3/Plugins/InertiaPlugin/",
+    "https://gsap.com/community/standard-license/",
+    "https://github.com/veltman/flubber"
+  ]
+}

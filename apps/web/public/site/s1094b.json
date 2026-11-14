@@ -1,0 +1,70 @@
+{
+  "site_id": "s1094b",
+  "credit": "HiRISE ESP_073578_2155 · NASA/JPL-Caltech/UArizona",
+  "source": "https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/",
+  "license": "USGS Astrogeology ARD copy, CC0; HiRISE NASA/JPL-Caltech/UArizona",
+  "grid_crs": "+proj=eqc +lat_ts=35.1105 +lat_0=35.1105 +lon_0=189.8273 +x_0=0 +y_0=0 +R=3389574.3490888 +units=m +no_defs",
+  "generated": "2026-11-10T19:45:12+00:00",
+  "generator": "apps/web/scripts/build-site-imagery.py",
+  "resampling": "lanczos",
+  "stretch": {
+    "percentiles": [
+      0.5,
+      99.5
+    ],
+    "from": "overview",
+    "dn_low": 190.62,
+    "dn_high": 238.99,
+    "detail_own_dn": [
+      194.22,
+      238.53
+    ]
+  },
+  "images": {
+    "overview": {
+      "file": "/site/s1094b-overview.webp",
+      "product": "ESP_073578_2155_RED_C_01_ORTHO",
+      "box_m": {
+        "xmin": -1500.0,
+        "ymin": -3300.0,
+        "xmax": 2100.0,
+        "ymax": 900.0
+      },
+      "m_per_px": 1.5,
+      "width_px": 2400,
+      "height_px": 2800,
+      "valid_fraction": 1.0,
+      "bytes": 1156292
+    },
+    "detail": {
+      "file": "/site/s1094b-detail.webp",
+      "product": "ESP_073578_2155_RED_A_01_ORTHO",
+      "box_m": {
+        "xmin": -100.0,
+        "ymin": -2650.0,
+        "xmax": 800.0,
+        "ymax": -1900.0
+      },
+      "m_per_px": 0.25,
+      "width_px": 3600,
+      "height_px": 3000,
+      "valid_fraction": 1.0,
+      "bytes": 1093488
+    }
+  },
+  "registration": {
+    "method": "area centroid of the crater bowl at half depth (10 m box blur, ±300 m window), on the overview",
+    "crater_xy_m": [
+      -13.0,
+      -3.9
+    ],
+    "error_m": 13.5,
+    "tolerance_m": 20.0,
+    "bowl_equivalent_diameter_m": 78.8,
+    "darkest_1pct_centroid_xy_m": [
+      -20.2,
+      -2.4
+    ],
+    "darkest_1pct_note": "biased toward the shadowed west wall; not the crater center"
+  }
+}

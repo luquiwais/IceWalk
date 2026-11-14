@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
-import { MaterialLayers } from "./material";
 import { cn } from "./utils";
 
 type SliderProps = {
@@ -29,7 +28,11 @@ const ENDPOINT_ICON = {
   large: "[&_svg]:size-[1.625rem]",
 } as const;
 
-/** Figma Sliders: 288pt track, 16/20/28/44pt heights. Native range behavior. */
+/**
+ * iOS slider, drawn as Fluid Kit's slider example: a 6pt track filled to the value and a white
+ * glass knob that turns into a lens, stretched along the track, while held. A native range input
+ * does the work underneath (keyboard, touch, screen readers).
+ */
 function Slider({
   label,
   value,
@@ -50,84 +53,41 @@ function Slider({
   const [localValue, setValue] = useState(defaultValue);
   const current = Math.max(min, Math.min(max, value ?? localValue));
   const fraction = max > min ? (current - min) / (max - min) : 0;
+  const endpoint = (content: ReactNode) => (
+    <span aria-hidden className={cn("flex size-7 shrink-0 items-center justify-center text-label-secondary", ENDPOINT_ICON[size])}>{content}</span>
+  );
   return (
     <div
       data-slot="slider"
-      data-size={size}
       data-variant={variant}
       data-disabled={disabled ? "" : undefined}
-      className={cn(
-        "vision-slider flex w-72 max-w-full items-center gap-3",
-        className,
-      )}
-      style={
-        {
-          "--range-value": fraction,
-          "--range-gradient": gradient,
-        } as CSSProperties
-      }
+      className={cn("flex w-72 max-w-full items-center gap-3 data-disabled:opacity-40", className)}
+      style={{ "--v": fraction } as CSSProperties}
     >
-      {leading ? (
-        <span
-          aria-hidden
-          className={cn("range-endpoint flex size-7 shrink-0 items-center justify-center", ENDPOINT_ICON[size])}
-        >
-          {leading}
+      {leading ? endpoint(leading) : null}
+      <div className="ui-slider">
+        <span className="ui-slider-track" style={variant === "color" ? { background: gradient } : undefined}>
+          {variant === "color" ? null : <span className="ui-slider-fill" />}
         </span>
-      ) : null}
-      <div className="vision-surface range-track relative min-w-0 flex-1 rounded-full">
-        <MaterialLayers kind={disabled ? "regular" : "recessed"} />
-        {variant === "color" ? (
-          <span
-            aria-hidden
-            className="range-color absolute inset-0 rounded-full"
-          />
-        ) : (
-          <span
-            aria-hidden
-            className="range-fill absolute inset-y-0 left-0 rounded-full"
-          />
-        )}
-        {variant === "segmented" ? (
-          <span
-            aria-hidden
-            className="range-divisions absolute inset-0 rounded-full"
-          />
-        ) : null}
-        {variant === "color" ? (
-          <span
-            aria-hidden
-            className="range-knob absolute top-1/2 rounded-full border-2 border-white"
-          />
-        ) : null}
-        <label htmlFor={id} className="sr-only">
-          {label}
-        </label>
+        <span aria-hidden className="ui-slider-knob lb lb-stretch" />
+        <label htmlFor={id} className="sr-only">{label}</label>
         <input
           id={id}
           type="range"
           min={min}
           max={max}
-          step={step}
+          step={variant === "segmented" ? (max - min) / 4 : step}
           value={current}
           disabled={disabled}
-          aria-valuetext={`${current}`}
           onChange={(event) => {
             const next = Number(event.target.value);
             setValue(next);
             onValueChange?.(next);
           }}
-          className="vision-range-input absolute inset-x-0 top-1/2 z-1 m-0 h-11 w-full -translate-y-1/2 cursor-pointer appearance-none bg-transparent outline-none disabled:cursor-not-allowed"
+          className="ui-slider-input"
         />
       </div>
-      {trailing ? (
-        <span
-          aria-hidden
-          className={cn("range-endpoint flex size-7 shrink-0 items-center justify-center", ENDPOINT_ICON[size])}
-        >
-          {trailing}
-        </span>
-      ) : null}
+      {trailing ? endpoint(trailing) : null}
     </div>
   );
 }

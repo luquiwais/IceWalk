@@ -24,7 +24,6 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 7 | ¿Se suma PDF del plan de EVA? | Sí, si el ciclo ya anda | Producto | 04/11 |
 | 8 | ¿Se recortan vista Science, segundo sitio, radar en marcha y voz? | Sí. Ojo: si el radar sube de importancia, revisar ese recorte | Producto | 04/11 |
 | 9 | ¿Premio objetivo? | Best Use of Science | Producto | 04/11 |
-| 47 | ¿Ventana de Planning anclada a la izquierda, cámara centrada en el área libre y modo Map focus? | Sí (`research/diseno-interfaz.md` §2.1) | Frontend | 09/11 |
 | 48 | ¿Barra de estado arriba, igual en Planning, EV y Science (PET, walkback, bingo, alerta tope, mini-timeline)? | Sí (§2.2; NASA-STD-3001 V2 10005) | Frontend + Producto | 09/11 |
 | 50 | ¿El antes/después de la demo pasa a ser local (~200 m alrededor de la medición) + puntos confirmados? | Sí: la incertidumbre del sitio entero casi no baja (§7) | Luqui + GP | 09/11 |
 | 51 | ¿`tool_assessment` (rendimiento por herramienta) en el plan o como endpoint aparte? | Bloque aditivo o endpoint, sin tocar `/replan` (§3.2) | Planificador + GP | 09/11 |
@@ -41,6 +40,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 68 | Darionautas no tiene canal privado en el Discord de la sede, que es por donde pasan los mentores. ¿Se pide en #equipos? | Sí, con nombre e integrantes, como hacen los demás equipos | Luqui | 14/11 |
 | 69 | ¿Qué texto va en la declaración de IA de la entrega? (asistentes de código e investigación; la idea y las decisiones, del equipo) | Redactarla con la lista de herramientas y para qué se usó cada una | Luqui + Diseño | 14/11 |
 | 70 | SkyFall (NASA) recibe propuestas de sitio hasta el 1/12/2026 (skyfall_lsw_input@jpl.nasa.gov; coordenadas, imagen HiRISE, trazabilidad). ¿Mandamos una con IceWalk (tarjeta en las 5 regiones, S1094b o AP-105) después del hackatón? Es enviar algo afuera: lo decide el equipo | Mencionarlo en el pitch como impacto inmediato; decidir el envío después del 15/11 | Luqui + equipo | 14/11 |
+| 72 | El hábitat por defecto (300, −2200) coincide con la estación 1 (E03S22), con traverse de 0 min. ¿Es lo esperado? | Revisar con Planificador; la web desplaza el marcador para que se vean los dos | Planificador | 10/11 |
+| 73 | ¿El planificador real puede devolver un plan sin estaciones? Hoy el cliente web lo rechaza como respuesta inválida | Si puede, la web necesita un estado vacío | Planificador | 10/11 |
 
 ## A averiguar
 
@@ -64,3 +65,13 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 ## Riesgo aceptado
 
 La FAQ prohíbe empezar antes del evento; el equipo decidió seguir. No se retoca el historial.
+
+## Frontend: pendientes de esta iteración (2026-11-09)
+
+- **2026-11-10:** P0 hecho (PR #4, borrador). En curso: capa de datos de la API, revisión de código del bloque de motion y Etapa 1 del diseño nuevo (`plans/web-design.md`). El inventario de inputs del kit está en `log/2026-11-10.md`.
+- **2026-11-11:** inputs implementados y verificados (163 tests UI en la recuperación). Diseño de Planning/EV/Science y globo en validación final; capa API ya presente. #58 resuelta con guard síncrono `busy`; #60 resuelta con instrumento asignado del catálogo y hora real al registrar (tests de integración). Ver `log/2026-11-11.md`.
+- Motion vuelve a ser objetivo principal por pedido explícito de Eitan: investigar y reproducir la forma, deformación/óptica y continuidad del visionOS original; comprobar rendimiento, Safari real y Reduce Motion. Investigación vigente: `research/visionos-motion-fidelity-2026-11-11.md`. No se considera cerrado por los checks de la iteración anterior.
+- Foco al montar una ventana que ya nace abierta: decisión UX consultada por Claude y aún sin respuesta; mantener mientras no se seleccione un cambio.
+- #47 y #53 resueltos solo para la composición frontend de la demo por instrucciones de Eitan; registrados en DECISIONS. #48–55 restantes siguen siendo decisiones del equipo; los mocks no fijan reglas operacionales.
+- **2026-11-12:** medidas 1:1 contra el kit oficial de iOS 27 en Figma: hace falta que Eitan duplique `figma.com/community/file/1651309003795292092` para leerlo con el MCP. Por ahora se sigue con HIG + WWDC + Fluid Kit.
+- **2026-11-12:** playbook HIG iOS 27, Tailwind y Morph implementados y verificados en Chromium. Falta QA en Safari real (recorrido CUA interrumpido por cambio de ventana durante uso del usuario); pickers y teclado sí tienen pruebas en Chromium. Figma continúa pendiente según la entrada anterior.

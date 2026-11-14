@@ -20,6 +20,9 @@ bun run moon run web:dev                      # http://localhost:3000
 bun run moon run web:lint web:typecheck web:test web:build
 ```
 
+Contra la API local: levantá el planificador (`cd apps/planner && uvicorn app.main:app --reload`, puerto 8000) y poné `NEXT_PUBLIC_PLANNER_API_URL=http://localhost:8000` en `apps/web/.env.local` (plantilla en `.env.example`); se lee al arrancar `dev` o en el `build`.
+Sin esa variable, o si la API no responde, la web usa `mock/` y lo dice (`source: "mock"` en `lib/use-plan-session.ts`, texto en el Mission brief).
+
 O directo en la carpeta:
 
 ```bash

@@ -1,8 +1,10 @@
 "use client";
 
 import { Popover } from "@base-ui/react/popover";
+import { useMergedRefs } from "@fluidkit/react";
 import { ChevronLeft, ChevronRight, Pipette, X } from "lucide-react";
 import {
+  cloneElement,
   useEffect,
   useRef,
   useState,
@@ -16,14 +18,20 @@ import { SegmentedControl } from "./segmented-control";
 import { Slider } from "./slider";
 import { TimeWheel as Wheel } from "./time-wheel";
 import { Text } from "./text";
+import { MorphOrigin, useMorphPopup } from "./morph-popup";
+import { placement, type PopupPlacement } from "./menu";
 import { cn } from "./utils";
 
+/** A picker that grows out of its button (Fluid Kit Morph); the button stays. Placement is configurable. */
 function PickerPopover({
   trigger,
   label,
   children,
   focusPopup = false,
-}: {
+  side = "bottom",
+  align = "center",
+  ...position
+}: PopupPlacement & {
   trigger: ReactElement;
   label: string;
   children: ReactNode;
@@ -31,16 +39,20 @@ function PickerPopover({
   focusPopup?: boolean;
 }) {
   const popup = useRef<HTMLDivElement>(null);
+  const morph = useMorphPopup();
+  const ref = useMergedRefs(popup, morph.popup);
   return (
-    <Popover.Root>
-      <Popover.Trigger render={trigger} />
+    <Popover.Root {...morph.root}>
+      <Popover.Trigger
+        render={cloneElement(trigger, {}, <>{(trigger.props as { children?: ReactNode }).children}<MorphOrigin ref={morph.trigger} /></>)}
+      />
       <Popover.Portal>
-        <Popover.Positioner sideOffset={12} className="z-50">
+        <Popover.Positioner {...placement({ side, align, ...position })} className="z-50">
           <Popover.Popup
-            ref={popup}
+            ref={ref}
             initialFocus={focusPopup ? popup : true}
             data-slot="picker-popover"
-            className="max-w-[calc(100vw-2rem)] text-label outline-none"
+            className="lb max-w-[calc(100vw-2rem)] rounded-[2rem] text-label outline-none"
           >
             <Popover.Title className="sr-only">{label}</Popover.Title>
             {children}
@@ -60,7 +72,7 @@ function parseDate(value: string) {
   return new Date(y, m - 1, d, 12);
 }
 
-type DatePickerProps = {
+type DatePickerProps = PopupPlacement & {
   label: string;
   value: string;
   onValueChange: (date: string) => void;
@@ -68,7 +80,7 @@ type DatePickerProps = {
   expanded?: boolean;
   className?: string;
 };
-/** Figma expanded calendar 436pt, 44pt days, 7pt row gaps. */
+/** Calendar: 340 pt wide, 44 pt days and a 16 pt content inset. */
 function Calendar({
   label,
   value,
@@ -122,7 +134,7 @@ function Calendar({
   return (
     <Material
       kind="glass"
-      className={cn("w-[27.25rem] max-w-full rounded-[2rem] p-4", className)}
+      className={cn("w-85 max-w-full rounded-3xl p-4", className)}
     >
       <div className="relative flex items-center justify-between gap-2">
         <Text
@@ -164,6 +176,8 @@ function Calendar({
         </div>
       </div>
       <div role="grid" aria-label={label} className="relative mt-4">
+        {/* The weekday row holds vibrant labels and doesn't change: only the
+            days animate, so no fade sits above a blended paint. */}
         <div role="row" className="grid grid-cols-7">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
             <Text
@@ -178,65 +192,75 @@ function Calendar({
             </Text>
           ))}
         </div>
-        {Array.from({ length: Math.ceil((offset + days) / 7) }, (_, week) => (
-          <div
-            role="row"
-            key={week}
-            className="mt-[0.4375rem] grid grid-cols-7 justify-items-center"
-          >
-            {Array.from({ length: 7 }, (_, weekday) => {
-              const day = week * 7 + weekday - offset + 1;
-              if (day < 1 || day > days)
-                return <span role="gridcell" key={weekday} />;
-              const key = iso(
-                new Date(month.getFullYear(), month.getMonth(), day, 12),
-              );
-              return (
-                <span role="gridcell" aria-selected={key === value} key={key}>
-                  <button
-                    type="button"
-                    ref={(node) => {
-                      if (node) buttons.current.set(key, node);
-                      else buttons.current.delete(key);
-                    }}
-                    disabled={disabled}
-                    tabIndex={
-                      key ===
-                      (focusDay.startsWith(iso(month).slice(0, 7))
-                        ? focusDay
-                        : iso(month))
-                        ? 0
-                        : -1
-                    }
-                    aria-label={parseDate(key).toLocaleDateString("en-US", {
-                      dateStyle: "full",
-                    })}
-                    onKeyDown={(event) => keyboard(event, day)}
-                    onClick={() => {
-                      setFocusDay(key);
-                      onValueChange(key);
-                    }}
-                    className={cn(
-                      "size-11 rounded-full text-[1rem] outline-none hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
-                      key === value && "bg-white text-black hover:bg-white",
-                    )}
-                  >
-                    {day}
-                  </button>
-                </span>
-              );
-            })}
-          </div>
-        ))}
+        <div
+          key={month.toISOString()}
+          role="rowgroup"
+          className="ui-swap"
+        >
+          {Array.from({ length: Math.ceil((offset + days) / 7) }, (_, week) => (
+            <div
+              role="row"
+              key={week}
+              className="mt-[0.4375rem] grid grid-cols-7 justify-items-center"
+            >
+              {Array.from({ length: 7 }, (_, weekday) => {
+                const day = week * 7 + weekday - offset + 1;
+                if (day < 1 || day > days)
+                  return <span role="gridcell" key={weekday} />;
+                const key = iso(
+                  new Date(month.getFullYear(), month.getMonth(), day, 12),
+                );
+                return (
+                  <span role="gridcell" aria-selected={key === value} key={key} className="w-full">
+                    <button
+                      type="button"
+                      ref={(node) => {
+                        if (node) buttons.current.set(key, node);
+                        else buttons.current.delete(key);
+                      }}
+                      disabled={disabled}
+                      tabIndex={
+                        key ===
+                        (focusDay.startsWith(iso(month).slice(0, 7))
+                          ? focusDay
+                          : iso(month))
+                          ? 0
+                          : -1
+                      }
+                      aria-label={parseDate(key).toLocaleDateString("en-US", {
+                        dateStyle: "full",
+                      })}
+                      onKeyDown={(event) => keyboard(event, day)}
+                      onClick={() => {
+                        setFocusDay(key);
+                        onValueChange(key);
+                      }}
+                      className={cn(
+                        "aspect-square w-full max-w-11 rounded-full text-[1rem] outline-none hover:bg-fill-tertiary focus-visible:outline-2 focus-visible:outline-label disabled:text-label-disabled",
+                        key === value && "ui-selected hover:bg-accent",
+                      )}
+                    >
+                      {day}
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
     </Material>
   );
 }
-function DatePicker(props: DatePickerProps) {
+function DatePicker({ side, align, sideOffset, cover, ...props }: DatePickerProps) {
   if (props.expanded) return <Calendar {...props} />;
   return (
     <PickerPopover
       label={props.label}
+      side={side}
+      align={align}
+      sideOffset={sideOffset}
+      cover={cover}
       trigger={
         <Button disabled={props.disabled} aria-label={props.label}>
           {parseDate(props.value).toLocaleDateString("en-US", {
@@ -252,19 +276,25 @@ function DatePicker(props: DatePickerProps) {
   );
 }
 
+type TimePickerProps = PopupPlacement & {
+  label: string;
+  value: string;
+  onValueChange: (time: string) => void;
+  expanded?: boolean;
+  disabled?: boolean;
+};
+
 function TimePicker({
   label,
   value,
   onValueChange,
   expanded = false,
   disabled = false,
-}: {
-  label: string;
-  value: string;
-  onValueChange: (time: string) => void;
-  expanded?: boolean;
-  disabled?: boolean;
-}) {
+  side,
+  align,
+  sideOffset,
+  cover,
+}: TimePickerProps) {
   const [h, m] = value.split(":").map(Number);
   const hour = h % 12 || 12;
   const period = h >= 12 ? "PM" : "AM";
@@ -312,6 +342,10 @@ function TimePicker({
     <PickerPopover
       label={label}
       focusPopup
+      side={side}
+      align={align}
+      sideOffset={sideOffset}
+      cover={cover}
       trigger={
         <Button disabled={disabled} aria-label={label}>
           {hour}:{String(m).padStart(2, "0")} {period}
@@ -385,7 +419,7 @@ function ColorPicker({
   return (
     <Material
       kind="glass"
-      className="w-[25.5rem] max-w-full rounded-[2.875rem] p-6"
+      className="w-88 max-w-full rounded-3xl p-4"
     >
       <header className="relative flex items-center justify-between pb-6">
         <span aria-hidden className="flex size-11 items-center justify-center">
@@ -417,7 +451,7 @@ function ColorPicker({
           { value: "sliders", label: "Sliders" },
         ]}
       />
-      <div className="relative mt-4">
+      <div key={tab} className="ui-swap relative mt-4">
         {tab === "grid" ? (
           <div
             aria-label="Color grid"
@@ -499,7 +533,7 @@ function ColorPicker({
                       : 0),
               );
             }}
-            className="relative h-[18.75rem] touch-none rounded-2xl outline-none focus-visible:outline-2 focus-visible:outline-label"
+            className="relative h-60 touch-none rounded-2xl outline-none focus-visible:outline-2 focus-visible:outline-label"
             style={{
               background:
                 "linear-gradient(0deg,black,transparent 50%,white),linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)",
@@ -515,7 +549,7 @@ function ColorPicker({
             />
           </div>
         ) : (
-          <div className="flex min-h-[18.75rem] flex-col justify-evenly gap-4">
+          <div className="flex min-h-60 flex-col justify-evenly gap-4">
             {["Red", "Green", "Blue"].map((channel, i) => (
               <div key={channel}>
                 <Text variant="callout" className="mb-2">
@@ -561,7 +595,7 @@ function ColorPicker({
       <div className="relative mt-6 flex gap-5">
         <span
           aria-label={`Selected color ${value}, ${opacity}% opacity`}
-          className="size-26 shrink-0 rounded-[1.375rem]"
+          className="size-16 shrink-0 rounded-2xl"
           style={{ background: value, opacity: opacity / 100 }}
         />
         <div className="grid flex-1 grid-cols-4 gap-3">
@@ -584,4 +618,4 @@ function ColorPicker({
 }
 
 export { Calendar, ColorPicker, DatePicker, PickerPopover, TimePicker };
-export type { DatePickerProps };
+export type { DatePickerProps, TimePickerProps };

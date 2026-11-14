@@ -163,6 +163,40 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 | Taladro de Apollo (ALSD): motorizado, < 13.6 kg, dos personas | Manual MCR-69-300, https://ntrs.nasa.gov/api/citations/19710014920/downloads/19710014920.pdf |
 | Vis-NIR y XRF de mano, ~2.5 kg (BASALT) | Sehlke et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442242/ |
 | Bingo times y "sin respuesta a tiempo, sigue la prioridad propia" | Stevens et al. (2019), https://pmc.ncbi.nlm.nih.gov/articles/PMC6442282/ |
+
+### Movimiento y composición inmersiva (2026-11-09)
+
+- Apple HIG: [Motion](https://developer.apple.com/design/human-interface-guidelines/motion), [Spatial layout](https://developer.apple.com/design/human-interface-guidelines/spatial-layout), [Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars), [Materials](https://developer.apple.com/design/human-interface-guidelines/materials), [Pointing devices](https://developer.apple.com/design/human-interface-guidelines/pointing-devices).
+- Apple [Applying Liquid Glass to custom views](https://developer.apple.com/documentation/swiftui/applying-liquid-glass-to-custom-views), [Meet Liquid Glass WWDC25/219](https://developer.apple.com/videos/play/wwdc2025/219/), [SwiftUI WWDC25/323](https://developer.apple.com/videos/play/wwdc2025/323/), [UIKit WWDC25/284](https://developer.apple.com/videos/play/wwdc2025/284/).
+- [MDN cursor](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/cursor). Fuentes y calibraciones propias diferenciadas en `research/diseno-inmersivo-y-motion.md`.
+
+### Imágenes del sitio en la web (2026-11-10)
+
+- Ortoimágenes HiRISE `ESP_073578_2155_RED_A_01_ORTHO` y `ESP_073578_2155_RED_C_01_ORTHO`. Crédito: NASA/JPL-Caltech/UArizona. Copia COG de USGS Astrogeology (CC0): https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/ (ver `provenance.txt` en esa carpeta). Capas `hirise_ortho_1m` y `hirise_ortho_25cm` de `data/layers.yaml`.
+
+### Fidelidad de movimiento visionOS (2026-11-11)
+
+- Apple [Design hover interactions for visionOS, WWDC25/303](https://developer.apple.com/videos/play/wwdc2025/303/): referencias de tab bar, Back y slider desde 2:08; efectos de hover y rampas desde 5:01. Los tiempos observados se distinguen de parámetros publicados en `research/visionos-motion-fidelity-2026-11-11.md`.
+- Apple [Create custom hover effects in visionOS, WWDC24/10152](https://developer.apple.com/videos/play/wwdc2024/10152/): coordinación de escala, opacidad y forma de clip; el ejemplo de escala es 1.05. No prescribe deformación líquida para todos los componentes.
+- Apple [Animate with springs, WWDC23/10158](https://developer.apple.com/videos/play/wwdc2023/10158/): modelo de springs y continuidad de velocidad. Los presets públicos se conservan separados de la calibración web en `packages/ui/src/spring.ts`.
+- Figma `TE1ta1HNhtbwSZn3LztSL5`, Context Menu `487:11347`: geometría y materiales recuperados con `get_design_context`; `get_motion_context` recursivo devolvió `nodes: []`. Ese componente estático no demuestra las transiciones nativas.
+- Apple [Design for spatial user interfaces, WWDC23/10076](https://developer.apple.com/videos/play/wwdc2023/10076/), [Design for spatial input, WWDC23/10073](https://developer.apple.com/videos/play/wwdc2023/10073/) y [Elevate your windowed app for spatial computing, WWDC23/10110](https://developer.apple.com/videos/play/wwdc2023/10110/): materiales, modales, activación y ornamentos.
+- Motion [spring generator](https://motion.dev/docs/spring), [animate](https://motion.dev/docs/animate), [springValue](https://motion.dev/docs/spring-value), [styleEffect](https://motion.dev/docs/style-effect) y [SVG morphing](https://motion.dev/docs/react-svg-animation): comparación de integración y física con velocidad. Versiones, licencias y pesos medidos de alternativas en la investigación del 11/11.
+- [CSSWG Filter Effects Level 2](https://drafts.csswg.org/filter-effects-2/) y [MDN backdrop-filter](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/backdrop-filter): semántica del backdrop y filtros SVG; se comprobó ejecución real por motor antes de afirmar soporte.
+
+### Liquid Glass iOS 27 y Fluid Kit (2026-11-12)
+
+- [Fluid Kit](https://github.com/mikhailmogilnikov/fluid-kit) (MIT © Mikhail Mogilnikov), `@fluidkit/react` 2.0.0: material `lb`, Morph, Indicator, Drag, Layout, scroll edges y springs. Switch, slider, menú y tabs copian los ejemplos de su documentación.
+- Apple [Meet Liquid Glass, WWDC25/219](https://developer.apple.com/videos/play/wwdc2025/219/): lensing, materialización, adaptividad, variantes regular/clear, capas (vidrio solo para navegación, nunca vidrio sobre vidrio) y accesibilidad.
+- Apple [HIG: Materials](https://developer.apple.com/design/human-interface-guidelines/materials) y [design kits de iOS/iPadOS/macOS 27](https://developer.apple.com/news?id=e2lxw9l1) (23/06/2026). El kit de Figma [iOS and iPadOS 27](https://www.figma.com/community/file/1651309003795292092) no se midió.
+- Cambios de iOS 27 según prensa, sin verificar con Apple: menos transparencia, bordes más definidos, modo oscuro más claro y un control de transparencia en Ajustes ([Tech Times](https://www.techtimes.com/articles/317975/20260608/apple-liquid-glass-ios-27-wwdc-2026-brings-refinements-developers-must-adopt-today.htm), [GSMSpecs](https://www.gsmspecs.com/news/ios-27-liquid-glass-update)).
+
+### Playbook iOS/iPadOS 27 y Tailwind (continuación, 2026-11-12)
+
+- Apple HIG: [Materials](https://developer.apple.com/design/human-interface-guidelines/materials), [Color](https://developer.apple.com/design/human-interface-guidelines/color), [Typography](https://developer.apple.com/design/human-interface-guidelines/typography), [Layout](https://developer.apple.com/design/human-interface-guidelines/layout), [Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars), [Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars) y [Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons). Fuentes primarias consultadas; fondo y controles según su función, sin calibración nueva contra Figma. Los tokens son una adaptación web de roles de UIKit, no acceso a colores dinámicos nativos del dispositivo.
+- Fluid Kit [Morph](https://fluidkit.mogilnikov.dev/morph/): hook React, más de dos estados, montaje antes de volar, cierre al terminar, foco, refs estables, límites de transform y Reduce Motion. Se consultó también el código instalado de `@fluidkit/core` 2.0.0 para distinguir seguimiento de tamaño durante un vuelo de un nuevo cambio de estado.
+- Tailwind: [Utility classes](https://tailwindcss.com/docs/styling-with-utility-classes), [Theme variables](https://tailwindcss.com/docs/theme), [Responsive design](https://tailwindcss.com/docs/responsive-design) y [Custom styles](https://tailwindcss.com/docs/adding-custom-styles): utilidades, componentes reutilizables, variantes mobile-first y `@theme static` para tokens usados por muestras dinámicas.
+- [Ejemplo Next.js con Vitest](https://github.com/vercel/next.js/tree/canary/examples/with-vitest): React Testing Library y tests por comportamiento.
 | Hora solar en Marte y posición del Sol (Mars24) | Allison y McEwen (2000), Planetary and Space Science 48, 215-235; algoritmo y ejemplos: https://www.giss.nasa.gov/tools/mars24/help/algorithm.html |
 | Meteorología del Viking Lander 2: presión, temperatura y viento en 25 bins por sol (sols 1-1050) | NASA PDS Atmospheres, VL1/VL2-M-MET-4-BINNED-P-T-V-V1.0 (Tillman et al.), https://atmos.nmsu.edu/PDS/data/vl_1001/data/vl_tbin.dat |
 | Umbral de saltación en Marte: 25-30 m/s a la altura de los sensores del Viking | Ryan, Sharman y Lucich (1981), Local Mars dust storm generation mechanism, GRL 8(8), 899-901, doi:10.1029/GL008i008p00899 |

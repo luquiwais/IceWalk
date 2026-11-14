@@ -19,6 +19,9 @@ import {
   TREK_MARS_CREDIT,
   TREK_MARS_MAX_LEVEL,
   TREK_MARS_TILE_URL,
+  TREK_OVERLAYS,
+  type GlobeOverlay,
+  type GlobeZone,
 } from "./globe-model";
 
 import type * as CesiumNS from "cesium";
@@ -31,11 +34,17 @@ export type MarsGlobeProps = {
   route?: RouteFeatureCollection;
   /** When set, the camera flies to this point. Without it, the whole globe is shown. */
   focus?: GlobeFocus;
+  /** Called when the flight to `focus` lands (at once with Reduce Motion). */
+  onFocusComplete?: () => void;
   onSelectStation?: (id: string) => void;
   /** Classes for the root element (it fills its positioned container by default). */
   className?: string;
   /** Classes for the Cesium credits container (attribution must stay visible). */
   creditsClassName?: string;
+  /** Mars Trek overlay drawn over the basemap (ellipsoid globe only). */
+  overlay?: GlobeOverlay;
+  /** NASA Exploration Zones and reference sites, shaded by probability. */
+  zones?: GlobeZone[];
 };
 
 const CESIUM_BASE_URL = "/cesium";
@@ -85,9 +94,12 @@ export default function MarsGlobe({
   stations,
   route,
   focus,
+  onFocusComplete,
   onSelectStation,
   className,
   creditsClassName,
+  overlay = "none",
+  zones,
 }: MarsGlobeProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const creditsRef = useRef<HTMLDivElement>(null);
@@ -95,20 +107,25 @@ export default function MarsGlobe({
   const viewerRef = useRef<CesiumNS.Viewer | null>(null);
   const stationSourceRef = useRef<CesiumNS.CustomDataSource | null>(null);
   const routeSourceRef = useRef<CesiumNS.CustomDataSource | null>(null);
+  const zoneSourceRef = useRef<CesiumNS.CustomDataSource | null>(null);
+  const overlayLayerRef = useRef<CesiumNS.ImageryLayer | null>(null);
   const tilesetModeRef = useRef(false);
   const onSelectRef = useRef(onSelectStation);
+  const onFocusCompleteRef = useRef(onFocusComplete);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [basemapKind, setBasemapKind] = useState<MarsBasemap["kind"]>("trek");
 
   useEffect(() => {
     onSelectRef.current = onSelectStation;
-  }, [onSelectStation]);
+    onFocusCompleteRef.current = onFocusComplete;
+  }, [onSelectStation, onFocusComplete]);
 
   // Create the viewer once, on the client.
   useEffect(() => {
     let cancelled = false;
     let viewer: CesiumNS.Viewer | undefined;
     let handler: CesiumNS.ScreenSpaceEventHandler | undefined;
+    let dragging = false;
 
     async function init() {
       const root = rootRef.current;
@@ -182,13 +199,25 @@ export default function MarsGlobe({
 
       const stationSource = new Cesium.CustomDataSource("stations");
       const routeSource = new Cesium.CustomDataSource("route");
+      const zoneSource = new Cesium.CustomDataSource("zones");
+      await viewer.dataSources.add(zoneSource);
       await viewer.dataSources.add(routeSource);
       await viewer.dataSources.add(stationSource);
       if (cancelled) return;
       stationSourceRef.current = stationSource;
       routeSourceRef.current = routeSource;
+      zoneSourceRef.current = zoneSource;
 
       handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      viewer.scene.canvas.style.cursor = "grab";
+      handler.setInputAction(() => {
+        dragging = true;
+        viewer!.scene.canvas.style.cursor = "grabbing";
+      }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
+      handler.setInputAction(() => {
+        dragging = false;
+        viewer!.scene.canvas.style.cursor = "grab";
+      }, Cesium.ScreenSpaceEventType.LEFT_UP);
       handler.setInputAction((click: { position: CesiumNS.Cartesian2 }) => {
         const picked = viewer!.scene.pick(click.position);
         const id: unknown = picked?.id?.id;
@@ -198,8 +227,8 @@ export default function MarsGlobe({
       }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
       handler.setInputAction((move: { endPosition: CesiumNS.Cartesian2 }) => {
         const id: unknown = viewer!.scene.pick(move.endPosition)?.id?.id;
-        viewer!.scene.canvas.style.cursor =
-          typeof id === "string" && id.startsWith("station:") ? "pointer" : "";
+        viewer!.scene.canvas.style.cursor = dragging ? "grabbing" :
+          typeof id === "string" && id.startsWith("station:") ? "pointer" : "grab";
       }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
       viewerRef.current = viewer;
@@ -218,6 +247,8 @@ export default function MarsGlobe({
       viewerRef.current = null;
       stationSourceRef.current = null;
       routeSourceRef.current = null;
+      zoneSourceRef.current = null;
+      overlayLayerRef.current = null;
       if (viewer && !viewer.isDestroyed()) viewer.destroy();
     };
   }, []);
@@ -271,6 +302,72 @@ export default function MarsGlobe({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, sKey]);
 
+  // Mars Trek overlay over the basemap (only on the ellipsoid globe, not the ion tileset).
+  useEffect(() => {
+    const Cesium = cesiumRef.current;
+    const viewer = viewerRef.current;
+    if (status !== "ready" || !Cesium || !viewer || tilesetModeRef.current) return;
+    if (overlayLayerRef.current) {
+      viewer.imageryLayers.remove(overlayLayerRef.current, true);
+      overlayLayerRef.current = null;
+    }
+    if (overlay !== "none") {
+      const o = TREK_OVERLAYS[overlay];
+      const layer = (
+        new Cesium.ImageryLayer(
+          new Cesium.UrlTemplateImageryProvider({
+            url: o.url,
+            tilingScheme: new Cesium.GeographicTilingScheme({ ellipsoid: Cesium.Ellipsoid.MARS }),
+            tileWidth: 256,
+            tileHeight: 256,
+            maximumLevel: o.maximumLevel,
+            credit: new Cesium.Credit(o.credit, true),
+          }),
+          { alpha: 0.85 },
+        )
+      );
+      viewer.imageryLayers.add(layer);
+      overlayLayerRef.current = layer;
+    }
+    viewer.scene.requestRender();
+  }, [status, overlay]);
+
+  // Zones: blue points, darker where ice is more likely (ice maps are the one place color is data).
+  const zKey = JSON.stringify(zones ?? []);
+  useEffect(() => {
+    const Cesium = cesiumRef.current;
+    const source = zoneSourceRef.current;
+    const viewer = viewerRef.current;
+    if (status !== "ready" || !Cesium || !source || !viewer) return;
+    const { Cartesian3, Cartesian2, Color, Ellipsoid, LabelStyle, VerticalOrigin, NearFarScalar } = Cesium;
+    const light = Color.fromCssColorString("#cde2fb");
+    const dark = Color.fromCssColorString("#0d366b");
+    source.entities.suspendEvents();
+    source.entities.removeAll();
+    for (const z of zones ?? []) {
+      const fill = z.p === undefined ? Color.GRAY : Color.lerp(light, dark, Math.min(1, Math.max(0, z.p)), new Color());
+      source.entities.add({
+        id: `zone:${z.id}`,
+        position: Cartesian3.fromDegrees(z.lonlat[0], z.lonlat[1], 0, Ellipsoid.MARS),
+        point: { pixelSize: z.highlight ? 14 : 10, color: fill, outlineColor: z.highlight ? Color.WHITE : Color.BLACK.withAlpha(0.7), outlineWidth: 2 },
+        label: {
+          text: z.label,
+          font: "500 12px -apple-system, 'SF Pro Text', Inter, system-ui, sans-serif",
+          style: LabelStyle.FILL_AND_OUTLINE,
+          fillColor: Color.WHITE,
+          outlineColor: Color.BLACK.withAlpha(0.85),
+          outlineWidth: 3,
+          verticalOrigin: VerticalOrigin.BOTTOM,
+          pixelOffset: new Cartesian2(0, -12),
+          scaleByDistance: new NearFarScalar(1_000_000, 1, 20_000_000, 0.6),
+        },
+      });
+    }
+    source.entities.resumeEvents();
+    viewer.scene.requestRender();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, zKey]);
+
   // Route: neutral polyline clamped to the surface.
   const rKey = routeKey(route);
   useEffect(() => {
@@ -320,6 +417,7 @@ export default function MarsGlobe({
       {
         offset: new HeadingPitchRange(0, CMath.toRadians(-70), fHeight),
         duration: reduce ? 0 : 3,
+        complete: () => onFocusCompleteRef.current?.(),
       },
     );
   }, [status, fLon, fLat, fHeight]);

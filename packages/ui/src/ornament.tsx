@@ -2,29 +2,26 @@
 
 import { Toolbar } from "@base-ui/react/toolbar";
 
-import { MaterialLayers, SurfaceScroll } from "./material";
+import { SurfaceScroll } from "./material";
 import { cn } from "./utils";
 
 /*
- * visionOS ornament / toolbar (Figma: Toolbars): a glass capsule with a 1.4px
- * edge, padding 12 and gap 8. Items are plain buttons: text items use
- * <ToggleButton appearance="toolbar" />, symbol items <IconButton variant="plain" />.
- * Keyboard: Tab enters the toolbar, arrow keys move between items.
+ * visionOS ornament / toolbar (Figma: Toolbars): a glass capsule, padding 12, gap 8. Items are
+ * plain buttons: <ToggleButton appearance="toolbar" />, <IconButton variant="plain" />.
+ * Keyboard: Tab enters the toolbar, arrow keys move between items. Overflow scrolls with faded edges.
  */
 function Ornament({ className, children, ...props }: Toolbar.Root.Props) {
+  const vertical = props.orientation === "vertical";
   return (
     <Toolbar.Root
       data-slot="ornament"
-      className={cn(
-        "vision-surface relative flex items-center overflow-clip rounded-full p-3 text-label [--glass-stroke-width:1.4px]",
-        "data-[orientation=vertical]:flex-col",
-        className,
-      )}
+      className={cn("lb flex max-w-full items-center p-3 text-label data-[orientation=vertical]:flex-col", className)}
       {...props}
     >
-      <MaterialLayers kind="glass" />
-      <SurfaceScroll direction={props.orientation === "vertical" ? "vertical" : "horizontal"} data-orientation={props.orientation} className="flex flex-1 items-center gap-2 [scrollbar-width:none] data-[orientation=vertical]:flex-col">
-        {children}
+      <SurfaceScroll direction={vertical ? "vertical" : "horizontal"} className="flex [scrollbar-width:none]">
+        <div data-orientation={props.orientation} className="flex w-max shrink-0 items-center gap-2 data-[orientation=vertical]:flex-col">
+          {children}
+        </div>
       </SurfaceScroll>
     </Toolbar.Root>
   );
@@ -36,12 +33,7 @@ function OrnamentItem(props: Toolbar.Button.Props) {
 }
 
 function OrnamentGroup({ className, ...props }: Toolbar.Group.Props) {
-  return (
-    <Toolbar.Group
-      className={cn("flex items-center gap-2 data-[orientation=vertical]:flex-col", className)}
-      {...props}
-    />
-  );
+  return <Toolbar.Group className={cn("flex items-center gap-2 data-[orientation=vertical]:flex-col", className)} {...props} />;
 }
 
 export { Ornament, OrnamentGroup, OrnamentItem };

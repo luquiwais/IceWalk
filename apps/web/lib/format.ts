@@ -27,3 +27,12 @@ export function formatPercent(fraction: number, decimals = 0): string {
     maximumFractionDigits: decimals,
   }).format(fraction);
 }
+
+/** Coarse frequency for comprehension; percentage remains the precise value. */
+export function formatOdds(probability: number): string {
+  if (probability < 0.1) return "< 1 in 10";
+  if (probability > 0.95) return "> 9 in 10";
+  const fractions = [{ p: 0.5, label: "~1 in 2" }, { p: 2 / 3, label: "~2 in 3" }, { p: 1 / 3, label: "~1 in 3" }];
+  const nearby = fractions.find((f) => Math.abs(f.p - probability) < 0.035);
+  return nearby?.label ?? `~${Math.round(probability * 10)} in 10`;
+}
