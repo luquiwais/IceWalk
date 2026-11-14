@@ -302,3 +302,6 @@
 
 /* The globe and the 3D terrain fill the scene like the map does. */
 .mission-scene > .mission-globe, .mission-scene > .site3d-stage { position: absolute; inset: 0; }
+
+/* EV1 helmet: the 3D view takes the whole screen; only the sr-only announcements stay. */
+.mission-app[data-helmet="true"] > :not(.mission-scene):not(.sr-only) { display: none !important; }

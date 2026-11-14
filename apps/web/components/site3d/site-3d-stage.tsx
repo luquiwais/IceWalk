@@ -11,12 +11,13 @@ import { bearing, decisionPointFor, measuringTool, nextStation, toolName, toolRe
 import { walkPath, type Site3DData } from "@/lib/site3d";
 import { useIceMap } from "@/lib/use-ice-map";
 import type { PlanSource } from "@/lib/use-plan-session";
+import { EvaMinimap } from "./eva-minimap";
 import type { FreePose } from "./site-3d";
 import "./site3d.css";
 
 const Site3D = dynamic(() => import("./site-3d").then((m) => m.Site3D), { ssr: false });
-/** Same radius as site-3d.tsx ARRIVE_M plus a step of slack, so the HUD offers the procedure on arrival. */
-const AT_STATION_M = 4;
+/** Inside the middle waypoint ring (site-3d.tsx RINGS_M) the helmet asks for the result. */
+const AT_STATION_M = 5;
 
 export type Site3DJump = FreePose & { key: number };
 type Log = (station: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") => void;
@@ -38,6 +39,8 @@ type Props = {
   onLog?: Log;
   onAccept?: () => void;
   onReturn?: () => void;
+  /** Helmet only: leave the full-screen helmet for the IV console. */
+  onLeave?: () => void;
 };
 
 const fmtClock = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
@@ -47,7 +50,7 @@ const fmtClock = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 6
  * the map book; during the EVA it is the EV's helmet view with waypoint rings, arrival and the
  * plan update when a measurement replans the traverse.
  */
-export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn }: Props) {
+export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave }: Props) {
   const [data, setData] = useState<Site3DData>();
   const [error, setError] = useState("");
   const [chosen, setChosen] = useState<"fly" | "stand">("fly");
@@ -103,11 +106,18 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
           {margin != null ? <div className="site3d-hud-row"><span className="site3d-hud-key">Walkback</span><span className="site3d-hud-value" data-alert={margin < (plan.summary.walkback_caution_min ?? 15) ? "caution" : undefined}>{formatNumber(margin, 0)} min margin</span></div> : null}
           {decide ? <div className="site3d-hud-row"><span className="site3d-hud-key">Bingo</span><span className="site3d-hud-value">{fmtClock(decide.decide_by_min)}</span></div> : null}
           {next ? <div className="site3d-hud-row"><span className="site3d-hud-key">Comms</span><span className="site3d-hud-value" data-alert={next.comm_los === false ? "caution" : undefined}>{next.comm_los === false ? "No line of sight · relay EV2" : "Habitat in view"}</span></div> : null}
-          {arrived && next && onLog ? <Procedure station={next} pending={pending} onLog={onLog} /> : null}
           {pending ? <div className="site3d-hud-row"><span className="site3d-hud-key">Planner</span><span className="site3d-hud-value">Replanning...</span></div> : null}
         </section>
       ) : null}
 
+      {helmet ? (
+        <header className="eva-topbar">
+          <span>EV1 · helmet view · <b>SIM</b></span>
+          {onLeave ? <Button size="small" variant="glass" onClick={onLeave}>IV console</Button> : null}
+        </header>
+      ) : null}
+      {arrived && next && onLog ? <ArrivalPrompt station={next} pending={pending} onLog={onLog} /> : null}
+      {helmet ? <EvaMinimap plan={plan} path={path} measurements={measurements} pose={pose} nextId={next?.id} elapsedMin={elapsedMin} marginMin={margin ?? undefined} /> : null}
       {helmet && reviewing && previousPlan && measurements.length ? (
         <PlanUpdate before={previousPlan} after={plan} measurement={measurements[measurements.length - 1]} onAccept={onAccept} onReturn={onReturn} />
       ) : null}
@@ -121,19 +131,22 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
   );
 }
 
-/** What the EV does on arrival: the station's tool and the three results. */
-function Procedure({ station, pending, onLog }: { station: Station; pending: boolean; onLog: Log }) {
+/** On arrival the helmet asks for the result: the station, the tool and its reach, three answers. */
+function ArrivalPrompt({ station, pending, onLog }: { station: Station; pending: boolean; onLog: Log }) {
   const tool = measuringTool(station);
   const depth = Math.min(1, toolReachM(tool) ?? 1);
   return (
-    <div className="site3d-hud-measure" role="group" aria-label={`At station ${station.id}`}>
-      <span className="site3d-hud-key">At {station.id} · {toolName(tool)} to {depth} m</span>
+    <section className="site3d-update eva-arrival" role="alertdialog" aria-label={`At station ${station.id}`}>
+      <span className="site3d-hud-key">At station {String(station.order).padStart(2, "0")} · {station.id}</span>
+      <strong className="site3d-update-call">What did you find?</strong>
+      <span className="site3d-update-line">{toolName(tool)} to {depth} m · P(ice) {Math.round(station.p_ice * 100)}% before measuring</span>
       <div className="site3d-hud-actions">
         <Button size="small" disabled={pending} onClick={() => onLog(station, "ice", depth, "EV1")}>Ice</Button>
         <Button size="small" disabled={pending} onClick={() => onLog(station, "no_ice", depth, "EV1")}>No ice</Button>
         <Button size="small" disabled={pending} onClick={() => onLog(station, "inconclusive", depth, "EV1")}>Inconclusive</Button>
       </div>
-    </div>
+      {pending ? <span className="site3d-update-line">Sending to the planner...</span> : null}
+    </section>
   );
 }
 

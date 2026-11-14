@@ -10,6 +10,8 @@ import { SiteScene, type SiteSceneHandle, type SiteLayers, type SiteRaster } fro
 import { type Insets } from "@/components/site/camera";
 import { Site3DStage } from "@/components/site3d/site-3d-stage";
 import type { FreePose } from "@/components/site3d/site-3d";
+import { EvaMinimap } from "@/components/site3d/eva-minimap";
+import { walkPath } from "@/lib/site3d";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
 import { Body } from "@icewalk/ui/text";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
@@ -85,6 +87,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     return renderIceView(iceMap.map, mapMode, HABITAT_XY, ICE_RADIUS_M);
   }, [iceMap.map, mapMode]);
   const helmet = phase === "execute" && evaView === "ev";
+  const evaPath = useMemo(() => walkPath(plan), [plan]);
   const onMap = phase === "plan" || phase === "debrief" || (phase === "execute" && evaView === "iv");
   const station = phase === "plan" && stationId ? stationById(plan, stationId) : undefined;
   const next = nextStation(plan, session.measurements);
@@ -161,7 +164,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const scene = phase === "site" ? <GlobeEntry plan={plan} flying={flying} onArrive={arrive} />
     : phase === "rehearse" ? <Site3DStage mode="brief" plan={plan} measurements={session.measurements} source={session.source} jump={jump} pose={briefPose} onPose={setBriefPose} />
       : helmet ? <Site3DStage mode="helmet" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} previousPlan={session.previous ?? undefined}
-        reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} onLog={logMeasurement} onAccept={accept} onReturn={terminate} />
+        reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} onLog={logMeasurement} onAccept={accept} onReturn={terminate} onLeave={() => setEvaView("iv")} />
       : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} />;
 
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
@@ -173,11 +176,12 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
           <SegmentedControl label="EVA view" value={evaView} options={[{ value: "ev", label: "EV1 helmet" }, { value: "iv", label: "IV console" }]} onValueChange={(v) => setEvaView(v as "ev" | "iv")} />
           {helmet ? <EvGuide plan={plan} measurements={session.measurements} returning={returning} reviewing={reviewing} onDebrief={() => goTo("debrief")} />
             : <ExecutePanel plan={plan} previous={session.previous} measurements={session.measurements} pending={pending} reviewing={reviewing} returning={returning}
-              onAccept={accept} onReturn={terminate} onDebrief={() => goTo("debrief")} />}
+              onAccept={accept} onReturn={terminate} onDebrief={() => goTo("debrief")}
+              tracker={<div className="mission-tracker"><EvaMinimap plan={plan} path={evaPath} measurements={session.measurements} pose={evPose} nextId={returning ? undefined : next?.id} elapsedMin={elapsedMin} marginMin={plan.summary.min_walkback_margin_min} /></div>} />}
         </section>
           : <DebriefPanel plan={plan} measurements={session.measurements} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
 
-  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); } }}>
+  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
     <div className="mission-scene">{scene}</div>
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>

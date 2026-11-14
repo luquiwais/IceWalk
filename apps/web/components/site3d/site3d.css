@@ -167,3 +167,29 @@
 .site3d-update[data-alert="caution"] .site3d-update-call { color: var(--color-caution, #f0bf4f); }
 .site3d-update-line { opacity: .9; }
 .site3d-label[data-kind="station-active"] { border: 1px solid #9fe8ff; color: #dff7ff; }
+
+/* Full-screen helmet (EVA phase, EV1): top bar, arrival question, race-style track map. */
+.site3d-stage[data-mode="helmet"] .site3d-toolbar { top: 64px; }
+.eva-topbar { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; align-items: center; z-index: 3;
+  font: 600 13px/1 ui-monospace, monospace; letter-spacing: .06em; color: #e6f4ff; text-shadow: 0 1px 4px #000; }
+.eva-topbar b { color: var(--color-caution, #f0bf4f); }
+.eva-arrival { top: auto; bottom: 24px; border-color: #9fe8ff; }
+.eva-minimap { position: absolute; right: 16px; bottom: 16px; width: 220px; padding: 10px; border-radius: 14px; z-index: 2;
+  border: 1px solid rgb(180 220 255 / .45); background: rgb(8 20 34 / .6); backdrop-filter: blur(6px); color: #d8eeff; }
+.eva-minimap svg { width: 100%; height: auto; display: block; }
+.eva-minimap-route { fill: none; stroke: rgb(255 255 255 / .35); stroke-width: 2.5; stroke-linejoin: round; }
+.eva-minimap-walked { fill: none; stroke: #9fe8ff; stroke-width: 3; stroke-linejoin: round; }
+.eva-minimap-hab { fill: #eef1f5; }
+.eva-minimap-station { fill: rgb(255 255 255 / .2); stroke: #fff; stroke-width: 1.5; }
+[data-state="next"] > .eva-minimap-station { fill: #9fe8ff; stroke: #fff; }
+[data-state="done"] > .eva-minimap-station { fill: rgb(255 255 255 / .55); stroke: rgb(255 255 255 / .55); }
+.eva-minimap-ev { fill: #f0bf4f; stroke: #111; stroke-width: 1; }
+.eva-minimap-label { fill: #d8eeff; font: 600 9px ui-monospace, monospace; }
+.eva-progress { margin-top: 6px; }
+.eva-progress-bar { height: 4px; border-radius: 2px; background: rgb(255 255 255 / .15); overflow: hidden; }
+.eva-progress-bar > i { display: block; height: 100%; background: #9fe8ff; }
+.eva-progress dl { margin: 6px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font: 500 11px/1.3 ui-monospace, monospace; }
+.eva-progress dt { opacity: .7; }
+.eva-progress dd { margin: 0; font-weight: 700; }
+/* Same tracker inside the IV console panel. */
+.mission-tracker .eva-minimap { position: static; width: 100%; max-width: 320px; }
