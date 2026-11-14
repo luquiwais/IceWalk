@@ -6,7 +6,7 @@ import { NextStep } from "./phases";
 
 export type Jump = { x: number; y: number; headingDeg: number; key: number };
 
-/** Phase 3: rehearse on the real terrain. Jump to any station, print the cuff checklist. */
+/** Phase 3, pre-EVA brief: the map book on the real terrain (stand at any station) and the cuff checklist. */
 export function RehearsePanel({ plan, onJump, onNext }: { plan: Plan; onJump: (jump: Jump) => void; onNext: () => void }) {
   const stations = orderedStations(plan);
   const jumpTo = (x: number, y: number, toward: readonly number[]) => {
@@ -15,8 +15,8 @@ export function RehearsePanel({ plan, onJump, onNext }: { plan: Plan; onJump: (j
   };
   return (
     <section aria-label="Rehearsal" className="mission-stack">
-      <Body>Walk the site at eye height on the HiRISE terrain model, with the planned route, the stations and the measured boulders.</Body>
-      <Footnote tone="secondary">Drag to look around · W A S D or arrows to walk · Shift to move faster</Footnote>
+      <Body>Fly over the site, or stand at each station to see the ground the crew will work: the HiRISE terrain model, the planned route and the measured boulders.</Body>
+      <Footnote tone="secondary">Drag to look around. Walking is for the EVA itself, in the EV helmet view.</Footnote>
       <section aria-label="Jump to" className="mission-stack">
         <Title3 as="h3">Jump to</Title3>
         <div className="mission-jumps">

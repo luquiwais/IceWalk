@@ -39,12 +39,6 @@ export type IceMap = {
 
 export type IceMapMode = "potential" | "probability" | "uncertainty" | "change";
 
-export const ICE_MAP_MODES: { value: IceMapMode; label: string }[] = [
-  { value: "potential", label: "Ice potential" },
-  { value: "probability", label: "P(ice)" },
-  { value: "uncertainty", label: "Uncertainty" },
-  { value: "change", label: "Change vs prior" },
-];
 
 /** Opacity of the overlay over the HiRISE ortho, so the terrain stays readable. */
 export const OVERLAY_ALPHA = 0.62;
@@ -133,21 +127,6 @@ export function renderPixels(map: IceMap, mode: IceMapMode, alpha = OVERLAY_ALPH
     }
   }
   return out;
-}
-
-/** PNG data URL for SiteScene's raster. Browser only; undefined where there is no canvas. */
-export function renderDataUrl(map: IceMap, mode: IceMapMode): string | undefined {
-  if (typeof document === "undefined") return undefined;
-  const canvas = document.createElement("canvas");
-  canvas.width = map.width;
-  canvas.height = map.height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return undefined;
-  const pixels = renderPixels(map, mode);
-  const image = ctx.createImageData(map.width, map.height);
-  image.data.set(pixels);
-  ctx.putImageData(image, 0, 0);
-  return canvas.toDataURL("image/png");
 }
 
 /** Legend for the current mode: label, gradient stops and the two ends. */

@@ -18,7 +18,7 @@ export function DebriefPanel({ plan, measurements, onNext, onReset }: { plan: Pl
           <ListSection footer="Measurements recorded in this session. The map shows what they changed.">
             {measurements.map((m, i) => <ListRow key={`${m.station_id}-${i}`} trailing={<Value>{m.crew_member ?? ""}</Value>}><RowLabel title={`${m.station_id} · ${measurementSummary(m)}`} detail={toolName(m.tool)} /></ListRow>)}
           </ListSection>
-        ) : <><Body>Waiting for the first measurement</Body><Footnote tone="secondary">Log a result in Execute to update the map and the plan.</Footnote></>}
+        ) : <><Body>Waiting for the first measurement</Body><Footnote tone="secondary">The EV logs results from the helmet during the EVA; each one updates the map and the plan.</Footnote></>}
       </section>
       <section aria-label="Campaign" className="mission-stack">
         <Title3 as="h3">Beyond one EVA</Title3>

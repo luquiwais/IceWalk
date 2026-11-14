@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { CRATER_XY, HABITAT_XY } from "@/components/site/site-data";
 import { orderedStations, type Plan } from "@/lib/plan";
-import { circle, Heightfield, iceColor, pointAt, type Box, type PathPoint, type Site3DData, type Site3DLevelName } from "@/lib/site3d";
+import { circle, Heightfield, walkPath, type Box, type PathPoint, type Site3DData, type Site3DLevelName } from "@/lib/site3d";
 
 /**
  * Illustrative sky: no calibrated value is citable. Pathfinder saw a yellowish-brown daytime sky,
@@ -24,6 +24,15 @@ const MOVE_KEYS: Record<string, [number, number]> = {
   KeyW: [0, 1], ArrowUp: [0, 1], KeyS: [0, -1], ArrowDown: [0, -1],
   KeyA: [-1, 0], ArrowLeft: [-1, 0], KeyD: [1, 0], ArrowRight: [1, 0],
 };
+/**
+ * Waypoint overlays drawn over the terrain, in the spirit of NASA SUITS AR navigation (they are
+ * HUD graphics, not terrain): three rings on the ground and a light column seen from afar.
+ * Radii in meters per level; the inner ring is the station's working area.
+ */
+const RINGS_M: Record<Site3DLevelName, [number, number, number]> = { detail: [3, 6, 10], overview: [20, 35, 55] };
+const BEACON: Record<Site3DLevelName, { radius: number; height: number }> = { detail: { radius: 0.5, height: 70 }, overview: { radius: 7, height: 420 } };
+/** Distance at which a station counts as reached (inner ring). */
+export const ARRIVE_M = 3;
 
 /** Where the free-walk camera stands: grid meters and heading (degrees clockwise from north). */
 export type FreePose = { x: number; y: number; headingDeg: number };
@@ -32,39 +41,53 @@ export type Site3DProps = {
   data: Site3DData;
   level: Site3DLevelName;
   plan: Plan;
+  /** The plan before the last replan: its route is drawn faded. */
+  previousPlan?: Plan;
   path: PathPoint[];
-  /**
-   * "orbit" flies around; "walk" puts the camera at eye height on the route at `progressM`;
-   * "free" walks anywhere at eye height (drag to look, WASD or arrows to move, Shift to run).
-   */
-  mode: "orbit" | "walk" | "free";
-  progressM: number;
+  /** "orbit" flies around the site; "free" stands at eye height (drag to look; WASD to move when `allowMove`). */
+  mode: "orbit" | "free";
+  allowMove?: boolean;
   exaggeration: number;
+  /** Station ids already measured (dim markers) and the one the crew heads to (bright beacon). */
+  measured?: readonly string[];
+  activeId?: string;
   /** Ice map raster (data URL) and its bounds in grid meters, draped on the terrain. */
   ice?: { url: string; bounds: Box } | null;
   onError?: (message: string) => void;
-  /** Free walk: a new `key` moves the camera to this pose (jump to a station). */
+  /** Starting pose of the free walk (kept by the parent across phase changes). */
+  initialPose?: FreePose;
+  /** A new `key` moves the camera to this pose. */
   teleport?: FreePose & { key: number };
-  /** Free walk: the camera pose, about 6 times a second, for the HUD. */
+  /** The camera pose, about 6 times a second. */
   onMove?: (pose: FreePose) => void;
 };
 
-type SceneContext = { scene: THREE.Scene; terrain: THREE.BufferGeometry; cx: number; cy: number };
+type Ground = {
+  scene: THREE.Scene;
+  terrain: THREE.BufferGeometry;
+  cx: number;
+  cy: number;
+  box: Box;
+  toWorld: (x: number, y: number, lift?: number) => THREE.Vector3;
+  addLabel: (text: string, pos: THREE.Vector3, kind: string) => () => void;
+};
+type Marker = { id: string; x: number; y: number; fill: THREE.MeshBasicMaterial; rings: THREE.LineBasicMaterial[]; beacon: THREE.MeshBasicMaterial; state: "active" | "planned" | "measured" };
 
-type Label = { el: HTMLDivElement; pos: THREE.Vector3 };
-
-/** Real S1094b terrain (HiRISE DTM + ortho), real boulders, the plan route and stations, in WebGL. */
-export function Site3D({ data, level, plan, path, mode, progressM, exaggeration, ice, onError, teleport, onMove }: Site3DProps) {
+/** Real S1094b terrain (HiRISE DTM + ortho), real boulders, the plan route and waypoint overlays, in WebGL. */
+export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove = true, exaggeration, measured, activeId, ice, onError, initialPose, teleport, onMove }: Site3DProps) {
   const host = useRef<HTMLDivElement>(null);
   const labelsHost = useRef<HTMLDivElement>(null);
-  const walk = useRef({ mode, progressM });
+  const modeRef = useRef({ mode, allowMove });
   const [ready, setReady] = useState(false);
-  const ctx = useRef<SceneContext | null>(null);
+  const ground = useRef<Ground | null>(null);
+  const markers = useRef<Marker[]>([]);
   const keys = useRef(new Set<string>());
-  const [hx0, hy0] = HABITAT_XY;
-  const free = useRef({ x: hx0, y: hy0, yaw: 0, pitch: -0.08 });
+  const free = useRef(initialPose
+    ? { x: initialPose.x, y: initialPose.y, yaw: (initialPose.headingDeg * Math.PI) / 180, pitch: -0.08 }
+    : { x: HABITAT_XY[0], y: HABITAT_XY[1], yaw: 0, pitch: -0.08 });
   const moveCb = useRef(onMove);
-  useEffect(() => { walk.current = { mode, progressM }; }, [mode, progressM]);
+  const measuredKey = (measured ?? []).join(",");
+  useEffect(() => { modeRef.current = { mode, allowMove }; }, [mode, allowMove]);
   useEffect(() => { moveCb.current = onMove; }, [onMove]);
   useEffect(() => {
     if (teleport) free.current = { ...free.current, x: teleport.x, y: teleport.y, yaw: (teleport.headingDeg * Math.PI) / 180 };
@@ -111,15 +134,17 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
     };
   }, [mode]);
 
+  // Ground: terrain, boulders, habitat, crater, walkback ring, camera and the render loop.
   useEffect(() => {
     const el = host.current;
     const labelsEl = labelsHost.current;
     if (!el || !labelsEl) return;
     const lv = data.levels[level];
-    const cx = (lv.box_m.xmin + lv.box_m.xmax) / 2;
-    const cy = (lv.box_m.ymin + lv.box_m.ymax) / 2;
-    const width = lv.box_m.xmax - lv.box_m.xmin;
-    const height = lv.box_m.ymax - lv.box_m.ymin;
+    const box = lv.box_m;
+    const cx = (box.xmin + box.xmax) / 2;
+    const cy = (box.ymin + box.ymax) / 2;
+    const width = box.xmax - box.xmin;
+    const height = box.ymax - box.ymin;
     let disposed = false;
     let frame = 0;
     let renderer: THREE.WebGLRenderer;
@@ -141,20 +166,22 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
     controls.enableDamping = true;
     controls.maxPolarAngle = Math.PI * 0.49;
 
-    scene.add(new THREE.HemisphereLight("#f4dcc0", "#5a3a26", 1.1));
-    const sun = new THREE.DirectionalLight("#fff1dd", 2.2);
+    scene.add(new THREE.HemisphereLight("#f4e8dc", "#4a4038", 1.1));
+    const sun = new THREE.DirectionalLight("#fff4e8", 1.6);
     const az = (SUN_AZIMUTH_DEG * Math.PI) / 180, el2 = (SUN_ELEVATION_DEG * Math.PI) / 180;
     sun.position.set(Math.sin(az) * Math.cos(el2), Math.sin(el2), -Math.cos(az) * Math.cos(el2)).multiplyScalar(1000);
     scene.add(sun);
 
-    const labels: Label[] = [];
+    const labels = new Set<{ el: HTMLDivElement; pos: THREE.Vector3 }>();
     const addLabel = (text: string, pos: THREE.Vector3, kind: string) => {
       const div = document.createElement("div");
       div.className = "site3d-label";
       div.dataset.kind = kind;
       div.textContent = text;
       labelsEl.appendChild(div);
-      labels.push({ el: div, pos });
+      const entry = { el: div, pos };
+      labels.add(entry);
+      return () => { labels.delete(entry); div.remove(); };
     };
 
     const geometries: THREE.BufferGeometry[] = [];
@@ -170,6 +197,7 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       const field = new Heightfield(lv, new Uint16Array(buf));
       const ex = exaggeration;
       const toWorld = (x: number, y: number, lift = 0) => new THREE.Vector3(x - cx, field.at(x, y) * ex + lift, -(y - cy));
+      const inBox = (x: number, y: number) => x >= box.xmin && x <= box.xmax && y >= box.ymin && y <= box.ymax;
 
       // Terrain: one vertex per heightmap sample, rows north to south like PlaneGeometry.
       const [w, h] = lv.size;
@@ -184,9 +212,8 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       const terrainMat = new THREE.MeshStandardMaterial({ map: texture, color: "#ffffff", roughness: 1, metalness: 0 });
       scene.add(new THREE.Mesh(geo, terrainMat));
       geometries.push(geo); materials.push(terrainMat); textures.push(texture);
-      ctx.current = { scene, terrain: geo, cx, cy };
 
-      // Boulders: real detections, sized by shadow-measured diameter and height.
+      // Boulders: real detections, sized by shadow-measured diameter and height; shapes illustrative.
       const rock = new THREE.DodecahedronGeometry(0.5, 0);
       geometries.push(rock);
       const dummy = new THREE.Object3D();
@@ -205,38 +232,6 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
         });
         scene.add(mesh);
         materials.push(mat);
-      }
-
-      // Route: a tube a little above the ground.
-      const inBox = (x: number, y: number) => x >= lv.box_m.xmin && x <= lv.box_m.xmax && y >= lv.box_m.ymin && y <= lv.box_m.ymax;
-      const routePts = path.filter((p) => inBox(p.x, p.y)).map((p) => toWorld(p.x, p.y, level === "overview" ? 1.5 : 0.04));
-      if (routePts.length > 1) {
-        const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(routePts, false, "catmullrom", 0), routePts.length * 2, level === "overview" ? 2.2 : 0.05, 6, false);
-        const tubeMat = new THREE.MeshBasicMaterial({ color: "#f5f8ff", transparent: true, opacity: level === "overview" ? 0.95 : 0.75 });
-        scene.add(new THREE.Mesh(tube, tubeMat));
-        geometries.push(tube); materials.push(tubeMat);
-      }
-
-      // Stations: pillars colored by P(ice), with labels.
-      // Overview: a tall marker to find the station from kilometers away. Walk: a 2.5 m survey pole.
-      const pillarH = level === "overview" ? 40 : 2.5;
-      for (const st of orderedStations(plan)) {
-        const [x, y] = st.position;
-        if (!inBox(x, y)) continue;
-        const g = new THREE.CylinderGeometry(level === "overview" ? 6 : 0.06, level === "overview" ? 6 : 0.06, pillarH, 12);
-        const m = new THREE.MeshStandardMaterial({ color: iceColor(st.p_ice), emissive: iceColor(st.p_ice), emissiveIntensity: 0.35 });
-        const mesh = new THREE.Mesh(g, m);
-        mesh.position.copy(toWorld(x, y, pillarH / 2));
-        scene.add(mesh);
-        geometries.push(g); materials.push(m);
-        if (level === "detail") addLabel(`${String(st.order).padStart(2, "0")} ${st.id} · P(ice) ${Math.round(st.p_ice * 100)}%`, toWorld(x, y, pillarH + 2), "station");
-      }
-      const shown = orderedStations(plan).filter((st) => inBox(...st.position));
-      if (level === "overview" && shown.length) {
-        const ps = shown.map((st) => Math.round(st.p_ice * 100));
-        const mx = shown.reduce((a, st) => a + st.position[0], 0) / shown.length;
-        const my = shown.reduce((a, st) => a + st.position[1], 0) / shown.length;
-        addLabel(`${shown.length} stations · P(ice) ${Math.min(...ps)}–${Math.max(...ps)}%`, toWorld(mx, my - 120, pillarH + 30), "station");
       }
 
       // Habitat and crater.
@@ -264,6 +259,7 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
         const top = ring.reduce((a, b) => (b.z < a.z ? b : a));
         addLabel("Walkback limit · 1.8 km", top.clone().add(new THREE.Vector3(0, 12, 0)), "ring");
       }
+      ground.current = { scene, terrain: geo, cx, cy, box, toWorld, addLabel };
 
       // Opening shot: from above the crater toward the habitat, then free orbit.
       const target = inBox(hx, hy) ? toWorld(hx, hy) : new THREE.Vector3(0, 0, 0);
@@ -293,17 +289,17 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
         const now = performance.now();
         const dt = Math.min((now - lastT) / 1000, 0.1);
         lastT = now;
-        const { mode: m, progressM: s } = walk.current;
+        const { mode: m, allowMove: canMove } = modeRef.current;
+        const f = free.current;
         if (m === "free") {
-          const f = free.current;
           let fwd = 0, side = 0;
-          for (const code of keys.current) { const k = MOVE_KEYS[code]; if (k) { side += k[0]; fwd += k[1]; } }
+          if (canMove) for (const code of keys.current) { const k = MOVE_KEYS[code]; if (k) { side += k[0]; fwd += k[1]; } }
           const fast = keys.current.has("ShiftLeft") || keys.current.has("ShiftRight");
           if (fwd || side) {
             const step = FREE_MPS * (fast ? FREE_FAST : 1) * dt / Math.hypot(fwd, side);
             const sx = Math.sin(f.yaw), sy = Math.cos(f.yaw);
-            f.x = Math.max(lv.box_m.xmin + 5, Math.min(lv.box_m.xmax - 5, f.x + (sx * fwd + sy * side) * step));
-            f.y = Math.max(lv.box_m.ymin + 5, Math.min(lv.box_m.ymax - 5, f.y + (sy * fwd - sx * side) * step));
+            f.x = Math.max(box.xmin + 5, Math.min(box.xmax - 5, f.x + (sx * fwd + sy * side) * step));
+            f.y = Math.max(box.ymin + 5, Math.min(box.ymax - 5, f.y + (sy * fwd - sx * side) * step));
           }
           camera.position.copy(toWorld(f.x, f.y, EYE_M));
           camera.rotation.set(f.pitch, -f.yaw, 0, "YXZ");
@@ -312,17 +308,22 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
             lastReport = now;
             moveCb.current?.({ x: f.x, y: f.y, headingDeg: (((f.yaw * 180) / Math.PI) % 360 + 360) % 360 });
           }
-        } else if (m === "walk" && path.length > 1) {
-          const p = pointAt(path, s), q = pointAt(path, s + 12);
-          camera.position.copy(toWorld(p.x, p.y, EYE_M));
-          const look = toWorld(q.x, q.y, EYE_M * 0.6);
-          camera.lookAt(look);
-          controls.enabled = false;
         } else {
           controls.enabled = true;
-          const k = Math.min((performance.now() - t0) / fly, 1);
+          const k = Math.min((now - t0) / fly, 1);
           if (k < 1) camera.position.lerpVectors(start, end, 1 - Math.pow(1 - k, 3));
           controls.update();
+        }
+        // Waypoints: the inner disc fills as the crew walks into the rings; beacons pulse softly.
+        const pulse = 0.8 + 0.2 * Math.sin(now / 450);
+        const radii = RINGS_M[level];
+        for (const mk of markers.current) {
+          const d = m === "free" ? Math.hypot(f.x - mk.x, f.y - mk.y) : Infinity;
+          const near = Math.max(0, Math.min(1, (radii[2] - d) / (radii[2] - ARRIVE_M)));
+          mk.fill.opacity = mk.state === "measured" ? 0.12 : near * 0.55;
+          const lit = mk.state === "active" ? 0.95 : mk.state === "planned" ? 0.5 : 0.18;
+          mk.rings.forEach((r, i) => { r.opacity = Math.min(1, lit + (d <= radii[i] ? 0.4 : 0)); });
+          mk.beacon.opacity = (mk.state === "active" ? 0.55 : mk.state === "planned" ? 0.22 : 0.06) * pulse * (d < radii[2] ? 0.35 : 1);
         }
         renderer.render(scene, camera);
         const rect = el.getBoundingClientRect();
@@ -352,14 +353,89 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       renderer.dispose();
       renderer.domElement.remove();
       labelsEl.replaceChildren();
-      ctx.current = null;
+      ground.current = null;
+      markers.current = [];
       setReady(false);
     };
-  }, [data, level, plan, path, exaggeration, onError]);
+  }, [data, level, exaggeration, onError]);
+
+  // Plan layer: route, the previous route faded, and the waypoint overlays. Rebuilt on each replan
+  // without reloading the terrain.
+  useEffect(() => {
+    const g = ground.current;
+    if (!ready || !g) return;
+    const group = new THREE.Group();
+    const geos: THREE.BufferGeometry[] = [];
+    const mats: THREE.Material[] = [];
+    const removers: (() => void)[] = [];
+    const { box, toWorld } = g;
+    const inBox = (x: number, y: number) => x >= box.xmin && x <= box.xmax && y >= box.ymin && y <= box.ymax;
+    const overview = level === "overview";
+
+    const tube = (pts: { x: number; y: number }[], color: string, opacity: number, radius: number) => {
+      const world = pts.filter((p) => inBox(p.x, p.y)).map((p) => toWorld(p.x, p.y, overview ? 1.5 : 0.05));
+      if (world.length < 2) return;
+      const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(world, false, "catmullrom", 0), world.length * 2, radius, 6, false);
+      const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity, depthWrite: false });
+      group.add(new THREE.Mesh(geo, mat));
+      geos.push(geo); mats.push(mat);
+    };
+    if (previousPlan) tube(walkPath(previousPlan, 4), "#ffffff", 0.22, overview ? 1.6 : 0.035);
+    tube(path, "#f5f8ff", overview ? 0.95 : 0.8, overview ? 2.2 : 0.05);
+
+    const beamTexture = beamGradient();
+    const done = new Set(measuredKey ? measuredKey.split(",") : []);
+    const list: Marker[] = [];
+    const [r1, r2, r3] = RINGS_M[level];
+    const beacon = BEACON[level];
+    const lift = overview ? 1 : 0.06;
+    for (const st of orderedStations(plan)) {
+      const [x, y] = st.position;
+      if (!inBox(x, y)) continue;
+      const state: Marker["state"] = done.has(st.id) ? "measured" : st.id === activeId ? "active" : "planned";
+      const color = state === "active" ? "#9fe8ff" : "#ffffff";
+      const rings = [r1, r2, r3].map((r) => {
+        const geo = new THREE.BufferGeometry().setFromPoints(circle([x, y], r, 72).map(([px, py]) => toWorld(px, py, lift)));
+        const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6, depthWrite: false });
+        group.add(new THREE.LineLoop(geo, mat));
+        geos.push(geo); mats.push(mat);
+        return mat;
+      });
+      // Inner disc that fills on approach: a fan that follows the ground.
+      const fanPts = [toWorld(x, y, lift + 0.01), ...circle([x, y], r1, 48).map(([px, py]) => toWorld(px, py, lift + 0.01))];
+      const idx: number[] = [];
+      for (let i = 1; i < fanPts.length - 1; i++) idx.push(0, i, i + 1);
+      idx.push(0, fanPts.length - 1, 1);
+      const fanGeo = new THREE.BufferGeometry().setFromPoints(fanPts);
+      fanGeo.setIndex(idx);
+      const fill = new THREE.MeshBasicMaterial({ color: "#9fe8ff", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+      group.add(new THREE.Mesh(fanGeo, fill));
+      geos.push(fanGeo); mats.push(fill);
+      // Light column, visible from far away.
+      const beamGeo = new THREE.CylinderGeometry(beacon.radius, beacon.radius, beacon.height, 16, 1, true);
+      const beam = new THREE.MeshBasicMaterial({ color, map: beamTexture, transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+      const beamMesh = new THREE.Mesh(beamGeo, beam);
+      beamMesh.position.copy(toWorld(x, y, beacon.height / 2));
+      group.add(beamMesh);
+      geos.push(beamGeo); mats.push(beam);
+      removers.push(g.addLabel(`${String(st.order).padStart(2, "0")} ${st.id}${state === "measured" ? " · measured" : state === "active" ? " · next" : ""}`, toWorld(x, y, overview ? 60 : 4), state === "active" ? "station-active" : "station"));
+      list.push({ id: st.id, x, y, fill, rings, beacon: beam, state });
+    }
+    g.scene.add(group);
+    markers.current = list;
+    return () => {
+      g.scene.remove(group);
+      geos.forEach((x) => x.dispose());
+      mats.forEach((x) => x.dispose());
+      beamTexture.dispose();
+      removers.forEach((r) => r());
+      markers.current = [];
+    };
+  }, [ready, plan, previousPlan, path, measuredKey, activeId, level]);
 
   // Ice map draped on the terrain: a copy of the terrain mesh with UVs in the raster's bounds.
   useEffect(() => {
-    const c = ctx.current;
+    const c = ground.current;
     if (!ready || !c || !ice) return;
     let mesh: THREE.Mesh | undefined;
     let texture: THREE.CanvasTexture | undefined;
@@ -376,7 +452,6 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       canvas.getContext("2d")?.drawImage(img, 1, 1);
       texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
-      texture.magFilter = THREE.NearestFilter;
       geo = c.terrain.clone();
       const pos = geo.getAttribute("position") as THREE.BufferAttribute;
       const uv = new Float32Array(pos.count * 2);
@@ -389,7 +464,7 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
         uv[i * 2 + 1] = (1 + ((gy - b.ymin) / (b.ymax - b.ymin)) * H) / (H + 2);
       }
       geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-      mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+      mat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
       mesh = new THREE.Mesh(geo, mat);
       mesh.renderOrder = 1;
       c.scene.add(mesh);
@@ -410,4 +485,21 @@ export function Site3D({ data, level, plan, path, mode, progressM, exaggeration,
       <div ref={labelsHost} className="site3d-labels" aria-hidden />
     </div>
   );
+}
+
+/** Vertical alpha gradient for the light columns: bright at the ground, fading upward. */
+function beamGradient(): THREE.CanvasTexture {
+  const c = document.createElement("canvas");
+  c.width = 4;
+  c.height = 128;
+  const ctx = c.getContext("2d");
+  if (ctx) {
+    const g = ctx.createLinearGradient(0, 0, 0, 128);
+    g.addColorStop(0, "rgba(255,255,255,0)");
+    g.addColorStop(0.7, "rgba(255,255,255,0.5)");
+    g.addColorStop(1, "rgba(255,255,255,1)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 4, 128);
+  }
+  return new THREE.CanvasTexture(c);
 }

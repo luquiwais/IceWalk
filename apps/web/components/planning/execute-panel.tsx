@@ -4,23 +4,21 @@ import { StatusBadge } from "@icewalk/ui/status-badge";
 import { Body, Footnote, Title3 } from "@icewalk/ui/text";
 import { HABITAT_XY } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
-import { bearing, decisionPointFor, diffPlans, measurementSummary, measuringTool, nextStation, toolName, type Measurement, type Plan, type ReplanAssessment, type Station } from "@/lib/plan";
-import { MeasurementForm } from "./ev-view";
+import { bearing, decisionPointFor, diffPlans, measurementSummary, measuringTool, nextStation, toolName, type Measurement, type Plan, type ReplanAssessment } from "@/lib/plan";
 import { RESULT_LABEL, RowLabel, Value } from "./parts";
 import { NextStep } from "./phases";
 
-type Log = (station: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") => void;
-
 /**
- * Phase 4: the current station and its procedure. After a result, the replan waits for review
- * (what changed and the planner's continue / return call) before the crew goes on.
+ * Phase 4, IV console: the IV follows the EVA from the habitat. Results come only from the EV
+ * at the station (the IV is not there to measure); the IV sees them arrive, reviews the replan
+ * and concurs or calls the EVA terminate.
  */
-export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, onLog, onAccept, onReturn, onRevert, onDebrief }: {
+export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, onAccept, onReturn, onDebrief }: {
   plan: Plan; previous: Plan | null; measurements: Measurement[]; pending: boolean; reviewing: boolean; returning: boolean;
-  onLog: Log; onAccept: () => void; onReturn: () => void; onRevert: () => void; onDebrief: () => void;
+  onAccept: () => void; onReturn: () => void; onDebrief: () => void;
 }) {
   const last = measurements.at(-1);
-  if (reviewing && previous && last) return <ReplanReview before={previous} after={plan} measurement={last} onAccept={onAccept} onReturn={onReturn} onRevert={onRevert} />;
+  if (reviewing && previous && last) return <ReplanReview before={previous} after={plan} measurement={last} onAccept={onAccept} onReturn={onReturn} />;
   const station = returning ? undefined : nextStation(plan, measurements);
   const origin = last?.position ?? HABITAT_XY;
   const direction = station ? bearing(origin, station.position) : undefined;
@@ -40,8 +38,12 @@ export function ExecutePanel({ plan, previous, measurements, pending, reviewing,
           {decision.options.map((o) => <ListRow key={o.rank}><RowLabel title={`${RESULT_LABEL[o.if_result]} → ${o.next_station_ids[0] ?? "habitat"}${o.rank === decision.default_option ? " (nominal)" : ""}`} detail={o.rationale} /></ListRow>)}
         </ListSection>
       ) : null}
-      {last ? <Footnote tone="secondary">Last result: {last.station_id} · {measurementSummary(last)}</Footnote> : null}
-      {station ? <MeasurementForm key={station.id} station={station} pending={pending} onLog={onLog} /> : null}
+      {station ? <Footnote role="status">{pending ? "Planner replanning..." : `Waiting for EV1 to report at ${station.id}.`}</Footnote> : null}
+      {measurements.length ? (
+        <ListSection header="Reported by the crew" footer="Results are logged by the EV at the station.">
+          {[...measurements].reverse().map((m, i) => <ListRow key={`${m.station_id}-${i}`} trailing={<Value>{m.crew_member ?? "EV"}</Value>}><RowLabel title={`${m.station_id} · ${measurementSummary(m)}`} detail={toolName(m.tool)} /></ListRow>)}
+        </ListSection>
+      ) : null}
       {!station ? <NextStep label="Debrief the EVA" onClick={onDebrief} /> : null}
     </section>
   );
@@ -49,9 +51,9 @@ export function ExecutePanel({ plan, previous, measurements, pending, reviewing,
 
 const TITLE: Record<ReplanAssessment["recommendation"], string> = { continue: "Continue the EVA", return_to_habitat: "EVA TERMINATE: begin the walkback" };
 
-/** What a measurement changed, and the planner's call. Shown over the map with the old route dashed. */
-export function ReplanReview({ before, after, measurement, onAccept, onReturn, onRevert }: {
-  before: Plan; after: Plan; measurement: Measurement; onAccept: () => void; onReturn: () => void; onRevert: () => void;
+/** What a measurement changed, and the planner's call, for the IV. Shown over the map with the old route dashed. */
+export function ReplanReview({ before, after, measurement, onAccept, onReturn }: {
+  before: Plan; after: Plan; measurement: Measurement; onAccept: () => void; onReturn: () => void;
 }) {
   const diff = diffPlans(before, after);
   const r: ReplanAssessment = after.replan ?? {
@@ -78,11 +80,11 @@ export function ReplanReview({ before, after, measurement, onAccept, onReturn, o
         {r.margin_before_min != null && r.margin_after_min != null ? <ListRow trailing={<Value>{formatNumber(r.margin_before_min, 1)} → {formatNumber(r.margin_after_min, 1)} min</Value>}>Min walkback margin</ListRow> : null}
       </ListSection>
       {back ? (
-        <><Button variant="prominent" onClick={onReturn}>Terminate EVA · walk back</Button><Button variant="plain" onClick={onAccept}>Continue anyway (crew decision)</Button></>
+        <><Button variant="prominent" onClick={onReturn}>Call EVA terminate</Button><Button variant="plain" onClick={onAccept}>Concur with continuing (crew call)</Button></>
       ) : (
-        <><Button variant="prominent" onClick={onAccept}>Accept replan</Button><Button variant="plain" onClick={onReturn}>Terminate EVA instead</Button></>
+        <><Button variant="prominent" onClick={onAccept}>Concur with replan</Button><Button variant="plain" onClick={onReturn}>Call EVA terminate instead</Button></>
       )}
-      <Button size="small" variant="plain" onClick={onRevert}>Back to nominal plan</Button>
+      <Footnote tone="secondary">The EV sees the same update in the helmet and copies it.</Footnote>
     </section>
   );
 }
