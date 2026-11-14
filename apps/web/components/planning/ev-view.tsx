@@ -55,7 +55,7 @@ export function EVView({ plan, measurements, pending, onLog, onReview }: {
   const direction = station ? bearing(origin, station.position) : undefined;
   return <div className="mission-stack">
     <Footnote tone="secondary">Simulated position · heading-up oblique of the flat HiRISE ortho.</Footnote>
-    <Site3DButton plan={plan} measurements={measurements} initial="walk">3D walk · helmet view</Site3DButton>
+    <Site3DButton plan={plan} measurements={measurements} initial="walk" onLog={onLog} pending={pending}>3D walk · helmet view</Site3DButton>
     {station ? <ListSection header={last ? "Next station" : "Current station"} headerId="ev-station">
       <ListRow trailing={<Value>{String(station.order).padStart(2, "0")}</Value>}><RowLabel title={station.id} detail={station.tools.map(toolName).join(" · ")} /></ListRow>
       <ListRow trailing={<Value>{Math.round(direction!.distanceM)} m</Value>}><RowLabel title={direction!.distanceM ? direction!.label : "At habitat"} detail="Straight-line grid distance · simulated position" /></ListRow>
