@@ -25,6 +25,7 @@ export const MissionBrief = memo(function MissionBrief({ plan, measurements, hov
   return <section aria-label="Mission brief" className="mission-stack">
     <div className="mission-objective"><Footnote tone="secondary">Science traceability matrix · {evaName(plan)}</Footnote><Body>{missionObjective(plan) ?? "Mission objective unavailable"}</Body>{plan.summary.ice_threshold_m !== undefined ? <Footnote tone="secondary">Ice threshold ≤ {plan.summary.ice_threshold_m} m</Footnote> : null}</div>
     <Site3DButton plan={plan} measurements={measurements} initial="site">Fly over the site in 3D</Site3DButton>
+    <a className="mission-cuff-link" href={`/cuff?plan=${encodeURIComponent(plan.plan_id)}`} target="_blank" rel="noopener">Print the EVA cuff checklist</a>
     <MetricList aria-label="Plan numbers" className="mission-metrics">
       <Metric label={limit ? `Duration · limit ${formatDuration(limit)}` : "Duration"} value={formatDuration(plan.summary.duration_min)} />
       <Metric label="Traverse" value={formatNumber(plan.summary.distance_km, 2)} unit="km" />

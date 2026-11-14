@@ -31,6 +31,25 @@ min_station_separation_m:
   assumption: true
   notes: Evita dos estaciones en el mismo punto (por ejemplo, un objetivo fijo y una candidata).
 
+habitat_exclusion_m:
+  value: 150
+  source: >-
+    Sin estaciones a menos de 150 m del hábitat: el aterrizaje barre y contamina el suelo cercano.
+    Los retrocohetes de Phoenix dejaron hielo expuesto bajo el lander (Mellon et al. 2009) y el
+    Apollo 12 arenó la Surveyor 3 a ~160 m (Immer et al. 2011). El radio para un lander tripulado
+    es nuestro
+  assumption: true
+  notes: Antes la estación 1 caía sobre el hábitat, con 0 min de traverse (cuestión 72).
+
+replan_return_changed_fraction:
+  value: 0.5
+  source: >-
+    Sin fuente: si un re-plan cambia más de la mitad de las estaciones (entran o salen, sobre el
+    total de las dos listas), se recomienda volver al hábitat y re-planificar con el IV. NASA
+    re-planifica en tiempo real con el equipo de apoyo (Stevens et al. 2019, BASALT), pero no
+    publica un umbral
+  assumption: true
+
 map_half_m:
   value: 1500
   source: >-

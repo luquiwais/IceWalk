@@ -62,6 +62,10 @@ function setup(props: Partial<SiteSceneProps> = {}) {
   return { ...utils, onSelectStation, onHoverStation };
 }
 
+/** Default habitat (apps/planner/config/eva.yaml) and the first station of the demo plan. */
+const HABITAT = [300, -2200] as const;
+const FIRST = orderedStations(demoPlan)[0].position as [number, number];
+
 function anchorOf(name: RegExp) {
   return screen.getByRole("button", { name }).parentElement as HTMLElement;
 }
@@ -74,14 +78,15 @@ function translate(el: HTMLElement): [number, number] {
 
 describe("site data", () => {
   it("names stations for assistive tech", () => {
-    expect(stationName(demoPlan.stations[0])).toBe("Station 1, E03S22, P(ice) 65%");
+    const s = orderedStations(demoPlan)[0];
+    expect(stationName(s)).toBe(`Station 1, ${s.id}, P(ice) ${Math.round(s.p_ice * 100)}%`);
   });
 
   it("converts the route as it comes, in grid meters", () => {
     const [line] = routeLines(demoPlan);
     expect(line.length).toBeGreaterThan(1);
-    // The planner's route vertices sit at cell centers, a few meters off the stations: drawn as given.
-    const [x0, y0] = orderedStations(demoPlan)[0].position;
+    // The route starts at the habitat; its vertices sit at cell centers, a few meters off: drawn as given.
+    const [x0, y0] = HABITAT;
     expect(Math.hypot(line[0][0] - x0, line[0][1] - y0)).toBeLessThan(10);
   });
 
@@ -95,16 +100,18 @@ describe("site data", () => {
   });
 
   it("knows when the habitat sits on a station", () => {
-    expect(habitatOnStation(demoPlan.stations)).toBe(true);
-    expect(habitatOnStation(demoReplan.stations)).toBe(false);
+    // The planner keeps stations off the landing zone (habitat_exclusion_m), so it only happens by hand.
+    expect(habitatOnStation(demoPlan.stations)).toBe(false);
+    expect(habitatOnStation([{ ...demoPlan.stations[0], position: [...HABITAT] as [number, number] }])).toBe(true);
   });
 });
 
 describe("SiteScene", () => {
   it("calls a completed station Measured instead of Dropped after re-planning", () => {
     setup({ plan: demoReplan, previousPlan: demoPlan, measurements: [demoMeasurement] });
-    expect(screen.getByRole("img", { name: /Measured station E03S22.*no ice to 1.0 m/ })).toBeInTheDocument();
-    expect(screen.queryByRole("img", { name: /Dropped station E03S22/ })).not.toBeInTheDocument();
+    const id = demoMeasurement.station_id;
+    expect(screen.getByRole("img", { name: new RegExp(`Measured station ${id}.*no ice to 1.0 m`) })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: new RegExp(`Dropped station ${id}`) })).not.toBeInTheDocument();
   });
   it("renders every station as a button with its accessible name", () => {
     setup();
@@ -123,7 +130,7 @@ describe("SiteScene", () => {
     const insets = { top: 88, right: 440, bottom: 176, left: 96 };
     setup({ insets });
     const cam = fitCamera(framePoints(demoPlan), VIEW, insets);
-    const [ex, ey] = worldToScreen(cam, VIEW, 300, -2200);
+    const [ex, ey] = worldToScreen(cam, VIEW, ...FIRST);
     const [x, y] = translate(anchorOf(/^Station 1,/));
     expect(x).toBeCloseTo(ex, 0);
     expect(y).toBeCloseTo(ey, 0);
@@ -135,7 +142,7 @@ describe("SiteScene", () => {
     rerender(<SiteScene plan={demoPlan} selectedStationId={null} hoveredStationId={null} onSelectStation={vi.fn()} onHoverStation={vi.fn()} layers={{ grid: true, rings: true }} insets={insets} />);
     flushFrames();
     const cam = fitCamera(framePoints(demoPlan), VIEW, insets);
-    const [ex, ey] = worldToScreen(cam, VIEW, 300, -2200);
+    const [ex, ey] = worldToScreen(cam, VIEW, ...FIRST);
     const [x, y] = translate(anchorOf(/^Station 1,/));
     expect(x).toBeCloseTo(ex, 0);
     expect(y).toBeCloseTo(ey, 0);
@@ -153,7 +160,7 @@ describe("SiteScene", () => {
     expect(after[0]).toBeCloseTo(before[0], 0);
     expect(after[1]).toBeCloseTo(before[1], 0);
     const moved = translate(anchorOf(/^Station 4,/));
-    expect(Math.abs(moved[0] - after[0])).toBeLessThan(Math.abs(neighbor[0] - before[0]));
+    expect(Math.hypot(moved[0] - after[0], moved[1] - after[1])).toBeLessThan(Math.hypot(neighbor[0] - before[0], neighbor[1] - before[1]));
   });
 
   it("zooms and pans with the keyboard", async () => {
@@ -214,7 +221,7 @@ describe("SiteScene", () => {
     const { onHoverStation, rerender } = setup();
     const button = screen.getByRole("button", { name: /^Station 1,/ });
     await userEvent.hover(button);
-    expect(onHoverStation).toHaveBeenLastCalledWith("E03S22");
+    expect(onHoverStation).toHaveBeenLastCalledWith(orderedStations(demoPlan)[0].id);
     await userEvent.unhover(button);
     expect(onHoverStation).toHaveBeenLastCalledWith(null);
 
@@ -222,14 +229,15 @@ describe("SiteScene", () => {
       <SiteScene
         plan={demoPlan}
         selectedStationId={null}
-        hoveredStationId="E03S22"
+        hoveredStationId={orderedStations(demoPlan)[0].id}
         onSelectStation={vi.fn()}
         onHoverStation={onHoverStation}
         layers={{ grid: true, rings: true }}
       />,
     );
     expect(button).toHaveAttribute("data-hovered");
-    expect(screen.getByText("E03S22 · 65%")).toBeInTheDocument();
+    const s1 = orderedStations(demoPlan)[0];
+    expect(screen.getByText(`${s1.id} · ${Math.round(s1.p_ice * 100)}%`)).toBeInTheDocument();
   });
 
   it("labels the re-plan diff with text, not only shape", () => {
@@ -280,7 +288,7 @@ describe("SiteScene", () => {
         x: 0, y: 0, left: 0, top: 0, right: 390, bottom: 844, width: 390, height: 844, toJSON: () => ({}),
       });
       const compactInsets = { top: 265, right: 20, bottom: 500, left: 20 };
-      setup({ insets: compactInsets, projection: { headingDeg: 90, pitchDeg: 58, focus: [300, -2200] } });
+      setup({ insets: compactInsets, projection: { headingDeg: 90, pitchDeg: 58, focus: [...FIRST] } });
       const [, y2] = translate(anchorOf(/^Station 2,/));
       expect(y2).toBeGreaterThan(compactInsets.top + 16);
       const [, y1] = translate(anchorOf(/^Station 1,/));
@@ -289,32 +297,32 @@ describe("SiteScene", () => {
 
     it("turns the heading up around the focus and keeps markers upright", () => {
       reduced();
-      setup({ insets, projection: { headingDeg: 90, pitchDeg: 58, focus: [300, -2200] } });
+      setup({ insets, projection: { headingDeg: 90, pitchDeg: 58, focus: [...FIRST] } });
       const map = screen.getByRole("group", { name: "Site map, S1094b" });
       expect(map).toHaveAttribute("data-projected");
       expect(map).toHaveAttribute("data-tilted");
-      // Station 1 is the focus; with east up, a station east of it lies ahead (higher on screen).
+      // Station 1 is the focus; with east up, north is to the left, so a station south of it lies right.
       const ordered = orderedStations(demoPlan);
-      const east = ordered.find((s) => s.position[0] > ordered[0].position[0] + 50)!;
-      const eastName = new RegExp(`^Station ${east.order},`);
-      const [x1, y1] = translate(anchorOf(/^Station 1,/));
-      const [, y2] = translate(anchorOf(eastName));
+      const south = ordered.find((s) => s.position[1] < ordered[0].position[1] - 50)!;
+      const southName = new RegExp(`^Station ${south.order},`);
+      const [x1] = translate(anchorOf(/^Station 1,/));
+      const [x2] = translate(anchorOf(southName));
       expect(x1).toBeCloseTo(96 + (VIEW.width - 96 - 440) / 2, 0);
-      expect(y2).toBeLessThan(y1 - 20);
-      expect(anchorOf(eastName).style.transform).toMatch(/scale\(0\.\d+\)/);
+      expect(x2).toBeGreaterThan(x1 + 20);
+      expect(anchorOf(southName).style.transform).toMatch(/scale\(/); // markers are scaled by depth when tilted
       expect(screen.getByRole("img", { name: "Heading 090°, north to the left" })).toBeInTheDocument();
       expect(screen.queryByRole("img", { name: "North is up" })).not.toBeInTheDocument();
     });
 
     it("returns to the north-up framing when the projection is removed", () => {
       reduced();
-      const { rerender } = setup({ insets, projection: { headingDeg: 90, pitchDeg: 58, focus: [300, -2200] } });
+      const { rerender } = setup({ insets, projection: { headingDeg: 90, pitchDeg: 58, focus: [...FIRST] } });
       rerender(<SiteScene plan={demoPlan} selectedStationId={null} hoveredStationId={null} onSelectStation={vi.fn()} onHoverStation={vi.fn()} layers={{ grid: true, rings: true }} insets={insets} />);
       flushFrames();
       const map = screen.getByRole("group", { name: "Site map, S1094b" });
       expect(map).not.toHaveAttribute("data-tilted");
       const cam = fitCamera(framePoints(demoPlan), VIEW, insets);
-      const [ex, ey] = worldToScreen(cam, VIEW, 300, -2200);
+      const [ex, ey] = worldToScreen(cam, VIEW, ...FIRST);
       const [x, y] = translate(anchorOf(/^Station 1,/));
       expect(x).toBeCloseTo(ex, 0);
       expect(y).toBeCloseTo(ey, 0);

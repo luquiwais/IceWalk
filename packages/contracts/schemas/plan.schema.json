@@ -161,7 +161,9 @@
                 "peak_limit_btu_h": { "type": "number" },
                 "vo2max_fraction": { "type": "number", "minimum": 0, "description": "VO2 medio de la EVA sobre el VO2max mínimo de regla de vuelo" },
                 "vo2max_fraction_limit": { "type": "number" },
-                "o2_kg_per_crew": { "type": "number", "minimum": 0 }
+                "o2_kg_per_crew": { "type": "number", "minimum": 0 },
+                "climb_m": { "type": "number", "minimum": 0, "description": "Desnivel positivo de la ruta sobre el DTM; suma el trabajo de subir al esfuerzo" },
+                "moved_mass_kg": { "type": "number", "minimum": 0, "description": "Tripulante + traje + carga por tripulante" }
               }
             },
             "carry": {
@@ -209,6 +211,32 @@
           "message": { "type": "string" },
           "source": { "type": "string" }
         }
+      }
+    },
+    "replan": {
+      "type": "object",
+      "description": "Solo en planes de /replan: que cambio respecto del plan anterior y si conviene seguir o volver al habitat (app/replan_check.py). La decision final es de la tripulacion",
+      "required": ["recommendation", "reasons", "stations_kept", "stations_added", "stations_dropped"],
+      "properties": {
+        "from_plan_id": { "type": ["string", "null"] },
+        "trigger": {
+          "type": "object",
+          "properties": {
+            "station_id": { "type": "string" },
+            "result": { "enum": ["ice", "no_ice", "inconclusive"] }
+          }
+        },
+        "stations_kept": { "type": "array", "items": { "type": "string" } },
+        "stations_added": { "type": "array", "items": { "type": "string" } },
+        "stations_dropped": { "type": "array", "items": { "type": "string" } },
+        "changed_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+        "changed_fraction_limit": { "type": "number", "minimum": 0, "maximum": 1 },
+        "margin_before_min": { "type": ["number", "null"] },
+        "margin_after_min": { "type": ["number", "null"] },
+        "objective_met": { "type": "boolean" },
+        "recommendation": { "enum": ["continue", "return_to_habitat"] },
+        "reasons": { "type": "array", "items": { "type": "string" } },
+        "is_assumption": { "type": "boolean" }
       }
     },
     "site_assessment": {

@@ -229,3 +229,6 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 | Umbral de saltación en Marte: 25-30 m/s a la altura de los sensores del Viking | Ryan, Sharman y Lucich (1981), Local Mars dust storm generation mechanism, GRL 8(8), 899-901, doi:10.1029/GL008i008p00899 |
 | DONKI: eventos SEP y simulaciones WSA-Enlil con llegada a Marte | NASA CCMC, https://ccmc.gsfc.nasa.gov/DONKI-API/get/SEP y /WSAEnlilSimulations |
 | Mars Climate Database: uso de la web "moderado"; la versión completa no se puede pasar a terceros | https://www-mars.lmd.jussieu.fr/mars/access.html |
+| Eficiencia del músculo en trabajo positivo al subir caminando (~25 %) y en trabajo negativo | Margaria, R. (1968), Positive and negative work performances and their efficiencies in human locomotion, Int. Z. angew. Physiol. 25, 339-351 |
+| El aterrizaje del Apollo 12 arenó la Surveyor 3 a ~160 m (alcance de la eyecta del motor; base del radio de exclusión del hábitat, que es supuesto) | Immer, C., Metzger, P., Hintze, P. E., Nick, A., Horan, R. (2011), Apollo 12 Lunar Module exhaust plume impingement on Lunar Surveyor III, Icarus 211(2), 1089-1102 |
+| Lista de puño (cuff checklist) de las EVAs | NASA, Apollo y Shuttle EVA cuff checklists (Flight Data File) |
