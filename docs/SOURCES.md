@@ -8,6 +8,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | --- | --- | --- |
 | HiRISE DTM y ortoimágenes de S1094b | https://hirise.lpl.arizona.edu/dtm/ESP_073578_2155 | NASA/JPL-Caltech/UArizona |
 | HiRISE DTM, copia COG controlada (CC0), la que lee el planificador | https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_073578_2155_ESP_073077_2155/DTEEC_073578_2155_073077_2155_A01.tif | NASA/JPL-Caltech/UArizona; USGS Astrogeology |
+| Labels PDS de los RDR `ESP_073578_2155_RED` y `ESP_073077_2155_RED`: incidencia y azimut del sol para medir sombras (el label del orto no los trae) | https://hirise.lpl.arizona.edu/PDS/RDR/ESP/ORB_073500_073599/ESP_073578_2155/ y https://hirise.lpl.arizona.edu/PDS/RDR/ESP/ORB_073000_073099/ESP_073077_2155/ | NASA/JPL-Caltech/UArizona |
 | Mapas de consistencia de hielo SWIM (Ci 0-1 m y 1-5 m, GeoTIFF del 2025-08-04; licencia no declarada, cuestión 56) | https://swim.psi.edu/SWIM4MIMProducts.php | Morgan et al. (2021) Nature Astronomy; SWIM (PSI/JPL) |
 | Mosaico global CTX | https://murray-lab.caltech.edu/CTX/ | Dickson et al. (2024) Earth and Space Science; NASA/JPL/MSSS/The Murray Lab |
 | Inercia térmica THEMIS | https://astrogeology.usgs.gov | Fergason et al. (2006) JGR; USGS / ASU |
@@ -30,6 +31,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Conteo de bloques y pérdida de hielo en S1094b (vara de validación de visión) | Tusberti et al., póster INAF, https://indico.ict.inaf.it/event/2923/attachments/8535/17568/Filippo_Tusberti.pdf |
 | Densidad de bloques de S1094b, feb y dic 2022 | arXiv 2608.02492, https://arxiv.org/pdf/2608.02492 |
 | Detección de bloques por sombras | Golombek et al. (2008) JGR, doi:10.1029/2007JE003065; Hood et al. (2022) Earth and Space Science, doi:10.1029/2022EA002410 |
+| Índice de una ley de potencias por máxima verosimilitud (comparación de tamaños de bloques con Tusberti et al., que citan el mismo método) | Clauset, Shalizi & Newman (2009) SIAM Review 51(4), 661-703, doi:10.1137/070710111 |
 | BoulderNet: detección de bloques con Mask R-CNN (datos y pesos CC BY 4.0) | Prieur et al. (2023) JGR Planets; https://zenodo.org/records/8171052 |
 | Prioridades científicas para humanos en Marte | National Academies (2025), A Science Strategy for the Human Exploration of Mars |
 | Hielo limpio a < 1 m en latitudes medias | Dundas et al. (2021) JGR Planets |
@@ -103,6 +105,21 @@ Valores sin fuente, en `model/gp/observations.py`. Se ajustan en el paso 5 del p
 | Reflector falso a una profundidad sacada de la distribución del sitio (`gp.tool_strategy`) | Dónde aparece un reflector que no es hielo | Es la mezcla que EP aproxima ensanchando el error (`gp/observations.py`); sin fuente |
 | Taladro hipotético de 3 m (`exploration_zones.json`) | Qué cambia en cada zona con más alcance | No está en el catálogo de herramientas; ilustrativo |
 | Alcance de 100 m y reparto 50/50 fuera de S1094b | Alcance del kernel y parte espacial de la varianza en un sitio sin catálogo (`gp.planning.regional_prior`) | Se toman los ajustados en S1094b; sin fuente para otros sitios |
+
+## Supuestos de visión
+
+Valores sin fuente en `packages/model/vision/boulders.py` (`DetectorParams`) y `vision/catalog.py`. Los umbrales se eligieron a ojo sobre el recorte `tune` (`vision/labels.py`), sin verdad de terreno: se revisan cuando estén las etiquetas a mano (cuestión 74).
+
+| Valor | Qué es | Por qué ese valor |
+| --- | --- | --- |
+| `DETECTION_LIMIT_M = 1.5` | Diámetro desde el que la detección se declara confiable | 6 píxeles a 25 cm. Golombek et al. (2008) dan ~1.5 m para HiRISE; en este sitio no está verificado |
+| Medio elipsoide sobre terreno plano | Modelo que convierte ancho y largo de la sombra en diámetro, altura y centro del bloque | Simplificación propia sobre la idea de Golombek et al. (2008): el ancho de la sombra es el diámetro y el largo da la altura. Un bloque enterrado, anguloso o sobre una pendiente no lo cumple |
+| `loose_sigma = 3.5`, `seed_sigma = 5` | Profundidad mínima de una sombra, en desvíos del terreno alrededor | Bajo 3.5, las candidatas del recorte `tune` son en su mayoría ondulaciones (a ojo, ~1 de 3 parece un bloque) |
+| `pair_sharpness = 0.16`, `pair_highlight = 1`, `min_sharpness = 0.12` | Nitidez del borde y brillo de la cara al sol que piden las sombras poco profundas | Las sombras claras del recorte `tune` dan 0.18-0.25 de nitidez; las caras en penumbra de las ondulaciones, 0.12-0.14 |
+| `large_diameter_m = 3` | Ancho desde el que una sombra sin cara iluminada no cuenta, y desde el que una sombra blanda va como `form: indeterminate` | Los falsos de 6-7 m vistos en la eyecta eran manchas sin cara iluminada |
+| `presence_sigma = 3`, `presence_radius_m = 1` | Cuándo la otra fecha confirma un bloque | La alineación entre los dos ortos es de ~0.1 m; 1 m cubre el corrimiento de la sombra entre un sol a 238° y otro a 248° |
+| `UNCONFIRMED_FACTOR = 0.6` y la fórmula de `confidence` | Puntaje 0-1 de cada objeto | Sin calibrar: ordena, no es una probabilidad |
+| `composition: indeterminate` en todo el catálogo real | Roca o hielo | El detector usa solo la banda roja; el brillo solo no es diagnóstico (Wójcicka et al. 2025) |
 
 ## Supuestos del planificador
 

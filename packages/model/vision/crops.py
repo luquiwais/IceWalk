@@ -21,26 +21,40 @@ DEFAULT_HALF_M = 750.0  # Recorte de ~1.5 km: cubre el km² mapeado por Tusberti
 DEFAULT_RES_M = 0.5  # La escala de la imagen más gruesa (abril de 2024).
 
 
-def crop_around_crater(
-    path: Path, grid: Grid, half_m: float = DEFAULT_HALF_M, res_m: float = DEFAULT_RES_M
+def read_window(
+    path: Path,
+    grid: Grid,
+    bounds: tuple[float, float, float, float],
+    res_m: float = DEFAULT_RES_M,
 ) -> np.ndarray:
-    """Primera banda, con norte arriba y el cráter en el centro. 0 = sin dato.
+    """Primera banda dentro de `bounds` = (xmin, ymin, xmax, ymax), en metros de la grilla.
 
-    Conserva el tipo original: los ortos son de 8 bits y los RDR RED, de 16. No los compares ni
-    conviertas sin normalizar.
+    Norte arriba: la fila 0 es el borde ymax. 0 = sin dato. Conserva el tipo original: los ortos
+    son de 8 bits y los RDR RED, de 16. No los compares ni conviertas sin normalizar.
     """
-    size = round(2 * half_m / res_m)
+    xmin, ymin, xmax, ymax = bounds
+    width = round((xmax - xmin) / res_m)
+    height = round((ymax - ymin) / res_m)
+    if width <= 0 or height <= 0:
+        raise ValueError(f"Ventana vacía: {bounds}")
     with rasterio.open(path) as src:
         if src.crs is None:
             raise ValueError(f"{Path(path).name} no tiene proyección")
         with WarpedVRT(
             src,
             crs=CRS.from_proj4(grid.proj4),
-            transform=Affine(res_m, 0, -half_m, 0, -res_m, half_m),
-            width=size,
-            height=size,
+            transform=Affine(res_m, 0, xmin, 0, -res_m, ymax),
+            width=width,
+            height=height,
             resampling=Resampling.bilinear,
             src_nodata=0,
             nodata=0,
         ) as vrt:
             return vrt.read(1)
+
+
+def crop_around_crater(
+    path: Path, grid: Grid, half_m: float = DEFAULT_HALF_M, res_m: float = DEFAULT_RES_M
+) -> np.ndarray:
+    """Primera banda, con norte arriba y el cráter en el centro. 0 = sin dato."""
+    return read_window(path, grid, (-half_m, -half_m, half_m, half_m), res_m)

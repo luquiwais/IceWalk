@@ -2,7 +2,21 @@
 
 **Para:** Guido, dueño de visión desde el 2026-11-11.
 **Rama sugerida:** `model/vision-bloques`, desde `main`. **Código:** `packages/model/vision/`.
-**Actualizado:** 2026-11-11, con el recorte para el hackatón (14-15 nov).
+**Actualizado:** 2026-11-13, con el estado de la rama `model/vision-bloques`. El recorte para el hackatón (14-15 nov) es del 11/11.
+
+## Estado al 13/11
+
+| # | Tarea | Estado |
+| --- | --- | --- |
+| 1 | Entorno | **Hecho.** Los ortos se leen por ventanas: abrirlos enteros con `WarpedVRT` no termina |
+| 2 | Verdad de terreno | **Pendiente, a mano.** Recortes listos con `python -m vision.labels` (`test_eva`, `test_ejecta`, `tune`); falta anotarlos en QGIS (cuestión 74) |
+| 3 | `boulders.py` | **Hecho, pero no alcanza.** F1 real contra BoulderNet: 0.13-0.49 (`python -m vision.bouldernet`, `EXPERIMENTS.md`). En la escena sintética da 0.98: no se traslada |
+| 4 | Capas reales | **Hecho** para la zona de la EVA: `python -m vision.run`. El catálogo valida contra el esquema y el planificador usa la capa (`uses_corridor` en true). Ninguna celda queda sin pasillo: las rutas no cambian |
+| 5 | Vara de Tusberti | **Hecho, y da mal**: ~25 % de su conteo sobre 1.8 m y una distribución mucho más plana (`EXPERIMENTS.md`, 2026-11-13) |
+| 6 | Entrega | PR con código, tests y docs. Capas y catálogo en un Release del fork de Guido: [`vision-s1094b-2026-11-13`](https://github.com/guidojacoo/IceWalk/releases/tag/vision-s1094b-2026-11-13); al mergear, pasarlo al repo principal. Falta avisar a Planificador y Frontend |
+
+Lo que sigue, en orden: anotar la verdad de terreno y medir el F1 real; con eso, revisar los umbrales (`SOURCES.md`, "Supuestos de visión"); decidir qué imagen manda (cuestión 76); el sitio entero; persistencia con ESP_077719.
+
 
 ## Para el hackatón: qué hacer y en qué orden
 
@@ -53,7 +67,7 @@
 
 ### Preguntas abiertas de visión
 
-12 (polígonos de Tusberti), 14 y 37 (imágenes posteriores a feb 2023), 18 (escarcha en dic 2022), 61 (cómo llega el catálogo a la web) y 62 (capas mock en el planificador), en `docs/OPEN_QUESTIONS.md`.
+12 (polígonos de Tusberti), 14 y 37 (imágenes posteriores a feb 2023), 18 (escarcha en dic 2022), 61 (cómo llega el catálogo a la web), 62 (capas mock en el planificador), 74 (verdad de terreno a mano), 75 (qué se dibuja como roca), 76 (qué imagen manda), 77 (la capa de pasillo no cambia las rutas) y 78 (una cita de `SOURCES.md` que no corresponde), en `docs/OPEN_QUESTIONS.md`.
 
 ## Qué hace este módulo
 
@@ -70,7 +84,7 @@ Fotos HiRISE -> coregister -> boulders -> rasterize -> capas de costo -> Planifi
 
 ## Salidas
 
-Capas sobre `packages/contracts/grid.json` (10 m, COG float32) y catálogo `boulders.geojson`, según `packages/contracts/schemas/boulders.schema.json`. Hoy se generan **falsas** con `python -m vision.mock_layers`.
+Capas sobre `packages/contracts/grid.json` (10 m, COG float32) y catálogo `boulders.geojson`, según `packages/contracts/schemas/boulders.schema.json`. Desde el 13/11, las seis capas de bloques y el catálogo son **reales** en la zona de la EVA (`python -m vision.run`); fuera de esa ventana van con `nodata`. Las demás capas siguen saliendo **falsas** de `python -m vision.mock_layers`.
 
 | Capa | Rol | Prioridad |
 | --- | --- | --- |
@@ -101,6 +115,9 @@ Capas sobre `packages/contracts/grid.json` (10 m, COG float32) y catálogo `boul
 | Detector de sombras primero, BoulderNet en paralelo | Queda el mejor en un test congelado. Empate: sombras, porque es explicable y da altura |
 | Anomalías opcional | No hay contra qué validarlas |
 | Sin Ultralytics YOLO | AGPL-3.0 frente a un repo Apache 2.0 |
+| Sombra cortada a media profundidad, con borde nítido y cara iluminada | Un umbral fijo mide de más y confunde la cara en penumbra de una ondulación con una sombra (13/11) |
+| Dos fechas del mismo par estéreo; la otra confirma con lo que muestra en el lugar de la sombra | Abril es más borrosa que febrero: exigirle una detección propia daba bloques "no visibles" que sí estaban (13/11) |
+| `composition: indeterminate` y `form: indeterminate` cuando no se puede decir más | Sin color no hay roca ni hielo; una sombra ancha y blanda puede ser un montículo (13/11) |
 
 ## Lo que se verificó con datos reales
 
@@ -148,12 +165,15 @@ Conviene preguntarles si comparten los polígonos: en lo publicado solo vimos to
 ### Hecho
 - **Paso 0:** contrato, capas falsas, `grid.py`, `rasterize.py` con pasillo, CI.
 - **Paso 1:** `pds.py`, `imagery.py`, `crops.py`, `coregister.py`, grilla verificada e imágenes alineadas. Salvedad: ver la tabla de alineación. El criterio de < 2 px se cumple entre febrero y abril de 2022; en las imágenes sin orto, solo a ojo y por zona.
+- **Paso 3 (13/11):** `boulders.py`. Fondo local → manchas oscuras cortadas a media profundidad → medidas sobre el eje del sol → filtros de forma, nitidez, cara iluminada y cráter → modelo de medio elipsoide. Tests con escena sintética (`synthetic.py`). Falta medirlo contra el paso 2.
+- **Paso 4, primera mitad (13/11):** `catalog.py` y `run.py`. Catálogo y capas reales de la zona de la EVA, cruzando abril y febrero de 2022. Falta la persistencia con ESP_077719.
+- **Paso 8, en parte (13/11):** `python -m vision.run --site s1094b`, con `manifest.json` por corrida. Falta llevar el catálogo al frontend (cuestión 61).
 
 ### Paso 2. Verdad de terreno (2-3 h, a mano)
 ≥ 200 bloques en QGIS en 3 zonas: eyecta cercana, media y campo lejano. Más un set aparte para ajustar. Dos personas anotan la misma zona para medir su desacuerdo. **El test se etiqueta a mano y no se toca al ajustar.**
 
-### Paso 3. `boulders.py`
-Umbral de sombra por tile → componentes conexas → filtro de forma sobre el eje del sol → elipse → diámetro por ancho y altura con `pds.height_from_shadow`. Tests con escena sintética. **Listo cuando:** cumple los criterios.
+### Paso 3. `boulders.py` (hecho el 13/11, ver arriba)
+Plan original: umbral de sombra por tile → componentes conexas → filtro de forma sobre el eje del sol → elipse → diámetro por ancho y altura con `pds.height_from_shadow`. Tests con escena sintética. **Listo cuando:** cumple los criterios. Lo que cambió al ver datos reales está en `EXPERIMENTS.md`, 2026-11-13.
 
 ### Paso 4. Capas reales de bloques
 Aplicar `rasterize_catalog` sobre el catálogo real y la huella real. Clasificar persistencia con ESP_077719, alineando por zona. **Hito mínimo para el 8 nov.**
@@ -184,9 +204,9 @@ Los umbrales son nuestros, y se ajustan después de medir el desacuerdo humano.
 
 | Qué | Métrica | Objetivo |
 | --- | --- | --- |
-| Bloques, nuestro test | F1 para diámetro ≥ 2 m | ≥ 0.70 |
-| Bloques, vara publicada | Conteo y tamaños sobre 1.8 m, feb y dic | ± 25 % |
-| Tamaños | Error de diámetro | ≤ 2 px |
+| Bloques, nuestro test | F1 para diámetro ≥ 2 m | ≥ 0.70. Al 13/11: sin medir (falta el paso 2); 0.98-1.00 en la escena sintética |
+| Bloques, vara publicada | Conteo y tamaños sobre 1.8 m, feb y dic | ± 25 %. Al 13/11, febrero: **no se cumple** (~25 % del conteo) |
+| Tamaños | Error de diámetro | ≤ 2 px. Al 13/11: 0.3-0.6 px en la escena sintética; sin medir en datos reales |
 | Hielo | Área expuesta, feb y dic | ± 30 % |
 
 ## Riesgos
@@ -206,8 +226,17 @@ cd packages/model
 uv sync --extra dev --extra vision      # o: pip install -e ".[dev,vision]"
 uv run python -m vision.mock_layers --out ../../data/processed/s1094b-mock   # capas falsas, fuera de la carpeta del planificador
 uv run ruff check . && uv run pytest -q # o, desde la raíz: bun run moon run model:lint model:test
-python ../../data/download.py --only hirise_ortho_25cm hirise_feb2022_ortho_25cm hirise_dec2022_red hirise_feb2023_red
+python ../../data/download.py --only hirise_ortho_25cm hirise_ortho_label hirise_feb2022_ortho_25cm hirise_feb2022_label
 python ../contracts/validate.py         # ejemplos y mocks (no mira data/processed/)
+
+# Capas y catálogo reales de la zona de la EVA (~15 min), en data/processed/s1094b/
+uv run python -m vision.run --site s1094b
+# Verdad de terreno: recortes para QGIS, y F1 una vez anotados
+uv run python -m vision.labels
+uv run python -m vision.evaluate labels --name test_eva
+# Vara de Tusberti: febrero de 2022 en su círculo de 1 km²
+uv run python -m vision.run --zone tusberti --image ESP_073077_2155 --out ../../data/processed/s1094b-tusberti
+uv run python -m vision.evaluate sfd --catalog ../../data/processed/s1094b-tusberti/boulders.geojson --radius 564.19
 # El catálogo real contra el contrato:
 uv run python -c "import json, jsonschema; jsonschema.validate(json.load(open('../../data/processed/s1094b/boulders.geojson')), json.load(open('../contracts/schemas/boulders.schema.json')))"
 ```

@@ -588,3 +588,95 @@ Sensibilidad con `false_p` 0.10-0.45 y error de permitividad 0.10-0.30: el rendi
 - El prior regional, que es el que decide la tarjeta, está **calibrado con datos que no vio** y acierta Phoenix. Es la validación positiva con datos reales que nos faltaba.
 - El ×2.8 vuelve como "no confirmado, no refutado". El número robusto para el pitch es el del radar: **×2.9 menos EVAs para confirmar hielo**, que no depende de ese supuesto.
 - El prior por latitud es conservador en Arcadia y la tarjeta ahora lo dice. Con Viking 2 queda una tensión abierta con una estimación publicada, que conviene declarar.
+
+## 2026-11-13: visión, bloques reales por sombras
+
+Detector `vision/boulders.py` sobre los dos ortos de 25 cm del par estéreo: ESP_073578_2155 (7 abr 2022, incidencia 67.7°, emisión 20.7°) y ESP_073077_2155 (27 feb 2022, 63.4° y 4.8°). Corrida completa con `python -m vision.run`. Los umbrales se eligieron mirando solo el recorte `tune` (`vision/labels.py`). Donde dice "a ojo" es una revisión de recortes de 16-20 m hecha con Claude: **no es verdad de terreno** y no reemplaza al paso 2 del plan, que sigue pendiente (cuestión 74).
+
+### Camino al detector
+
+| Prueba | Datos | Resultado | Conclusión |
+| --- | --- | --- | --- |
+| Abrir el orto entero con `WarpedVRT` (vista de todo el sitio a 10 m) | Orto JP2 de 25 cm | **Falló**: no terminó en 5 min | Leer por ventanas: 1024 × 1024 px en 1.6 s. El pipeline va por teselas de 500 m |
+| Sol e incidencia en el label del orto | `*_ORTHO.LBL` | **No los trae** | Se usa el label del RDR de la misma observación (`hirise_ortho_label` y `hirise_feb2022_label` en `layers.yaml`) |
+| Rango de la imagen | Ortos de 8 bits | Suelo ≈ 215 y sombra más profunda ≈ 181 en abril (205 y 162 en febrero): 35-45 niveles | Un umbral absoluto o un cociente de brillo no sirven; se mide en desvíos del fondo local |
+| Umbral fijo de sombra y componentes conexas (el plan original) | Escena sintética | **Falló**: diámetro 2.5 px de más y decenas de falsos en la textura | Cada mancha se corta a la mitad de su propia profundidad: el diámetro queda a menos de 1 px |
+| El mismo detector en terreno real | Recorte de 100 m junto al hábitat | El terreno es ondulado: las caras opuestas al sol dan manchas de 5-10 m tan oscuras como una sombra (con el sol a 68°, una pendiente de 10° pierde ~44 % de la luz directa) | La profundidad no alcanza. Se agregan nitidez del borde y cara iluminada del lado del sol |
+| Profundidad en desvíos del terreno | Recorte de eyecta | Una sombra negra llega solo a 5-7 desvíos, porque las ondulaciones suben el desvío a ~7 niveles | El umbral se adapta al terreno, pero pierde bloques de 2-3 m en zonas rugosas. Es el límite conocido del detector |
+| Estratos de candidatas | Recorte `tune`, febrero, 368 candidatas ≥ 1.5 m | Par nítido con cara iluminada y 3.5-5 desvíos: ~16 de 18 parecen bloques. El mismo par con 2.5-3.5: ~1 de 3. De 4-5 desvíos sin par nítido: montículos de 4-7 m con sombra real, ~2 de 3 | Piso en 3.5 desvíos; los anchos y blandos solo entran con cara iluminada, y van como `form: indeterminate` |
+| Abril contra febrero, misma zona | Círculo de 1 km² del cráter | Abril: 357 detecciones firmes; febrero: 839 | Febrero es más nítida (se tomó casi vertical); abril, la "mejor para sombras" del plan, pierde los bloques chicos. Cuestión 67 |
+| Cruzar fechas pidiendo detección en las dos | Ídem | **Falló**: bloques que están quedaban como "no visibles en la última" solo porque abril no llega a medirlos | La otra fecha confirma si muestra algo oscuro (≥ 3 desvíos) a menos de 1 m de la sombra. Queda 854 `persistent`, 52 `not_visible_latest`, 7 `single_epoch` |
+| Filtro de cráteres por pared iluminada | Escena sintética con borde levantado | Funciona en los 8 cráteres de la escena de test; no está medido en cráteres reales | Pendiente de verificar con las etiquetas |
+
+### Zona de la EVA (hábitat ± 1.5 km, 9 km²)
+
+| Qué | Resultado |
+| --- | --- |
+| Objetos en el catálogo | 2808; 2747 de 1.5 m o más (305 por km²) y 2378 de 2 m o más |
+| Persistencia | 2735 `persistent`, 50 `single_epoch`, 23 `not_visible_latest` |
+| Forma | 2198 `block` y 610 `indeterminate` (sombra ancha y de borde blando: puede ser un montículo) |
+| Detecciones firmes por imagen | Abril 1448, febrero 2234 |
+| Diámetro | Mediana 2.8 m; uno de cada cuatro, 4.0 m o más; máximo 10.0 m |
+| Altura | Mediana 1.1 m; el 95 %, bajo 2.4 m |
+| Densidad según la distancia al cráter | 0.7-1.5 km: 295 por km²; 1.5-2.5 km: 301 por km²; 2.5-4.2 km: 313 por km² (objetos de 1.5 m o más) |
+| Celdas con algún objeto | 2 728 de 90 000 |
+| Ancho de pasillo | Mínimo 3.0 m; 437 celdas con menos de 10 m; **ninguna** bajo los 1.02 m del planificador |
+| Tiempo | 17 min para las dos imágenes |
+| A ojo, 20 objetos al azar | ~15 son un par claro de cara iluminada y sombra; 3-4, dudosos; 1 es un montículo de ~9 m |
+
+La densidad no cae al alejarse del cráter: lo que se detecta lejos son sobre todo resaltos del propio terreno, no eyecta. Desde órbita no se distinguen de un bloque suelto, y para caminar son el mismo obstáculo.
+
+**Planificador con la capa real** (capas del terreno generadas con `python -m app.traverse.terrain`): `TraverseMap.from_processed()` da `uses_corridor` en true. Celdas transitables: 592 707 con la capa y sin ella. Cinco rutas del hábitat a los bordes de la ventana (1.4-1.7 km) dan el mismo tiempo y la misma distancia. `POST /plan` valida contra `plan.schema.json`: 6 estaciones, 351 min, margen de regreso 33 min. Los 58 tests del planificador pasan con las capas reales en la carpeta. **Con bloques reales, la regla del pasillo no prohíbe ninguna celda en la zona de la EVA y las rutas no cambian.**
+
+### Vara de Tusberti: febrero de 2022, círculo de 1 km² centrado en el cráter
+
+Detector sobre ESP_073077_2155 sola (`--zone tusberti --image ESP_073077_2155`). Los valores de Tusberti et al. se leyeron del gráfico de su póster (fig. 5), con ~15 % de error de lectura; el índice es el que publican.
+
+| | Tusberti et al. | Nuestro | Solo `form: block` |
+| --- | --- | --- | --- |
+| Bloques de 1.8 m o más, por km² | ~2100 | 526 | 426 |
+| De 2 m o más | ~1400 | 460 | 360 |
+| De 3 m o más | ~220 | 247 | 147 |
+| De 4 m o más | ~50 | 139 | 62 |
+| Índice de la acumulada sobre 1.8 m (Clauset et al. 2009) | −4.68 ± 0.15 | −1.86 ± 0.08 | −2.37 ± 0.11 |
+| Total mapeado | 7989 (todos los tamaños) | 707 | 607 |
+
+**No cumple el criterio de ± 25 %.** Encontramos uno de cada cuatro de sus bloques de 1.8 m o más y, a la vez, casi el triple de 4 m o más: la distribución sale mucho más plana. Lo que sabemos y lo que no:
+
+- Faltan bloques de 2-3 m. El piso de 3.5 desvíos los pierde en la eyecta rugosa; bajarlo trae sobre todo ondulaciones (~1 de 3 parece un bloque).
+- Sobran objetos grandes. Nuestro diámetro es el ancho de la sombra: un grupo de bloques pegados o un montículo dan un solo objeto ancho. A ojo, de 20 objetos de 4 m o más, ~13 tienen cara iluminada y sombra nítida y ~6 son montículos difusos de 5-7 m. Sin los `indeterminate`, la cola se acerca a la de ellos (62 por km² de 4 m o más, contra ~50), pero el conteo sobre 1.8 m baja al 20 %.
+- No sabemos cómo midieron ellos (¿lado mayor del bloque?, ¿cuentan bloques de hielo sin sombra?): solo publican totales. Con sus polígonos (cuestión 12) se podría comparar bloque por bloque.
+- No es un número para el pitch.
+
+### Tests y tiempos
+
+| Prueba | Resultado |
+| --- | --- |
+| Tests de `packages/model` | 239 pasan (53 nuevos: detector, catálogo, evaluación y corrida completa) |
+| Escena sintética: 60 bloques de 1.5-5 m y 8 cráteres sobre terreno ondulado, 250 × 250 m | F1 de 1.00 con el sol de abril y 0.98 con el de febrero y con otro azimut, para ≥ 2 m; error de diámetro 0.3-0.6 px. Es más fácil que el terreno real: no reemplaza al F1 de las etiquetas |
+| `contracts/validate.py` | Pasa; 37 capas en `layers.yaml` |
+| Catálogo real contra `boulders.schema.json` | Válido |
+
+### Medición externa: bloques marcados a mano de BoulderNet (2026-11-14)
+
+`python -m vision.bouldernet` corre el detector sobre los recortes HiRISE de Marte del dataset de Prieur et al. (2023), Zenodo 8171052, CC BY 4.0: 4 imágenes, 49 recortes, 6826 bloques marcados a mano. Etiquetas que no hicimos nosotros: es la primera medición real del detector.
+
+| Imagen | Incidencia | F1 ≥ 2 m | F1 ≥ 3 m |
+| --- | --- | --- | --- |
+| ESP_017355_2260 (0.5 m/px) | 42° | 0.33 | 0.49 |
+| ESP_025650_2165 (0.25 m/px) | 38° | 0.42 | 0.47 |
+| ESP_028537_2270 (0.25 m/px) | 58° | 0.49 | 0.46 |
+| ESP_037018_2170 (0.6 m/px) | 53° | 0.13 | 0.30 |
+
+**El detector no cumple el criterio de F1 ≥ 0.70.** El 0.98-1.00 de la escena sintética no se traslada a datos reales. Dos salvedades: en ESP_017355 y ESP_037018 los anotadores marcaron solo bloques de 3 m o más, así que a 2 m hay bloques reales contados como falsos positivos; y esas imágenes tienen el sol más alto que S1094b (63-68°).
+
+Errores que se ven: faltan bloques grandes y brillantes, y sobran pozos chicos y textura. Prototipos probados (código en el scratch de la sesión, no en el repo):
+
+| Prueba | Resultado |
+| --- | --- |
+| Candidatos amplios a dos escalas de fondo + clasificador (gradient boosting), validado dejando una imagen afuera | Los candidatos alcanzan 69-85 % de los bloques; F1 0.32-0.42. No mejora |
+| Candidatos con un filtro orientado al sol (cara iluminada seguida de sombra), multiescala | Alcanzan 83-98 % de los bloques: mejor generador |
+| El mismo clasificador sobre esos candidatos | AUC 0.62-0.94 en la imagen dejada afuera; las probabilidades no viajan entre imágenes. Sin terminar |
+
+Siguiente paso recomendado: un detector aprendido (CNN chica o BoulderNet) entrenado con este dataset, sumando los recortes lunares para tener más datos. Hay que decidirlo con Luqui (`plans/vision.md`).
+

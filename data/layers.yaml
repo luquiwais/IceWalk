@@ -136,6 +136,16 @@ layers:
     citation: NASA/JPL-Caltech/UArizona
     status: scripted
 
+  - id: hirise_ortho_label
+    name: PDS label of HiRISE RDR ESP_073578_2155 RED (sun geometry)
+    role: visual
+    notes: Incidencia y azimut del sol para medir sombras (vision/pds.py). El label del orto no los trae; se usa el del RDR de la misma observacion.
+    resolution_m: 0.25
+    source: HiRISE
+    url: https://hirise.lpl.arizona.edu/PDS/RDR/ESP/ORB_073500_073599/ESP_073578_2155/ESP_073578_2155_RED.LBL
+    citation: NASA/JPL-Caltech/UArizona
+    status: scripted
+
   - id: ctx_context
     name: Global CTX Mosaic (Murray Lab) V01, tile E-172_N32
     role: visual
@@ -173,6 +183,16 @@ layers:
     resolution_m: 0.25
     source: HiRISE
     url: https://hirise.lpl.arizona.edu/PDS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/ESP_073077_2155_RED_A_01_ORTHO.JP2
+    citation: NASA/JPL-Caltech/UArizona
+    status: scripted
+
+  - id: hirise_feb2022_label
+    name: PDS label of HiRISE RDR ESP_073077_2155 RED (sun geometry)
+    role: visual
+    notes: Incidencia y azimut del sol de la segunda fecha de vision (vision/run.py).
+    resolution_m: 0.25
+    source: HiRISE
+    url: https://hirise.lpl.arizona.edu/PDS/RDR/ESP/ORB_073000_073099/ESP_073077_2155/ESP_073077_2155_RED.LBL
     citation: NASA/JPL-Caltech/UArizona
     status: scripted
 
@@ -248,7 +268,10 @@ layers:
 
   # Capas derivadas de vision (packages/model/vision). Grilla de packages/contracts/grid.json.
   # En capas de bloques, 0 = nada detectado sobre detection_limit_m (ver boulders.geojson), NO terreno libre.
-  # nodata = fuera de la huella de la imagen: desconocido.
+  # nodata = fuera de la huella de la imagen o de la ventana procesada: desconocido.
+  # Las seis capas de bloques son reales desde el 2026-11-13: detector de sombras sobre los ortos
+  # ESP_073578_2155 y ESP_073077_2155, en la zona de la EVA (python -m vision.run, en packages/model).
+  # Las demas (ejecta_zone en adelante) siguen saliendo solo de vision.mock_layers.
   - id: boulder_max_diam_m
     name: Maximum boulder diameter per cell
     role: cost
@@ -257,7 +280,7 @@ layers:
     source: IceWalk vision (HiRISE)
     url: data/processed/s1094b/boulder_max_diam_m.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
-    status: derived (packages/model/vision)
+    status: derived (python -m vision.run, en packages/model)
 
   - id: boulder_max_height_m
     name: Maximum boulder height per cell
@@ -267,8 +290,8 @@ layers:
     source: IceWalk vision (HiRISE)
     url: data/processed/s1094b/boulder_max_height_m.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
-    notes: Altura medida por sombra, error aprox. 1 pixel.
-    status: derived (packages/model/vision)
+    notes: Altura por largo de sombra e incidencia del label, con modelo de medio elipsoide (vision/boulders.py).
+    status: derived (python -m vision.run, en packages/model)
 
   - id: cfa_detected
     name: Cumulative fractional area of detected boulders
@@ -279,7 +302,7 @@ layers:
     url: data/processed/s1094b/cfa_detected.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: Solo bloques sobre el limite de deteccion.
-    status: derived (packages/model/vision)
+    status: derived (python -m vision.run, en packages/model)
 
   - id: boulder_density
     name: Boulder density
@@ -289,7 +312,7 @@ layers:
     source: IceWalk vision (HiRISE)
     url: data/processed/s1094b/boulder_density.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
-    status: derived (packages/model/vision)
+    status: derived (python -m vision.run, en packages/model)
 
   - id: boulder_unresolved_density
     name: Density of objects not visible in the latest image
@@ -299,8 +322,8 @@ layers:
     source: IceWalk vision (HiRISE)
     url: data/processed/s1094b/boulder_unresolved_density.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
-    notes: "El planificador decide: pueden ser hielo sublimado o cubierto."
-    status: derived (packages/model/vision)
+    notes: "Vistos en feb 2022 y sin sombra en abr 2022. El planificador decide: pueden ser hielo sublimado o cubierto, o una deteccion falsa."
+    status: derived (python -m vision.run, en packages/model)
 
   - id: clear_path_width_m
     name: Width of the widest corridor crossing the cell
@@ -311,7 +334,7 @@ layers:
     url: data/processed/s1094b/clear_path_width_m.tif
     citation: Derived from HiRISE; NASA/JPL-Caltech/UArizona
     notes: La celda se prohibe si no alcanza el ancho minimo que define el planificador (assumption).
-    status: derived (packages/model/vision)
+    status: derived (python -m vision.run, en packages/model)
 
   - id: ejecta_zone
     name: Proximal ejecta zone mask
@@ -377,3 +400,7 @@ labels:
     name: Ice-exposing scarps and new craters, mid-latitudes
     url: https://doi.org/10.5066/P9Y8FR1R
     citation: Dundas et al. (2021) USGS data release
+  - id: bouldernet_mars
+    name: BoulderNet hand-mapped boulders on Mars HiRISE patches (4 images, 49 patches)
+    url: https://zenodo.org/records/8171052/files/Apr2023-Mars-Moon-Earth-mask-5px.zip
+    citation: Prieur et al. (2023) JGR Planets; CC BY 4.0
