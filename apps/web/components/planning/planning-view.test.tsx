@@ -3,13 +3,14 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/components/site/site-scene", () => ({
-  SiteScene: ({ plan, selectedStationId, hoveredStationId, onSelectStation, onHoverStation, measurements = [], layers, previousPlan }: {
+  SiteScene: ({ plan, selectedStationId, hoveredStationId, onSelectStation, onHoverStation, measurements = [], layers, previousPlan, onPick }: {
     plan: { stations: { id: string }[] }; selectedStationId: string | null; hoveredStationId: string | null;
     onSelectStation: (id: string) => void; onHoverStation: (id: string | null) => void;
-    measurements?: { station_id: string }[]; layers: { grid: boolean; rings: boolean }; previousPlan?: unknown;
+    measurements?: { station_id: string }[]; layers: { grid: boolean; rings: boolean }; previousPlan?: unknown; onPick?: (xy: [number, number]) => void;
   }) => <div aria-label="Map stations" data-testid="mock-map" data-hovered={hoveredStationId} data-grid={layers.grid} data-previous={Boolean(previousPlan)}>
     {plan.stations.map((s) => <button key={s.id} aria-pressed={s.id === selectedStationId} onClick={() => onSelectStation(s.id)} onMouseEnter={() => onHoverStation(s.id)}>Map {s.id}</button>)}
     {measurements.map((m) => <span key={m.station_id}>Measured {m.station_id}</span>)}
+    {onPick ? <button onClick={() => onPick([800, -1200])}>Pick map point</button> : null}
   </div>,
 }));
 vi.mock("@/components/globe/mars-globe", () => ({ MarsGlobe: ({ focus, onFocusComplete }: { focus?: unknown; onFocusComplete?: () => void }) => <div data-testid="mars-globe">{focus ? <button onClick={onFocusComplete}>Complete flight</button> : null}</div> }));
@@ -99,6 +100,18 @@ describe("Mission flow", () => {
     await back();
     await userEvent.click(screen.getByRole("button", { name: /^EVA window/ }));
     expect(screen.getByRole("region", { name: "EVA window and weather" })).toHaveTextContent("Hope EMIRS (UAE)");
+  });
+
+  it("moves the habitat from the map: a mode with its banner, Esc cancels, the planner's answer shows", async () => {
+    render(<PlanningView initialPhase="plan" />);
+    expect(screen.queryByRole("button", { name: "Pick map point" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Move habitat" }));
+    expect(screen.getByText(/Click the map to place the habitat/, visible)).toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("button", { name: "Pick map point" })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Move habitat" }));
+    await userEvent.click(screen.getByRole("button", { name: "Pick map point" }));
+    expect(await screen.findByText(/Habitat not moved: Moving the habitat needs the planner API/, visible)).toBeInTheDocument();
   });
 
   it("explains the ice map: probability and certainty in one legend, and the prior as background", async () => {

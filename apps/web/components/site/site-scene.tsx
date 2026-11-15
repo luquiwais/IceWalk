@@ -53,6 +53,7 @@ import {
   CRATER_XY,
   framePoints,
   HABITAT_XY,
+  habitatOf,
   habitatOnStation,
   MODEL_RANGE_M,
   pIceLabel,
@@ -99,6 +100,8 @@ export type SiteSceneProps = {
   raster?: SiteRaster;
   /** Where the EV is during the EVA (grid meters, heading clockwise from north), for the IV. */
   crew?: { x: number; y: number; headingDeg: number };
+  /** While set, a click on the map (not a drag) reports its grid point: used to place the habitat. */
+  onPick?: (xy: [number, number]) => void;
   className?: string;
   ref?: Ref<SiteSceneHandle>;
 };
@@ -189,6 +192,8 @@ type Live = {
   insets: Insets;
   habitatOffset: boolean;
   projection: SiteProjection | null;
+  /** The plan's habitat, in grid meters. */
+  habitat: [number, number];
 };
 
 export function SiteScene({
@@ -204,10 +209,14 @@ export function SiteScene({
   insets = NO_INSETS,
   raster,
   crew,
+  onPick,
   className,
   ref,
 }: SiteSceneProps) {
   const helpId = useId();
+  const habitat = useMemo(() => habitatOf(plan), [plan]);
+  const pickRef = useRef(onPick);
+  useEffect(() => { pickRef.current = onPick; }, [onPick]);
   const crewRef = useRef(crew);
   useEffect(() => { crewRef.current = crew; }, [crew]);
   const { stations, dropped } = useMemo(() => sceneStations(plan, previousPlan), [plan, previousPlan]);
@@ -220,7 +229,7 @@ export function SiteScene({
   const nextId = measurements.length ? nextStation(plan, measurements)?.id : undefined;
   const lines = useMemo(() => routeLines(plan), [plan]);
   const previousLines = useMemo(() => (previousPlan ? routeLines(previousPlan) : []), [previousPlan]);
-  const habitatOffset = habitatOnStation([...stations, ...dropped]);
+  const habitatOffset = habitatOnStation([...stations, ...dropped], habitat);
   const selected = stations.find((s) => s.id === selectedStationId) ?? null;
 
   const [ready, setReady] = useState(false);
@@ -272,6 +281,7 @@ export function SiteScene({
     insets,
     habitatOffset,
     projection: null,
+    habitat: HABITAT_XY,
   });
 
   const draw = useCallback(() => {
@@ -392,7 +402,7 @@ export function SiteScene({
     const free = freeArea(view, L.insets);
     const [imgLeft, imgTop] = toScreen(SCENE_BOUNDS.xmin, SCENE_BOUNDS.ymax);
     const [imgRight, imgBottom] = toScreen(SCENE_BOUNDS.xmax, SCENE_BOUNDS.ymin);
-    const [hx, hy] = toScreen(HABITAT_XY[0], HABITAT_XY[1]);
+    const [hx, hy] = toScreen(L.habitat[0], L.habitat[1]);
     rings.current.forEach((ring, i) => {
       const meters = (i + 1) * 100;
       const label = ringLabels.current[i];
@@ -634,6 +644,7 @@ export function SiteScene({
       insets,
       habitatOffset,
       projection: projection ?? null,
+      habitat,
     };
     if (projection?.focus) pivotWorld.current = projection.focus;
     const flatCamera = () =>
@@ -668,7 +679,7 @@ export function SiteScene({
       );
     }
     schedule();
-  }, [plan, framing, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera, crew]);
+  }, [plan, framing, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera, crew, habitat]);
 
   // Size, gestures and keys: native listeners, so wheel can be non-passive and
   // nothing goes through React per frame.
@@ -704,10 +715,12 @@ export function SiteScene({
       return { dist: Math.hypot(a[0] - b[0], a[1] - b[1]), mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] as [number, number] };
     };
 
+    let downAt: [number, number] | null = null;
     const onPointerDown = (e: PointerEvent) => {
       if (live.current.projection) return;
       autoFrame.current = false;
       if (e.button !== 0 || onObject(e)) return;
+      downAt = local(e);
       el.setPointerCapture?.(e.pointerId);
       pointers.set(e.pointerId, local(e));
       anim.current = null;
@@ -736,6 +749,13 @@ export function SiteScene({
       schedule();
     };
     const onPointerUp = (e: PointerEvent) => {
+      const up = local(e);
+      const cam = camera.current;
+      if (pickRef.current && downAt && cam && Math.hypot(up[0] - downAt[0], up[1] - downAt[1]) < 5) {
+        const [wx, wy] = screenToWorld(cam, size.current, up[0], up[1]);
+        pickRef.current([Math.round(wx), Math.round(wy)]);
+      }
+      downAt = null;
       pointers.delete(e.pointerId);
       pinch = pointers.size === 2 ? pinchState() : null;
       if (!pointers.size) delete el.dataset.dragging;
@@ -1024,7 +1044,7 @@ export function SiteScene({
           </div>
         ) : null}
         <div ref={anchorRef("@habitat")} className="site-anchor">
-          <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(HABITAT_XY[0])} m, y ${signed(HABITAT_XY[1])} m`} data-site-object>
+          <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(habitat[0])} m, y ${signed(habitat[1])} m`} data-site-object>
             HAB
           </div>
         </div>

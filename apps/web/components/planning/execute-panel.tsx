@@ -3,7 +3,7 @@ import { ListRow, ListSection } from "@icewalk/ui/list";
 import { StatusBadge } from "@icewalk/ui/status-badge";
 import { Body, Footnote, Title3 } from "@icewalk/ui/text";
 import type { ReactNode } from "react";
-import { HABITAT_XY } from "@/components/site/site-data";
+import { habitatOf } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
 import { bearing, decisionPointFor, diffPlans, measurementSummary, measuringTool, nextStation, toolName, type Measurement, type Plan, type ReplanAssessment } from "@/lib/plan";
 import { RESULT_LABEL, RowLabel, Value } from "./parts";
@@ -23,7 +23,7 @@ export function ExecutePanel({ plan, previous, measurements, pending, reviewing,
   const last = measurements.at(-1);
   if (reviewing && previous && last) return <>{tracker}<ReplanReview before={previous} after={plan} measurement={last} onAccept={onAccept} onReturn={onReturn} /></>;
   const station = returning ? undefined : nextStation(plan, measurements);
-  const origin = last?.position ?? HABITAT_XY;
+  const origin = last?.position ?? habitatOf(plan);
   const direction = station ? bearing(origin, station.position) : undefined;
   const decision = station ? decisionPointFor(plan, station.id) : undefined;
   return (

@@ -301,6 +301,7 @@ describe("describeSource", () => {
     isMock: false,
     error: null,
     apiConfigured: false,
+    habitatError: null,
   };
 
   it("never presents bundled data as planner output", () => {
@@ -323,5 +324,34 @@ describe("describeSource", () => {
     expect(describeSource({ ...api, status: "error", error: { kind: "timeout" } as never })).toBe(
       "Planner API · replan failed, showing the last plan",
     );
+  });
+});
+
+describe("moving the habitat", () => {
+  const moved: Plan = { ...apiPlan, plan_id: "plan-api0003", habitat_xy: [805, -1205] };
+
+  it("re-plans from the operator's habitat and keeps it when the goal changes", async () => {
+    const bodies: unknown[] = [];
+    const fetch = routes({ ...healthy, "/plan": (init) => { const body = JSON.parse(init.body as string); bodies.push(body); return json(body.habitat_xy ? moved : apiPlan); } });
+    const session = await started(fetch);
+    await session.setHabitat([800, -1200]);
+    expect(session.getSnapshot()).toMatchObject({ plan: moved, status: "ready", habitatError: null });
+    expect(bodies.at(-1)).toMatchObject({ habitat_xy: [800, -1200] });
+    await session.setStrategy("confirm");
+    expect(bodies.at(-1)).toMatchObject({ strategy: "confirm", habitat_xy: [805, -1205] });
+  });
+
+  it("keeps the plan and shows the planner's reason when it refuses the habitat", async () => {
+    let first = true;
+    const fetch = routes({ ...healthy, "/plan": () => { if (first) { first = false; return json(apiPlan); } return json({ detail: "Habitat outside the planning area covered by the HiRISE terrain model" }, 422); } });
+    const session = await started(fetch);
+    await session.setHabitat([3000, 4000]);
+    expect(session.getSnapshot()).toMatchObject({ plan: apiPlan, status: "ready", habitatError: "Habitat outside the planning area covered by the HiRISE terrain model" });
+  });
+
+  it("says the planner API is needed when there is none", async () => {
+    const session = createPlanSession({ baseUrl: null, fallback });
+    await session.setHabitat([800, -1200]);
+    expect(session.getSnapshot()).toMatchObject({ plan: demoPlan, habitatError: "Moving the habitat needs the planner API." });
   });
 });

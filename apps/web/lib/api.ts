@@ -24,13 +24,16 @@ export class PlannerApiError extends Error {
   readonly kind: PlannerErrorKind;
   readonly status?: number;
   readonly url?: string;
+  /** The planner's own reason (FastAPI `detail`), safe to show the operator. */
+  readonly detail?: string;
 
-  constructor(kind: PlannerErrorKind, message: string, options: { status?: number; url?: string; cause?: unknown } = {}) {
+  constructor(kind: PlannerErrorKind, message: string, options: { status?: number; url?: string; cause?: unknown; detail?: string } = {}) {
     super(message, { cause: options.cause });
     this.name = "PlannerApiError";
     this.kind = kind;
     this.status = options.status;
     this.url = options.url;
+    this.detail = options.detail;
   }
 }
 
@@ -48,7 +51,7 @@ export type CatalogTool = { id: string; name?: string; [key: string]: unknown };
 /** GET /eva-window (eva_window.schema.json); the UI reads it through lib/eva-window. */
 export type EvaWindowPayload = Record<string, unknown> & { best?: unknown; sols?: unknown };
 
-export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[]; strategy?: "learn" | "confirm" };
+export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[]; strategy?: "learn" | "confirm"; habitat_xy?: [number, number] };
 export type ReplanRequest = {
   plan_id: string;
   measurement: Measurement;
@@ -159,6 +162,7 @@ async function request<T>(
       throw new PlannerApiError("http", `${path} returned HTTP ${response.status}${detail ? `: ${detail}` : ""}`, {
         status: response.status,
         url,
+        detail: detail || undefined,
       });
     }
 

@@ -1,6 +1,6 @@
 import { Button } from "@icewalk/ui/button";
 import { Body, Footnote, Title3 } from "@icewalk/ui/text";
-import { HABITAT_XY } from "@/components/site/site-data";
+import { habitatOf } from "@/components/site/site-data";
 import { bearing, measuringTool, orderedStations, toolName, type Plan } from "@/lib/plan";
 import { NextStep } from "./phases";
 
@@ -9,6 +9,7 @@ export type Jump = { x: number; y: number; headingDeg: number; key: number };
 /** Phase 3, pre-EVA brief: the map book on the real terrain (stand at any station) and the cuff checklist. */
 export function RehearsePanel({ plan, onJump, onNext }: { plan: Plan; onJump: (jump: Jump) => void; onNext: () => void }) {
   const stations = orderedStations(plan);
+  const habitat = habitatOf(plan);
   const jumpTo = (x: number, y: number, toward: readonly number[]) => {
     const dir = bearing([x, y], toward);
     onJump({ x, y, headingDeg: dir.distanceM > 1 ? dir.deg : 0, key: Date.now() });
@@ -20,7 +21,7 @@ export function RehearsePanel({ plan, onJump, onNext }: { plan: Plan; onJump: (j
       <section aria-label="Jump to" className="mission-stack">
         <Title3 as="h3">Jump to</Title3>
         <div className="mission-jumps">
-          <Button size="small" variant="platter" onClick={() => jumpTo(HABITAT_XY[0], HABITAT_XY[1], stations[0]?.position ?? HABITAT_XY)}>Habitat</Button>
+          <Button size="small" variant="platter" onClick={() => jumpTo(habitat[0], habitat[1], stations[0]?.position ?? habitat)}>Habitat</Button>
           {stations.map((s) => (
             <Button key={s.id} size="small" variant="platter" aria-label={`Station ${s.order}, ${s.id}, ${toolName(measuringTool(s))}`}
               onClick={() => jumpTo(s.position[0] - 15, s.position[1] - 15, s.position)}>
