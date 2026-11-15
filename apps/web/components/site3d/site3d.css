@@ -222,3 +222,9 @@
 .site3d-watch-chip { display: inline-flex; align-items: center; gap: .5rem; padding: 0 .5rem; font: 600 13px/1 var(--font-sans, system-ui, sans-serif); color: #e6f4ff; white-space: nowrap; }
 .eva-minimap-route[data-faded] { stroke: rgb(255 255 255 / .18); }
 .eva-minimap-walkback { fill: none; stroke: var(--color-caution, #f0bf4f); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+
+/* Helmet, plan update with an IV on the loop: the EV waits for the IV's call, then copies it. */
+.site3d-await { display: inline-flex; align-items: center; gap: .5rem; font-size: .8125rem; font-weight: 600; color: var(--color-label-secondary, rgb(255 255 255 / .7)); }
+.site3d-await::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; animation: site3d-await 1.2s ease-in-out infinite; }
+@keyframes site3d-await { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .site3d-await::before { animation: none; } }

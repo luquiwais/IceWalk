@@ -39,6 +39,10 @@ type Props = {
   /** EVA TERMINATE: the fastest route back (grid meters) and its length and time; null while unknown. */
   walkback?: { path: PathPoint[]; distanceM: number; minutes: number } | null;
   reviewing?: boolean;
+  /** An IV window is on the loop: the IV makes the call on a replan and the EV copies it. */
+  ivOnline?: boolean;
+  /** The IV's call on the replan under review, once made. */
+  ivCall?: "continue" | "terminate" | null;
   returning?: boolean;
   pending?: boolean;
   elapsedMin?: number;
@@ -57,7 +61,7 @@ type Props = {
  * the map book; during the EVA it is the EV's helmet view with waypoint rings, arrival and the
  * plan update when a measurement replans the traverse.
  */
-export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, walkback, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave, onComplete }: Props) {
+export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, walkback, reviewing = false, ivOnline = false, ivCall = null, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave, onComplete }: Props) {
   const [data, setData] = useState<Site3DData>();
   const [error, setError] = useState("");
   // The view the user picked and the jump it was picked at: a newer jump stands at that station,
@@ -144,7 +148,7 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
       ) : null}
       {helmet ? <EvaMinimap plan={plan} path={path} measurements={measurements} pose={pose} nextId={next?.id} elapsedMin={elapsedMin} marginMin={margin ?? undefined} previousPath={oldPath} walkback={returning ? walkback?.path : undefined} /> : null}
       {helmet && reviewing && previousPlan && measurements.length ? (
-        <PlanUpdate before={previousPlan} after={plan} measurement={measurements[measurements.length - 1]} onAccept={onAccept} onReturn={onReturn}
+        <PlanUpdate before={previousPlan} after={plan} measurement={measurements[measurements.length - 1]} onAccept={onAccept} onReturn={onReturn} ivOnline={ivOnline} ivCall={ivCall}
           mapAfter={iceMap.map ? probabilityAt(iceMap.map, measurements[measurements.length - 1].position[0], measurements[measurements.length - 1].position[1]) : undefined} />
       ) : null}
 
@@ -175,7 +179,7 @@ function ArrivalPrompt({ station, pending, onLog }: { station: Station; pending:
 const CALL: Record<ReplanAssessment["recommendation"], string> = { continue: "Continue", return_to_habitat: "EVA TERMINATE · walk back" };
 
 /** The replan as the EV sees it: the planner's call, the next station before and after, the margin. */
-function PlanUpdate({ before, after, measurement, onAccept, onReturn, mapAfter }: { before: Plan; after: Plan; measurement: Measurement; onAccept?: () => void; onReturn?: () => void; mapAfter?: number }) {
+function PlanUpdate({ before, after, measurement, onAccept, onReturn, mapAfter, ivOnline = false, ivCall = null }: { before: Plan; after: Plan; measurement: Measurement; onAccept?: () => void; onReturn?: () => void; mapAfter?: number; ivOnline?: boolean; ivCall?: "continue" | "terminate" | null }) {
   const r = after.replan;
   const done = [measurement];
   const oldNext = nextStation(before, done);
@@ -189,17 +193,20 @@ function PlanUpdate({ before, after, measurement, onAccept, onReturn, mapAfter }
   return (
     <section className="site3d-update" role="alertdialog" aria-label="Plan update" data-alert={back ? "caution" : undefined}>
       <span className="site3d-hud-key">Plan update · {result} at {measurement.station_id}</span>
-      <strong className="site3d-update-call">{r ? CALL[r.recommendation] : "Review the new plan"}</strong>
+      <strong className="site3d-update-call">{ivCall ? (ivCall === "terminate" ? "IV call: EVA TERMINATE" : "IV call: continue") : r ? CALL[r.recommendation] : "Review the new plan"}</strong>
+      {ivCall && r && (ivCall === "terminate") !== back ? <span className="site3d-update-line">Planner recommended: {CALL[r.recommendation].toLowerCase()}</span> : null}
       {r?.iv_decision ? <span className="site3d-update-line">Large replan: IV decision</span> : null}
       <span className="site3d-update-line">Next: {newNext ? newNext.id : "habitat"}{change}</span>
       {mapBefore != null && mapAfter != null ? <span className="site3d-update-line">Ice map at {measurement.station_id}: {Math.round(mapBefore * 100)}% → {Math.round(mapAfter * 100)}%</span> : null}
       {unchanged ? <span className="site3d-update-line">Route unchanged: {small ? `a ${toolName(measurement.tool)} result to ${measurement.depth_m ?? "?"} m barely moves P(ice within ${after.summary.ice_threshold_m ?? 3} m)` : "the plan still holds"}.</span> : null}
       {r?.margin_before_min != null && r.margin_after_min != null ? <span className="site3d-update-line">Walkback margin {formatNumber(r.margin_before_min, 0)} → {formatNumber(r.margin_after_min, 0)} min</span> : null}
       {r ? <span className="site3d-update-line">+{r.stations_added.length} / −{r.stations_dropped.length} stations · faded line: old route</span> : null}
-      <div className="site3d-hud-actions">
+      {ivOnline && !ivCall ? <div className="site3d-hud-actions" role="status"><span className="site3d-await">Awaiting IV call</span></div> : ivCall ? (
+        <div className="site3d-hud-actions"><Button size="small" variant="prominent" onClick={ivCall === "terminate" ? onReturn : onAccept}>{ivCall === "terminate" ? "Copy, terminate" : "Copy, continue"}</Button></div>
+      ) : <div className="site3d-hud-actions">
         {back ? <><Button size="small" variant="prominent" onClick={onReturn}>Copy, terminate</Button><Button size="small" onClick={onAccept}>Continue (crew call)</Button></>
           : <><Button size="small" variant="prominent" onClick={onAccept}>Copy, continue</Button><Button size="small" onClick={onReturn}>Terminate</Button></>}
-      </div>
+      </div>}
     </section>
   );
 }

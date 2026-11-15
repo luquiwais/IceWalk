@@ -61,6 +61,8 @@ export type PlanSession = {
   setStrategy: (strategy: Strategy) => Promise<void>;
   /** Re-plans from a habitat the operator placed (grid meters); keeps the plan if the planner refuses it. */
   setHabitat: (xy: [number, number]) => Promise<void>;
+  /** Takes the session another window holds (the EV1 / IV link): drops any request of its own. */
+  adopt: (from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">) => void;
   dispose: () => void;
 };
 
@@ -213,8 +215,15 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     await start();
   }
 
+  function adopt(from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">) {
+    begin();
+    if (from.source === "api" && !from.previous && !from.measurements.length) nominal = from.plan;
+    set({ plan: from.plan, previous: from.previous, measurements: from.measurements, status: from.status, source: from.source, isMock: isMock(from.plan), error: null, habitatError: null });
+  }
+
   return {
     getSnapshot: () => state,
+    adopt,
     subscribe(listener) {
       listeners.add(listener);
       return () => listeners.delete(listener);
@@ -240,7 +249,7 @@ export function usePlanSession(options: PlanSessionOptions = {}) {
     void session.start();
     return () => session.dispose();
   }, [session]);
-  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset, setStrategy: session.setStrategy, setHabitat: session.setHabitat };
+  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset, setStrategy: session.setStrategy, setHabitat: session.setHabitat, adopt: session.adopt };
 }
 
 /** One discreet line for the UI about where the plan comes from. */

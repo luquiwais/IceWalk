@@ -287,3 +287,8 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 ## 2026-11-15 · Site sin scroll
 
 - Site: veredicto arriba ("GO with ground radar: 97 % within 10 m · median depth"), una fila por herramienta (alcance, P(hielo), veredicto) y el botón a la vista; las notas del modelo y las zonas de NASA se abren en el panel con "Back". "No-go" se lee "Out of reach" y va en gris: no es un warning (HIDH 10.6.19).
+
+## 2026-11-15 · EV1 e IV sincronizados
+
+- Las ventanas EV1 e IV se sincronizan con `BroadcastChannel` (`apps/web/lib/use-eva-link.ts`), sin servidor ni líder: cada cambio local sale como foto (plan, mediciones, re-plan en revisión, TERMINATE, walkback, aprobación) y las otras ventanas la adoptan; la que se abre tarde pide el estado. La pose del EV va aparte, a 10 Hz. Motivo: el video en pantalla dividida, sin agregar estado en la API.
+- Con un IV conectado, el casco muestra "Awaiting IV call", el IV da la orden ("Concur" o "Call EVA terminate", que puede cambiar) y el EV la copia ("Copy, continue" / "Copy, terminate"). Sin IV conectado, el EV decide como antes y la decisión del IV en la misma ventana se aplica directo. Motivo: xEVA Con Ops 4.3.2 y 8.1 sin trabar la demo de una sola ventana.
