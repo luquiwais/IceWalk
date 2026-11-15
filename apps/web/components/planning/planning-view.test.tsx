@@ -79,16 +79,15 @@ describe("Mission flow", () => {
     expect(screen.getByRole("region", { name: "EVA window and weather" })).toHaveTextContent("Hope EMIRS (UAE)");
   });
 
-  it("explains the ice map: evidence dots, prior rings, likely zones and how much is known", async () => {
+  it("explains the ice map: probability and certainty in one legend, and the prior as background", async () => {
     render(<PlanningView initialPhase="plan" />);
     const legend = screen.getByRole("group", { name: "Map legend" });
-    await within(legend).findByText(/Local evidence covers \d+% of the area shown/);
-    for (const text of ["Where ice is likely", "Local evidence", "Regional prior only", "Ice likely zone", "Habitat", "Traverse", "349 craters"]) expect(legend).toHaveTextContent(text);
+    await within(legend).findByText(/Background 67%: regional prior/);
+    expect(within(legend).getByRole("img", { name: /Brighter blue means likelier ice/ })).toBeInTheDocument();
+    for (const text of ["P(ice within 3 m)", "Likelier", "Prior only", "Habitat", "Traverse", "349 craters"]) expect(legend).toHaveTextContent(text);
     const layers = screen.getByRole("region", { name: "Map layers" });
-    const likely = within(layers).getByRole("button", { name: "Where ice is likely" });
-    expect(likely).toHaveAttribute("aria-pressed", "true");
-    await userEvent.click(within(layers).getByRole("button", { name: "What we don't know" }));
-    expect(legend).toHaveTextContent("No local data");
+    const map = within(layers).getByRole("button", { name: "Ice map" });
+    expect(map).toHaveAttribute("aria-pressed", "true");
     expect(within(layers).queryByRole("button", { name: "What measuring changed" })).not.toBeInTheDocument();
     await userEvent.click(within(layers).getByRole("button", { name: "Grid" }));
     expect(screen.getByTestId("mock-map")).toHaveAttribute("data-grid", "true");
