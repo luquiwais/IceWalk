@@ -8,8 +8,8 @@ import { habitatOf } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
 import { probabilityAt } from "@/lib/ice-map";
 import { ICE_RADIUS_M, renderIceView } from "@/lib/ice-view";
-import { bearing, decisionPointFor, measuringTool, nextStation, toolName, toolReachM, type Measurement, type Plan, type ReplanAssessment, type Station } from "@/lib/plan";
-import { walkPath, type Site3DData } from "@/lib/site3d";
+import { bearing, measuringTool, nextStation, toolName, toolReachM, type Measurement, type Plan, type ReplanAssessment, type Station } from "@/lib/plan";
+import { walkPath, type PathPoint, type Site3DData } from "@/lib/site3d";
 import { useIceMap } from "@/lib/use-ice-map";
 import type { PlanSource } from "@/lib/use-plan-session";
 import { EvaMinimap } from "./eva-minimap";
@@ -20,19 +20,24 @@ const Site3D = dynamic(() => import("./site-3d").then((m) => m.Site3D), { ssr: f
 /** Inside the middle waypoint ring (site-3d.tsx RINGS_M) the helmet asks for the result. */
 const AT_STATION_M = 5;
 
-export type Site3DJump = FreePose & { key: number };
+export type Site3DJump = FreePose & { key: number; view?: "stand" | "fly" };
 type Log = (station: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") => void;
 
 type Props = {
   plan: Plan;
   measurements: readonly Measurement[];
   source: PlanSource;
-  /** "brief": fly over or stand at a station before the EVA. "helmet": the EV walking during the EVA. */
-  mode: "brief" | "helmet";
+  /**
+   * "brief": fly over or stand at a station before the EVA. "helmet": the EV walking during the EVA.
+   * "watch": the IV looking through the EV's camera, view only.
+   */
+  mode: "brief" | "helmet" | "watch";
   jump?: Site3DJump;
   pose: FreePose;
   onPose: (pose: FreePose) => void;
   previousPlan?: Plan;
+  /** EVA TERMINATE: the fastest route back (grid meters) and its length and time; null while unknown. */
+  walkback?: { path: PathPoint[]; distanceM: number; minutes: number } | null;
   reviewing?: boolean;
   returning?: boolean;
   pending?: boolean;
@@ -40,28 +45,34 @@ type Props = {
   onLog?: Log;
   onAccept?: () => void;
   onReturn?: () => void;
-  /** Helmet only: leave the full-screen helmet for the IV console. */
+  /** Helmet only: leave the helmet for the role choice. */
   onLeave?: () => void;
   /** Helmet only: the EV is back at the habitat with nothing left to do. */
   onComplete?: () => void;
 };
 
-const fmtClock = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
 
 /**
  * The real S1094b terrain (HiRISE DTM and ortho) inline in the mission layout. In the brief it is
  * the map book; during the EVA it is the EV's helmet view with waypoint rings, arrival and the
  * plan update when a measurement replans the traverse.
  */
-export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave, onComplete }: Props) {
+export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, walkback, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave, onComplete }: Props) {
   const [data, setData] = useState<Site3DData>();
   const [error, setError] = useState("");
-  const [chosen, setChosen] = useState<"fly" | "stand">("fly");
+  // The view the user picked and the jump it was picked at: a newer jump stands at that station,
+  // and picking "Fly over" afterwards holds until the next jump.
+  const [chosen, setChosen] = useState<{ view: "fly" | "stand"; atKey: number }>({ view: "fly", atKey: 0 });
   const [iceChoice, setIce] = useState<boolean | null>(null);
   const helmet = mode === "helmet";
-  const iceOn = iceChoice ?? !helmet;
-  const view = helmet ? "stand" : jump && jump.key > 0 && chosen === "fly" ? "stand" : chosen;
+  const watch = mode === "watch";
+  const firstPerson = helmet || watch;
+  const iceOn = iceChoice ?? !firstPerson;
+  const view = firstPerson ? "stand" : jump && jump.key > chosen.atKey ? jump.view ?? "stand" : chosen.view;
+  // Watching, the camera follows the EV's pose as it arrives.
+  const follow = useMemo(() => (watch ? { ...pose, key: 1 } : undefined), [watch, pose]);
   const path = useMemo(() => walkPath(plan), [plan]);
+  const oldPath = useMemo(() => (reviewing && previousPlan ? walkPath(previousPlan) : undefined), [reviewing, previousPlan]);
   const iceMap = useIceMap(plan.plan_id, source);
   const ice = useMemo(() => (iceOn && iceMap.map ? renderIceView(iceMap.map, "likely", habitatOf(plan), ICE_RADIUS_M) ?? null : null), [iceOn, iceMap.map, plan]);
   const measuredIds = useMemo(() => measurements.map((m) => m.station_id), [measurements]);
@@ -84,42 +95,42 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
   // Terminated, or every station done: the light column moves to the habitat; arriving ends the EVA.
   const home = helmet && !next && !reviewing;
   const atHome = home && dir.distanceM <= 12;
-  const decide = next ? decisionPointFor(plan, next.id) : undefined;
   const margin = next ? plan.timeline.find((t) => t.kind === "station" && t.station_id === next.id)?.walkback_margin_min : plan.summary.min_walkback_margin_min;
 
+  // One line in the EVA views (full text on hover); whole in the brief.
+  const credit = `${ice ? "Dots: P(ice within reach), filled where craters or measurements back it · " : ""}${helmet ? "Rings and light columns: AR waypoint cues (concept), not terrain · " : ""}${view === "stand" ? "HiRISE DTM (2 m) and 25 cm ortho, true relief" : "HiRISE DTM (6 m) and 1.5 m ortho, relief ×3"} · HiRISE RED band, grayscale as acquired · boulders sized from their shadows, shapes illustrative · sky color illustrative · habitat shape: Habitat Demonstration Unit model (NASA 3D Resources), untextured · NASA/JPL-Caltech/UArizona, USGS`;
   return (
     <div className="site3d-stage" aria-label="3D site view" data-mode={mode}>
       {data && !error ? (
-        <Site3D data={data} level={view === "stand" ? "detail" : "overview"} plan={plan} previousPlan={reviewing ? previousPlan : undefined} path={path}
-          mode={view === "stand" ? "free" : "orbit"} allowMove={helmet} exaggeration={view === "stand" ? 1 : 3}
-          measured={measuredIds} activeId={next?.id} homeActive={home} ice={ice} onError={onError} initialPose={pose} teleport={jump} onMove={onPose} />
+        <Site3D data={data} level={view === "stand" ? "detail" : "overview"} plan={plan} previousPlan={reviewing ? previousPlan : undefined} path={path} walkback={returning ? walkback?.path : undefined}
+          mode={view === "stand" ? "free" : "orbit"} allowMove={helmet} interactive={!watch} exaggeration={view === "stand" ? 1 : 3}
+          measured={measuredIds} activeId={next?.id} homeActive={home || (watch && !next)} ice={ice} onError={onError} initialPose={pose} teleport={watch ? follow : jump} onMove={watch ? undefined : onPose} />
       ) : (
         <div className="site3d-status">{error || "Loading the HiRISE terrain..."}</div>
       )}
       <div className="site3d-toolbar">
-        {!helmet ? <SegmentedControl label="3D view" value={view} options={[{ value: "fly", label: "Fly over · relief ×3" }, { value: "stand", label: "Stand at station" }]} onValueChange={(v) => setChosen(v as "fly" | "stand")} /> : null}
+        {watch ? <span className="site3d-watch-chip">EV1 camera · view only <b className="mission-sim">SIM</b></span> : null}
+        {!firstPerson ? <SegmentedControl label="3D view" value={view} options={[{ value: "fly", label: "Fly over · relief ×3" }, { value: "stand", label: "Stand at station" }]} onValueChange={(v) => setChosen({ view: v as "fly" | "stand", atKey: jump?.key ?? 0 })} /> : null}
         <SegmentedControl label="Ice map" value={iceOn ? "on" : "off"} options={[{ value: "on", label: "Ice map" }, { value: "off", label: "Terrain only" }]} onValueChange={(v) => setIce(v === "on")} />
       </div>
 
       {helmet ? (
         <section className="site3d-hud" aria-label="Helmet HUD" aria-live="polite">
-          <div className="site3d-hud-row"><span className="site3d-hud-key">PET</span><span className="site3d-hud-value">{fmtClock(elapsedMin)} · SIM</span></div>
           {returning ? <div className="site3d-hud-row"><span className="site3d-hud-key">EVA</span><span className="site3d-hud-value" data-alert="caution">TERMINATE · walk back</span></div> : null}
+          {returning ? <div className="site3d-hud-row"><span className="site3d-hud-key">Walkback</span><span className="site3d-hud-value" data-alert="caution">{walkback ? `${formatNumber(walkback.distanceM, 0)} m · ${formatNumber(walkback.minutes, 0)} min · fastest` : "Follow the habitat light"}</span></div> : null}
           <div className="site3d-hud-row"><span className="site3d-hud-key">{next ? "Next" : "Habitat"}</span><span className="site3d-hud-value">{next ? `${String(next.order).padStart(2, "0")} ${next.id}` : "Walk back"}</span></div>
           <div className="site3d-hud-row"><span className="site3d-hud-key">Range</span><span className="site3d-hud-value">{formatNumber(dir.distanceM, 0)} m · {dir.label}</span></div>
-          <div className="site3d-hud-row"><span className="site3d-hud-key">Steer</span><span className="site3d-hud-value">{Math.abs(turn) < 10 ? "Ahead" : `${turn < 0 ? "Left" : "Right"} ${Math.round(Math.abs(turn))}°`}</span></div>
-          {next ? <div className="site3d-hud-row"><span className="site3d-hud-key">Tool</span><span className="site3d-hud-value">{toolName(measuringTool(next))}</span></div> : null}
-          {margin != null ? <div className="site3d-hud-row"><span className="site3d-hud-key">Walkback</span><span className="site3d-hud-value" data-alert={margin < (plan.summary.walkback_caution_min ?? 15) ? "caution" : undefined}>{formatNumber(margin, 0)} min margin</span></div> : null}
-          {decide ? <div className="site3d-hud-row"><span className="site3d-hud-key">Bingo</span><span className="site3d-hud-value">{fmtClock(decide.decide_by_min)}</span></div> : null}
-          {next ? <div className="site3d-hud-row"><span className="site3d-hud-key">Comms</span><span className="site3d-hud-value" data-alert={next.comm_los === false ? "caution" : undefined}>{next.comm_los === false ? "No line of sight · relay EV2" : "Habitat in view"}</span></div> : null}
+          <div className="site3d-hud-row"><span className="site3d-hud-key">Steer</span><span className="site3d-hud-value">{Math.abs(turn) < 10 ? "On course" : `Turn ${turn < 0 ? "left" : "right"} ${Math.round(Math.abs(turn))}°`}</span></div>
+          {next ? <div className="site3d-hud-row"><span className="site3d-hud-key">Tool</span><span className="site3d-hud-value">{toolName(measuringTool(next)).replace("Powered hand core drill", "Core drill")}</span></div> : null}
+          {next?.comm_los === false ? <div className="site3d-hud-row"><span className="site3d-hud-key">Comms</span><span className="site3d-hud-value" data-alert="caution">No line of sight · relay EV2</span></div> : null}
           {pending ? <div className="site3d-hud-row"><span className="site3d-hud-key">Planner</span><span className="site3d-hud-value">Replanning...</span></div> : null}
         </section>
       ) : null}
 
       {helmet ? (
         <header className="eva-topbar">
-          <span>EV1 · helmet view · <b>SIM</b></span>
-          {onLeave ? <Button size="small" variant="glass" onClick={onLeave}>IV console</Button> : null}
+          <span>EV1 · helmet view <b className="mission-sim">SIM</b></span>
+          {onLeave ? <Button size="small" variant="glass" onClick={onLeave}>Switch role</Button> : null}
         </header>
       ) : null}
       {arrived && next && onLog ? <ArrivalPrompt station={next} pending={pending} onLog={onLog} /> : null}
@@ -131,17 +142,13 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
           {onComplete ? <div className="site3d-hud-actions"><Button size="small" variant="prominent" onClick={onComplete}>Go to debrief</Button></div> : null}
         </section>
       ) : null}
-      {helmet ? <EvaMinimap plan={plan} path={path} measurements={measurements} pose={pose} nextId={next?.id} elapsedMin={elapsedMin} marginMin={margin ?? undefined} /> : null}
+      {helmet ? <EvaMinimap plan={plan} path={path} measurements={measurements} pose={pose} nextId={next?.id} elapsedMin={elapsedMin} marginMin={margin ?? undefined} previousPath={oldPath} walkback={returning ? walkback?.path : undefined} /> : null}
       {helmet && reviewing && previousPlan && measurements.length ? (
         <PlanUpdate before={previousPlan} after={plan} measurement={measurements[measurements.length - 1]} onAccept={onAccept} onReturn={onReturn}
           mapAfter={iceMap.map ? probabilityAt(iceMap.map, measurements[measurements.length - 1].position[0], measurements[measurements.length - 1].position[1]) : undefined} />
       ) : null}
 
-      <p className="site3d-credit">
-        {ice ? "Dots: P(ice within reach), filled where craters or measurements back it · " : ""}
-        {helmet ? "Rings and light columns: AR waypoint cues (concept), not terrain · " : ""}
-        {view === "stand" ? "HiRISE DTM (2 m) and 25 cm ortho, true relief" : "HiRISE DTM (6 m) and 1.5 m ortho, relief ×3"} · HiRISE RED band, grayscale as acquired · boulders sized from their shadows, shapes illustrative · sky color illustrative · NASA/JPL-Caltech/UArizona, USGS
-      </p>
+      <p className="site3d-credit" data-compact={firstPerson ? mode : undefined} title={firstPerson ? credit : undefined}>{credit}</p>
     </div>
   );
 }

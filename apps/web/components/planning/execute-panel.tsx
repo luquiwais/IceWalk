@@ -14,8 +14,10 @@ import { NextStep } from "./phases";
  * at the station (the IV is not there to measure); the IV sees them arrive, reviews the replan
  * and concurs or calls the EVA terminate.
  */
-export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, onAccept, onReturn, onDebrief, tracker }: {
+export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, walkback, onAccept, onReturn, onDebrief, tracker }: {
   plan: Plan; previous: Plan | null; measurements: Measurement[]; pending: boolean; reviewing: boolean; returning: boolean;
+  /** EVA TERMINATE: length and time of the fastest route back (GET /walkback); null if unknown. */
+  walkback?: { distanceM: number; minutes: number } | null;
   onAccept: () => void; onReturn: () => void; onDebrief: () => void;
   /** The EV's track map and progress, the same the EV sees in the helmet. */
   tracker?: ReactNode;
@@ -26,28 +28,24 @@ export function ExecutePanel({ plan, previous, measurements, pending, reviewing,
   const origin = last?.position ?? habitatOf(plan);
   const direction = station ? bearing(origin, station.position) : undefined;
   const decision = station ? decisionPointFor(plan, station.id) : undefined;
+  const nexts = decision ? [...new Set(decision.options.map((o) => o.next_station_ids[0] ?? ""))] : [];
+  const then = !decision ? undefined : nexts.length === 1
+    ? `${nexts[0] || "habitat"} for any result`
+    : decision.options.map((o) => `${RESULT_LABEL[o.if_result]} → ${o.next_station_ids[0] ?? "habitat"}`).join(" · ");
   return (
-    <section aria-label="EVA execution" className="mission-stack">
+    <section aria-label="EVA execution" className="mission-stack mission-iv">
       {tracker}
-      {returning ? <StatusBadge level="caution">EVA TERMINATE · walkback to the habitat · margin {formatNumber(plan.summary.min_walkback_margin_min ?? 0, 0)} min</StatusBadge> : null}
+      {returning ? <StatusBadge level="caution">EVA TERMINATE · {walkback ? `fastest walkback ${formatNumber(walkback.distanceM, 0)} m, ${formatNumber(walkback.minutes, 0)} min` : "walkback to the habitat"}</StatusBadge> : null}
       {station && direction ? (
-        <ListSection header={last ? "Next station" : "Current station"} headerId="ev-station">
-          <ListRow trailing={<Value>{String(station.order).padStart(2, "0")}</Value>}><RowLabel title={station.id} detail={station.tools.map(toolName).join(" · ")} /></ListRow>
-          <ListRow trailing={<Value>{Math.round(direction.distanceM)} m</Value>}><RowLabel title={direction.distanceM ? direction.label : "At the habitat"} detail="Straight-line distance from the last position" /></ListRow>
-          <ListRow trailing={<Value>{Math.round(station.p_ice * 100)}%</Value>}><RowLabel title="P(ice within reach)" detail={`${toolName(measuringTool(station))} · model estimate`} /></ListRow>
-        </ListSection>
-      ) : <Body>{returning ? "Follow the traverse back to the habitat." : "All planned stations measured. Return to the habitat."}</Body>}
-      {decision && station ? (
-        <ListSection header="After this station" footer="Options from the planner. The crew decides.">
-          {decision.options.map((o) => <ListRow key={o.rank}><RowLabel title={`${RESULT_LABEL[o.if_result]} → ${o.next_station_ids[0] ?? "habitat"}${o.rank === decision.default_option ? " (nominal)" : ""}`} detail={o.rationale} /></ListRow>)}
-        </ListSection>
-      ) : null}
+        <section className="mission-iv-station" aria-label={last ? "Next station" : "Current station"}>
+          <span className="mission-iv-key">{last ? "Next station" : "Current station"}</span>
+          <strong>{String(station.order).padStart(2, "0")} · {station.id}</strong>
+          <span>{direction.distanceM >= 1 ? `${Math.round(direction.distanceM)} m ${direction.label}` : "At the habitat"} · {toolName(measuringTool(station)).replace("Powered hand core drill", "Core drill")} · P(ice) {Math.round(station.p_ice * 100)}%</span>
+          {then ? <span><b>Then:</b> {then}</span> : null}
+        </section>
+      ) : <Body>{returning ? (walkback ? "The EV follows the amber route: the fastest way back over the terrain model." : "Walkback route unavailable: the EV heads for the habitat light.") : "All planned stations measured. Return to the habitat."}</Body>}
       {station ? <Footnote role="status">{pending ? "Planner replanning..." : `Waiting for EV1 to report at ${station.id}.`}</Footnote> : null}
-      {measurements.length ? (
-        <ListSection header="Reported by the crew" footer="Results are logged by the EV at the station.">
-          {[...measurements].reverse().map((m, i) => <ListRow key={`${m.station_id}-${i}`} trailing={<Value>{m.crew_member ?? "EV"}</Value>}><RowLabel title={`${m.station_id} · ${measurementSummary(m)}`} detail={toolName(m.tool)} /></ListRow>)}
-        </ListSection>
-      ) : null}
+      {last ? <Footnote tone="secondary" aria-label="Last report">Last report: {last.station_id} · {measurementSummary(last)} · {last.crew_member ?? "EV"} ({measurements.length} logged by the EV)</Footnote> : null}
       {!station ? <NextStep label="Debrief the EVA" onClick={onDebrief} /> : null}
     </section>
   );

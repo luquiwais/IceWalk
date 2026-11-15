@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // CesiumJS runtime assets copied by scripts/copy-cesium.mjs (gitignored).
     "public/cesium/**",
+    // Draco decoder from three/examples/jsm/libs/draco/gltf (third-party, minified), for the habitat model.
+    "public/draco/**",
   ]),
 ]);
 

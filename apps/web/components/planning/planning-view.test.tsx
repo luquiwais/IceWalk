@@ -17,23 +17,30 @@ vi.mock("@/components/globe/mars-globe", () => ({ MarsGlobe: ({ focus, onFocusCo
 type StageProps = {
   jump?: { x: number; y: number }; mode: string; pose: { x: number; y: number }; onPose: (p: { x: number; y: number; headingDeg: number }) => void;
   plan: { stations: { id: string; order: number }[] }; measurements: { station_id: string }[]; reviewing?: boolean;
-  onLog?: (station: unknown, result: string, depth: number, crew: string) => void; onAccept?: () => void; onReturn?: () => void;
+  onLog?: (station: unknown, result: string, depth: number, crew: string) => void; onAccept?: () => void; onReturn?: () => void; onLeave?: () => void;
 };
 // The 3D helmet view, reduced to what the shell wires: arrival logging, the plan update and the pose.
-vi.mock("@/components/site3d/site-3d-stage", () => ({ Site3DStage: ({ jump, mode, pose, onPose, plan, measurements, reviewing, onLog, onAccept, onReturn }: StageProps) => {
+vi.mock("@/components/site3d/site-3d-stage", () => ({ Site3DStage: ({ jump, mode, pose, onPose, plan, measurements, reviewing, onLog, onAccept, onReturn, onLeave }: StageProps) => {
   const next = [...plan.stations].sort((a, b) => a.order - b.order).find((s) => !measurements.some((m) => m.station_id === s.id));
   return <div data-testid="site-3d" data-mode={mode} data-jump={jump ? `${jump.x},${jump.y}` : ""} data-pose={`${pose.x},${pose.y}`}>
     {mode === "helmet" && onLog && next ? (["ice", "no_ice", "inconclusive"] as const).map((r) => <button key={r} onClick={() => onLog(next, r, 1, "EV1")}>EV log {r}</button>) : null}
     {mode === "helmet" ? <button onClick={() => onPose({ x: 350, y: -2250, headingDeg: 0 })}>Move EV</button> : null}
+    {mode === "helmet" && onLeave ? <button onClick={onLeave}>Switch role</button> : null}
     {reviewing ? <><button onClick={onAccept}>Copy, continue</button><button onClick={onReturn}>Copy, terminate</button></> : null}
   </div>;
 } }));
 import { demoConfirm, demoPlan, demoReplan, orderedStations, measuringTool } from "@/lib/plan";
+import { habitatOf } from "@/components/site/site-data";
 import { PlanningView } from "./planning-view";
 const first = orderedStations(demoPlan)[0];
 const second = orderedStations(demoPlan)[1];
 const visible = { ignore: "script, style, [aria-hidden], [aria-hidden] *" };
 const tab = (name: string) => screen.getByRole("tab", { name: new RegExp(name) });
+/** From the EV helmet to the IV console, through the role choice. */
+async function joinAsIV() {
+  await userEvent.click(screen.getByRole("button", { name: "Switch role" }));
+  await userEvent.click(screen.getByRole("button", { name: "Join as IV" }));
+}
 
 describe("Mission flow", () => {
   it("opens on the site: the globe, the question and the site card per tool", () => {
@@ -41,7 +48,7 @@ describe("Mission flow", () => {
     expect(screen.getByTestId("mars-globe")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Is there ice within reach here?" })).toBeInTheDocument();
     const card = screen.getByRole("region", { name: "Site card" });
-    expect(card).toHaveTextContent("No-go");
+    expect(card).toHaveTextContent("Out of reach");
     expect(card).toHaveTextContent("SkyFall radar");
     expect(screen.getByText(/not one of NASA's 51 exploration zones/, visible)).toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "EVA status" })).not.toBeInTheDocument();
@@ -168,16 +175,40 @@ describe("Mission flow", () => {
     expect(screen.getByTestId("site-3d")).toBeInTheDocument();
     expect(screen.queryByTestId("mock-map")).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: new RegExp(`Station ${first.order}, ${first.id}`) }));
-    expect(screen.getByTestId("site-3d")).toHaveAttribute("data-jump", `${first.position[0] - 15},${first.position[1] - 15}`);
+    // Stands as the crew arrives: 15 m short of the station on the leg from the habitat, facing it.
+    const [hx, hy] = habitatOf(demoPlan);
+    const leg = Math.hypot(first.position[0] - hx, first.position[1] - hy);
+    const [jx, jy] = (screen.getByTestId("site-3d").getAttribute("data-jump") ?? "").split(",").map(Number);
+    expect(jx).toBeCloseTo(first.position[0] - ((first.position[0] - hx) / leg) * 15, 6);
+    expect(jy).toBeCloseTo(first.position[1] - ((first.position[1] - hy) / leg) * 15, 6);
+    // The window takes the station's name with a back arrow, as in Plan; back returns to the fly-over.
+    expect(screen.getByRole("heading", { name: `Station ${first.order} · ${first.id}` })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Back to fly-over" }));
+    expect(screen.getByRole("heading", { name: "Pre-EVA review: what will we find?" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: new RegExp(`Station ${first.order}, ${first.id}`) }));
     expect(screen.getByRole("link", { name: "Print the EVA cuff checklist" })).toHaveAttribute("href", `/cuff?plan=${demoPlan.plan_id}`);
+    expect(screen.getByRole("region", { name: `Station ${first.order} brief` })).toHaveTextContent("Expect:");
+    // Going for EVA asks for confirmation; cancel keeps the brief.
     await userEvent.click(screen.getByRole("button", { name: "Go for EVA" }));
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(tab("Brief")).toHaveAttribute("aria-selected", "true");
+    await userEvent.click(screen.getByRole("button", { name: "Go for EVA" }));
+    await userEvent.click(screen.getByRole("button", { name: "Confirm EVA" }));
     expect(tab("EVA")).toHaveAttribute("aria-selected", "true");
-    // The EVA opens on the EV's helmet view; the IV console is one switch away.
+    // The EVA opens on the role choice: EV1 in the helmet or the IV console, each with a window of its own.
+    const roles = screen.getByRole("region", { name: "Join the EVA" });
+    expect(within(roles).getAllByRole("link", { name: /Open in a new window/ }).map((a) => a.getAttribute("href"))).toEqual(["/?phase=eva&role=ev1", "/?phase=eva&role=iv"]);
+    expect(within(roles).getByRole("article", { name: "IV · Habitat console" })).toHaveTextContent("Does not log measurements");
+    await userEvent.click(screen.getByRole("button", { name: "Join as EV1" }));
+    expect(screen.queryByRole("region", { name: "Join the EVA" })).not.toBeInTheDocument();
     expect(screen.getByTestId("site-3d")).toHaveAttribute("data-mode", "helmet");
     expect(screen.getByRole("region", { name: "EV guide" })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("tab", { name: "IV console" }));
+    await joinAsIV();
     expect(screen.getByTestId("mock-map")).toBeInTheDocument();
     expect(screen.getByText("SIM", visible)).toBeInTheDocument();
+    // The IV switches back from its own panel.
+    await userEvent.click(screen.getByRole("button", { name: "Switch role" }));
+    expect(screen.getByRole("region", { name: "Join the EVA" })).toBeInTheDocument();
   });
 
   it("logs results only from the EV helmet; the IV console sees them and has no measurement controls", async () => {
@@ -186,19 +217,19 @@ describe("Mission flow", () => {
     expect(screen.getByText(`Waiting for EV1 to report at ${first.id}.`, visible)).toBeInTheDocument();
     for (const name of ["Ice", "No ice", "Inconclusive", "Log measurement"]) expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
     unmount();
-    render(<PlanningView initialPhase="execute" />);
+    render(<PlanningView initialPhase="execute" initialEvaView="ev" />);
     expect(screen.queryByRole("group", { name: "Plan timeline" })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "EV log ice" }));
-    await userEvent.click(screen.getByRole("tab", { name: "IV console" }));
+    await joinAsIV();
     expect(screen.getByRole("region", { name: "Next station" })).toHaveTextContent(second.id);
-    expect(screen.getByText(`${first.id} · ice at 1.0 m`, visible)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`Last report: ${first.id} · ice at 1.0 m · EV1`), visible)).toBeInTheDocument();
   });
 
   it("replans after the EV's result: the EV copies it in the helmet, the IV reviews the old route against the new", async () => {
-    render(<PlanningView initialPhase="execute" />);
+    render(<PlanningView initialPhase="execute" initialEvaView="ev" />);
     await userEvent.click(screen.getByRole("button", { name: "EV log no_ice" }));
     expect(screen.getByRole("button", { name: "Copy, continue" })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("tab", { name: "IV console" }));
+    await joinAsIV();
     const review = screen.getByRole("region", { name: "Replan" });
     expect(review).toHaveTextContent(first.id);
     expect(review).toHaveTextContent(demoReplan.replan?.recommendation === "return_to_habitat" ? "EVA TERMINATE" : "Continue the EVA");
@@ -210,10 +241,10 @@ describe("Mission flow", () => {
   });
 
   it("terminates the EVA when the EV copies a terminate, and debriefs", async () => {
-    render(<PlanningView initialPhase="execute" />);
+    render(<PlanningView initialPhase="execute" initialEvaView="ev" />);
     await userEvent.click(screen.getByRole("button", { name: "EV log no_ice" }));
     await userEvent.click(screen.getByRole("button", { name: "Copy, terminate" }));
-    await userEvent.click(screen.getByRole("tab", { name: "IV console" }));
+    await joinAsIV();
     expect(screen.getByText(/EVA TERMINATE · walkback to the habitat/, visible)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Debrief the EVA" }));
     expect(screen.getByRole("region", { name: "Measurement log" })).toHaveTextContent(first.id);
@@ -225,7 +256,7 @@ describe("Mission flow", () => {
   });
 
   it("keeps the walk across phase changes", async () => {
-    render(<PlanningView initialPhase="execute" />);
+    render(<PlanningView initialPhase="execute" initialEvaView="ev" />);
     await userEvent.click(screen.getByRole("button", { name: "Move EV" }));
     expect(screen.getByTestId("site-3d")).toHaveAttribute("data-pose", "350,-2250");
     await userEvent.click(tab("Plan"));
@@ -250,7 +281,7 @@ describe("Mission flow API states", () => {
     let resolveReplan!: (value: Response) => void;
     const fetch = vi.fn(async (url: string) => url.endsWith("/health") ? response({ status: "ok", planner: "real" }) : url.endsWith("/plan") ? response(demoPlan) : url.endsWith("/replan") ? new Promise<Response>((resolve) => { resolveReplan = resolve; }) : Promise.reject(new TypeError("not mocked")));
     vi.stubGlobal("fetch", fetch);
-    render(<PlanningView initialPhase="execute" />);
+    render(<PlanningView initialPhase="execute" initialEvaView="ev" />);
     await waitFor(() => expect(fetch.mock.calls.some(([url]) => String(url).endsWith("/plan"))).toBe(true));
     const before = Date.now();
     await userEvent.click(screen.getByRole("button", { name: "EV log ice" }));

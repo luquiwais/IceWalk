@@ -49,7 +49,11 @@ export type PathPoint = { x: number; y: number; s: number };
 
 /** The plan route as one polyline in grid meters, resampled every `step` meters. */
 export function walkPath(plan: Plan, step = 2): PathPoint[] {
-  const raw = routeLines(plan).flat();
+  return polylinePath(routeLines(plan).flat(), step);
+}
+
+/** Any polyline in grid meters (the walkback route), resampled every `step` meters. */
+export function polylinePath(raw: readonly (readonly number[])[], step = 2): PathPoint[] {
   const out: PathPoint[] = [];
   let s = 0;
   for (let i = 0; i < raw.length; i++) {

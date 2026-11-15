@@ -26,9 +26,24 @@ describe("cuff checklist", () => {
     expect(decisions.length).toBe(demoPlan.decision_points?.length ?? 0);
     for (const d of decisions) {
       expect(d.lines.some((l) => l.endsWith("(nominal)"))).toBe(true);
-      expect(d.lines.slice(0, -1).every((l) => l.startsWith("IF "))).toBe(true);
+      const branches = d.lines.filter((l) => l !== "The result does not change the next station").slice(0, -1);
+      expect(branches.every((l) => l.startsWith("IF "))).toBe(true);
       expect(d.lines.at(-1)).toMatch(/^Bingo: leave /);
     }
+  });
+
+  it("collapses branches that lead to the same station and says so", () => {
+    const first = cuffChecklist(demoPlan).steps.find((s) => s.decision);
+    expect(first?.lines[0]).toMatch(/^IF ANY RESULT: go to \S+ \(nominal\)$/);
+    expect(first?.lines[1]).toBe("The result does not change the next station");
+  });
+
+  it("names EVA TERMINATE in the hard stops and lists planetary protection once", () => {
+    const cuff = cuffChecklist(demoPlan);
+    expect(cuff.hardStops.some((h) => h.includes("EVA TERMINATE"))).toBe(true);
+    expect(cuff.hardStops.some((h) => /return to habitat/i.test(h))).toBe(false);
+    expect(cuff.steps.some((s) => s.lines.some((l) => l.startsWith("Planetary protection")))).toBe(false);
+    expect(cuff.notes.filter((n) => n.startsWith("Planetary protection")).length).toBe(1);
   });
 
   it("keeps PET non-decreasing, decisions included", () => {

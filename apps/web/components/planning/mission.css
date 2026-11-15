@@ -260,8 +260,33 @@
 /* First-person analogue photo: full width of the window, rounded like the kit's media. */
 .mission-analog-image { width: 100%; height: auto; border-radius: 12px; }
 
-.mission-cuff-link { align-self: start; font-size: .8125rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; }
-.mission-cuff-link:hover { color: var(--color-label); }
+/* Brief (rehearse-panel.tsx): stand-at strip, the station card, the cuff checklist and the confirmed go. */
+.mission-brief { gap: .5rem; }
+.mission-brief-station { gap: .5rem; }
+.mission-brief-hint { margin: 0; }
+.mission-brief .mission-station-strip { padding: .3125rem .5rem; gap: .375rem; }
+.mission-brief .mission-station-chips { justify-content: space-between; gap: .1875rem; }
+.mission-brief .mission-station-chips button { width: 1.5rem; height: 1.5rem; padding: 0; display: inline-grid; place-items: center; line-height: 1; font-variant-numeric: tabular-nums; }
+.mission-brief .mission-station-chips .mission-chip-hab { width: auto; padding: 0 .4375rem; border-radius: 999px; font-size: .625rem; letter-spacing: .04em; }
+.mission-brief .mission-station-chips button[aria-pressed=true] { background: #0a84ff; border-color: #0a84ff; }
+.mission-brief-card { display: flex; flex-direction: column; gap: .4rem; padding: .5rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .1); }
+.mission-brief-card > header { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.mission-brief-card > header strong { font-size: .9375rem; font-weight: 600; white-space: nowrap; }
+.mission-brief-card > header span { font-size: .75rem; color: var(--color-label-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mission-brief-crew { margin: 0; padding: 0; display: flex; flex-wrap: wrap; column-gap: .75rem; row-gap: .125rem; font-size: .8125rem; line-height: 1.35; color: var(--color-label-secondary); }
+.mission-brief-crew b { font-weight: 600; color: var(--color-label); margin-right: .375rem; }
+.mission-brief-card .mission-after { margin: 0; padding-top: 0; border-top: 0; }
+.mission-brief .mission-next { padding-top: 0; margin-top: 0; border-top: 0; }
+.mission-cuff { align-self: start; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .18); background: rgb(255 255 255 / .06); color: var(--color-label); font-size: .8125rem; font-weight: 600; text-decoration: none; }
+.mission-cuff:hover { background: rgb(255 255 255 / .14); }
+.mission-cuff:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.mission-cuff svg { width: 1rem; height: 1rem; }
+.mission-brief-go { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: .5rem; align-items: center; }
+.mission-brief-go > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-brief-go > button { width: 100%; }
+.mission-brief-go .mission-cuff { align-self: stretch; }
+.mission-confirm { display: grid; grid-template-columns: 1fr 2fr; gap: .5rem; }
+.mission-confirm > button { width: 100%; }
 
 /* Phase flow (phases.tsx): the panel title is the phase question, the footer the next step. */
 .mission-panel-title { display: flex; flex-direction: column; gap: .125rem; min-width: 0; flex: 1; }
@@ -530,3 +555,66 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
   .mission-dock-line { padding-left: .875rem; }
   .mission-dock-toggle { margin-left: auto; }
 }
+
+/* EVA role choice (role-select.tsx): two seats over the scene; the panel, map tools and dock wait. */
+.mission-app[data-choosing="true"] > :not(.mission-scene):not(.mission-heading):not(.mission-tabs):not(.mission-roles):not(.sr-only) { display: none !important; }
+.mission-roles { position: absolute; inset: var(--mission-tabs-bottom, 88px) 16px 16px; display: grid; place-items: center; z-index: 5; pointer-events: none; }
+.mission-roles-window { pointer-events: auto; width: min(680px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: .875rem; padding: 1.125rem 1.25rem 1.25rem; }
+.mission-roles-head { display: flex; flex-direction: column; gap: .25rem; }
+.mission-roles-head [data-text-style=title-2] { font-size: 1.25rem; }
+.mission-roles-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.mission-role { display: flex; flex-direction: column; gap: .625rem; padding: .875rem; border-radius: 16px; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .12); }
+.mission-role-title { display: flex; align-items: center; gap: .625rem; }
+.mission-role-title > svg { width: 1.5rem; height: 1.5rem; flex: none; color: var(--color-label-secondary); }
+.mission-role-title strong { display: block; font-size: 1rem; font-weight: 600; }
+.mission-role-title span { display: block; font-size: .75rem; color: var(--color-label-secondary); }
+.mission-role-does { margin: 0; font-size: .8125rem; line-height: 1.4; color: var(--color-label-secondary); flex: 1; }
+.mission-role-facts { margin: 0; display: flex; flex-direction: column; gap: .25rem; font-size: .75rem; }
+.mission-role-facts > div { display: flex; gap: .5rem; }
+.mission-role-facts dt { flex: none; width: 4.25rem; color: var(--color-label-secondary); }
+.mission-role-facts dd { margin: 0; color: var(--color-label); }
+.mission-role > button { width: 100%; }
+.mission-role-window { align-self: center; display: inline-flex; align-items: center; gap: .25rem; font-size: .75rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; }
+.mission-role-window:hover { color: var(--color-label); }
+.mission-role-window svg { width: .8125rem; height: .8125rem; }
+@media (max-width: 640px) { .mission-roles-cards { grid-template-columns: 1fr; } }
+.mission-role-row { display: flex; justify-content: space-between; align-items: center; gap: .75rem; font-size: .8125rem; color: var(--color-label-secondary); }
+.mission-role-row > :first-child { flex: 1; min-width: 0; }
+.mission-role-row > .mission-text-link { align-self: center; white-space: nowrap; }
+.mission-role-row b { color: var(--color-label); font-weight: 600; margin-left: .25rem; }
+
+/* EVA dock: the top alert shrinks with an ellipsis (full text on hover) so the Timeline button stays in. */
+.mission-app[data-phase="execute"] .mission-dock-alert:has(.mission-dock-badge) { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+.mission-app[data-phase="execute"] .mission-dock-badge { display: block; min-width: 0; }
+.mission-app[data-phase="execute"] .mission-dock-badge [data-slot=status-badge] { max-width: 100%; }
+.mission-app[data-phase="execute"] .mission-dock-bar { min-width: 1.5rem; }
+/* The status dock also runs along the bottom of the EV helmet and of the IV's EV camera. */
+.mission-app.mission-app[data-helmet="true"] > .mission-dock-position.mission-dock-position { display: block !important; left: var(--mission-edge); right: var(--mission-edge); }
+.mission-app[data-phase="execute"] .mission-dock-position { z-index: 4; }
+/* IV window (execute-panel.tsx): compact, no scrolling. */
+.mission-iv { gap: .5rem; }
+.mission-iv-station { display: flex; flex-direction: column; gap: .125rem; padding: .5rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); font-size: .8125rem; line-height: 1.35; color: var(--color-label-secondary); }
+.mission-iv-station strong { font-size: .9375rem; color: var(--color-label); font-weight: 600; }
+.mission-iv-station b { color: var(--color-label); font-weight: 600; }
+.mission-iv-key { font-size: .6875rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+/* Site (site-panel.tsx, site-card.tsx): verdict, compact tool table and the step to the plan, no scrolling. */
+.mission-site { gap: .5rem; }
+.mission-site .mission-next { padding-top: 0; margin-top: 0; border-top: 0; }
+.mission-site .mission-why { padding: .5rem .75rem; font-size: .8125rem; }
+.mission-site-lead { font-size: .8125rem; line-height: 1.4; color: var(--color-label-secondary); }
+.mission-site-card { gap: .5rem; }
+.mission-site-tools { width: 100%; border-collapse: collapse; font-size: .8125rem; font-variant-numeric: tabular-nums; }
+.mission-site-tools th, .mission-site-tools td { padding: .2rem .25rem; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--color-separator); }
+.mission-site-tools thead th { font-size: .6875rem; font-weight: 600; color: var(--color-label-secondary); border-bottom: 0; padding-top: 0; }
+.mission-site-tools th:first-child { text-align: left; font-weight: 500; overflow: hidden; text-overflow: ellipsis; max-width: 11rem; }
+.mission-site-tools thead th:first-child { font-weight: 600; }
+.mission-site-tools tbody tr:last-child > * { border-bottom: 0; }
+.mission-site-card .mission-verdict { font-weight: 600; color: var(--color-label-secondary); }
+.mission-site-card .mission-verdict[data-verdict="GO"] { color: var(--color-label); }
+.mission-site-card .mission-verdict[data-verdict="CONDITIONAL"] { color: var(--color-caution, #d9a400); }
+.mission-site-links { display: flex; gap: 1rem; align-items: baseline; }
+.mission-site-skip { margin-left: auto; }
+.mission-site-back { display: inline-flex; align-items: center; gap: .125rem; }
+.mission-site-back svg { width: 1rem; height: 1rem; }
+.mission-site-notes [data-text-style=footnote] { font-size: .75rem; line-height: 1.4; }
+.mission-site [aria-label="Zones ranked"] { gap: .375rem; }
