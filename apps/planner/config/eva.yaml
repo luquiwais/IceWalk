@@ -8,6 +8,15 @@ habitat_xy:
   assumption: true
   notes: Metros de la grilla desde el cráter, a ~2.2 km, fuera de la eyecta cercana. Antes era (-1200, -900), el punto del mock. Cuando se toque el contrato de la STM, pasar a `habitat_xy` en la STM.
 
+habitat_area_m:
+  value: {xmin: -1200, xmax: 1800, ymin: -3000, ymax: 600}
+  source: >-
+    Caja del DTM HiRISE de 6 m del 3D (apps/web/public/site/s1094b.json, overview: x -1500..2100,
+    y -3300..900) menos 300 m de borde, para que el hábitat y sus primeras estaciones tengan terreno en
+    el Brief y en el casco. No es un límite operativo de NASA
+  assumption: true
+  notes: El operador puede mover el hábitat dentro de esta caja (POST /plan con habitat_xy). El suelo además tiene que ser transitable (TraverseMap.snap, 50 m).
+
 egress_min:
   value: 45
   source: Sin fuente; valor del planificador mock
