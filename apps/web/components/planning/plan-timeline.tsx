@@ -4,8 +4,10 @@ import { Footnote } from "@icewalk/ui/text";
 import { stationById, type Plan } from "@/lib/plan";
 import { clock } from "./parts";
 
-export const PlanTimeline = memo(function PlanTimeline({ plan, previousPlan, stationId, hoveredId, elapsedMin, onSelectStation, onHoverStation }: {
+export const PlanTimeline = memo(function PlanTimeline({ plan, previousPlan, stationId, hoveredId, elapsedMin, bare = false, onSelectStation, onHoverStation }: {
   plan: Plan; previousPlan?: Plan; stationId: string | null; hoveredId: string | null; elapsedMin?: number;
+  /** Inside the dock: the status line above already names it, so no header. */
+  bare?: boolean;
   onSelectStation: (id: string) => void; onHoverStation: (id: string | null) => void;
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -24,8 +26,8 @@ export const PlanTimeline = memo(function PlanTimeline({ plan, previousPlan, sta
     if (next === undefined) return;
     event.preventDefault(); setFocused(next); refs.current[next]?.focus();
   }
-  return <section className="mission-time" aria-label="Traverse timeline">
-    <header><Footnote>Traverse · station order</Footnote><Footnote tone="secondary">{min == null ? "Walkback unavailable" : `Min walkback ${min.toFixed(1)} min`}</Footnote></header>
+  return <section className="mission-time" aria-label="Traverse timeline" data-bare={bare || undefined}>
+    {bare ? null : <header><Footnote>Traverse · station order</Footnote><Footnote tone="secondary">{min == null ? "Walkback unavailable" : `Min walkback ${min.toFixed(1)} min`}</Footnote></header>}
     <div className="mission-time-scroll">
       <div className="mission-time-inner" role="group" aria-label="Plan timeline">
         <svg className="mission-walkback" viewBox="0 0 1000 28" preserveAspectRatio="none" role="img" aria-label={min == null ? "No walkback data" : `Planned walkback margin, minimum ${min.toFixed(1)} minutes`}><polyline points={points} fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" /></svg>
