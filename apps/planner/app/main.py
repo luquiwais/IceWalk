@@ -225,6 +225,7 @@ def ice_map(plan_id: str | None = None) -> dict:
 @app.post("/plan")
 def plan(req: PlanRequest) -> dict:
     stm = req.stm or DEFAULT_STM
+    catalog = _catalog(req.tools)  # ids desconocidos: 422 también sin terreno
     tmap = _traverse_map(stm)
     if tmap is None:
         if req.habitat_xy is not None:
@@ -233,7 +234,6 @@ def plan(req: PlanRequest) -> dict:
         mock = mock_planner.build_plan(stm)
         return _store(mock, stm, list(req.measurements), [], req.strategy)
     cfg = _habitat_config(req.habitat_xy, tmap)
-    catalog = _catalog(req.tools)
     model = _ice_model(stm, req.measurements)
     p = eva_planner.build(stm, tmap, model, config=cfg, strategy=req.strategy, catalog=catalog)
     return _store(p, stm, list(req.measurements), [], req.strategy, cfg,
