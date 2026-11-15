@@ -51,7 +51,9 @@ export type CatalogTool = { id: string; name?: string; [key: string]: unknown };
 /** GET /eva-window (eva_window.schema.json); the UI reads it through lib/eva-window. */
 export type EvaWindowPayload = Record<string, unknown> & { best?: unknown; sols?: unknown };
 
-export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[]; strategy?: "learn" | "confirm"; habitat_xy?: [number, number] };
+export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[]; strategy?: "learn" | "confirm"; habitat_xy?: [number, number]; tools?: string[] };
+/** A station as the operator left it: an existing id keeps its tools and objectives; no id, a new station. */
+export type EditedStation = { id?: string; position: [number, number]; tools?: string[] };
 export type ReplanRequest = {
   plan_id: string;
   measurement: Measurement;
@@ -94,6 +96,11 @@ export function getEvaWindow(planId?: string, options?: ApiOptions): Promise<Eva
 
 export function postPlan(body: PlanRequest, options?: ApiOptions): Promise<Plan> {
   return request("/plan", post(body), isPlan, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
+}
+
+/** POST /evaluate: the plan with the operator's stations, in that order, without re-choosing any. */
+export function postEvaluate(body: { plan_id: string; stations: EditedStation[]; decisions?: boolean }, options?: ApiOptions): Promise<Plan> {
+  return request("/evaluate", post(body), isPlan, options);
 }
 
 export function postReplan(body: ReplanRequest, options?: ApiOptions): Promise<Plan> {

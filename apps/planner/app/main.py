@@ -22,7 +22,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from gp.observations import Observation, from_measurement
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from . import campaign, donki, eva_planner, eva_window, maps, mock_planner, replan_check
 from .contracts import CONTRACTS, ROOT, tool_catalog, tools_by_id
@@ -60,6 +60,21 @@ class PlanRequest(BaseModel):
     strategy: Literal["learn", "confirm"] = "learn"
     # Hábitat movido por el operador, en metros de la grilla; None: el de config/eva.yaml.
     habitat_xy: tuple[float, float] | None = None
+    # Herramientas que lleva la tripulación (ids del catálogo); None: todo el catálogo.
+    tools: list[str] | None = Field(default=None, max_length=32)
+
+
+class EditedStation(BaseModel):
+    id: str | None = Field(default=None, max_length=16)
+    position: tuple[float, float]
+    tools: list[str] | None = Field(default=None, max_length=8)
+
+
+class EvaluateRequest(BaseModel):
+    plan_id: str
+    stations: list[EditedStation] = Field(min_length=1, max_length=12)
+    # Puntos de decisión (un re-plan por resultado); False para la vista previa al arrastrar.
+    decisions: bool = False
 
 
 class ReplanRequest(BaseModel):
@@ -122,13 +137,25 @@ def _map(stm: dict, entry: dict | None = None) -> dict:
 
 
 def _store(plan: dict, stm: dict, measurements: list[dict], completed: list[dict],
-           strategy: str = "learn", config: eva_planner.EvaConfig | None = None) -> dict:
+           strategy: str = "learn", config: eva_planner.EvaConfig | None = None,
+           tools: list[str] | None = None) -> dict:
     plan["site_assessment"] = site_card(stm)  # plan y re-plan, real o mock
     plan["summary"].setdefault("strategy", strategy)
     _PLANS[plan["plan_id"]] = {"plan": plan, "stm": stm, "measurements": measurements,
                                "completed": completed, "strategy": strategy,
-                               "config": config or eva_planner.eva_config()}
+                               "config": config or eva_planner.eva_config(), "tools": tools}
     return plan
+
+
+def _catalog(tools: list[str] | None) -> dict[str, dict] | None:
+    """El catálogo restringido a lo que lleva la tripulación; 422 si hay ids desconocidos."""
+    if tools is None:
+        return None
+    catalog = tools_by_id()
+    unknown = sorted(set(tools) - set(catalog))
+    if unknown:
+        raise HTTPException(422, f"Unknown tools: {', '.join(unknown[:5])}")
+    return {t: catalog[t] for t in dict.fromkeys(tools)}
 
 
 def _habitat_config(
@@ -206,9 +233,39 @@ def plan(req: PlanRequest) -> dict:
         mock = mock_planner.build_plan(stm)
         return _store(mock, stm, list(req.measurements), [], req.strategy)
     cfg = _habitat_config(req.habitat_xy, tmap)
+    catalog = _catalog(req.tools)
     model = _ice_model(stm, req.measurements)
-    p = eva_planner.build(stm, tmap, model, config=cfg, strategy=req.strategy)
-    return _store(p, stm, list(req.measurements), [], req.strategy, cfg)
+    p = eva_planner.build(stm, tmap, model, config=cfg, strategy=req.strategy, catalog=catalog)
+    return _store(p, stm, list(req.measurements), [], req.strategy, cfg,
+                  list(catalog) if catalog is not None else None)
+
+
+@app.post("/evaluate")
+def evaluate(req: EvaluateRequest) -> dict:
+    """El plan con las estaciones que editó el operador (posición, orden, herramientas).
+
+    Responde al instante: horario, margen de regreso, factibilidad, P(hielo) y avisos, sin
+    reelegir estaciones. Un plan no viable vuelve igual, con su warning. Solo antes de la EVA.
+    """
+    entry = _PLANS.get(req.plan_id)
+    if entry is None:
+        raise HTTPException(404, "Unknown plan_id")
+    if entry["measurements"]:
+        raise HTTPException(409, "Edit the plan before the EVA starts: this plan has measurements")
+    stm = entry["stm"]
+    tmap = _traverse_map(stm)
+    if tmap is None or entry["plan"]["summary"].get("is_mock"):
+        raise HTTPException(422, "Editing stations needs the terrain model, which is not loaded")
+    edits = [s.model_dump() for s in req.stations]
+    try:
+        p = eva_planner.evaluate(
+            stm, tmap, _ice_model(stm, []), entry["plan"], edits, config=entry.get("config"),
+            strategy=entry.get("strategy", "learn"), catalog=_catalog(entry.get("tools")),
+            decisions=req.decisions)
+    except eva_planner.EditError as err:
+        raise HTTPException(422, str(err)) from None
+    return _store(p, stm, [], [], entry.get("strategy", "learn"), entry.get("config"),
+                  entry.get("tools"))
 
 
 @app.post("/replan")
@@ -237,14 +294,15 @@ def replan(req: ReplanRequest) -> dict:
         stm, tmap, _ice_model(stm, measurements),
         start_xy=tuple(meas["position"]), elapsed_min=req.elapsed_min,
         completed=completed, replanned_from=current["plan_id"], strategy=strategy,
-        config=entry.get("config"),
+        config=entry.get("config"), catalog=_catalog(entry.get("tools")),
     )
     result = {"ice": "Ice", "no_ice": "No ice", "inconclusive": "Inconclusive result"}
     p["alerts"].insert(0, {"level": "advisory", "source": "planner",
                            "message": f"{result[meas['result']]} at {meas['station_id']}. "
                                       "EVA replanned."})
     p["replan"] = replan_check.assess(current, p, meas, stm)
-    return _store(p, stm, measurements, completed, strategy, entry.get("config"))
+    return _store(p, stm, measurements, completed, strategy, entry.get("config"),
+                  entry.get("tools"))
 
 
 @app.get("/plan/{plan_id}")

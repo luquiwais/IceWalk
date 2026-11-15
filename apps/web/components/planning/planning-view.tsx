@@ -12,7 +12,8 @@ import { Site3DStage } from "@/components/site3d/site-3d-stage";
 import type { FreePose } from "@/components/site3d/site-3d";
 import { EvaMinimap } from "@/components/site3d/eva-minimap";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
-import { getWalkback } from "@/lib/api";
+import { getWalkback, postEvaluate, type PlannerApiError } from "@/lib/api";
+import { editedStations, editVerdict } from "@/lib/plan-edit";
 import { polylinePath, walkPath, type PathPoint } from "@/lib/site3d";
 import { Body } from "@icewalk/ui/text";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
@@ -191,6 +192,35 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
     setAnnouncement(`Re-planning from a habitat at x ${xy[0]} m, y ${xy[1]} m.`);
     void setHabitat(xy);
   }, [setHabitat]);
+  // Editing stations by hand (Plan, before approval): the planner scores each point live while dragging.
+  const canEditStations = phase === "plan" && !approved && session.source === "api";
+  const [dragNote, setDragNote] = useState<{ text: string; level: "go" | "caution" | "warning" | "pending" } | undefined>();
+  const preview = useRef<{ ctrl?: AbortController; timer?: number }>({});
+  const dragStation = useCallback((id: string, xy: [number, number] | null) => {
+    const p = preview.current;
+    window.clearTimeout(p.timer);
+    if (!xy) { p.ctrl?.abort(); setDragNote(undefined); return; }
+    p.timer = window.setTimeout(() => {
+      p.ctrl?.abort();
+      const ctrl = new AbortController();
+      p.ctrl = ctrl;
+      postEvaluate({ plan_id: plan.plan_id, stations: editedStations(plan, { move: { id, xy } }) }, { signal: ctrl.signal })
+        .then((r) => { if (!ctrl.signal.aborted) setDragNote(editVerdict(r)); })
+        .catch((e: PlannerApiError) => { if (!ctrl.signal.aborted && e?.kind !== "aborted") setDragNote({ text: e?.detail ?? "Cannot score this point", level: "warning" }); });
+    }, 90);
+  }, [plan]);
+  const evaluate = session.evaluate;
+  const moveStation = useCallback((id: string, xy: [number, number]) => {
+    setApprovedId(null);
+    setAnnouncement(`Scoring ${id} moved to x ${xy[0]} m, y ${xy[1]} m.`);
+    void evaluate(editedStations(plan, { move: { id, xy } }));
+  }, [evaluate, plan]);
+  const removeStation = (id: string) => {
+    setStationId(null); setApprovedId(null);
+    setAnnouncement(`Scoring the plan without ${id}.`);
+    void session.evaluate(editedStations(plan, { remove: id }));
+    requestAnimationFrame(() => sceneRef.current?.fit());
+  };
   const hoverStation = useCallback((id: string | null) => setHoveredId(id), []);
   // Opening the timeline folds the legend to its button so the map keeps room; closing restores it.
   const legendBefore = useRef(true);
@@ -266,15 +296,17 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
       : helmet ? <Site3DStage mode="helmet" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} previousPlan={session.previous ?? undefined} walkback={walkback}
         reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} ivOnline={link.ivOnline} ivCall={ivCall} onLog={logMeasurement} onAccept={accept} onReturn={terminate} onLeave={() => setEvaView(null)}
         onComplete={() => { setReturning(false); setEvaView("iv"); goTo("debrief"); setAnnouncement("EVA complete: back at the habitat."); }} />
-      : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} walkback={phase === "execute" && returning ? walkback?.line : undefined} onMoveHabitat={canMoveHabitat ? pickHabitat : undefined} stale={replanning} />;
+      : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} walkback={phase === "execute" && returning ? walkback?.line : undefined} onMoveHabitat={canMoveHabitat ? pickHabitat : undefined} onMoveStation={canEditStations ? moveStation : undefined} onDragStation={canEditStations ? dragStation : undefined} dragNote={dragNote} stale={replanning} />;
 
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
     : phase === "plan" ? station
-      ? <StationDetail plan={plan} station={station} source={session.source} onSelect={selectStation} />
+      ? <StationDetail plan={plan} station={station} source={session.source} onSelect={selectStation} onRemove={canEditStations && plan.stations.length > 1 ? () => removeStation(station.id) : undefined} />
       : <PlanPanel plan={plan} planSource={session.source} pending={pending} approved={approved}
         onApprove={() => { setApprovedId(plan.plan_id); if (!timelineOpen) toggleTimeline(); setAnnouncement("Plan approved."); }} onEdit={() => setApprovedId(null)}
         onStrategy={(s) => { setStationId(null); setApprovedId(null); void session.setStrategy(s); }} onNext={() => goTo("rehearse")}
-        onSelect={selectStation} onTimeline={() => { if (!timelineOpen) toggleTimeline(); }} />
+        onSelect={selectStation} onTimeline={() => { if (!timelineOpen) toggleTimeline(); }}
+        edit={session.editBase ? { base: session.editBase, onUndo: () => { setApprovedId(null); session.undoEdit(); setAnnouncement("Edit undone."); } } : undefined}
+        tools={session.source === "api" ? { carried: session.tools, disabled: pending, onChange: (t) => { setStationId(null); setApprovedId(null); void session.setTools(t); } } : undefined} />
       : phase === "rehearse" ? <RehearsePanel plan={plan} at={briefPoint} onStand={(at, j) => { setBriefAt(at); setJump(j); }} onNext={() => goTo("execute")} />
         : phase === "execute" ? <section className="mission-stack" aria-label="EVA">
           {/* The helmet has its own switch in its top bar; this row is the IV's. */}
@@ -296,7 +328,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
     <div className="mission-tabs" ref={tabsRef}><TabBar label="Mission phase" layout={compact ? "compact" : "regular"} value={phase} tabs={TABS} onValueChange={goTo} /></div>
     {onMap ? <div className="mission-camera"><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></div> : null}
-    {onMap && replanning ? <p className="mission-map-banner" role="status">Building a new plan…</p> : canMoveHabitat && session.habitatError ? <p className="mission-map-banner" role="status" data-level="caution">Habitat not moved: {session.habitatError}</p> : null}
+    {onMap && replanning ? <p className="mission-map-banner" role="status">Building a new plan…</p> : canMoveHabitat && session.habitatError ? <p className="mission-map-banner" role="status" data-level="caution">Habitat not moved: {session.habitatError}</p> : canEditStations && session.editError ? <p className="mission-map-banner" role="status" data-level="caution">Edit not applied: {session.editError}</p> : null}
     <WindowMotion open={!mapFocus && !choosing} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
       <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : briefPoint ? <IconButton label="Back to fly-over" variant="plain" onClick={backToFlyOver}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}{phase === "execute" && evaView === "iv" ? " · IV console" : ""}</Footnote><Title2 as="h2">{station ? `Station ${station.order} · ${station.id}` : briefStation ? `Station ${briefStation.order} · ${briefStation.id}` : briefPoint === AT_HABITAT ? "Habitat · egress" : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
       {phase === "plan" && session.error ? <Footnote role="status" className="mission-api-note">{session.source === "mock" ? "Planner API unavailable. Using bundled mock data." : "Replan failed. Showing the last plan."}</Footnote> : null}
@@ -310,7 +342,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
       <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
         {iceMap.map && mapMode ? <IceViewLegend map={iceMap.map} mode={mapMode} habitat={habitatOf(plan)} goal={phase === "plan" ? plan.summary.strategy ?? "learn" : undefined} /> : null}
         <span className="mission-legend-keys">
-          <span title={canMoveHabitat ? "Drag the habitat to move it and re-plan" : undefined}><i data-key="hab" aria-hidden />{canMoveHabitat ? "Habitat · drag" : "Habitat"}</span><span><i data-key="route" aria-hidden />Traverse</span>{phase === "plan" ? <span title="Select a station for its details"><i data-key="station" aria-hidden>1</i>Station · select</span> : null}
+          <span title={canMoveHabitat ? "Drag the habitat to move it and re-plan" : undefined}><i data-key="hab" aria-hidden />{canMoveHabitat ? "Habitat · drag" : "Habitat"}</span><span><i data-key="route" aria-hidden />Traverse</span>{phase === "plan" ? <span title={canEditStations ? "Select a station for its details, or drag it to move it: the planner scores the change" : "Select a station for its details"}><i data-key="station" aria-hidden>1</i>{canEditStations ? "Station · select, drag" : "Station · select"}</span> : null}
           {layers.rings ? <span><i data-key="ring" aria-hidden />Distance rings</span> : null}{(reviewing || phase === "debrief") && session.previous ? <span><i data-key="previous" aria-hidden />Plan before the last result</span> : null}
         </span>
         <span className="mission-legend-source">Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>

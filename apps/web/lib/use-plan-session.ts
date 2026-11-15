@@ -13,7 +13,7 @@
  */
 import { useEffect, useState, useSyncExternalStore } from "react";
 
-import { getHealth, PlannerApiError, plannerBaseUrl, postPlan, postReplan, type PlannerHealth } from "./api";
+import { getHealth, PlannerApiError, plannerBaseUrl, postEvaluate, postPlan, postReplan, type EditedStation, type PlannerHealth } from "./api";
 import { demoPlan, demoReplan, type Measurement, type Plan } from "./plan";
 
 export type PlanSource = "api" | "mock";
@@ -39,6 +39,12 @@ export type PlanSessionState = {
   apiConfigured: boolean;
   /** Why the last habitat move was refused (the planner's reason), or null. */
   habitatError: string | null;
+  /** The plan before the operator's last edit (POST /evaluate), for before/after and undo; null when not edited. */
+  editBase: Plan | null;
+  /** Why the last edit was refused (the planner's reason), or null. */
+  editError: string | null;
+  /** Tools the crew carries (catalog ids); null: the whole catalog. */
+  tools: string[] | null;
 };
 
 export type PlanSessionOptions = {
@@ -61,6 +67,12 @@ export type PlanSession = {
   setStrategy: (strategy: Strategy) => Promise<void>;
   /** Re-plans from a habitat the operator placed (grid meters); keeps the plan if the planner refuses it. */
   setHabitat: (xy: [number, number]) => Promise<void>;
+  /** Scores the operator's stations (POST /evaluate) and makes that the plan; keeps the plan if refused. */
+  evaluate: (stations: EditedStation[]) => Promise<void>;
+  /** Back to the plan before the last edit. */
+  undoEdit: () => void;
+  /** Re-plans from the habitat with only these tools (catalog ids); null: the whole catalog. */
+  setTools: (tools: string[] | null) => Promise<void>;
   /** Takes the session another window holds (the EV1 / IV link): drops any request of its own. */
   adopt: (from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">) => void;
   dispose: () => void;
@@ -79,6 +91,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
   let nominal: Plan | null = null;
   let strategy: Strategy = "learn";
   let habitat: [number, number] | null = null;
+  let tools: string[] | null = null;
   let generation = 0;
   let controller: AbortController | null = null;
   let state: PlanSessionState = {
@@ -86,10 +99,13 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     status: baseUrl ? "idle" : "ready",
     apiConfigured: Boolean(baseUrl),
     habitatError: null,
+    editBase: null,
+    editError: null,
+    tools: null,
   };
 
   function mockState(plan: Plan): Omit<PlanSessionState, "status" | "apiConfigured"> {
-    return { plan, previous: null, measurements: [], source: "mock", planner: null, isMock: isMock(plan), error: null, habitatError: null };
+    return { plan, previous: null, measurements: [], source: "mock", planner: null, isMock: isMock(plan), error: null, habitatError: null, editBase: null, editError: null, tools };
   }
 
   function set(patch: Partial<PlanSessionState>) {
@@ -111,7 +127,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     set({ status: "loading" });
     const [health, plan] = await Promise.allSettled([
       getHealth({ ...api, signal, timeoutMs: Math.min(api.timeoutMs ?? 5_000, 5_000) }),
-      postPlan({ ...stm, measurements: [], strategy, ...(habitat ? { habitat_xy: habitat } : {}) }, { ...api, signal }),
+      postPlan({ ...stm, measurements: [], strategy, ...(habitat ? { habitat_xy: habitat } : {}), ...(tools ? { tools } : {}) }, { ...api, signal }),
     ]);
     if (id !== generation) return;
     if (plan.status === "fulfilled") {
@@ -126,6 +142,9 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
         isMock: isMock(plan.value),
         error: null,
         habitatError: null,
+        editBase: null,
+        editError: null,
+        tools,
       });
     } else {
       nominal = null;
@@ -192,11 +211,11 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     const { id, signal } = begin();
     set({ status: "loading", habitatError: null });
     try {
-      const plan = await postPlan({ ...stm, measurements: [], strategy, habitat_xy: xy }, { ...api, signal });
+      const plan = await postPlan({ ...stm, measurements: [], strategy, habitat_xy: xy, ...(tools ? { tools } : {}) }, { ...api, signal });
       if (id !== generation) return;
       habitat = plan.habitat_xy ?? xy;
       nominal = plan;
-      set({ plan, previous: null, measurements: [], status: "ready", isMock: isMock(plan), error: null, habitatError: null });
+      set({ plan, previous: null, measurements: [], status: "ready", isMock: isMock(plan), error: null, habitatError: null, editBase: null, editError: null });
     } catch (error) {
       if (id !== generation) return;
       const e = asError(error);
@@ -215,6 +234,41 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     await start();
   }
 
+  async function evaluate(stations: EditedStation[]) {
+    if (!baseUrl || state.source !== "api") {
+      set({ editError: "Editing stations needs the planner API." });
+      return;
+    }
+    const before = state.plan;
+    const { id, signal } = begin();
+    set({ status: "loading", editError: null });
+    try {
+      const plan = await postEvaluate({ plan_id: before.plan_id, stations, decisions: true }, { ...api, signal });
+      if (id !== generation) return;
+      nominal = plan;
+      set({ plan, previous: null, measurements: [], status: "ready", isMock: isMock(plan), error: null, editBase: before, editError: null });
+    } catch (error) {
+      if (id !== generation) return;
+      const e = asError(error);
+      set({ status: "ready", editError: e.detail ?? "The planner could not score that edit." });
+    }
+  }
+
+  function undoEdit() {
+    const base = state.editBase;
+    if (!base) return;
+    begin();
+    nominal = base;
+    set({ plan: base, previous: null, measurements: [], status: "ready", isMock: isMock(base), error: null, editBase: null, editError: null });
+  }
+
+  async function setTools(next: string[] | null) {
+    tools = next && next.length ? [...next] : null;
+    set({ tools });
+    if (!baseUrl) return;
+    await start();
+  }
+
   function adopt(from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">) {
     begin();
     if (from.source === "api" && !from.previous && !from.measurements.length) nominal = from.plan;
@@ -224,6 +278,9 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
   return {
     getSnapshot: () => state,
     adopt,
+    evaluate,
+    undoEdit,
+    setTools,
     subscribe(listener) {
       listeners.add(listener);
       return () => listeners.delete(listener);
@@ -249,7 +306,7 @@ export function usePlanSession(options: PlanSessionOptions = {}) {
     void session.start();
     return () => session.dispose();
   }, [session]);
-  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset, setStrategy: session.setStrategy, setHabitat: session.setHabitat, adopt: session.adopt };
+  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset, setStrategy: session.setStrategy, setHabitat: session.setHabitat, adopt: session.adopt, evaluate: session.evaluate, undoEdit: session.undoEdit, setTools: session.setTools };
 }
 
 /** One discreet line for the UI about where the plan comes from. */

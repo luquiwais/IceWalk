@@ -106,6 +106,12 @@ export type SiteSceneProps = {
   stale?: boolean;
   /** While set, the habitat marker can be dragged; on release it reports the new grid point. */
   onMoveHabitat?: (xy: [number, number]) => void;
+  /** While set, station markers can be dragged; on release each reports its new grid point. */
+  onMoveStation?: (id: string, xy: [number, number]) => void;
+  /** Live while a station is dragged (grid point), null when the drag ends: the caller scores it. */
+  onDragStation?: (id: string, xy: [number, number] | null) => void;
+  /** The verdict on the point under the dragged station, shown under its ghost. */
+  dragNote?: { text: string; level: "go" | "caution" | "warning" | "pending" };
   className?: string;
   ref?: Ref<SiteSceneHandle>;
 };
@@ -218,6 +224,9 @@ export function SiteScene({
   stale = false,
   walkback,
   onMoveHabitat,
+  onMoveStation,
+  onDragStation,
+  dragNote,
   className,
   ref,
 }: SiteSceneProps) {
@@ -246,6 +255,20 @@ export function SiteScene({
     }
     const outside = !!a && (wx < a.xmin || wx > a.xmax || wy < a.ymin || wy > a.ymax);
     setHabDrag({ ox, oy, sx, sy, wx: Math.round(wx), wy: Math.round(wy), area, outside });
+  };
+  // Dragging a station: the same ghost as the habitat, with the planner's verdict under it.
+  type StDrag = { id: string; order: number; ox: number; oy: number; sx: number; sy: number; wx: number; wy: number; moved: boolean; released?: string };
+  const [stDrag, setStDrag] = useState<StDrag | null>(null);
+  const suppressClick = useRef(false);
+  const stGhost = stDrag && stDrag.moved && (!stDrag.released || (stale && stDrag.released === plan.plan_id)) ? stDrag : null;
+  const stationDragTo = (d: Omit<StDrag, "sx" | "sy" | "wx" | "wy" | "moved">, sx: number, sy: number) => {
+    const cam = camera.current;
+    if (!cam) return;
+    const [wx, wy] = screenToWorld(cam, size.current, sx, sy);
+    const moved = Math.hypot(sx - d.ox, sy - d.oy) > 6;
+    const next = { ...d, sx, sy, wx: Math.round(wx), wy: Math.round(wy), moved };
+    setStDrag(next);
+    if (moved) onDragStation?.(d.id, [next.wx, next.wy]);
   };
   const crewRef = useRef(crew);
   useEffect(() => { crewRef.current = crew; }, [crew]);
@@ -1071,6 +1094,14 @@ export function SiteScene({
             </div>
           </div>
         ) : null}
+        {stGhost ? (
+          <div className="site-hab-drag" aria-hidden>
+            <svg width="100%" height="100%"><line x1={stGhost.ox} y1={stGhost.oy} x2={stGhost.sx} y2={stGhost.sy} /></svg>
+            <div className="site-station-ghost" data-level={stGhost.released ? "pending" : dragNote?.level ?? "pending"} style={{ left: stGhost.sx, top: stGhost.sy }}>{stGhost.order}
+              <span>{stGhost.released ? "Scoring the edited plan…" : dragNote?.text ?? `x ${signed(stGhost.wx)} m · y ${signed(stGhost.wy)} m`}</span>
+            </div>
+          </div>
+        ) : null}
         {ghost ? (
           <div className="site-hab-drag" aria-hidden>
             <svg width="100%" height="100%">
@@ -1122,7 +1153,32 @@ export function SiteScene({
                 data-selected={isSelected ? "" : undefined}
                 data-hovered={isHovered ? "" : undefined}
                 data-status={s.status}
-                onClick={() => onSelectStation(isSelected ? null : s.id)}
+                data-draggable={onMoveStation ? "" : undefined}
+                data-dragging={stGhost?.id === s.id ? "" : undefined}
+                title={onMoveStation ? "Drag to move the station; the planner scores the change" : undefined}
+                onPointerDown={onMoveStation ? (e) => {
+                  if (e.button !== 0) return;
+                  e.stopPropagation();
+                  try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* drag still works over the marker */ }
+                  const [sx, sy] = localPoint(e);
+                  stationDragTo({ id: s.id, order: s.order, ox: sx, oy: sy }, sx, sy);
+                } : undefined}
+                onPointerMove={onMoveStation ? (e) => {
+                  if (!stDrag || stDrag.released || stDrag.id !== s.id) return;
+                  const [sx, sy] = localPoint(e);
+                  stationDragTo(stDrag, sx, sy);
+                } : undefined}
+                onPointerUp={onMoveStation ? () => {
+                  const d = stDrag;
+                  if (d && !d.released && d.moved) {
+                    suppressClick.current = true;
+                    setStDrag({ ...d, released: plan.plan_id });
+                    onDragStation?.(d.id, null);
+                    onMoveStation(d.id, [d.wx, d.wy]);
+                  } else setStDrag(null);
+                } : undefined}
+                onPointerCancel={onMoveStation ? () => { setStDrag(null); onDragStation?.(s.id, null); } : undefined}
+                onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } onSelectStation(isSelected ? null : s.id); }}
                 onPointerEnter={() => onHoverStation(s.id)}
                 onPointerLeave={() => onHoverStation(null)}
                 onFocus={() => reveal(s.id)}

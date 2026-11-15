@@ -668,3 +668,14 @@
 
 /* EVA TERMINATE: the fastest route back to the habitat (caution). Only drawn during the EVA. */
 .site-route-walkback { fill: none; stroke: var(--color-caution, #f0bf4f); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Dragging a station (Plan, before approval): its ghost says at once whether the new point works. */
+.site-station[data-draggable] { cursor: grab; touch-action: none; }
+.site-station[data-dragging] { opacity: .35; }
+.site-station-ghost { position: absolute; transform: translate(-50%, -50%); display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: rgb(20 20 24 / .9); box-shadow: 0 0 0 2px #fff; font-size: .875rem; font-weight: 700; color: #fff; }
+.site-station-ghost span { position: absolute; top: calc(100% + .375rem); white-space: nowrap; padding: .2rem .5rem; border-radius: .375rem; background: rgb(20 20 24 / .9); font-size: .75rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.site-station-ghost[data-level=caution] { box-shadow: 0 0 0 2px var(--color-caution, #ffd60a); }
+.site-station-ghost[data-level=caution] span { color: var(--color-caution, #ffd60a); }
+.site-station-ghost[data-level=warning] { box-shadow: 0 0 0 2px var(--color-warning, #ff453a); }
+.site-station-ghost[data-level=warning] span { color: var(--color-warning, #ff453a); }
+.site-station-ghost[data-level=pending] span { color: rgb(255 255 255 / .75); }
