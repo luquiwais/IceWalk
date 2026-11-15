@@ -62,6 +62,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const [reviewing, setReviewing] = useState(false);
   const [returning, setReturning] = useState(false);
   const [jump, setJump] = useState<Jump>();
+  // The step timeline opens on demand so the map keeps the space (closed by default).
+  const [timelineOpen, setTimelineOpen] = useState(false);
   const [evaView, setEvaView] = useState<"ev" | "iv">(initialEvaView);
   // The EV and brief poses live here so a phase change never loses the walk.
   const [evPose, setEvPose] = useState<FreePose>(() => startPose(demoPlan));
@@ -123,7 +125,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     const observer = new ResizeObserver(measure);
     [root, status, tabs, timeline, panelRef.current, toolsRef.current, legendRef.current, hud].forEach((node) => { if (node) observer.observe(node); });
     return () => observer.disconnect();
-  }, [mapFocus, compact, phase, evaView]);
+  }, [mapFocus, compact, phase, evaView, timelineOpen]);
 
   const hoverStation = useCallback((id: string | null) => setHoveredId(id), []);
   const selectStation = useCallback((id: string | null) => {
@@ -186,10 +188,10 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     <div className="mission-scene">{scene}</div>
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
     <div className="mission-tabs" ref={tabsRef}><TabBar label="Mission phase" layout={compact ? "compact" : "regular"} value={phase} tabs={TABS} onValueChange={goTo} /></div>
-    {onMap ? <div className="mission-status-position" ref={statusRef}><Window className="mission-status-window"><MissionStatus plan={plan} elapsedMin={executing ? elapsedMin : 0} execution={executing} session={session} /></Window></div> : null}
     {onMap ? <div className="mission-camera"><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></div> : null}
     <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
       <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}</Footnote><Title2 as="h2">{station ? `Station ${station.id}` : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
+      {onMap ? <div ref={statusRef}><MissionStatus plan={plan} elapsedMin={executing ? elapsedMin : 0} execution={executing} session={session} /></div> : null}
       <div className="mission-panel-scroll" tabIndex={-1} ref={contentRef}>
         <WindowContent contentKey={phase === "plan" ? stationId ?? "plan" : phase} direction={station ? "forward" : "back"}>{panel}</WindowContent>
       </div>
@@ -198,6 +200,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     {onMap ? <div className="mission-map-tools" ref={toolsRef}>
       <section className="mission-layer-position" aria-label="Map layers"><Window className="mission-layer-window">
         {iceMap.map ? ICE_VIEW_MODES.filter((m) => m.value !== "change" || session.measurements.length).map((m) => <Button key={m.value} variant="plain" size="small" aria-pressed={mapMode === m.value} onClick={() => setMapMode((cur) => (cur === m.value ? null : m.value))}>{m.label}</Button>) : <Button variant="plain" size="small" disabled>{iceMap.loading ? "Ice map · loading" : "Ice map unavailable"}</Button>}
+        {phase === "plan" || phase === "execute" ? <Button variant="plain" size="small" aria-pressed={timelineOpen} onClick={() => setTimelineOpen((v) => !v)}>Timeline</Button> : null}
         <Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button>
         <Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button>
       </Window></section>
@@ -208,7 +211,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
         <span>Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>
       </div>
     </div> : null}
-    {phase === "plan" || (phase === "execute" && !helmet) ? <div className="mission-timeline-position" ref={timelineRef}><Window className="mission-timeline-window"><PlanTimeline plan={plan} previousPlan={reviewing ? session.previous ?? undefined : undefined} stationId={sceneStationId} hoveredId={hoveredId} elapsedMin={executing ? elapsedMin : undefined} onSelectStation={selectStation} onHoverStation={hoverStation} /></Window></div> : null}
+    {timelineOpen && (phase === "plan" || (phase === "execute" && !helmet)) ? <div className="mission-timeline-position" ref={timelineRef}><Window className="mission-timeline-window"><PlanTimeline plan={plan} previousPlan={reviewing ? session.previous ?? undefined : undefined} stationId={sceneStationId} hoveredId={hoveredId} elapsedMin={executing ? elapsedMin : undefined} onSelectStation={selectStation} onHoverStation={hoverStation} /></Window></div> : null}
   </main>;
 }
 

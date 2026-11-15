@@ -730,3 +730,63 @@ Para que BoulderNet sirva acá haría falta **reentrenarlo con bloques de S1094b
 - **Distribución del mapa nominal** (`apps/web/mock/map.json`, 300 × 300 celdas de 10 m): P(hielo ≤ 3 m) vale 0.669 (el prior) en el 75 % de las celdas; la incertidumbre restante es 1.0 en más del 75 %. Solo 474 celdas (0.5 %) se apartan del prior en 0.1 o más, en manchas de decenas de metros alrededor de cráteres. Con una rampa continua (y la misma paleta para probabilidad e incertidumbre) se veía un azul parejo.
 - **Bloques de 100 m con la media**: ningún bloque baja de U = 0.8 (la evidencia se diluye). **Con la mejor celda del bloque**: 25 de 716 bloques del círculo de 1.5 km tienen evidencia local (3.5 %), 12 con P ≥ prior + 0.1 y 4 con P ≤ prior − 0.1. Es lo que dibuja la grilla de puntos.
 - **Color del terreno con el orto IRB** (`ESP_073578_2155_IRB_C_01_ORTHO.JP2`, 1 m, bajado de hirise.lpl.arizona.edu): las tres bandas de 8 bits vienen estiradas por separado (en una ventana de 400 × 400 px, medianas NIR 182, RED 157, BG 14). Cualquier compuesto RED/BG sale rojo saturado: no es color natural. Para color real hace falta el COLOR RDR calibrado (I/F) registrado sobre el DTM. **Descartado**: el terreno queda en gris (HiRISE RED, como se adquirió). El IRB queda en `data/raw/hirise_irb/` (fuera de Git).
+
+## 2026-11-14: ¿la inercia térmica predice el hielo?
+
+Pregunta: ¿la inercia térmica (TI) en la posición de cada impacto fresco predice si expuso hielo **mejor que la latitud sola**? Si sí, entraría como covariable del prior y daría variación real entre cráteres. Solo se midió: el prior y el planificador no cambian.
+
+Código: `packages/model/gp/thermal_inertia_check.py` (`python -m gp.thermal_inertia_check`), con tests en `tests/test_thermal_inertia_check.py`. Resultados en `data/processed/daubar2022/thermal_inertia_check.json` y la TI de THEMIS por impacto en `thermal_inertia_themis.csv`, fuera de Git.
+
+**Datos.** Los 383 impactos del prior regional (Daubar et al. 2022, norte de 20°N, 37 con hielo).
+- **THEMIS 100 m** (opción a): mosaico global cuantitativo de USGS, leído por ventanas con `/vsicurl` (bloques de 128 × 128, ~25 MB en total, 2.5 min) sin bajar las teselas de 2.5 GB. **Falló como prueba principal:** cubre solo hasta 60°N y sus huecos crecen con la latitud. Al norte de 40°N tienen dato 29 de 63 impactos; en total, 317 impactos y **solo 11 de los 37 con hielo**.
+- **TES, Putzig y Mellon (2007)** (opción b), PDS, ~3 km, global hasta 87°: mapas nocturno y diurno con máscara de interpolación (155 MB en `data/raw/tes_putzig2007/`). Quedó como **prueba principal**: TES nocturno en el píxel del impacto, sin píxeles interpolados (337 impactos, 35 con hielo). La elección se hizo después de ver la cobertura de THEMIS y antes de mirar cualquier métrica.
+- Orientación de TES verificada con regiones conocidas: Arabia 57, Amazonis 51, Tharsis 79, Acidalia 301; con el mapa invertido no cuadra.
+
+**Método.** Validación cruzada estratificada 5 × 5, con las mismas particiones para todos los modelos. La TI se estandariza dentro de cada pliegue y nada se elige mirando el test. Se comparan dos pares de modelos:
+- probit censurado (la familia del prior: `log(r·D)` de offset, latitud) contra el mismo con `log TI`;
+- logística en latitud y `log D`, con L2 fija de 1, contra la misma con `log TI`.
+
+Se mide la diferencia con un bootstrap pareado y estratificado (2000 remuestreos) y se hacen 300 permutaciones de la TI **dentro de franjas de 5° de latitud**. Así se conserva la relación TI-latitud y solo se rompe lo que la TI agrega.
+
+**Prueba principal (TES nocturno, ≥ 20°N, n = 337, 35 con hielo; correlación entre latitud y log TI: 0.55)**
+
+| Modelo | AUC | Brier | Log-loss | Δ log-loss contra solo latitud (90 % bootstrap) | Permutación |
+| --- | --- | --- | --- | --- | --- |
+| Tasa constante | 0.500 | 0.0931 | 0.3335 | - | - |
+| Probit, latitud (prior) | 0.981 | 0.0329 | 0.1058 | - | - |
+| Probit, latitud + TI | 0.982 | 0.0326 | 0.1062 | +0.0004 (−0.0070 a +0.0075) | p = 0.28 |
+| Logística, latitud + log D | 0.982 | 0.0327 | 0.1070 | - | - |
+| Logística, + TI | 0.982 | 0.0323 | 0.1046 | −0.0024 (−0.0078 a +0.0031) | p = 0.28 |
+
+**Variantes declaradas de antemano** (Δ log-loss con TI menos sin TI; negativo = la TI ayuda)
+
+| Variante | n (hielo) | Probit: Δ (90 %), p | Logística: Δ (90 %), p |
+| --- | --- | --- | --- |
+| TES nocturno, solo ≥ 35°N | 106 (35) | −0.0046 (−0.037 a +0.020), p = 0.073 | −0.0140 (−0.034 a +0.006), **p = 0.030** |
+| TES diurno | 346 (32) | +0.0014 (−0.001 a +0.005), p = 0.37 | +0.0002 (−0.003 a +0.004), p = 0.49 |
+| TES nocturno, mediana 3 × 3 (~9 km) | 377 (37) | −0.0001 (−0.006 a +0.005) | −0.0024 (−0.007 a +0.003) |
+| Cociente diurno / nocturno (capas, exploratoria) | 309 (30) | −0.0002 (−0.007 a +0.008), p = 0.15 | +0.0006 (−0.000 a +0.002), p = 0.40 |
+| THEMIS, mediana 5 × 5 (500 m) | 317 (11) | +0.0034 (−0.005 a +0.009), p = 0.27 | +0.0002 (−0.003 a +0.003), p = 0.33 |
+| THEMIS, píxel central / 11 × 11 | 317-318 (11) | +0.0030 / +0.0096 | +0.0002 / +0.0007 |
+
+**Lo que sí aparece.** Con todos los datos, el probit da a la TI nocturna de TES un coeficiente negativo: −0.33 en `log d` por desvío de `log TI`, con intervalo bootstrap del 90 % de −0.60 a −0.09. Es decir, a más TI, hielo más somero, como esperaría la física. Pero es un ajuste dentro de muestra, y **fuera de muestra no mejora la predicción**: la latitud ya explica casi todo (AUC 0.981).
+
+**Arcadia y S1094b.**
+- La TI explica una parte chica del exceso de Arcadia (40-60°N, 165-190°E, con TES válido): 4 impactos con hielo por 1.6 esperados con latitud (z = 2.6) y por 1.9 con latitud + TI (z = 2.1).
+- Alrededor de S1094b (±10°, ±30°): 7 por 3.3 (z = 2.8) contra 7 por 3.5 (z = 2.6). El aviso de `nearby_impacts` sigue haciendo falta.
+- En el sitio, **las dos fuentes de TI dicen lo contrario**. TES da 78 (polvo, a 3 km); THEMIS da 488 (suelo firme, a 100 m; coincide con `build_soil.py`).
+  - Con TES: mediana 4.4 m y P(≤ 3 m) 0.28, contra 3.3 m y 0.45 con solo latitud sobre la misma muestra.
+  - Con THEMIS: 2.9 m y 0.51, contra 4.9 m y 0.23. Además, 488 está a 2 desvíos de los impactos (mediana 140): es una extrapolación.
+  - El signo del cambio en el sitio depende de qué producto se use.
+
+**Lo que falló o queda débil.**
+- THEMIS como fuente principal (cobertura; ver arriba).
+- La única p < 0.05 (logística, ≥ 35°N, p = 0.030) es una de 12 pruebas de permutación; con Bonferroni el umbral es 0.004. Además, su intervalo bootstrap cruza el cero y el probit en la misma muestra no llega (p = 0.073). Es una pista, no un resultado.
+- El cociente diurno / nocturno (la firma de capas de Putzig y Mellon 2007) no aporta nada.
+- Límites:
+  - la TI diurna y nocturna mide centímetros, y el hielo en latitudes medias está a decímetros o metros;
+  - el píxel de TES (3 km) mezcla terrenos;
+  - quedan 26 a 35 impactos con hielo por variante;
+  - "sin hielo" puede ser hielo no visible.
+
+**Conclusión: no.** La TI no predice el hielo de los impactos frescos mejor que la latitud sola, ni con TES (3 km) ni con THEMIS (100 m): la diferencia de log-loss es de ±0.003 sobre 0.106, con p = 0.28. Hay una señal física débil (a más TI, hielo más somero) que no se traduce en predicción. **No entra como covariable del prior.** Donde podría aportar es al norte de 35°N; se revisaría con más impactos con hielo (catálogos posteriores a 2022) o con TI estacional, que llega más hondo.
