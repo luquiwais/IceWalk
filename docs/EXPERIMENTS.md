@@ -694,3 +694,50 @@ Errores que se ven: faltan bloques grandes y brillantes, y sobran pozos chicos y
 
 Siguiente paso recomendado: un detector aprendido (CNN chica o BoulderNet) entrenado con este dataset, sumando los recortes lunares para tener más datos. Hay que decidirlo con Luqui (`plans/vision.md`).
 
+
+### Mask R-CNN propio entrenado con BoulderNet, validación dejando una imagen afuera (2026-11-15)
+
+`python -m vision.maskrcnn cv` entrena un Mask R-CNN de torchvision (ResNet-50 FPN v2, de COCO) con los 953 recortes de BoulderNet (Marte, Luna y Tierra), en una RTX 4060 Ti de 8 GB. En cada pliegue, una imagen HiRISE queda **entera afuera**: el modelo no ve ninguno de sus recortes. El umbral de score se elige con los recortes `validation` de las otras tres imágenes de Marte, sin mirar el test. Se usa el mismo emparejamiento que el detector de sombras (`vision.evaluate.score`, sin puntuar 4 m de borde). No se usan los pesos publicados de BoulderNet: se entrenaron con todo el dataset y piden detectron2.
+
+Configuración: recortes aleatorios de 256 px agrandados ×2, giros de 90° y espejos, anclas de 8 a 128 px, SGD con lr 0.01 y coseno, batch 6, 12 épocas (~1870 pasos, ~15 min por pliegue).
+
+| Imagen dejada afuera | Umbral | F1 ≥ 2 m (sombras → Mask R-CNN) | F1 ≥ 3 m (sombras → Mask R-CNN) | P / R ≥ 3 m |
+| --- | --- | --- | --- | --- |
+| ESP_017355_2260 | 0.6 | 0.33 → **0.70** | 0.49 → **0.71** | 0.71 / 0.72 |
+| ESP_025650_2165 | 0.5 | 0.42 → **0.60** | 0.47 → **0.59** | 0.56 / 0.62 |
+| ESP_028537_2270 | 0.5 | 0.49 → **0.76** | 0.46 → **0.82** | 0.87 / 0.77 |
+| ESP_037018_2170 | 0.6 | 0.13 → **0.45** | 0.30 → **0.45** | 0.65 / 0.34 |
+| Media | | 0.34 → **0.63** | 0.43 → **0.64** | |
+
+**Gana en las 8 comparaciones**, pero solo dos imágenes llegan a F1 ≥ 0.70. ESP_037018 (0.6 m/px, la más gruesa) es la peor: pierde dos tercios de los bloques. ESP_025650 tiene solo 87 bloques de 3 m o más: el número es ruidoso.
+
+Lo que falló en el camino:
+- Con recortes enteros de 500 px agrandados a 1000 px, un paso tardaba ~1.8 s con batch 2: con cientos de máscaras por recorte, 12 épocas por pliegue no entraban.
+- Con batch 8, la memoria creció hasta llenar los 8 GB. En Windows eso no da error: desborda a memoria compartida y cada paso pasó a tardar minutos (1 h perdida). Se arregló con `torch.cuda.set_per_process_memory_fraction(0.8)` y batch 6.
+- Un proceso suspendido no sobrevive a un apagado: el pliegue 2 se perdió a mitad y se relanzó.
+
+Umbral del modelo final (`vision.maskrcnn train`): **0.6**, el de mejor F1 medio (2 y 3 m) en la validación de los pliegues 2 a 4: 0.676, contra 0.673 con 0.5. La validación del pliegue 1 se perdió con el reinicio.
+
+#### S1094b, zona de la EVA: primera corrida a 0.5 m/px (falló)
+
+Siguiendo `plans/vision-bouldernet.md`, el orto se remuestreó a 0.5 m/px. Resultado: 3528 objetos de **3.2 a 27 m** (mediana 7 m), 2158 de ellos `not_visible_latest` y 27 celdas con pasillo menor a 1.02 m. Mirando un recorte de 100 m (x 200-300, y −1100 a −1000): el modelo marca los montículos de 5-10 m con su sombra y no ve un grupo de bloques de 1-2 m que se ve a ojo. A 0.25 m/px (la nativa; dos de las cuatro imágenes de entrenamiento son de 0.25) el mismo recorte da 4 detecciones de 2.7-4.3 m justo sobre ese grupo, y ningún montículo.
+
+En abril (ESP_073578, la más borrosa) el modelo casi no detecta nada: sus 3288 detecciones de febrero sin pareja en abril salían como `not_visible_latest`. Se cambió: solo en la fecha anterior = `single_epoch` sin castigo. Que el modelo no lo vea en una imagen borrosa no prueba que no esté.
+
+**Esto es un cambio de dominio que la validación cruzada no mide:** S1094b no tiene bloques marcados a mano. El F1 de arriba vale para las imágenes de BoulderNet, no para este sitio.
+
+#### S1094b a 0.25 m/px: zona de la EVA y vara de Tusberti
+
+`python -m vision.maskrcnn_run --model ../../data/processed/maskrcnn/final.pt` (umbral 0.6, modelo entrenado con todo BoulderNet). Zona de la EVA: **752 bloques** de 1.6-9.4 m (mediana 3.3), 130 detecciones en abril y 682 en febrero (sombras: 1448 y 2234 firmes). 57 `persistent`, 695 `single_epoch`. Solo **35** con altura de sombra: el resto va con `height_m: null`. Ninguna celda baja de 1.02 m de pasillo (mínimo 3 m). Catálogo válido contra el esquema. Modelo 15 min y sombras 8 min en la RTX 4060 Ti.
+
+Km² de Tusberti (`--zone tusberti`, `python -m vision.evaluate sfd ... --radius 564.19`):
+
+| | Tusberti et al. | Sombras (solo feb) | Mask R-CNN (dos fechas) |
+| --- | --- | --- | --- |
+| ≥ 1.8 m, por km² | ~2100 | 526 | 266 |
+| ≥ 2 m | ~1400 | 460 | 216 |
+| ≥ 3 m | ~220 | 247 | 62 |
+| ≥ 4 m | ~50 | 139 | 35 |
+| Índice sobre 1.8 m | −4.68 ± 0.15 | −1.86 ± 0.08 | −2.76 ± 0.17 |
+
+La forma mejora (la cola de grandes ya no sobra, el índice se acerca), pero **el conteo cae a la mitad del de sombras** y al 13 % del de Tusberti. En BoulderNet el modelo le gana a las sombras en las 8 comparaciones; en S1094b, sin etiquetas propias, la única vara externa dice que pierde muchos bloques. Probable cambio de dominio: incidencia de 63-68° (el entrenamiento de Marte va de 38° a 58°) y eyecta rugosa.
