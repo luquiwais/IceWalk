@@ -247,12 +247,14 @@ describe("Mission flow", () => {
     await joinAsIV();
     expect(screen.getByText(/EVA TERMINATE · walkback to the habitat/, visible)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Debrief the EVA" }));
-    expect(screen.getByRole("region", { name: "Measurement log" })).toHaveTextContent(first.id);
+    expect(screen.getByRole("list", { name: "Measurement log" })).toHaveTextContent(first.id);
+    await userEvent.click(screen.getByRole("button", { name: "Beyond one EVA" }));
     expect(screen.getByRole("img", { name: /P\(ice confirmed\) after 1 to 6 EVAs/ })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Back to the debrief" }));
     const layers = screen.getByRole("region", { name: "Map layers" });
     expect(within(layers).getByRole("button", { name: "What measuring changed" })).toHaveAttribute("aria-pressed", "true");
     await userEvent.click(screen.getByRole("button", { name: "Reset session" }));
-    expect(screen.getByRole("region", { name: "Measurement log" })).toHaveTextContent("Waiting for the first measurement");
+    expect(screen.getByRole("region", { name: "Debrief" })).toHaveTextContent("No measurements yet");
   });
 
   it("keeps the walk across phase changes", async () => {

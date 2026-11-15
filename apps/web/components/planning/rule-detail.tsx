@@ -36,7 +36,7 @@ export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRul
         <Fact label="Walking" value={clock(sum("traverse"))} note={`${formatNumber(plan.summary.distance_km, 2)} km`} />
         <Fact label="At stations" value={clock(sum("station"))} note={`${stations.length} stations`} />
         <Fact label="Ingress" value={clock(sum("ingress"))} />
-        <Fact label="Reserve" value={c ? clock(c.eva_max_h * 60 * c.reserve) : dash} note={c ? `${Math.round(c.reserve * 100)} % of ${c.eva_max_h} h, kept free` : "STM unknown"} />
+        <Fact label="Reserve" value={c ? clock(c.eva_max_h * 60 * c.reserve) : dash} note={c ? `${Math.round(c.reserve * 100)} % of ${c.eva_max_h} h` : "STM unknown"} />
         <Fact label="Left in budget" value={budget ? clock(Math.max(0, budget - plan.summary.duration_min)) : dash} />
       </dl>
       <button type="button" className="mission-text-link" onClick={onTimeline}>Show on the timeline<ChevronRight aria-hidden /></button>

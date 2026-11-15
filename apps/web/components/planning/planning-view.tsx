@@ -263,7 +263,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
               onAccept={accept} onReturn={terminate} onDebrief={() => goTo("debrief")}
               tracker={<div className="mission-tracker"><EvaMinimap plan={plan} path={evaPath} measurements={session.measurements} pose={evPose} nextId={returning ? undefined : next?.id} elapsedMin={elapsedMin} marginMin={plan.summary.min_walkback_margin_min} orientation="north" layout="panel" previousPath={previousPath} walkback={returning ? walkback?.path : undefined} /></div>} />}
         </section>
-          : <DebriefPanel plan={plan} measurements={session.measurements} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
+          : <DebriefPanel plan={plan} previousPlan={session.previous ?? undefined} measurements={session.measurements} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
 
   return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-choosing={choosing} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); else if (briefPoint) backToFlyOver(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
