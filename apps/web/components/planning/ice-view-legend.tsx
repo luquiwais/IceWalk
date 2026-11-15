@@ -30,7 +30,7 @@ export function IceViewLegend({ map, mode }: { map: IceMap; mode: IceViewMode })
         <span className="mission-ice-axis" aria-hidden>Prior only</span>
         <span className="mission-ice-scale-labels" aria-hidden><span>Less likely</span><span>Likelier</span></span>
       </span>
-      <span className="mission-ice-known">Background {Math.round(map.prior_probability * 100)}%: regional prior · local evidence near craters and measurements covers {Math.round(known * 100)}% of the area · labels: real peak; halos drawn wider than the model's reach</span>
+      <span className="mission-ice-known">Background {Math.round(map.prior_probability * 100)}%: regional prior · local evidence near craters and measurements covers {Math.round(known * 100)}% of the area · labels: real peak; halos drawn wider than the model&apos;s reach</span>
     </span>
   );
 }
