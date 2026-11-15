@@ -206,8 +206,10 @@
 .eva-topbar > span { display: inline-flex; align-items: center; gap: .5rem; }
 .site3d-credit[data-compact] { left: auto; right: var(--mission-edge, 1rem); bottom: auto; top: 56px; max-width: min(520px, 50%);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10px; opacity: .7; }
-.site3d-stage[data-mode="helmet"] .eva-minimap, .site3d-stage[data-mode="watch"] .eva-minimap { bottom: calc(var(--mission-dock-h, 64px) + 16px); }
-.site3d-stage[data-mode="helmet"] .eva-arrival { bottom: calc(var(--mission-dock-h, 64px) + 24px); }
+/* Above the dock as measured (--mission-timeline-y: its top from the bottom), so an open timeline never
+   covers the arrival question or the track map. */
+.site3d-stage[data-mode="helmet"] .eva-minimap, .site3d-stage[data-mode="watch"] .eva-minimap { bottom: calc(var(--mission-timeline-y, 80px) + 8px); }
+.site3d-stage[data-mode="helmet"] .eva-arrival { bottom: calc(var(--mission-timeline-y, 80px) + 12px); z-index: 5; }
 .eva-minimap { font-family: var(--font-sans, system-ui, sans-serif); }
 .eva-minimap-label { font-family: var(--font-sans, system-ui, sans-serif); font-size: 10px; }
 .eva-progress dl { font-family: var(--font-sans, system-ui, sans-serif); }

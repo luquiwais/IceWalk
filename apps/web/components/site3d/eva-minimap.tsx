@@ -86,7 +86,9 @@ export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin,
   const pts: [number, number][] = [...path.map((p) => [p.x, p.y] as [number, number]), ...(walkback ?? []).map((p) => [p.x, p.y] as [number, number]), [hab[0], hab[1]], [pose.x, pose.y]];
   const at = minimapFrame(pts, pose, orientation);
   const measured = new Set(measurements.map((m) => m.station_id));
-  const done = stations.filter((s) => measured.has(s.id)).length;
+  // A replan drops the stations already measured from the plan: count them from the log.
+  const done = measured.size;
+  const total = stations.filter((s) => !measured.has(s.id)).length + done;
   const lastDone = [...measurements].reverse().find((m) => stations.some((s) => s.id === m.station_id));
   const nextStop = stations.find((s) => s.id === nextId);
   const progress = routeProgress(path, pose, { from: lastDone?.position, to: nextStop?.position });
@@ -99,7 +101,7 @@ export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin,
   const fmt = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
   return (
     <section className="eva-minimap" data-layout={layout} aria-label="EVA progress">
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Track map, ${orientation === "heading" ? "heading" : "north"} up: ${done} of ${stations.length} stations measured, ${Math.round(progress * 100)}% of the route`}>
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Track map, ${orientation === "heading" ? "heading" : "north"} up: ${done} of ${total} stations measured, ${Math.round(progress * 100)}% of the route`}>
         {previousPath?.length ? <polyline points={poly(previousPath)} className="eva-minimap-previous" /> : null}
         <polyline points={poly(path)} className="eva-minimap-route" data-faded={walkback?.length ? true : undefined} />
         {walked.length > 1 ? <polyline points={poly(walked)} className="eva-minimap-walked" /> : null}
@@ -123,7 +125,7 @@ export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin,
       <div className="eva-progress">
         <div className="eva-progress-bar" aria-hidden><i style={{ width: `${Math.round(progress * 100)}%` }} /></div>
         <dl>
-          <div><dt>Stations</dt><dd>{done} / {stations.length}</dd></div>
+          <div><dt>Stations</dt><dd>{done} / {total}</dd></div>
           <div><dt>Route</dt><dd>{Math.round(progress * 100)}%</dd></div>
           <div><dt>PET</dt><dd>{fmt(elapsedMin)}</dd></div>
           {marginMin != null ? <div><dt>Margin</dt><dd>{formatNumber(marginMin, 0)} min</dd></div> : null}
