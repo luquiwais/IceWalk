@@ -33,6 +33,33 @@
       "maxItems": 2,
       "description": "Habitat position in grid meters (x, y) the plan starts and ends at. The operator can move it (POST /plan habitat_xy); absent in older plans, which used config/eva.yaml"
     },
+    "habitat_area_m": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "xmin": {
+          "type": "number"
+        },
+        "xmax": {
+          "type": "number"
+        },
+        "ymin": {
+          "type": "number"
+        },
+        "ymax": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "xmin",
+        "xmax",
+        "ymin",
+        "ymax"
+      ],
+      "description": "Box in grid meters where the operator may move the habitat (config/eva.yaml habitat_area_m). Absent or null: the habitat cannot be moved"
+    },
     "stations": {
       "type": "array",
       "items": {

@@ -234,9 +234,9 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     {onMap ? <div className="mission-map-tools" ref={toolsRef}>
       {legendOpen ? <Window className="mission-legend-card">
       <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
-        {iceMap.map && mapMode ? <IceViewLegend map={iceMap.map} mode={mapMode} habitat={habitatOf(plan)} /> : null}
+        {iceMap.map && mapMode ? <IceViewLegend map={iceMap.map} mode={mapMode} habitat={habitatOf(plan)} goal={phase === "plan" ? plan.summary.strategy ?? "learn" : undefined} /> : null}
         <span className="mission-legend-keys">
-          <span><i data-key="hab" aria-hidden />{canMoveHabitat ? "Habitat · drag to move" : "Habitat"}</span><span><i data-key="route" aria-hidden />Traverse</span>{phase === "plan" ? <span><i data-key="station" aria-hidden>1</i>Station · select for details</span> : null}
+          <span title={canMoveHabitat ? "Drag the habitat to move it and re-plan" : undefined}><i data-key="hab" aria-hidden />{canMoveHabitat ? "Habitat · drag" : "Habitat"}</span><span><i data-key="route" aria-hidden />Traverse</span>{phase === "plan" ? <span title="Select a station for its details"><i data-key="station" aria-hidden>1</i>Station · select</span> : null}
           {layers.rings ? <span><i data-key="ring" aria-hidden />Distance rings</span> : null}{(reviewing || phase === "debrief") && session.previous ? <span><i data-key="previous" aria-hidden />Plan before the last result</span> : null}
         </span>
         <span className="mission-legend-source">Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>

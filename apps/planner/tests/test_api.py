@@ -92,6 +92,8 @@ def test_every_plan_reports_its_habitat():
 def test_plan_reports_its_habitat_and_the_operator_can_move_it():
     base = client.post("/plan", json={}).json()
     assert base["habitat_xy"] == [300.0, -2200.0]
+    area = {"xmin": -1200.0, "xmax": 1800.0, "ymin": -3000.0, "ymax": 600.0}
+    assert base["habitat_area_m"] == area
     moved = client.post("/plan", json={"habitat_xy": [800, -1200]}).json()
     jsonschema.validate(moved, PLAN_SCHEMA)
     hx, hy = moved["habitat_xy"]

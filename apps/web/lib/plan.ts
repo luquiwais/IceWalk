@@ -129,6 +129,8 @@ export type Plan = {
   replanned_from?: string | null;
   /** Habitat the plan starts and ends at (grid meters); the operator can move it. Absent in older plans. */
   habitat_xy?: [number, number];
+  /** Where the operator may move the habitat (grid meters); null or absent: it cannot be moved. */
+  habitat_area_m?: { xmin: number; xmax: number; ymin: number; ymax: number } | null;
   stations: Station[];
   route: { type: "FeatureCollection"; features: unknown[] };
   timeline: TimelineItem[];

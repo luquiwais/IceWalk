@@ -662,3 +662,6 @@
 /* A new plan is being built: hide the old route and stations rather than show them frozen. */
 .site-scene :is(.site-route, .site-route-halo, .site-route-previous, .site-chevrons, .site-station, .site-dropped, .site-leader) { transition: opacity .15s ease; }
 .site-scene[data-stale] :is(.site-route, .site-route-halo, .site-route-previous, .site-chevrons, .site-station, .site-dropped, .site-range, .site-range-label, .site-leader) { opacity: 0; pointer-events: none; }
+.site-hab-area { fill: rgb(10 132 255 / .06); stroke: rgb(255 255 255 / .7); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.site-hab-ghost[data-outside] { background: var(--color-warning, #ff453a); }
+.site-hab-ghost[data-outside] span { color: var(--color-warning, #ff453a); }
