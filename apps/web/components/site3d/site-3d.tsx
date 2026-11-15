@@ -51,6 +51,8 @@ export type Site3DProps = {
   /** Station ids already measured (dim markers) and the one the crew heads to (bright beacon). */
   measured?: readonly string[];
   activeId?: string;
+  /** Heading home: the bright light column stands at the habitat. */
+  homeActive?: boolean;
   /** Ice map raster (data URL) and its bounds in grid meters, draped on the terrain. */
   ice?: { url: string; bounds: Box } | null;
   onError?: (message: string) => void;
@@ -74,7 +76,7 @@ type Ground = {
 type Marker = { id: string; x: number; y: number; fill: THREE.MeshBasicMaterial; rings: THREE.LineBasicMaterial[]; beacon: THREE.MeshBasicMaterial; state: "active" | "planned" | "measured" };
 
 /** Real S1094b terrain (HiRISE DTM + ortho), real boulders, the plan route and waypoint overlays, in WebGL. */
-export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove = true, exaggeration, measured, activeId, ice, onError, initialPose, teleport, onMove }: Site3DProps) {
+export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove = true, exaggeration, measured, activeId, homeActive = false, ice, onError, initialPose, teleport, onMove }: Site3DProps) {
   const host = useRef<HTMLDivElement>(null);
   const labelsHost = useRef<HTMLDivElement>(null);
   const modeRef = useRef({ mode, allowMove });
@@ -421,6 +423,24 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       removers.push(g.addLabel(`${String(st.order).padStart(2, "0")} ${st.id}${state === "measured" ? " · measured" : state === "active" ? " · next" : ""}`, toWorld(x, y, overview ? 60 : 4), state === "active" ? "station-active" : "station"));
       list.push({ id: st.id, x, y, fill, rings, beacon: beam, state });
     }
+    if (homeActive && inBox(HABITAT_XY[0], HABITAT_XY[1])) {
+      const beamGeo = new THREE.CylinderGeometry(beacon.radius * 1.4, beacon.radius * 1.4, beacon.height, 16, 1, true);
+      const beam = new THREE.MeshBasicMaterial({ color: "#9fe8ff", map: beamTexture, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+      const mesh = new THREE.Mesh(beamGeo, beam);
+      mesh.position.copy(toWorld(HABITAT_XY[0], HABITAT_XY[1], beacon.height / 2));
+      group.add(mesh);
+      geos.push(beamGeo); mats.push(beam);
+      const ringMats = [r1 * 2, r2 * 2, r3 * 2].map((r) => {
+        const geo = new THREE.BufferGeometry().setFromPoints(circle(HABITAT_XY, r, 72).map(([px, py]) => toWorld(px, py, lift)));
+        const mat = new THREE.LineBasicMaterial({ color: "#9fe8ff", transparent: true, opacity: 0.9, depthWrite: false });
+        group.add(new THREE.LineLoop(geo, mat));
+        geos.push(geo); mats.push(mat);
+        return mat;
+      });
+      const fill = new THREE.MeshBasicMaterial({ color: "#9fe8ff", transparent: true, opacity: 0, depthWrite: false });
+      mats.push(fill);
+      list.push({ id: "@habitat", x: HABITAT_XY[0], y: HABITAT_XY[1], fill, rings: ringMats, beacon: beam, state: "active" });
+    }
     g.scene.add(group);
     markers.current = list;
     return () => {
@@ -431,7 +451,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       removers.forEach((r) => r());
       markers.current = [];
     };
-  }, [ready, plan, previousPlan, path, measuredKey, activeId, level]);
+  }, [ready, plan, previousPlan, path, measuredKey, activeId, homeActive, level]);
 
   // Ice map draped on the terrain: a copy of the terrain mesh with UVs in the raster's bounds.
   useEffect(() => {

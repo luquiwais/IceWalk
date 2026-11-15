@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { HABITAT_XY } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
+import { probabilityAt } from "@/lib/ice-map";
 import { ICE_RADIUS_M, renderIceView } from "@/lib/ice-view";
 import { bearing, decisionPointFor, measuringTool, nextStation, toolName, toolReachM, type Measurement, type Plan, type ReplanAssessment, type Station } from "@/lib/plan";
 import { walkPath, type Site3DData } from "@/lib/site3d";
@@ -41,6 +42,8 @@ type Props = {
   onReturn?: () => void;
   /** Helmet only: leave the full-screen helmet for the IV console. */
   onLeave?: () => void;
+  /** Helmet only: the EV is back at the habitat with nothing left to do. */
+  onComplete?: () => void;
 };
 
 const fmtClock = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
@@ -50,7 +53,7 @@ const fmtClock = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 6
  * the map book; during the EVA it is the EV's helmet view with waypoint rings, arrival and the
  * plan update when a measurement replans the traverse.
  */
-export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave }: Props) {
+export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave, onComplete }: Props) {
   const [data, setData] = useState<Site3DData>();
   const [error, setError] = useState("");
   const [chosen, setChosen] = useState<"fly" | "stand">("fly");
@@ -78,6 +81,9 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
   const dir = bearing([pose.x, pose.y], target);
   const turn = ((dir.deg - pose.headingDeg + 540) % 360) - 180;
   const arrived = helmet && next && dir.distanceM <= AT_STATION_M && !reviewing;
+  // Terminated, or every station done: the light column moves to the habitat; arriving ends the EVA.
+  const home = helmet && !next && !reviewing;
+  const atHome = home && dir.distanceM <= 12;
   const decide = next ? decisionPointFor(plan, next.id) : undefined;
   const margin = next ? plan.timeline.find((t) => t.kind === "station" && t.station_id === next.id)?.walkback_margin_min : plan.summary.min_walkback_margin_min;
 
@@ -86,7 +92,7 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
       {data && !error ? (
         <Site3D data={data} level={view === "stand" ? "detail" : "overview"} plan={plan} previousPlan={reviewing ? previousPlan : undefined} path={path}
           mode={view === "stand" ? "free" : "orbit"} allowMove={helmet} exaggeration={view === "stand" ? 1 : 3}
-          measured={measuredIds} activeId={next?.id} ice={ice} onError={onError} initialPose={pose} teleport={jump} onMove={onPose} />
+          measured={measuredIds} activeId={next?.id} homeActive={home} ice={ice} onError={onError} initialPose={pose} teleport={jump} onMove={onPose} />
       ) : (
         <div className="site3d-status">{error || "Loading the HiRISE terrain..."}</div>
       )}
@@ -117,9 +123,18 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
         </header>
       ) : null}
       {arrived && next && onLog ? <ArrivalPrompt station={next} pending={pending} onLog={onLog} /> : null}
+      {atHome ? (
+        <section className="site3d-update eva-arrival" role="alertdialog" aria-label="Back at the habitat">
+          <span className="site3d-hud-key">Habitat · ingress</span>
+          <strong className="site3d-update-call">EVA complete</strong>
+          <span className="site3d-update-line">{measurements.length} station{measurements.length === 1 ? "" : "s"} measured{returning ? " · terminated early" : ""}.</span>
+          {onComplete ? <div className="site3d-hud-actions"><Button size="small" variant="prominent" onClick={onComplete}>Go to debrief</Button></div> : null}
+        </section>
+      ) : null}
       {helmet ? <EvaMinimap plan={plan} path={path} measurements={measurements} pose={pose} nextId={next?.id} elapsedMin={elapsedMin} marginMin={margin ?? undefined} /> : null}
       {helmet && reviewing && previousPlan && measurements.length ? (
-        <PlanUpdate before={previousPlan} after={plan} measurement={measurements[measurements.length - 1]} onAccept={onAccept} onReturn={onReturn} />
+        <PlanUpdate before={previousPlan} after={plan} measurement={measurements[measurements.length - 1]} onAccept={onAccept} onReturn={onReturn}
+          mapAfter={iceMap.map ? probabilityAt(iceMap.map, measurements[measurements.length - 1].position[0], measurements[measurements.length - 1].position[1]) : undefined} />
       ) : null}
 
       <p className="site3d-credit">
@@ -153,7 +168,7 @@ function ArrivalPrompt({ station, pending, onLog }: { station: Station; pending:
 const CALL: Record<ReplanAssessment["recommendation"], string> = { continue: "Continue", return_to_habitat: "EVA TERMINATE · walk back" };
 
 /** The replan as the EV sees it: the planner's call, the next station before and after, the margin. */
-function PlanUpdate({ before, after, measurement, onAccept, onReturn }: { before: Plan; after: Plan; measurement: Measurement; onAccept?: () => void; onReturn?: () => void }) {
+function PlanUpdate({ before, after, measurement, onAccept, onReturn, mapAfter }: { before: Plan; after: Plan; measurement: Measurement; onAccept?: () => void; onReturn?: () => void; mapAfter?: number }) {
   const r = after.replan;
   const done = [measurement];
   const oldNext = nextStation(before, done);
@@ -161,12 +176,17 @@ function PlanUpdate({ before, after, measurement, onAccept, onReturn }: { before
   const back = r?.recommendation === "return_to_habitat";
   const result = measurement.result === "no_ice" ? "No ice" : measurement.result === "ice" ? "Ice" : "Inconclusive";
   const change = oldNext && newNext && oldNext.id !== newNext.id ? ` (was ${oldNext.id})` : oldNext?.id === newNext?.id ? " (unchanged)" : "";
+  const mapBefore = before.stations.find((s) => s.id === measurement.station_id)?.p_ice;
+  const unchanged = !!r && r.stations_added.length === 0 && r.stations_dropped.length === 0;
+  const small = mapBefore != null && mapAfter != null && Math.abs(mapAfter - mapBefore) < 0.05;
   return (
     <section className="site3d-update" role="alertdialog" aria-label="Plan update" data-alert={back ? "caution" : undefined}>
       <span className="site3d-hud-key">Plan update · {result} at {measurement.station_id}</span>
       <strong className="site3d-update-call">{r ? CALL[r.recommendation] : "Review the new plan"}</strong>
       {r?.iv_decision ? <span className="site3d-update-line">Large replan: IV decision</span> : null}
       <span className="site3d-update-line">Next: {newNext ? newNext.id : "habitat"}{change}</span>
+      {mapBefore != null && mapAfter != null ? <span className="site3d-update-line">Ice map at {measurement.station_id}: {Math.round(mapBefore * 100)}% → {Math.round(mapAfter * 100)}%</span> : null}
+      {unchanged ? <span className="site3d-update-line">Route unchanged: {small ? `a ${toolName(measurement.tool)} result to ${measurement.depth_m ?? "?"} m barely moves P(ice within ${after.summary.ice_threshold_m ?? 3} m)` : "the plan still holds"}.</span> : null}
       {r?.margin_before_min != null && r.margin_after_min != null ? <span className="site3d-update-line">Walkback margin {formatNumber(r.margin_before_min, 0)} → {formatNumber(r.margin_after_min, 0)} min</span> : null}
       {r ? <span className="site3d-update-line">+{r.stations_added.length} / −{r.stations_dropped.length} stations · faded line: old route</span> : null}
       <div className="site3d-hud-actions">
