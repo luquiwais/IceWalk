@@ -4,7 +4,7 @@ import { Button } from "@icewalk/ui/button";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { HABITAT_XY } from "@/components/site/site-data";
+import { habitatOf } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
 import { probabilityAt } from "@/lib/ice-map";
 import { ICE_RADIUS_M, renderIceView } from "@/lib/ice-view";
@@ -63,7 +63,7 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
   const view = helmet ? "stand" : jump && jump.key > 0 && chosen === "fly" ? "stand" : chosen;
   const path = useMemo(() => walkPath(plan), [plan]);
   const iceMap = useIceMap(plan.plan_id, source);
-  const ice = useMemo(() => (iceOn && iceMap.map ? renderIceView(iceMap.map, "likely", HABITAT_XY, ICE_RADIUS_M) ?? null : null), [iceOn, iceMap.map]);
+  const ice = useMemo(() => (iceOn && iceMap.map ? renderIceView(iceMap.map, "likely", habitatOf(plan), ICE_RADIUS_M) ?? null : null), [iceOn, iceMap.map, plan]);
   const measuredIds = useMemo(() => measurements.map((m) => m.station_id), [measurements]);
   const next = returning ? undefined : nextStation(plan, [...measurements]);
 
@@ -77,7 +77,7 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
   }, []);
   const onError = useCallback((message: string) => setError(message), []);
 
-  const target = next?.position ?? HABITAT_XY;
+  const target = next?.position ?? habitatOf(plan);
   const dir = bearing([pose.x, pose.y], target);
   const turn = ((dir.deg - pose.headingDeg + 540) % 360) - 180;
   const arrived = helmet && next && dir.distanceM <= AT_STATION_M && !reviewing;

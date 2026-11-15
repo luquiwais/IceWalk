@@ -127,6 +127,8 @@ export type Plan = {
   mission_id: string;
   plan_id: string;
   replanned_from?: string | null;
+  /** Habitat the plan starts and ends at (grid meters); the operator can move it. Absent in older plans. */
+  habitat_xy?: [number, number];
   stations: Station[];
   route: { type: "FeatureCollection"; features: unknown[] };
   timeline: TimelineItem[];

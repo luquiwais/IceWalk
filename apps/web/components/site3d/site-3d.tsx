@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { CRATER_XY, HABITAT_XY } from "@/components/site/site-data";
+import { CRATER_XY, habitatOf } from "@/components/site/site-data";
 import { orderedStations, type Plan } from "@/lib/plan";
 import { circle, Heightfield, walkPath, type Box, type PathPoint, type Site3DData, type Site3DLevelName } from "@/lib/site3d";
 
@@ -86,11 +86,14 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
   const keys = useRef(new Set<string>());
   const free = useRef(initialPose
     ? { x: initialPose.x, y: initialPose.y, yaw: (initialPose.headingDeg * Math.PI) / 180, pitch: -0.08 }
-    : { x: HABITAT_XY[0], y: HABITAT_XY[1], yaw: 0, pitch: -0.08 });
+    : { x: habitatOf(plan)[0], y: habitatOf(plan)[1], yaw: 0, pitch: -0.08 });
   const moveCb = useRef(onMove);
   const measuredKey = (measured ?? []).join(",");
   useEffect(() => { modeRef.current = { mode, allowMove }; }, [mode, allowMove]);
   useEffect(() => { moveCb.current = onMove; }, [onMove]);
+  // The terrain is built once per level; it reads the plan's habitat at that moment (set just before).
+  const habitatRef = useRef<[number, number]>(habitatOf(plan));
+  useEffect(() => { habitatRef.current = habitatOf(plan); }, [plan]);
   useEffect(() => {
     if (teleport) free.current = { ...free.current, x: teleport.x, y: teleport.y, yaw: (teleport.headingDeg * Math.PI) / 180 };
   }, [teleport]);
@@ -237,7 +240,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       }
 
       // Habitat and crater.
-      const [hx, hy] = HABITAT_XY;
+      const [hx, hy] = habitatRef.current;
       if (inBox(hx, hy)) {
         const g = new THREE.CylinderGeometry(level === "overview" ? 18 : 5, level === "overview" ? 22 : 6, level === "overview" ? 30 : 7, 24);
         const m = new THREE.MeshStandardMaterial({ color: "#eef1f5", roughness: 0.6 });
@@ -250,7 +253,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       if (inBox(...CRATER_XY)) addLabel("S1094b · ice exposed by a 2021 impact", toWorld(CRATER_XY[0], CRATER_XY[1], 25), "crater");
 
       // Walkback limit ring (NASA ICES-2026-127: 30 min at 3.5 km/h).
-      const ring = circle(HABITAT_XY, WALKBACK_M).filter(([x, y]) => inBox(x, y)).map(([x, y]) => toWorld(x, y, 1.5));
+      const ring = circle(habitatRef.current, WALKBACK_M).filter(([x, y]) => inBox(x, y)).map(([x, y]) => toWorld(x, y, 1.5));
       if (ring.length > 1) {
         const g = new THREE.BufferGeometry().setFromPoints(ring);
         const m = new THREE.LineDashedMaterial({ color: "#ffffff", dashSize: 30, gapSize: 20 });
@@ -423,15 +426,16 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       removers.push(g.addLabel(`${String(st.order).padStart(2, "0")} ${st.id}${state === "measured" ? " · measured" : state === "active" ? " · next" : ""}`, toWorld(x, y, overview ? 60 : 4), state === "active" ? "station-active" : "station"));
       list.push({ id: st.id, x, y, fill, rings, beacon: beam, state });
     }
-    if (homeActive && inBox(HABITAT_XY[0], HABITAT_XY[1])) {
+    const home = habitatOf(plan);
+    if (homeActive && inBox(home[0], home[1])) {
       const beamGeo = new THREE.CylinderGeometry(beacon.radius * 1.4, beacon.radius * 1.4, beacon.height, 16, 1, true);
       const beam = new THREE.MeshBasicMaterial({ color: "#9fe8ff", map: beamTexture, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
       const mesh = new THREE.Mesh(beamGeo, beam);
-      mesh.position.copy(toWorld(HABITAT_XY[0], HABITAT_XY[1], beacon.height / 2));
+      mesh.position.copy(toWorld(home[0], home[1], beacon.height / 2));
       group.add(mesh);
       geos.push(beamGeo); mats.push(beam);
       const ringMats = [r1 * 2, r2 * 2, r3 * 2].map((r) => {
-        const geo = new THREE.BufferGeometry().setFromPoints(circle(HABITAT_XY, r, 72).map(([px, py]) => toWorld(px, py, lift)));
+        const geo = new THREE.BufferGeometry().setFromPoints(circle(home, r, 72).map(([px, py]) => toWorld(px, py, lift)));
         const mat = new THREE.LineBasicMaterial({ color: "#9fe8ff", transparent: true, opacity: 0.9, depthWrite: false });
         group.add(new THREE.LineLoop(geo, mat));
         geos.push(geo); mats.push(mat);
@@ -439,7 +443,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       });
       const fill = new THREE.MeshBasicMaterial({ color: "#9fe8ff", transparent: true, opacity: 0, depthWrite: false });
       mats.push(fill);
-      list.push({ id: "@habitat", x: HABITAT_XY[0], y: HABITAT_XY[1], fill, rings: ringMats, beacon: beam, state: "active" });
+      list.push({ id: "@habitat", x: home[0], y: home[1], fill, rings: ringMats, beacon: beam, state: "active" });
     }
     g.scene.add(group);
     markers.current = list;

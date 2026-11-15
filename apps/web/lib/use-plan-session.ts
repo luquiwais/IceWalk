@@ -37,6 +37,8 @@ export type PlanSessionState = {
   isMock: boolean | null;
   error: PlannerApiError | null;
   apiConfigured: boolean;
+  /** Why the last habitat move was refused (the planner's reason), or null. */
+  habitatError: string | null;
 };
 
 export type PlanSessionOptions = {
@@ -57,6 +59,8 @@ export type PlanSession = {
   reset: () => void;
   /** Re-plans from the habitat with another strategy: learn (reduce uncertainty) or confirm (go where ice is likeliest). */
   setStrategy: (strategy: Strategy) => Promise<void>;
+  /** Re-plans from a habitat the operator placed (grid meters); keeps the plan if the planner refuses it. */
+  setHabitat: (xy: [number, number]) => Promise<void>;
   dispose: () => void;
 };
 
@@ -72,16 +76,18 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
   /** The nominal plan from POST /plan; reset returns to it (the server keeps it by plan_id). */
   let nominal: Plan | null = null;
   let strategy: Strategy = "learn";
+  let habitat: [number, number] | null = null;
   let generation = 0;
   let controller: AbortController | null = null;
   let state: PlanSessionState = {
     ...mockState(fallback.plan),
     status: baseUrl ? "idle" : "ready",
     apiConfigured: Boolean(baseUrl),
+    habitatError: null,
   };
 
   function mockState(plan: Plan): Omit<PlanSessionState, "status" | "apiConfigured"> {
-    return { plan, previous: null, measurements: [], source: "mock", planner: null, isMock: isMock(plan), error: null };
+    return { plan, previous: null, measurements: [], source: "mock", planner: null, isMock: isMock(plan), error: null, habitatError: null };
   }
 
   function set(patch: Partial<PlanSessionState>) {
@@ -103,7 +109,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     set({ status: "loading" });
     const [health, plan] = await Promise.allSettled([
       getHealth({ ...api, signal, timeoutMs: Math.min(api.timeoutMs ?? 5_000, 5_000) }),
-      postPlan({ ...stm, measurements: [], strategy }, { ...api, signal }),
+      postPlan({ ...stm, measurements: [], strategy, ...(habitat ? { habitat_xy: habitat } : {}) }, { ...api, signal }),
     ]);
     if (id !== generation) return;
     if (plan.status === "fulfilled") {
@@ -117,6 +123,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
         planner: health.status === "fulfilled" ? health.value.planner : null,
         isMock: isMock(plan.value),
         error: null,
+        habitatError: null,
       });
     } else {
       nominal = null;
@@ -175,6 +182,27 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     set({ ...mockState(strategy === "confirm" && fallback.confirm ? fallback.confirm : fallback.plan), status: "ready" });
   }
 
+  async function setHabitat(xy: [number, number]) {
+    if (!baseUrl || state.source !== "api") {
+      set({ habitatError: "Moving the habitat needs the planner API." });
+      return;
+    }
+    const { id, signal } = begin();
+    set({ status: "loading", habitatError: null });
+    try {
+      const plan = await postPlan({ ...stm, measurements: [], strategy, habitat_xy: xy }, { ...api, signal });
+      if (id !== generation) return;
+      habitat = plan.habitat_xy ?? xy;
+      nominal = plan;
+      set({ plan, previous: null, measurements: [], status: "ready", isMock: isMock(plan), error: null, habitatError: null });
+    } catch (error) {
+      if (id !== generation) return;
+      const e = asError(error);
+      // The plan stays as it was: only the move is refused, with the planner's reason.
+      set({ status: "ready", habitatError: e.detail ?? "The planner could not place the habitat there." });
+    }
+  }
+
   async function setStrategy(next: Strategy) {
     strategy = next;
     if (!baseUrl) {
@@ -195,6 +223,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     logMeasurement,
     reset,
     setStrategy,
+    setHabitat,
     dispose() {
       generation += 1;
       controller?.abort();
@@ -211,7 +240,7 @@ export function usePlanSession(options: PlanSessionOptions = {}) {
     void session.start();
     return () => session.dispose();
   }, [session]);
-  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset, setStrategy: session.setStrategy };
+  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset, setStrategy: session.setStrategy, setHabitat: session.setHabitat };
 }
 
 /** One discreet line for the UI about where the plan comes from. */

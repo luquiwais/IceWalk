@@ -13,8 +13,9 @@ const U_SAMPLES = [0.1, 1];
  * Legend of the combined ice map: a small grid where probability runs left to right and
  * certainty top to bottom, drawn with the map's own colors, and one line in words.
  */
-export function IceViewLegend({ map, mode }: { map: IceMap; mode: IceViewMode }) {
-  const known = useMemo(() => knownFraction(blocks(map).filter((b) => Math.hypot(b.x - HABITAT_XY[0], b.y - HABITAT_XY[1]) <= ICE_RADIUS_M)), [map]);
+export function IceViewLegend({ map, mode, habitat = HABITAT_XY }: { map: IceMap; mode: IceViewMode; habitat?: readonly [number, number] }) {
+  const [hx, hy] = habitat;
+  const known = useMemo(() => knownFraction(blocks(map).filter((b) => Math.hypot(b.x - hx, b.y - hy) <= ICE_RADIUS_M)), [map, hx, hy]);
   if (mode === "change") return <span className="mission-ice-legend"><IceLegend map={map} mode="change" /></span>;
   return (
     <span className="mission-ice-legend" data-mode={mode}>

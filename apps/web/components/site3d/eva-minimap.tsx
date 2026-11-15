@@ -1,4 +1,4 @@
-import { HABITAT_XY } from "@/components/site/site-data";
+import { habitatOf } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
 import { orderedStations, type Measurement, type Plan } from "@/lib/plan";
 import type { PathPoint } from "@/lib/site3d";
@@ -26,8 +26,9 @@ export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin,
   plan: Plan; path: readonly PathPoint[]; measurements: readonly Measurement[]; pose: FreePose; nextId?: string; elapsedMin: number; marginMin?: number;
 }) {
   const stations = orderedStations(plan);
-  const xs = [...path.map((p) => p.x), HABITAT_XY[0], pose.x];
-  const ys = [...path.map((p) => p.y), HABITAT_XY[1], pose.y];
+  const hab = habitatOf(plan);
+  const xs = [...path.map((p) => p.x), hab[0], pose.x];
+  const ys = [...path.map((p) => p.y), hab[1], pose.y];
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
   const span = Math.max(maxX - minX, maxY - minY, 50);
   const k = (SIZE - 2 * PAD) / span;
@@ -46,7 +47,7 @@ export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin,
         <g transform={`rotate(${-pose.headingDeg} ${sx(pose.x)} ${sy(pose.y)})`}>
         <polyline points={line} className="eva-minimap-route" />
         {walked ? <polyline points={walked} className="eva-minimap-walked" /> : null}
-        <rect x={sx(HABITAT_XY[0]) - 5} y={sy(HABITAT_XY[1]) - 5} width={10} height={10} className="eva-minimap-hab" />
+        <rect x={sx(hab[0]) - 5} y={sy(hab[1]) - 5} width={10} height={10} className="eva-minimap-hab" />
         {stations.map((s) => {
           const state = measured.has(s.id) ? "done" : s.id === nextId ? "next" : "todo";
           return <g key={s.id} data-state={state}>

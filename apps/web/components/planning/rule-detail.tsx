@@ -1,6 +1,6 @@
 import { Footnote } from "@icewalk/ui/text";
 import { ChevronRight } from "lucide-react";
-import { HABITAT_XY } from "@/components/site/site-data";
+import { habitatOf } from "@/components/site/site-data";
 import type { FlightRule } from "@/lib/flight-rules";
 import { formatNumber, formatPercent } from "@/lib/format";
 import { decisionPointFor, missionConstraints, orderedStations, stationBlock, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
@@ -55,11 +55,12 @@ export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRul
   }
 
   if (rule.id === "distance") {
-    const far = Math.max(...stations.map((s) => Math.hypot(s.position[0] - HABITAT_XY[0], s.position[1] - HABITAT_XY[1])));
+    const [hx, hy] = habitatOf(plan);
+    const far = Math.max(...stations.map((s) => Math.hypot(s.position[0] - hx, s.position[1] - hy)));
     return <section className="mission-detail" aria-label="Distance detail">{head}
       <table className="mission-table">
         <thead><tr><th>#</th><th>Station</th><th>From habitat</th><th></th></tr></thead>
-        <tbody>{stations.map((s) => { const d = Math.hypot(s.position[0] - HABITAT_XY[0], s.position[1] - HABITAT_XY[1]); return <tr key={s.id}><td>{s.order}</td><td>{s.id}</td><td>{formatNumber(d / 1000, 2)} km</td><td>{d === far ? "farthest" : ""}</td></tr>; })}</tbody>
+        <tbody>{stations.map((s) => { const d = Math.hypot(s.position[0] - hx, s.position[1] - hy); return <tr key={s.id}><td>{s.order}</td><td>{s.id}</td><td>{formatNumber(d / 1000, 2)} km</td><td>{d === far ? "farthest" : ""}</td></tr>; })}</tbody>
       </table>
       <Footnote tone="secondary">{f ? `${MODE_LABEL[f.mobility.mode]}: ${f.mobility.reasons.join("; ").toLowerCase()}. ` : ""}Straight-line distance. The walkback limit is 30 min at 3.5 km/h if a suit or rover fails (NASA ICES-2026-127).</Footnote>
     </section>;

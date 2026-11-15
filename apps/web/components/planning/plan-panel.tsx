@@ -65,6 +65,18 @@ export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEd
     );
   }
 
+  if (pending) {
+    return (
+      <section aria-label="EVA plan" aria-busy="true" className="mission-plan-eva mission-plan-loading">
+        <p className="mission-answer" role="status">Building a new plan…</p>
+        <div className="mission-skeleton mission-skeleton-goal" />
+        <ul className="mission-rules" aria-hidden>{rules.map((r) => <li key={r.id}><div className="mission-rule mission-skeleton-rule"><span className="mission-rule-name">{r.name}</span><span className="mission-skeleton mission-skeleton-line" /></div></li>)}</ul>
+        <div className="mission-skeleton mission-skeleton-strip" />
+        <div className="mission-plan-footer"><Button variant="prominent" disabled>Approve plan</Button></div>
+      </section>
+    );
+  }
+
   return (
     <section aria-label="EVA plan" className="mission-plan-eva">
       <p className="mission-answer"><strong>{verdict}</strong> · {text}</p>
