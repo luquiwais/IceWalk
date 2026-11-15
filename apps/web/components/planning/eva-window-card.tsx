@@ -2,24 +2,12 @@
 
 import { ListRow, ListSection } from "@icewalk/ui/list";
 import { Body, Footnote } from "@icewalk/ui/text";
-import { useEffect, useState } from "react";
-import { getEvaWindow } from "@/lib/api";
 import { formatNumber } from "@/lib/format";
 import type { PlanSource } from "@/lib/use-plan-session";
-import mockWindow from "@/mock/eva-window.json";
+import { useEvaWindow, type EvaWindow, type WindowLevel } from "@/lib/use-eva-window";
 import { RowLabel, Value } from "./parts";
 
-type Level = "none" | "advisory" | "caution" | "warning";
-type StationConditions = { station_id: string; arrival_ltst: string; sun_elevation_deg: number; temperature_k: number; wind_p95_mps: number; level: Level; reasons: string[] };
-type EvaWindow = {
-  mode?: string;
-  recommended?: { sol: number; start_ltst: string; end_ltst: string; level: Level; go: boolean; reasons: string[] } | null;
-  dust?: { tau: number; reported: boolean; source?: "crew" | "hope_emirs" | "default"; ls_deg?: number; note?: string };
-  space_weather?: { source: string; status: string; events: { kind: string; time_utc: string }[] };
-  stations?: StationConditions[];
-  climate_source?: string;
-  notes?: string;
-};
+type Level = WindowLevel;
 
 function dustDetail(dust: EvaWindow["dust"]): string {
   if (!dust) return "Unavailable";
@@ -35,16 +23,7 @@ const LEVEL_LABEL: Record<Level, string> = { none: "Nominal", advisory: "Advisor
 
 /** Best EVA start in the next sols and conditions at each station (GET /eva-window). */
 export function EvaWindowCard({ planId, source }: { planId: string; source: PlanSource }) {
-  const [data, setData] = useState<EvaWindow>(mockWindow as unknown as EvaWindow);
-  useEffect(() => {
-    if (source !== "api") return;
-    const controller = new AbortController();
-    getEvaWindow(planId, { signal: controller.signal })
-      .then((w) => setData(w as unknown as EvaWindow))
-      .catch(() => undefined); // keep the bundled demo window
-    return () => controller.abort();
-  }, [planId, source]);
-
+  const data = useEvaWindow(planId, source);
   const rec = data.recommended;
   const sw = data.space_weather;
   return (

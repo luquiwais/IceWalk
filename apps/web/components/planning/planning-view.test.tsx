@@ -58,36 +58,39 @@ describe("Mission flow", () => {
     expect(screen.getByRole("heading", { name: "Where do we go, and is it safe?" })).toBeInTheDocument();
   });
 
-  it("shows the plan numbers, go/no-go checks, stations, timeline and provenance", async () => {
+  it("answers at the EVA level with the flight rules, and keeps the timeline and provenance", async () => {
     render(<PlanningView initialPhase="plan" />);
     const panel = screen.getByRole("region", { name: "EVA plan" });
-    expect(within(panel).getByLabelText("Plan numbers")).toBeInTheDocument();
-    for (const s of orderedStations(demoPlan)) expect(within(panel).getByRole("button", { name: new RegExp(`Station ${s.order}, ${s.id}`) })).toBeInTheDocument();
-    expect(screen.getByRole("list", { name: "Go / no-go checks" })).toHaveTextContent("Comms");
+    expect(panel).toHaveTextContent(/^(GO|NO-GO)\./);
+    const rules = within(panel).getByRole("list", { name: "Flight rules" });
+    expect(within(rules).getAllByRole("listitem")).toHaveLength(8);
+    for (const name of ["Duration", "Walkback margin", "Distance out", "Route slope", "Comms gap", "Metabolic rate", "Carry per EV", "EVA window"]) expect(rules).toHaveTextContent(name);
     expect(screen.queryByRole("group", { name: "Plan timeline" })).not.toBeInTheDocument(); // opens on demand
     expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Bundled mock data");
+    expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Station · select for details");
     expect(screen.getByText("Step 2 of 5 · Plan", visible)).toBeInTheDocument();
   });
 
   it("lets the crew choose the EVA goal and says why each station is there", async () => {
     render(<PlanningView initialPhase="plan" />);
-    const panel = screen.getByRole("region", { name: "EVA plan" });
-    expect(within(panel).getByText(first.reason!.split(":")[0], visible)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: `Map ${first.id}` }));
+    expect(screen.getByRole("region", { name: "Why this station" })).toHaveTextContent(first.reason!);
+    await userEvent.click(screen.getByRole("button", { name: "Back to plan" }));
     await userEvent.click(screen.getByRole("tab", { name: "Confirm ice" }));
     const c1 = orderedStations(demoConfirm)[0];
-    expect(await screen.findByRole("button", { name: new RegExp(`Station 1, ${c1.id}`) })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: `Map ${c1.id}` }));
+    await userEvent.click(await screen.findByRole("button", { name: `Map ${c1.id}` }));
     expect(screen.getByRole("region", { name: "Why this station" })).toHaveTextContent(c1.reason!);
+    expect(screen.getByRole("region", { name: "After this station" })).toBeInTheDocument();
   });
 
-  it("answers whether the EVA can be walked, and where the dust opacity comes from", async () => {
+  it("opens what supports a rule: the walk and the EVA window, then back to the rules", async () => {
     render(<PlanningView initialPhase="plan" />);
-    await userEvent.click(screen.getByRole("tab", { name: "Checks" }));
-    await userEvent.click(screen.getByRole("button", { name: /Can we walk it\?/ }));
+    await userEvent.click(screen.getByRole("button", { name: /^Distance out/ }));
     const card = screen.getByRole("region", { name: "Feasibility" });
     expect(card).toHaveTextContent("Soil firmness");
     expect(card).toHaveTextContent("ICES-2026-127");
-    await userEvent.click(screen.getByRole("button", { name: /EVA window & space weather/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Flight rules" }));
+    await userEvent.click(screen.getByRole("button", { name: /^EVA window/ }));
     expect(screen.getByRole("region", { name: "EVA window and weather" })).toHaveTextContent("Hope EMIRS (UAE)");
   });
 
@@ -113,7 +116,7 @@ describe("Mission flow", () => {
     await userEvent.hover(block);
     expect(screen.getByTestId("mock-map")).toHaveAttribute("data-hovered", first.id);
     await userEvent.click(block);
-    expect(screen.getByRole("heading", { name: `Station ${first.id}` })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: `Station ${first.order} · ${first.id}` })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: `Map ${first.id}` })).toHaveAttribute("aria-pressed", "true");
     await userEvent.click(screen.getByRole("button", { name: "Back to plan" }));
     expect(screen.getByRole("region", { name: "EVA plan" })).toBeInTheDocument();
@@ -127,16 +130,16 @@ describe("Mission flow", () => {
     await userEvent.keyboard("{ArrowRight}");
     expect(within(timeline).getByRole("button", { name: new RegExp(second.id) })).toHaveFocus();
     await userEvent.keyboard("{Enter}");
-    expect(screen.getByRole("heading", { name: `Station ${second.id}` })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: `Station ${second.order} · ${second.id}` })).toBeInTheDocument();
   });
 
   it("keeps the selected station through Map focus", async () => {
     render(<PlanningView initialPhase="plan" />);
     await userEvent.click(screen.getByRole("button", { name: `Map ${first.id}` }));
     await userEvent.click(screen.getByRole("button", { name: "Map focus" }));
-    expect(screen.queryByRole("heading", { name: `Station ${first.id}` })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: `Station ${first.order} · ${first.id}` })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Show plan window" }));
-    expect(screen.getByRole("heading", { name: `Station ${first.id}` })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: `Station ${first.order} · ${first.id}` })).toBeInTheDocument();
   });
 
   it("briefs the EVA on the 3D terrain, jumps to a station and goes for EVA", async () => {
