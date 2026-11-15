@@ -365,6 +365,147 @@
 @media (min-width: 760px) { .mission-app[data-panel="compact"] { --dc-col: 330px; } }
 
 /* Legend in its own card above the layer buttons: border and solid ground so it always reads. */
-.mission-legend-card { padding: .625rem .75rem; border-radius: 1rem; background: rgb(18 20 26 / .82) !important; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .16) !important; }
 .mission-legend-card .mission-legend { pointer-events: auto; text-shadow: none; padding-inline: 0; flex-direction: column; align-items: start; gap: .375rem; color: var(--color-label); }
 .mission-legend-card .mission-ice-known { font-size: .6875rem; color: var(--color-label-secondary); white-space: normal; }
+
+/* Dock and map tools (15/11, docs/research/auditoria-ux-2026-11-15.md). The status line replaces the
+   floating timeline and the scattered numbers: one dock at the bottom of the map, the same in every map
+   phase ([V2 10005]). Layers and legend move to a column at the top left, the camera to the bottom right
+   of the map, so nothing stacks above the dock. The legend uses the same glass as every other window. */
+.mission-dock-position { position: absolute; left: var(--mission-edge); right: var(--mission-edge); bottom: var(--mission-edge); z-index: 2; }
+.mission-dock-window { width: 100%; border-radius: 1.5rem; }
+.mission-dock { width: 100%; display: flex; flex-direction: column; }
+.mission-dock-line { display: flex; align-items: center; gap: 0; min-height: 3rem; padding: .375rem .5rem .375rem 1.125rem; overflow-x: auto; scrollbar-width: none; }
+.mission-dock-mode { font-size: .75rem; font-weight: 500; color: var(--color-label-secondary); }
+.mission-dock-mode[data-sim] { font-size: .625rem; font-weight: 700; letter-spacing: .1em; padding: .1rem .3rem; border-radius: 4px; border: 1px solid var(--color-caution); color: var(--color-caution); }
+.mission-dock-cell { display: flex; align-items: baseline; gap: .375rem; padding: 0 .625rem; border-left: 1px solid var(--color-separator); white-space: nowrap; flex-shrink: 0; }
+.mission-dock-cell:first-child { border-left: 0; padding-left: 0; }
+.mission-dock-cell > span:first-child { font-size: .625rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--color-label-secondary); }
+.mission-dock-cell strong { font-size: .9375rem; font-weight: 600; }
+.mission-dock-cell small { font-size: .75rem; font-weight: 500; color: var(--color-label-secondary); }
+.mission-dock-cell[data-alert=caution] strong { color: var(--color-caution); }
+.mission-dock-alert { min-width: 0; }
+.mission-dock-badge { min-width: 0; overflow: hidden; }
+.mission-dock-badge [data-slot=status-badge] { max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; font-size: .6875rem; }
+.mission-dock-bar { position: relative; flex: 1 1 6rem; min-width: 3rem; height: .375rem; margin: 0 .75rem; border-radius: .2rem; background: rgb(255 255 255 / .06); overflow: hidden; }
+.mission-dock-bar > i { position: absolute; top: 0; bottom: 0; border-inline: 1px solid transparent; background-clip: padding-box; background-color: rgb(255 255 255 / .22); }
+.mission-dock-bar > i[data-kind=station] { background-color: rgb(255 255 255 / .7); }
+.mission-dock-bar > i[data-kind=reserve] { background-color: transparent; background-image: repeating-linear-gradient(135deg, rgb(255 255 255 / .2) 0 2px, transparent 2px 5px); }
+.mission-dock-bar > b { position: absolute; top: -2px; bottom: -2px; width: 2px; background: #fff; }
+.mission-dock-toggle { flex-shrink: 0; display: inline-flex; align-items: center; gap: .25rem; height: 2rem; padding: 0 .75rem; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: .8125rem; font-weight: 600; color: var(--color-label); }
+.mission-dock-toggle:hover { background: rgb(255 255 255 / .18); }
+.mission-dock-toggle:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.mission-dock-toggle svg { width: 1rem; height: 1rem; }
+.mission-dock .mission-time[data-bare] { padding: .25rem 1.25rem 1.125rem; border-top: 1px solid var(--color-separator); }
+.mission-dock .mission-time[data-bare] .mission-time-inner { padding-top: 2rem; }
+.mission-dock .mission-time[data-bare] .mission-walkback { height: 2rem; }
+.mission-dock .mission-time[data-bare] .mission-time-track { height: 2.25rem; margin-top: .75rem; }
+.mission-dock .mission-time[data-bare] .mission-time-station, .mission-dock .mission-time[data-bare] .mission-time-segment { height: 2.25rem; }
+.mission-dock .mission-time[data-bare] .mission-time-axis { margin-top: .5rem; font-size: .6875rem; }
+.mission-dock .mission-time[data-bare] .mission-time-scroll { overflow-y: hidden; padding-right: .75rem; }
+
+.mission-legend-card { padding: .625rem .75rem; border-radius: 1.25rem; }
+.mission-legend-toggle svg { width: .875rem; height: .875rem; margin-left: .125rem; }
+@media (min-width: 760px) {
+  /* Map tools stay at the bottom left and ride on top of the dock: they rise when the timeline opens. */
+  .mission-app .mission-map-tools { top: auto; left: var(--mission-edge); bottom: calc(var(--mission-timeline-y, 3rem) + 1.5rem); width: auto; max-width: 24rem; gap: .5rem; }
+  .mission-app .mission-map-card { padding: .375rem; }
+  .mission-app .mission-dock-position { right: calc(var(--dc-col, 400px) + 2 * var(--mission-edge)); }
+  .mission-app .mission-panel-presence { bottom: var(--mission-edge); }
+  /* North arrow and scale at the top right of the map, beside the panel; the credit sits on the dock. */
+  .mission-app .site-hud { top: calc(var(--dc-header, 5rem) + .75rem); bottom: auto; }
+  .mission-app .site-hud .site-credit { display: none; }
+  .mission-map-credit { position: absolute; right: calc(var(--dc-col, 400px) + 2 * var(--mission-edge) + .5rem); bottom: calc(var(--mission-timeline-y, 3rem) + .375rem); margin: 0; font-size: .625rem; color: rgb(255 255 255 / .6); text-shadow: 0 0 3px #000, 0 1px 3px #000; pointer-events: none; white-space: nowrap; }
+}
+@media (max-width: 759px) { .mission-map-credit { display: none; } }
+
+/* Planner view, EVA level (alternativa 2, 15/11): one-line answer, the goal, the flight rules as tiles
+   (value, limit in plain words, state with icon and word) and the approve button, all without scrolling. */
+.mission-plan-eva { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.mission-answer { margin: 0; font-size: .9375rem; line-height: 1.35; color: var(--color-label); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-answer strong { font-weight: 700; }
+.mission-goal { display: flex; flex-direction: column; gap: .3rem; }
+.mission-goal [data-text-style=footnote] { font-size: .75rem; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-rules-head { display: flex; justify-content: space-between; align-items: baseline; font-size: .6875rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--color-label-secondary); margin-top: .125rem; }
+.mission-rules-head strong { font-size: .8125rem; letter-spacing: 0; text-transform: none; color: var(--color-label); }
+.mission-rules { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .375rem; }
+.mission-rule { width: 100%; height: 100%; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: .0625rem; padding: .25rem .625rem; border-radius: .75rem; background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .12); text-align: left; color: var(--color-label); font: inherit; line-height: 1.25; }
+button.mission-rule { cursor: pointer; }
+button.mission-rule:hover { background: rgb(255 255 255 / .14); border-color: rgb(255 255 255 / .35); }
+button.mission-rule:hover .mission-rule-top svg { opacity: 1; transform: translateX(1px); }
+button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 1px; }
+.mission-rule-top, .mission-rule-bottom { display: flex; justify-content: space-between; align-items: center; gap: .375rem; min-width: 0; }
+.mission-rule-name { font-size: .625rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--color-label-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-rule-value { flex-shrink: 0; display: inline-flex; align-items: center; gap: .25rem; font-size: .875rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mission-rule-state { display: inline-flex; align-items: center; gap: .2rem; color: var(--color-label-secondary); font-size: .6875rem; }
+.mission-rule-state b { font-weight: 700; }
+.mission-rules > li[data-level=caution] .mission-rule-state { color: var(--color-caution); }
+.mission-rules > li[data-level=warning] .mission-rule-state { color: var(--color-warning, #ff453a); }
+.mission-rules > li[data-level=advisory] .mission-rule-state, .mission-rules > li[data-level=unknown] .mission-rule-state { color: var(--color-label); }
+.mission-rule-state svg { width: .8125rem; height: .8125rem; }
+.mission-rule-limit { font-size: .6875rem; color: var(--color-label-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-rule-limit b { font-weight: 700; }
+.mission-rule-limit b[data-level=caution] { color: var(--color-caution); }
+.mission-rule-limit b[data-level=warning] { color: var(--color-warning, #ff453a); }
+.mission-rule-limit b[data-level=advisory], .mission-rule-limit b[data-level=unknown] { color: var(--color-label); }
+.mission-rule-top svg { width: .875rem; height: .875rem; flex-shrink: 0; opacity: .85; color: var(--color-label); transition: transform .15s; }
+.mission-rule-limit { flex-shrink: 1; min-width: 0; text-align: right; }
+.mission-rules > li[data-level=caution] .mission-rule { border-color: var(--color-caution); }
+.mission-rules > li[data-level=caution] .mission-rule-state { color: var(--color-caution); }
+.mission-rules > li[data-level=warning] .mission-rule { border-color: var(--color-warning, #ff453a); }
+.mission-rules > li[data-level=warning] .mission-rule-state { color: var(--color-warning, #ff453a); }
+.mission-rules > li[data-level=advisory] .mission-rule, .mission-rules > li[data-level=unknown] .mission-rule { border-color: rgb(255 255 255 / .3); }
+.mission-rules > li[data-level=advisory] .mission-rule-state, .mission-rules > li[data-level=unknown] .mission-rule-state { color: var(--color-label); }
+.mission-plan-links { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.mission-plan-links [data-text-style=footnote] { font-size: .75rem; }
+.mission-plan-links .mission-text-link { display: inline-flex; align-items: center; gap: .125rem; white-space: nowrap; align-self: center; }
+.mission-plan-links .mission-text-link svg { width: .875rem; height: .875rem; }
+.mission-plan-eva .mission-plan-footer { position: static; margin-top: 0; padding: .125rem 0 0; background: none; }
+.mission-panel-scroll:has(.mission-plan-eva) { padding-bottom: .375rem; }
+.mission-back-link { align-self: start; display: inline-flex; align-items: center; gap: .125rem; padding: .25rem .5rem .25rem .25rem; border-radius: 999px; background: rgb(255 255 255 / .08); border: 0; color: var(--color-label); font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.mission-back-link:hover { background: rgb(255 255 255 / .15); }
+.mission-back-link svg { width: 1rem; height: 1rem; }
+.mission-detail-title { margin: 0; font-size: 1.0625rem; font-weight: 700; }
+
+/* Station composition. */
+.mission-station { display: flex; flex-direction: column; gap: .5rem; }
+.mission-station .mission-why { font-size: .8125rem; padding: .5rem .75rem; gap: .125rem; }
+.mission-station-sub { font-size: .75rem; margin-top: -.25rem; }
+.mission-facts { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem .75rem; }
+.mission-facts > div { display: flex; flex-direction: column; min-width: 0; }
+.mission-facts dt { font-size: .6875rem; font-weight: 500; color: var(--color-label-secondary); }
+.mission-facts dd { margin: 0; font-size: .9375rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mission-facts dd { line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-facts dd small { display: block; font-size: .6875rem; font-weight: 500; color: var(--color-label-secondary); overflow: hidden; text-overflow: ellipsis; }
+.mission-after { font-size: .8125rem; line-height: 1.4; padding-top: .5rem; border-top: 1px solid var(--color-separator); }
+.mission-legend i[data-key=station] { width: .875rem; height: .875rem; border-radius: 50%; border: 1px solid #fff; display: inline-grid; place-items: center; font-size: .5rem; font-style: normal; font-weight: 700; background: rgb(20 20 24 / .8); }
+.mission-approved-line { margin: 0; display: flex; align-items: center; gap: .375rem; font-size: .8125rem; font-weight: 600; color: var(--color-label-secondary); }
+.mission-approved-line svg { width: 1rem; height: 1rem; }
+.mission-station-strip { display: flex; align-items: center; gap: .5rem; padding: .3rem .375rem .3rem .625rem; border-radius: .75rem; background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .12); }
+.mission-station-strip > span:first-child { font-size: .75rem; font-weight: 600; color: var(--color-label); white-space: nowrap; }
+.mission-station-chips { flex: 1; display: flex; justify-content: flex-end; gap: .25rem; }
+.mission-station-chips button { width: 1.625rem; height: 1.625rem; border-radius: 50%; border: 1px solid rgb(255 255 255 / .6); background: rgb(20 20 24 / .7); color: #fff; font-size: .75rem; font-weight: 700; cursor: pointer; }
+.mission-station-chips button:hover { background: #0a84ff; border-color: #0a84ff; }
+.mission-station-chips button:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.mission-station-strip > svg { width: .875rem; height: .875rem; opacity: .6; }
+.mission-station-nav { display: flex; justify-content: space-between; gap: .5rem; }
+.mission-station-nav button { display: inline-flex; align-items: center; gap: .125rem; padding: .3rem .625rem; border-radius: 999px; border: 0; background: rgb(255 255 255 / .08); color: var(--color-label); font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.mission-station-nav button:hover { background: rgb(255 255 255 / .16); }
+.mission-station-nav svg { width: 1rem; height: 1rem; }
+/* Detail views: compact grids and tables so they fit the panel without scrolling (rule for every panel). */
+.mission-plan-detail { gap: .5rem; }
+.mission-detail { display: flex; flex-direction: column; gap: .5rem; }
+.mission-detail-lead { margin: 0; font-size: .8125rem; line-height: 1.4; }
+.mission-detail [data-text-style=footnote] { font-size: .6875rem; line-height: 1.35; }
+.mission-facts-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mission-table { width: 100%; border-collapse: collapse; font-size: .75rem; font-variant-numeric: tabular-nums; }
+.mission-table caption { text-align: left; font-size: .6875rem; color: var(--color-label-secondary); padding-bottom: .25rem; }
+.mission-table th { text-align: left; font-size: .625rem; font-weight: 600; color: var(--color-label-secondary); padding: .2rem .3rem; border-bottom: 1px solid var(--color-separator); }
+.mission-table td { padding: .12rem .3rem; border-bottom: 1px solid rgb(255 255 255 / .06); white-space: nowrap; }
+.mission-table tr[data-level=caution] td:last-child { color: var(--color-caution); font-weight: 600; }
+.mission-table tr[data-level=warning] td:last-child { color: var(--color-warning, #ff453a); font-weight: 600; }
+.mission-detail-title .mission-detail-value { font-size: .8125rem; font-weight: 500; color: var(--color-label-secondary); margin-left: .25rem; }
+.mission-detail .mission-text-link { display: inline-flex; align-items: center; gap: .125rem; }
+.mission-detail .mission-text-link svg { width: .875rem; height: .875rem; }
+.mission-table-fixed { table-layout: fixed; }
+.mission-table td.mission-wrap { white-space: normal; line-height: 1.25; }

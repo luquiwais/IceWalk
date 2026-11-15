@@ -42,7 +42,8 @@ export const SITE_IMAGERY = {
 } as const;
 
 /** The camera never leaves the context image. */
-export const SCENE_BOUNDS: Box = SITE_IMAGERY.context.box;
+// The map never shows past the wide HiRISE strip (2.5 m): THEMIS beyond it is dark and soft at this scale.
+export const SCENE_BOUNDS: Box = SITE_IMAGERY.wide.box;
 
 /**
  * Habitat in grid meters. apps/planner/config/eva.yaml `habitat_xy` (assumption: true,

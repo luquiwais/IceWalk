@@ -7,7 +7,9 @@ mapa de hielo del GP (`app/maps.py`, `map.schema.json`) con o sin terreno.
 
 from __future__ import annotations
 
+import dataclasses
 import json
+import math
 import os
 import re
 import threading
@@ -28,7 +30,7 @@ from .ice import IceModel
 from .marstime import utc
 from .site_card import site_card
 from .traverse.params import default_params
-from .traverse.route import TraverseMap, cached_map
+from .traverse.route import NoRouteError, TraverseMap, cached_map
 
 DEFAULT_STM = json.loads((CONTRACTS / "examples" / "stm.s1094b.json").read_text())
 PLAN_ID = re.compile(r"plan-[A-Za-z0-9_-]{1,64}")
@@ -56,6 +58,8 @@ class PlanRequest(BaseModel):
     measurements: list[dict] = []
     # "learn": bajar la incertidumbre; "confirm": ir donde es más probable el hielo.
     strategy: Literal["learn", "confirm"] = "learn"
+    # Hábitat movido por el operador, en metros de la grilla; None: el de config/eva.yaml.
+    habitat_xy: tuple[float, float] | None = None
 
 
 class ReplanRequest(BaseModel):
@@ -101,7 +105,8 @@ def _ice_model(stm: dict, measurements: list[dict]) -> IceModel:
 def _map(stm: dict, entry: dict | None = None) -> dict:
     """Mapa base de la STM, o el de un plan guardado con sus mediciones (se cachea en el plan)."""
     base = _base_model(eva_planner.ice_threshold(stm))
-    habitat = eva_planner.eva_config().habitat_xy
+    cfg = (entry or {}).get("config") or eva_planner.eva_config()
+    habitat = cfg.habitat_xy
     if entry is None:
         return maps.ice_map(base, habitat)
     if "map" not in entry:
@@ -117,12 +122,39 @@ def _map(stm: dict, entry: dict | None = None) -> dict:
 
 
 def _store(plan: dict, stm: dict, measurements: list[dict], completed: list[dict],
-           strategy: str = "learn") -> dict:
+           strategy: str = "learn", config: eva_planner.EvaConfig | None = None) -> dict:
     plan["site_assessment"] = site_card(stm)  # plan y re-plan, real o mock
     plan["summary"].setdefault("strategy", strategy)
     _PLANS[plan["plan_id"]] = {"plan": plan, "stm": stm, "measurements": measurements,
-                               "completed": completed, "strategy": strategy}
+                               "completed": completed, "strategy": strategy,
+                               "config": config or eva_planner.eva_config()}
     return plan
+
+
+def _habitat_config(
+    xy: tuple[float, float] | None, tmap: TraverseMap
+) -> eva_planner.EvaConfig:
+    """La config de la EVA con el hábitat del operador, validado; sin hábitat, la de siempre.
+
+    Todo input es malicioso: números finitos, dentro del área declarada (habitat_area_m) y
+    sobre suelo transitable. Se lleva a la celda transitable más cercana, como las estaciones.
+    """
+    cfg = eva_planner.eva_config()
+    if xy is None:
+        return cfg
+    x, y = (float(v) for v in xy)
+    if not (math.isfinite(x) and math.isfinite(y)):
+        raise HTTPException(422, "Habitat position must be two finite numbers in grid meters")
+    area = cfg.habitat_area_m
+    if area is not None and not (area[0] <= x <= area[1] and area[2] <= y <= area[3]):
+        raise HTTPException(
+            422, "Habitat outside the planning area covered by the HiRISE terrain model")
+    try:
+        cell = tmap.snap(x, y)
+    except NoRouteError:
+        raise HTTPException(422, "No walkable ground within 50 m of that point") from None
+    sx, sy = tmap.xy(cell)
+    return dataclasses.replace(cfg, habitat_xy=(float(sx), float(sy)))
 
 
 @app.get("/health")
@@ -168,9 +200,15 @@ def plan(req: PlanRequest) -> dict:
     stm = req.stm or DEFAULT_STM
     tmap = _traverse_map(stm)
     if tmap is None:
-        return _store(mock_planner.build_plan(stm), stm, list(req.measurements), [], req.strategy)
-    p = eva_planner.build(stm, tmap, _ice_model(stm, req.measurements), strategy=req.strategy)
-    return _store(p, stm, list(req.measurements), [], req.strategy)
+        if req.habitat_xy is not None:
+            raise HTTPException(
+                422, "Moving the habitat needs the terrain model, which is not loaded")
+        mock = mock_planner.build_plan(stm)
+        return _store(mock, stm, list(req.measurements), [], req.strategy)
+    cfg = _habitat_config(req.habitat_xy, tmap)
+    model = _ice_model(stm, req.measurements)
+    p = eva_planner.build(stm, tmap, model, config=cfg, strategy=req.strategy)
+    return _store(p, stm, list(req.measurements), [], req.strategy, cfg)
 
 
 @app.post("/replan")
@@ -199,13 +237,14 @@ def replan(req: ReplanRequest) -> dict:
         stm, tmap, _ice_model(stm, measurements),
         start_xy=tuple(meas["position"]), elapsed_min=req.elapsed_min,
         completed=completed, replanned_from=current["plan_id"], strategy=strategy,
+        config=entry.get("config"),
     )
     result = {"ice": "Ice", "no_ice": "No ice", "inconclusive": "Inconclusive result"}
     p["alerts"].insert(0, {"level": "advisory", "source": "planner",
                            "message": f"{result[meas['result']]} at {meas['station_id']}. "
                                       "EVA replanned."})
     p["replan"] = replan_check.assess(current, p, meas, stm)
-    return _store(p, stm, measurements, completed, strategy)
+    return _store(p, stm, measurements, completed, strategy, entry.get("config"))
 
 
 @app.get("/plan/{plan_id}")

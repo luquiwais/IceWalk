@@ -12,7 +12,8 @@ export type Insets = { top: number; right: number; bottom: number; left: number 
 export type Box = { xmin: number; ymin: number; xmax: number; ymax: number };
 
 /** Zoom limits (docs/plans/web-design.md, "Cámara"). */
-export const MIN_PX_PER_M = 0.15;
+// Farthest zoom: about 3.5 km across the map, enough for the 1.5 km ice map around the habitat.
+export const MIN_PX_PER_M = 0.22;
 export const MAX_PX_PER_M = 6;
 /** The 0.25 m/px detail image fades in from this zoom. */
 export const DETAIL_FROM_PX_PER_M = 1.2;

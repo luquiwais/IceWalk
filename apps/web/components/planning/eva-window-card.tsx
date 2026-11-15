@@ -1,25 +1,8 @@
-"use client";
-
-import { ListRow, ListSection } from "@icewalk/ui/list";
-import { Body, Footnote } from "@icewalk/ui/text";
-import { useEffect, useState } from "react";
-import { getEvaWindow } from "@/lib/api";
+import { Footnote } from "@icewalk/ui/text";
 import { formatNumber } from "@/lib/format";
-import type { PlanSource } from "@/lib/use-plan-session";
-import mockWindow from "@/mock/eva-window.json";
-import { RowLabel, Value } from "./parts";
+import type { EvaWindow, WindowLevel } from "@/lib/use-eva-window";
 
-type Level = "none" | "advisory" | "caution" | "warning";
-type StationConditions = { station_id: string; arrival_ltst: string; sun_elevation_deg: number; temperature_k: number; wind_p95_mps: number; level: Level; reasons: string[] };
-type EvaWindow = {
-  mode?: string;
-  recommended?: { sol: number; start_ltst: string; end_ltst: string; level: Level; go: boolean; reasons: string[] } | null;
-  dust?: { tau: number; reported: boolean; source?: "crew" | "hope_emirs" | "default"; ls_deg?: number; note?: string };
-  space_weather?: { source: string; status: string; events: { kind: string; time_utc: string }[] };
-  stations?: StationConditions[];
-  climate_source?: string;
-  notes?: string;
-};
+type Level = WindowLevel;
 
 function dustDetail(dust: EvaWindow["dust"]): string {
   if (!dust) return "Unavailable";
@@ -34,38 +17,19 @@ function dustDetail(dust: EvaWindow["dust"]): string {
 const LEVEL_LABEL: Record<Level, string> = { none: "Nominal", advisory: "Advisory", caution: "Caution", warning: "Warning" };
 
 /** Best EVA start in the next sols and conditions at each station (GET /eva-window). */
-export function EvaWindowCard({ planId, source }: { planId: string; source: PlanSource }) {
-  const [data, setData] = useState<EvaWindow>(mockWindow as unknown as EvaWindow);
-  useEffect(() => {
-    if (source !== "api") return;
-    const controller = new AbortController();
-    getEvaWindow(planId, { signal: controller.signal })
-      .then((w) => setData(w as unknown as EvaWindow))
-      .catch(() => undefined); // keep the bundled demo window
-    return () => controller.abort();
-  }, [planId, source]);
-
+export function EvaWindowCard({ data }: { data: EvaWindow }) {
   const rec = data.recommended;
   const sw = data.space_weather;
   return (
-    <section aria-label="EVA window and weather" className="mission-stack">
-      <Body>
-        {rec ? <>Recommended: sol {rec.sol}, {rec.start_ltst}–{rec.end_ltst} local solar time · <span className="mission-verdict" data-verdict={rec.go ? "GO" : "NO_GO"}>{rec.go ? "GO" : "Hold"}</span></> : "No safe window in the next sols."}
-      </Body>
-      <ListSection footer={data.climate_source ? `Climate: ${data.climate_source.split(",")[0]} (analogue at 48°N).` : undefined}>
-        <ListRow trailing={<Value>{sw ? `${sw.events.length} events` : "—"}</Value>}>
-          <RowLabel title="Space weather · NASA DONKI" detail={sw ? `${sw.events.map((e) => e.kind.toUpperCase()).join(", ") || "Quiet"}${data.mode === "demo" ? " · demo period Aug 2023" : " · live"}` : "Unavailable"} />
-        </ListRow>
-        <ListRow trailing={<Value>τ {data.dust ? formatNumber(data.dust.tau, 1) : "—"}</Value>}>
-          <RowLabel title="Dust opacity" detail={dustDetail(data.dust)} />
-        </ListRow>
-        {(data.stations ?? []).slice(0, 6).map((s) => (
-          <ListRow key={s.station_id} trailing={<Value>{LEVEL_LABEL[s.level]}</Value>}>
-            <RowLabel title={`${s.station_id} · ${s.arrival_ltst}`} detail={`Sun ${formatNumber(s.sun_elevation_deg, 0)}° · ${formatNumber(s.temperature_k - 273.15, 0)} °C · wind p95 ${formatNumber(s.wind_p95_mps, 0)} m/s`} />
-          </ListRow>
-        ))}
-      </ListSection>
-      {data.notes ? <Footnote tone="secondary">{data.notes}</Footnote> : null}
+    <section aria-label="EVA window and weather" className="mission-detail">
+      <p className="mission-detail-lead"><strong>NASA DONKI:</strong> {sw ? (sw.events.map((e) => e.kind === "sep" ? "SEP" : e.kind.replace(/_/g, " ").replace(/^cme/i, "CME")).join(", ") || "quiet") : "unavailable"}{sw && data.mode === "demo" ? " (demo period)" : ""} · <strong>Dust</strong> τ {data.dust ? formatNumber(data.dust.tau, 1) : "—"}, <span title={dustDetail(data.dust)}>{data.dust?.source === "hope_emirs" ? "Hope EMIRS (UAE)" : data.dust?.reported ? "crew report" : "assumed"}</span></p>
+      <table className="mission-table">
+        <thead><tr><th>Station</th><th>LTST</th><th>Sun</th><th>Temp.</th><th>Wind p95</th><th>Level</th></tr></thead>
+        <tbody>{(data.stations ?? []).slice(0, 8).map((st) => (
+          <tr key={st.station_id} data-level={st.level}><td>{st.station_id}</td><td>{st.arrival_ltst}</td><td>{formatNumber(st.sun_elevation_deg, 0)}°</td><td>{formatNumber(st.temperature_k - 273.15, 0)} °C</td><td>{formatNumber(st.wind_p95_mps, 0)} m/s</td><td>{LEVEL_LABEL[st.level]}</td></tr>
+        ))}</tbody>
+      </table>
+      <Footnote tone="secondary">Stations at planned arrival{rec ? ` on sol ${rec.sol}` : ""}. Viking 2 climate (48°N analogue); thresholds are assumptions.</Footnote>
     </section>
   );
 }

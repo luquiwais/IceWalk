@@ -300,6 +300,29 @@ export function evaLimitMin(plan: Plan): number | undefined {
   return plan.mission_id === defaultStm.mission_id ? defaultStm.constraints.eva_max_h * 60 : undefined;
 }
 
+/** A station with the ones before and after it in walking order: what the map frames when it is selected. */
+export function stationWithNeighbors(plan: Plan, id: string): string[] {
+  const order = orderedStations(plan);
+  const i = order.findIndex((s) => s.id === id);
+  if (i < 0) return [id];
+  // Three stations, centered on this one when it can be; at either end, the three nearest.
+  const start = Math.min(Math.max(0, i - 1), Math.max(0, order.length - 3));
+  return order.slice(start, start + 3).map((s) => s.id);
+}
+
+/** The STM constraints of this plan's mission, when the web bundles that STM. */
+export function missionConstraints(plan: Plan): typeof defaultStm.constraints | undefined {
+  return plan.mission_id === defaultStm.mission_id ? defaultStm.constraints : undefined;
+}
+
+/** Steepest leg of the traverse, from the route's GeoJSON properties (DTM routing). */
+export function routeMaxSlope(plan: Plan): number | undefined {
+  const slopes = plan.route.features
+    .map((f) => (f as { properties?: { max_slope_deg?: number } }).properties?.max_slope_deg)
+    .filter((v): v is number => typeof v === "number");
+  return slopes.length ? Math.max(...slopes) : undefined;
+}
+
 export function missionObjective(plan: Plan): string | undefined {
   return plan.mission_id === defaultStm.mission_id ? defaultStm.objectives[0].title : undefined;
 }
