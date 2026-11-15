@@ -903,3 +903,11 @@ vueltas y avance visibles sin depender del desenfoque para comunicar giro.
 Fuente, licencia y adaptación de shaders:
 [`research/astronaut-assets-2026-11-15.md`](research/astronaut-assets-2026-11-15.md).
 Los clips siguen en producción; falta revisión continua de las películas.
+
+## 2026-11-15 · Brief: bordes del 3D, camino y saltos
+
+- **Faldón de anillos alrededor del DTM** (descartado): anillos desplazados desde el borde con esquinas en abanico. Se veía como un aro facetado con muchos polígonos. Reemplazado por una grilla pareja de 240 × 240 que sigue el relieve del borde y se aplana, sin celdas dentro de la caja del DTM (la primera versión pasaba por debajo del terreno y asomaba en los pozos con su textura más borrosa).
+- **Camino con borde oscuro y tubo grueso** (descartado): a pie parecía una ruta en 3D. Queda la línea original, apenas más ancha.
+- **Viaje animado entre estaciones** (descartado, 1.3 s con arco): Luqui prefirió el salto instantáneo.
+- **Modelo HDU de NASA**: el GLB exige `KHR_draco_mesh_compression` (sin el decodificador cae al cilindro) y su material con transmisión se ve negro sin mapa de entorno; con DRACOLoader y material mate se ve bien.
+- Medido: panel del Brief sin scroll a 1280 × 551 en el sobrevuelo, el hábitat, las 6 estaciones y la confirmación. A 1024 × 768 no se pudo medir (la ventana del navegador de prueba no se achicó).

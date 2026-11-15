@@ -260,8 +260,32 @@
 /* First-person analogue photo: full width of the window, rounded like the kit's media. */
 .mission-analog-image { width: 100%; height: auto; border-radius: 12px; }
 
-.mission-cuff-link { align-self: start; font-size: .8125rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; }
-.mission-cuff-link:hover { color: var(--color-label); }
+/* Brief (rehearse-panel.tsx): stand-at strip, the station card, the cuff checklist and the confirmed go. */
+.mission-brief { gap: .5rem; }
+.mission-brief-station { gap: .5rem; }
+.mission-brief-hint { margin: 0; }
+.mission-brief .mission-station-strip { padding: .3125rem .5rem; gap: .375rem; }
+.mission-brief .mission-station-chips { justify-content: space-between; gap: .1875rem; }
+.mission-brief .mission-station-chips button { width: 1.5rem; height: 1.5rem; padding: 0; display: inline-grid; place-items: center; line-height: 1; font-variant-numeric: tabular-nums; }
+.mission-brief .mission-station-chips .mission-chip-hab { width: auto; padding: 0 .4375rem; border-radius: 999px; font-size: .625rem; letter-spacing: .04em; }
+.mission-brief .mission-station-chips button[aria-pressed=true] { background: #0a84ff; border-color: #0a84ff; }
+.mission-brief-card { display: flex; flex-direction: column; gap: .4rem; padding: .5rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .1); }
+.mission-brief-card > header { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.mission-brief-card > header strong { font-size: .9375rem; font-weight: 600; white-space: nowrap; }
+.mission-brief-card > header span { font-size: .75rem; color: var(--color-label-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mission-brief-crew { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .125rem; font-size: .8125rem; line-height: 1.35; color: var(--color-label-secondary); }
+.mission-brief-crew b { font-weight: 600; color: var(--color-label); margin-right: .375rem; }
+.mission-brief-card .mission-after { margin: 0; padding-top: 0; border-top: 0; }
+.mission-brief .mission-next { padding-top: 0; margin-top: 0; border-top: 0; }
+.mission-cuff { align-self: start; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .18); background: rgb(255 255 255 / .06); color: var(--color-label); font-size: .8125rem; font-weight: 600; text-decoration: none; }
+.mission-cuff:hover { background: rgb(255 255 255 / .14); }
+.mission-cuff:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.mission-cuff svg { width: 1rem; height: 1rem; }
+.mission-brief-go { display: grid; grid-template-columns: auto 1fr; gap: .5rem; align-items: center; }
+.mission-brief-go > button { width: 100%; }
+.mission-brief-go .mission-cuff { align-self: stretch; }
+.mission-confirm { display: grid; grid-template-columns: 1fr 2fr; gap: .5rem; }
+.mission-confirm > button { width: 100%; }
 
 /* Phase flow (phases.tsx): the panel title is the phase question, the footer the next step. */
 .mission-panel-title { display: flex; flex-direction: column; gap: .125rem; min-width: 0; flex: 1; }

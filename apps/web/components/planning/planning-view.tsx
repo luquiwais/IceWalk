@@ -27,7 +27,7 @@ import { IceViewLegend } from "./ice-view-legend";
 import { PHASES, phaseIndex, type Phase } from "./phases";
 import { SitePanel } from "./site-panel";
 import { PlanPanel } from "./plan-panel";
-import { RehearsePanel, type Jump } from "./rehearse-panel";
+import { AT_HABITAT, RehearsePanel, nextJumpKey, type Jump } from "./rehearse-panel";
 import { ExecutePanel } from "./execute-panel";
 import { DebriefPanel } from "./debrief-panel";
 
@@ -61,6 +61,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const [reviewing, setReviewing] = useState(false);
   const [returning, setReturning] = useState(false);
   const [jump, setJump] = useState<Jump>();
+  /** Brief: where the viewer stands (station id or the habitat); null is the fly-over. */
+  const [briefAt, setBriefAt] = useState<string | null>(null);
   // The dock's timeline opens on demand so the map keeps the space (closed by default).
   const [timelineOpen, setTimelineOpen] = useState(false);
   // The legend explains the ice map, so it starts open; it folds to one button.
@@ -98,6 +100,9 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const evaPath = useMemo(() => walkPath(plan), [plan]);
   const onMap = phase === "plan" || phase === "debrief" || (phase === "execute" && evaView === "iv");
   const station = phase === "plan" && stationId ? stationById(plan, stationId) : undefined;
+  // A replan can drop the station the brief stood at: then the brief is back at the fly-over.
+  const briefStation = phase === "rehearse" && briefAt && briefAt !== AT_HABITAT ? stationById(plan, briefAt) : undefined;
+  const briefPoint = phase === "rehearse" ? (briefStation ? briefStation.id : briefAt === AT_HABITAT ? AT_HABITAT : null) : null;
   const next = nextStation(plan, session.measurements);
   const elapsedMin = next ? stationBlock(plan, next.id)?.t_start_min ?? 0 : plan.summary.duration_min;
   const executing = phase === "execute";
@@ -170,6 +175,11 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     sceneRef.current?.fit(); // back at the EVA level, the whole plan in view
     if (hadFocus) requestAnimationFrame(() => { const target = panelOrigin.current; if (target?.isConnected) target.focus(); else contentRef.current?.focus(); panelOrigin.current = null; });
   }
+  /** Brief: back from standing at a point to the fly-over, as the back arrow does for a station in Plan. */
+  function backToFlyOver() {
+    setBriefAt(null);
+    setJump({ x: briefPose.x, y: briefPose.y, headingDeg: briefPose.headingDeg, key: nextJumpKey(), view: "fly" });
+  }
   function goTo(value: string) {
     const target = value as Phase;
     setPhase(target); setMapFocus(false); setFlying(false); panelOrigin.current = null;
@@ -206,7 +216,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
         onApprove={() => { setApprovedId(plan.plan_id); if (!timelineOpen) toggleTimeline(); setAnnouncement("Plan approved."); }} onEdit={() => setApprovedId(null)}
         onStrategy={(s) => { setStationId(null); setApprovedId(null); void session.setStrategy(s); }} onNext={() => goTo("rehearse")}
         onSelect={selectStation} onTimeline={() => { if (!timelineOpen) toggleTimeline(); }} />
-      : phase === "rehearse" ? <RehearsePanel plan={plan} onJump={setJump} onNext={() => goTo("execute")} />
+      : phase === "rehearse" ? <RehearsePanel plan={plan} at={briefPoint} onStand={(at, j) => { setBriefAt(at); setJump(j); }} onNext={() => goTo("execute")} />
         : phase === "execute" ? <section className="mission-stack" aria-label="EVA">
           <SegmentedControl label="EVA view" value={evaView} options={[{ value: "ev", label: "EV1 helmet" }, { value: "iv", label: "IV console" }]} onValueChange={(v) => setEvaView(v as "ev" | "iv")} />
           {helmet ? <EvGuide plan={plan} measurements={session.measurements} returning={returning} reviewing={reviewing} onDebrief={() => goTo("debrief")} />
@@ -216,7 +226,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
         </section>
           : <DebriefPanel plan={plan} measurements={session.measurements} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
 
-  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); } }}>
+  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); else if (briefPoint) backToFlyOver(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
     <div className="mission-scene">{scene}</div>
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
@@ -224,10 +234,10 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     {onMap ? <div className="mission-camera"><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></div> : null}
     {onMap && replanning ? <p className="mission-map-banner" role="status">Building a new plan…</p> : canMoveHabitat && session.habitatError ? <p className="mission-map-banner" role="status" data-level="caution">Habitat not moved: {session.habitatError}</p> : null}
     <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
-      <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}</Footnote><Title2 as="h2">{station ? `Station ${station.order} · ${station.id}` : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
+      <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : briefPoint ? <IconButton label="Back to fly-over" variant="plain" onClick={backToFlyOver}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}</Footnote><Title2 as="h2">{station ? `Station ${station.order} · ${station.id}` : briefStation ? `Station ${briefStation.order} · ${briefStation.id}` : briefPoint === AT_HABITAT ? "Habitat · egress" : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
       {phase === "plan" && session.error ? <Footnote role="status" className="mission-api-note">{session.source === "mock" ? "Planner API unavailable. Using bundled mock data." : "Replan failed. Showing the last plan."}</Footnote> : null}
       <div className="mission-panel-scroll" tabIndex={-1} ref={contentRef}>
-        <WindowContent contentKey={phase === "plan" ? stationId ?? "plan" : phase} direction={station ? "forward" : "back"}>{panel}</WindowContent>
+        <WindowContent contentKey={phase === "plan" ? stationId ?? "plan" : phase === "rehearse" ? briefPoint ?? "rehearse" : phase} direction={station || briefPoint ? "forward" : "back"}>{panel}</WindowContent>
       </div>
     </Window></div></WindowMotion>
     {mapFocus ? <Button ref={reopenRef} variant="glass" className="mission-show-panel" onClick={() => setMapFocus(false)}>Show {current.label.toLowerCase()} window</Button> : null}

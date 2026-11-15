@@ -253,3 +253,16 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 - Cycles (GPU Metal) para los planos de superficie; EEVEE para órbita, consola y corte del subsuelo, por tiempo de render.
 - La interfaz de los monitores se compone en Remotion con corner pin exportado por cuadro desde Blender, para que el texto quede legible y editable sin re-render.
 - El corte del subsuelo se rotula como estimación del modelo, no como imagen del subsuelo. Sin telemetría de traje inventada en el HUD: solo valores de IceWalk.
+
+## 2026-11-15 · Brief (Luqui)
+
+- El Brief es para ver la EVA antes de salir, desde arriba o desde los ojos del astronauta; no se camina ni se registra (eso es la fase EVA).
+- Pararse en una estación titula la ventana con la estación y muestra la flecha de volver, como una estación en Plan; volver (o Esc) lleva al sobrevuelo. La tira "Stand at" (HAB y números) reemplaza los botones de salto.
+- Cada estación del Brief abre con "Expect": la profundidad del hielo del modelo contra el alcance de la herramienta ("not within 1 m" es lo probable cuando el hielo está más abajo). Sin scroll en ninguna vista ni en la confirmación.
+- "Go for EVA" pide confirmación en la misma fila (Cancel / Confirm), sin sumar altura.
+- Al pararse en una estación se llega como la tripulación: 15 m antes, sobre el tramo desde la parada anterior, mirando la estación. En el hábitat, 45 m detrás y 14 m al costado, para verlo.
+- Saltos instantáneos entre puntos: Luqui prefirió el corte al viaje animado.
+- El camino en el 3D sigue siendo una línea sobre el piso, apenas más ancha (3.2 m de radio desde arriba, 9 cm a pie); nada de volumen ni borde.
+- Alrededor del DTM, el terreno se extiende solo como decorado (grilla que continúa el relieve del borde y se aplana, con THEMIS, HiRISE amplio y el orto del nivel); adentro el terreno no cambia. El zoom out del sobrevuelo tiene tope y el centro de la órbita no sale del sitio.
+- Hábitat del 3D: modelo HDU de NASA 3D Resources (parte 1), con material mate porque su vidrio sale negro sin mapa de entorno; el decodificador Draco viene de three (`public/draco`). Si no carga, queda el cilindro.
+- Cuff checklist: "EVA TERMINATE" en los hard stops, ramas que llevan a la misma estación en una sola línea, protección planetaria una vez en las notas.

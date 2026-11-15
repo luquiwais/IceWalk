@@ -29,6 +29,7 @@ vi.mock("@/components/site3d/site-3d-stage", () => ({ Site3DStage: ({ jump, mode
   </div>;
 } }));
 import { demoConfirm, demoPlan, demoReplan, orderedStations, measuringTool } from "@/lib/plan";
+import { habitatOf } from "@/components/site/site-data";
 import { PlanningView } from "./planning-view";
 const first = orderedStations(demoPlan)[0];
 const second = orderedStations(demoPlan)[1];
@@ -168,9 +169,25 @@ describe("Mission flow", () => {
     expect(screen.getByTestId("site-3d")).toBeInTheDocument();
     expect(screen.queryByTestId("mock-map")).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: new RegExp(`Station ${first.order}, ${first.id}`) }));
-    expect(screen.getByTestId("site-3d")).toHaveAttribute("data-jump", `${first.position[0] - 15},${first.position[1] - 15}`);
+    // Stands as the crew arrives: 15 m short of the station on the leg from the habitat, facing it.
+    const [hx, hy] = habitatOf(demoPlan);
+    const leg = Math.hypot(first.position[0] - hx, first.position[1] - hy);
+    const [jx, jy] = (screen.getByTestId("site-3d").getAttribute("data-jump") ?? "").split(",").map(Number);
+    expect(jx).toBeCloseTo(first.position[0] - ((first.position[0] - hx) / leg) * 15, 6);
+    expect(jy).toBeCloseTo(first.position[1] - ((first.position[1] - hy) / leg) * 15, 6);
+    // The window takes the station's name with a back arrow, as in Plan; back returns to the fly-over.
+    expect(screen.getByRole("heading", { name: `Station ${first.order} · ${first.id}` })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Back to fly-over" }));
+    expect(screen.getByRole("heading", { name: "Pre-EVA review: what will we find?" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: new RegExp(`Station ${first.order}, ${first.id}`) }));
     expect(screen.getByRole("link", { name: "Print the EVA cuff checklist" })).toHaveAttribute("href", `/cuff?plan=${demoPlan.plan_id}`);
+    expect(screen.getByRole("region", { name: `Station ${first.order} brief` })).toHaveTextContent("Expect:");
+    // Going for EVA asks for confirmation; cancel keeps the brief.
     await userEvent.click(screen.getByRole("button", { name: "Go for EVA" }));
+    await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(tab("Brief")).toHaveAttribute("aria-selected", "true");
+    await userEvent.click(screen.getByRole("button", { name: "Go for EVA" }));
+    await userEvent.click(screen.getByRole("button", { name: "Confirm, go for EVA" }));
     expect(tab("EVA")).toHaveAttribute("aria-selected", "true");
     // The EVA opens on the EV's helmet view; the IV console is one switch away.
     expect(screen.getByTestId("site-3d")).toHaveAttribute("data-mode", "helmet");

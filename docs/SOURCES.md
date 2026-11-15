@@ -290,3 +290,8 @@ y copias raw de canales permanecen fuera del repo.
 
 - Astronauta articulado: [Animated Astronaut Character in Space Suit Loop](https://sketchfab.com/3d-models/animated-astronaut-character-in-space-suit-loop-8fe5c8d3365e4d87bb7bc253d53a64e1), de [LasquetiSpice](https://sketchfab.com/LasquetiSpice), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Skin y rig originales preservados; materiales, poses y animación adaptados. Descarga, licencia y límites en [el registro del activo](research/astronaut-assets-2026-11-15.md).
 - Voces de catálogo Orus y Charon, mediante [Gemini speech generation](https://ai.google.dev/gemini-api/docs/speech-generation). Diálogo dirigido con Gemini 3.8 Flash TTS por Interactions; reemplaza las voces Microsoft anteriores en GlobalFilm y LocalFilm. No se clonó una persona. Audio y manifiestos quedan locales; el texto coincide con los guiones y datos congelados.
+
+### Brief (15/11)
+
+- Hábitat del 3D: [Habitat Demonstration Unit (part 1)](https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Habitat%20Demonstration%20Unit), repositorio oficial NASA 3D Resources. GLB de 516 748 bytes, SHA-256 `3106557bea24c9ba012556ddbecf3740c39276dc369cf359b77225de97458cfe`. Uso según las [NASA Media Usage Guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/); el modelo trae la insignia de NASA y la bandera en su textura (no implica respaldo de NASA). Escala 12 m de ancho a pie y 48 m desde arriba (`assumption`: ancho aproximado del HDU con la esclusa; desde arriba agrandado como el resto de los marcadores).
+- Decodificador Draco: `three/examples/jsm/libs/draco/gltf` (three 0.170.0, MIT), copiado a `apps/web/public/draco/`.

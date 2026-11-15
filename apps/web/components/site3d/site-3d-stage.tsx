@@ -20,7 +20,7 @@ const Site3D = dynamic(() => import("./site-3d").then((m) => m.Site3D), { ssr: f
 /** Inside the middle waypoint ring (site-3d.tsx RINGS_M) the helmet asks for the result. */
 const AT_STATION_M = 5;
 
-export type Site3DJump = FreePose & { key: number };
+export type Site3DJump = FreePose & { key: number; view?: "stand" | "fly" };
 type Log = (station: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") => void;
 
 type Props = {
@@ -56,11 +56,13 @@ const fmtClock = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 6
 export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPose, previousPlan, reviewing = false, returning = false, pending = false, elapsedMin = 0, onLog, onAccept, onReturn, onLeave, onComplete }: Props) {
   const [data, setData] = useState<Site3DData>();
   const [error, setError] = useState("");
-  const [chosen, setChosen] = useState<"fly" | "stand">("fly");
+  // The view the user picked and the jump it was picked at: a newer jump stands at that station,
+  // and picking "Fly over" afterwards holds until the next jump.
+  const [chosen, setChosen] = useState<{ view: "fly" | "stand"; atKey: number }>({ view: "fly", atKey: 0 });
   const [iceChoice, setIce] = useState<boolean | null>(null);
   const helmet = mode === "helmet";
   const iceOn = iceChoice ?? !helmet;
-  const view = helmet ? "stand" : jump && jump.key > 0 && chosen === "fly" ? "stand" : chosen;
+  const view = helmet ? "stand" : jump && jump.key > chosen.atKey ? jump.view ?? "stand" : chosen.view;
   const path = useMemo(() => walkPath(plan), [plan]);
   const iceMap = useIceMap(plan.plan_id, source);
   const ice = useMemo(() => (iceOn && iceMap.map ? renderIceView(iceMap.map, "likely", habitatOf(plan), ICE_RADIUS_M) ?? null : null), [iceOn, iceMap.map, plan]);
@@ -97,7 +99,7 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
         <div className="site3d-status">{error || "Loading the HiRISE terrain..."}</div>
       )}
       <div className="site3d-toolbar">
-        {!helmet ? <SegmentedControl label="3D view" value={view} options={[{ value: "fly", label: "Fly over · relief ×3" }, { value: "stand", label: "Stand at station" }]} onValueChange={(v) => setChosen(v as "fly" | "stand")} /> : null}
+        {!helmet ? <SegmentedControl label="3D view" value={view} options={[{ value: "fly", label: "Fly over · relief ×3" }, { value: "stand", label: "Stand at station" }]} onValueChange={(v) => setChosen({ view: v as "fly" | "stand", atKey: jump?.key ?? 0 })} /> : null}
         <SegmentedControl label="Ice map" value={iceOn ? "on" : "off"} options={[{ value: "on", label: "Ice map" }, { value: "off", label: "Terrain only" }]} onValueChange={(v) => setIce(v === "on")} />
       </div>
 
@@ -140,7 +142,7 @@ export function Site3DStage({ plan, measurements, source, mode, jump, pose, onPo
       <p className="site3d-credit">
         {ice ? "Dots: P(ice within reach), filled where craters or measurements back it · " : ""}
         {helmet ? "Rings and light columns: AR waypoint cues (concept), not terrain · " : ""}
-        {view === "stand" ? "HiRISE DTM (2 m) and 25 cm ortho, true relief" : "HiRISE DTM (6 m) and 1.5 m ortho, relief ×3"} · HiRISE RED band, grayscale as acquired · boulders sized from their shadows, shapes illustrative · sky color illustrative · NASA/JPL-Caltech/UArizona, USGS
+        {view === "stand" ? "HiRISE DTM (2 m) and 25 cm ortho, true relief" : "HiRISE DTM (6 m) and 1.5 m ortho, relief ×3"} · HiRISE RED band, grayscale as acquired · boulders sized from their shadows, shapes illustrative · sky color illustrative · habitat: NASA Habitat Demonstration Unit model (NASA 3D Resources) · NASA/JPL-Caltech/UArizona, USGS
       </p>
     </div>
   );
