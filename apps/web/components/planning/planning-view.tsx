@@ -4,7 +4,7 @@ import { Button, IconButton } from "@icewalk/ui/button";
 import { Footnote, Title1, Title2 } from "@icewalk/ui/text";
 import { TabBar } from "@icewalk/ui/tab-bar";
 import { Window, WindowContent, WindowMotion } from "@icewalk/ui/window";
-import { ArrowLeft, Maximize2, Minus, Plus, Scan } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronUp, Maximize2, Minus, Plus, Scan } from "lucide-react";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { SiteScene, type SiteSceneHandle, type SiteLayers, type SiteRaster } from "@/components/site/site-scene";
 import { type Insets } from "@/components/site/camera";
@@ -19,9 +19,8 @@ import { useIceMap } from "@/lib/use-ice-map";
 import { ICE_RADIUS_M, ICE_VIEW_MODES, renderIceView, type IceViewMode } from "@/lib/ice-view";
 import { bearing, demoConfirm, demoPlan, demoReplan, measuringTool, nextStation, orderedStations, stationBlock, stationById, type Measurement, type Plan, type Station } from "@/lib/plan";
 import { formatOdds } from "@/lib/format";
-import { HABITAT_XY } from "@/components/site/site-data";
-import { MissionStatus } from "./mission-status";
-import { PlanTimeline } from "./plan-timeline";
+import { HABITAT_XY, SITE_IMAGERY } from "@/components/site/site-data";
+import { MissionDock } from "./mission-dock";
 import { StationDetail } from "./station-detail";
 import { sceneInsets } from "./layout";
 import { GlobeEntry } from "./globe-entry";
@@ -62,8 +61,10 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const [reviewing, setReviewing] = useState(false);
   const [returning, setReturning] = useState(false);
   const [jump, setJump] = useState<Jump>();
-  // The step timeline opens on demand so the map keeps the space (closed by default).
+  // The dock's timeline opens on demand so the map keeps the space (closed by default).
   const [timelineOpen, setTimelineOpen] = useState(false);
+  // The legend explains the ice map, so it starts open; it folds to one button.
+  const [legendOpen, setLegendOpen] = useState(true);
   // Plan approval belongs to one plan: a new plan (another goal, a replan) withdraws it.
   const [approvedId, setApprovedId] = useState<string | null>(null);
   const [evaView, setEvaView] = useState<"ev" | "iv">(initialEvaView);
@@ -73,7 +74,6 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const [announcement, setAnnouncement] = useState("");
   const [insets, setInsets] = useState<Insets>({ top: 0, right: 0, bottom: 0, left: 0 });
   const rootRef = useRef<HTMLElement>(null);
-  const statusRef = useRef<HTMLDivElement>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -105,19 +105,19 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
 
   useLayoutEffect(() => {
     const root = rootRef.current;
-    const status = statusRef.current;
     const tabs = tabsRef.current;
     const timeline = timelineRef.current;
     if (!root || !tabs) return;
     const hud = root.querySelector<HTMLElement>(".site-hud");
     function measure() {
       const rootBox = root!.getBoundingClientRect();
-      const statusBox = status?.getBoundingClientRect() ?? tabs!.getBoundingClientRect();
+      const statusBox = tabs!.getBoundingClientRect();
       const timelineBox = timeline?.getBoundingClientRect() ?? new DOMRect(rootBox.left, rootBox.bottom, rootBox.width, 0);
       root!.style.setProperty("--mission-panel-top", `${statusBox.bottom - rootBox.top + 16}px`);
       const panel = mapFocus ? undefined : panelRef.current?.getBoundingClientRect();
       root!.style.setProperty("--mission-panel-y", `${(panel?.top ?? timelineBox.top) - rootBox.top}px`);
-      const tools = compact ? { above: legendRef.current?.getBoundingClientRect(), below: hud?.getBoundingClientRect() } : { below: toolsRef.current?.getBoundingClientRect() };
+      // Wide: the layers and legend form a column at the top left, so the map frames to its right.
+      const tools = compact ? { above: legendRef.current?.getBoundingClientRect(), below: hud?.getBoundingClientRect() } : { left: toolsRef.current?.getBoundingClientRect() };
       root!.style.setProperty("--mission-timeline-y", `${rootBox.bottom - timelineBox.top}px`);
       root!.style.setProperty("--mission-tabs-bottom", `${tabs!.getBoundingClientRect().bottom - rootBox.top}px`);
       // Wide layout: status sits in the right column (theme-dc.css), so only the header bounds the map's top.
@@ -127,11 +127,17 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     measure();
     if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(measure);
-    [root, status, tabs, timeline, panelRef.current, toolsRef.current, legendRef.current, hud].forEach((node) => { if (node) observer.observe(node); });
+    [root, tabs, timeline, panelRef.current, toolsRef.current, legendRef.current, hud].forEach((node) => { if (node) observer.observe(node); });
     return () => observer.disconnect();
-  }, [mapFocus, compact, phase, evaView, timelineOpen]);
+  }, [mapFocus, compact, phase, evaView, timelineOpen, legendOpen]);
 
   const hoverStation = useCallback((id: string | null) => setHoveredId(id), []);
+  // Opening the timeline folds the legend to its button so the map keeps room; closing restores it.
+  const legendBefore = useRef(true);
+  function toggleTimeline() {
+    if (!timelineOpen) { legendBefore.current = legendOpen; setLegendOpen(false); } else setLegendOpen(legendBefore.current);
+    setTimelineOpen(!timelineOpen);
+  }
   const selectStation = useCallback((id: string | null) => {
     const fromPanel = !!panelRef.current?.contains(document.activeElement);
     if (fromPanel && document.activeElement instanceof HTMLElement) panelOrigin.current = document.activeElement;
@@ -178,7 +184,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     : phase === "plan" ? station
       ? <section className="mission-stack" aria-label="Station detail"><Footnote>{formatOdds(station.p_ice)} chance of ice at the STM threshold</Footnote><StationDetail plan={plan} station={station} /></section>
       : <PlanPanel plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} planSource={session.source} pending={pending} approved={approved}
-        onApprove={() => { setApprovedId(plan.plan_id); setTimelineOpen(true); setAnnouncement("Plan approved."); }} onEdit={() => setApprovedId(null)}
+        onApprove={() => { setApprovedId(plan.plan_id); if (!timelineOpen) toggleTimeline(); setAnnouncement("Plan approved."); }} onEdit={() => setApprovedId(null)}
         onStrategy={(s) => { setStationId(null); setApprovedId(null); void session.setStrategy(s); }} onSelect={selectStation} onHover={hoverStation} onNext={() => goTo("rehearse")} />
       : phase === "rehearse" ? <RehearsePanel plan={plan} onJump={setJump} onNext={() => goTo("execute")} />
         : phase === "execute" ? <section className="mission-stack" aria-label="EVA">
@@ -199,14 +205,13 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
       <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}</Footnote><Title2 as="h2">{station ? `Station ${station.id}` : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
       {phase === "plan" && session.error ? <Footnote role="status" className="mission-api-note">{session.source === "mock" ? "Planner API unavailable. Using bundled mock data." : "Replan failed. Showing the last plan."}</Footnote> : null}
-      {onMap && phase !== "plan" ? <div ref={statusRef}><MissionStatus plan={plan} elapsedMin={executing ? elapsedMin : 0} execution={executing} session={session} /></div> : null}
       <div className="mission-panel-scroll" tabIndex={-1} ref={contentRef}>
         <WindowContent contentKey={phase === "plan" ? stationId ?? "plan" : phase} direction={station ? "forward" : "back"}>{panel}</WindowContent>
       </div>
     </Window></div></WindowMotion>
     {mapFocus ? <Button ref={reopenRef} variant="glass" className="mission-show-panel" onClick={() => setMapFocus(false)}>Show {current.label.toLowerCase()} window</Button> : null}
     {onMap ? <div className="mission-map-tools" ref={toolsRef}>
-      <Window className="mission-legend-card">
+      {legendOpen ? <Window className="mission-legend-card">
       <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
         {iceMap.map && mapMode ? <IceViewLegend map={iceMap.map} mode={mapMode} /> : null}
         <span className="mission-legend-keys">
@@ -215,16 +220,21 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
         </span>
         <span className="mission-legend-source">Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>
       </div>
-      </Window>
+      </Window> : null}
       <Window className="mission-map-card">
       <section className="mission-layer-position" aria-label="Map layers"><div className="mission-layer-window">
         {iceMap.map ? ICE_VIEW_MODES.filter((m) => m.value !== "change" || session.measurements.length).map((m) => <Button key={m.value} variant="plain" size="small" aria-pressed={mapMode === m.value} onClick={() => setMapMode((cur) => (cur === m.value ? null : m.value))}>{m.label}</Button>) : <Button variant="plain" size="small" disabled>{iceMap.loading ? "Ice map · loading" : "Ice map unavailable"}</Button>}
-        {phase === "plan" || phase === "execute" ? <Button variant="plain" size="small" aria-pressed={timelineOpen} onClick={() => setTimelineOpen((v) => !v)}>Timeline</Button> : null}
         <Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button>
         <Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button>
+        <Button variant="plain" size="small" className="mission-legend-toggle" aria-expanded={legendOpen} onClick={() => setLegendOpen((v) => !v)}>Legend{legendOpen ? <ChevronUp aria-hidden /> : <ChevronDown aria-hidden />}</Button>
       </div></section>
+      </Window>
+    </div> : null}
+    {onMap ? <p className="mission-map-credit">{SITE_IMAGERY.credit} · context: THEMIS Day IR (NASA/JPL-Caltech/ASU)</p> : null}
+    {onMap ? <div className="mission-dock-position" ref={timelineRef}><Window className="mission-dock-window">
+      <MissionDock plan={plan} previousPlan={reviewing ? session.previous ?? undefined : undefined} measurements={session.measurements} session={session} execution={executing} elapsedMin={elapsedMin}
+        open={timelineOpen} onToggle={toggleTimeline} stationId={sceneStationId} hoveredId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} />
     </Window></div> : null}
-    {timelineOpen && (phase === "plan" || (phase === "execute" && !helmet)) ? <div className="mission-timeline-position" ref={timelineRef}><Window className="mission-timeline-window"><PlanTimeline plan={plan} previousPlan={reviewing ? session.previous ?? undefined : undefined} stationId={sceneStationId} hoveredId={hoveredId} elapsedMin={executing ? elapsedMin : undefined} onSelectStation={selectStation} onHoverStation={hoverStation} /></Window></div> : null}
   </main>;
 }
 
