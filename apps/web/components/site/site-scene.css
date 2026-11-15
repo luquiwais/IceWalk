@@ -636,3 +636,6 @@
 .site-crew { position: absolute; left: -11px; top: -11px; display: flex; align-items: center; gap: 4px; pointer-events: none; }
 .site-crew svg { width: 22px; height: 22px; fill: #9fe8ff; stroke: #0b1a24; stroke-width: 1.2; filter: drop-shadow(0 0 3px rgb(0 0 0 / .8)); }
 .site-crew span { font: 700 11px/1 ui-monospace, monospace; color: #dff7ff; text-shadow: 0 0 3px #000, 0 1px 4px #000; }
+
+/* THEMIS context under HiRISE: a little softer so the HiRISE detail reads as the focus. */
+.site-image[data-kind="context"] { opacity: .85; }

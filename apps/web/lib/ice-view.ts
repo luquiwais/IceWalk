@@ -12,11 +12,8 @@
  */
 import { decodeLayer, renderPixels, type IceMap } from "./ice-map";
 
-/**
- * Radius of the drawn ice map around the habitat: the HiRISE overview image ends 1.1 km south of
- * the habitat, and the plan reaches 0.5 km, so the circle stays on real imagery.
- */
-export const ICE_RADIUS_M = 1100;
+/** Radius of the drawn ice map around the habitat: the whole 3 x 3 km map window (planner map_half_m). */
+export const ICE_RADIUS_M = 1500;
 /** Station grid spacing (contracts/grid.json: station_grid_cell_size_m). */
 export const BLOCK_M = 100;
 /** Uncertainty left (fraction of prior variance) below which a block counts as data-backed. */

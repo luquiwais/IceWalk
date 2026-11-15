@@ -18,6 +18,14 @@ export const SITE_IMAGERY = {
     width: imagery.images.overview.width_px,
     height: imagery.images.overview.height_px,
   },
+  /** THEMIS Day IR around the site (build-site-context.py): real terrain beyond HiRISE, never black. */
+  context: {
+    src: imagery.images.context.file,
+    box: imagery.images.context.box_m as Box,
+    width: imagery.images.context.width_px,
+    height: imagery.images.context.height_px,
+    credit: imagery.images.context.credit,
+  },
   detail: {
     src: imagery.images.detail.file,
     box: imagery.images.detail.box_m as Box,
@@ -26,8 +34,8 @@ export const SITE_IMAGERY = {
   },
 } as const;
 
-/** The camera never leaves the overview image. */
-export const SCENE_BOUNDS: Box = SITE_IMAGERY.overview.box;
+/** The camera never leaves the context image. */
+export const SCENE_BOUNDS: Box = SITE_IMAGERY.context.box;
 
 /**
  * Habitat in grid meters. apps/planner/config/eva.yaml `habitat_xy` (assumption: true,

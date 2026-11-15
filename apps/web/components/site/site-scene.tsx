@@ -851,6 +851,7 @@ export function SiteScene({
   };
 
   const overview = SITE_IMAGERY.overview;
+  const context = SITE_IMAGERY.context;
   const detail = SITE_IMAGERY.detail;
   const rasterWidth = raster ? raster.bounds.xmax - raster.bounds.xmin : 0;
 
@@ -881,6 +882,18 @@ export function SiteScene({
 
       <div className="site-ground">
       <div className="site-imagery" aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element -- transformed per frame; next/image adds nothing here */}
+        <img
+          ref={imageRef("context", context.box, context.width)}
+          className="site-image"
+          data-kind="context"
+          src={context.src}
+          width={context.width}
+          height={context.height}
+          alt=""
+          draggable={false}
+          decoding="async"
+        />
         {/* eslint-disable-next-line @next/next/no-img-element -- transformed per frame; next/image adds nothing here */}
         <img
           ref={imageRef("overview", overview.box, overview.width)}
@@ -1072,7 +1085,7 @@ export function SiteScene({
           </div>
         </div>
         <span ref={coords} className="site-coords" aria-hidden />
-        <span className="site-credit">{SITE_IMAGERY.credit}</span>
+        <span className="site-credit">{SITE_IMAGERY.credit} · context: THEMIS Day IR (NASA/JPL-Caltech/ASU)</span>
       </div>
 
       <p className="site-sr-only" aria-live="polite">

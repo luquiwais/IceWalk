@@ -123,7 +123,7 @@ describe("SiteScene", () => {
 
   it("shows the HiRISE credit", () => {
     setup();
-    expect(screen.getByText("HiRISE ESP_073578_2155 · NASA/JPL-Caltech/UArizona")).toBeInTheDocument();
+    expect(screen.getByText((t) => t.includes("HiRISE ESP_073578_2155 · NASA/JPL-Caltech/UArizona"))).toBeInTheDocument();
   });
 
   it("frames the plan in the free area on first layout", () => {
