@@ -657,3 +657,9 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
 .mission-evidence-truth b { font-weight: 600; }
 .mission-site-notes [data-text-style=footnote] { font-size: .75rem; line-height: 1.4; }
 .mission-site [aria-label="Zones ranked"] { gap: .375rem; }
+
+/* IV replan review (execute-panel.tsx): the call fits above the fold, the IV decides without scrolling. */
+.mission-replan { gap: .375rem; }
+.mission-replan .mission-replan-title { font-size: 1.0625rem; }
+.mission-replan .mission-reasons { margin: 0; font-size: .8125rem; line-height: 1.35; }
+.mission-replan [data-text-style=footnote] { font-size: .75rem; line-height: 1.35; }
