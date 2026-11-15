@@ -63,9 +63,9 @@ describe("Mission flow", () => {
     const panel = screen.getByRole("region", { name: "EVA plan" });
     expect(within(panel).getByLabelText("Plan numbers")).toBeInTheDocument();
     for (const s of orderedStations(demoPlan)) expect(within(panel).getByRole("button", { name: new RegExp(`Station ${s.order}, ${s.id}`) })).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "Go / no-go checks" })).toHaveTextContent("Comms with the habitat");
+    expect(screen.getByRole("list", { name: "Go / no-go checks" })).toHaveTextContent("Comms");
     expect(screen.queryByRole("group", { name: "Plan timeline" })).not.toBeInTheDocument(); // opens on demand
-    expect(screen.getByRole("region", { name: "EVA status" })).toHaveTextContent("Bundled mock data");
+    expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Bundled mock data");
     expect(screen.getByText("Step 2 of 5 · Plan", visible)).toBeInTheDocument();
   });
 
@@ -82,6 +82,7 @@ describe("Mission flow", () => {
 
   it("answers whether the EVA can be walked, and where the dust opacity comes from", async () => {
     render(<PlanningView initialPhase="plan" />);
+    await userEvent.click(screen.getByRole("tab", { name: "Checks" }));
     await userEvent.click(screen.getByRole("button", { name: /Can we walk it\?/ }));
     const card = screen.getByRole("region", { name: "Feasibility" });
     expect(card).toHaveTextContent("Soil firmness");
@@ -93,7 +94,7 @@ describe("Mission flow", () => {
   it("explains the ice map: probability and certainty in one legend, and the prior as background", async () => {
     render(<PlanningView initialPhase="plan" />);
     const legend = screen.getByRole("group", { name: "Map legend" });
-    await within(legend).findByText(/Background 67%: regional prior/);
+    await within(legend).findByText(/Background 67% = regional prior/);
     expect(within(legend).getByRole("img", { name: /Brighter blue means likelier ice/ })).toBeInTheDocument();
     for (const text of ["P(ice within 3 m)", "Likelier", "Prior only", "Habitat", "Traverse", "349 craters"]) expect(legend).toHaveTextContent(text);
     const layers = screen.getByRole("region", { name: "Map layers" });
@@ -140,7 +141,10 @@ describe("Mission flow", () => {
 
   it("briefs the EVA on the 3D terrain, jumps to a station and goes for EVA", async () => {
     render(<PlanningView initialPhase="plan" />);
-    await userEvent.click(screen.getByRole("button", { name: "Brief the EVA in 3D" }));
+    await userEvent.click(screen.getByRole("button", { name: "Approve plan" }));
+    expect(screen.getByRole("region", { name: "Approved plan" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Plan timeline" })).toBeInTheDocument(); // opens on approval
+    await userEvent.click(screen.getByRole("button", { name: "Brief the EVA" }));
     expect(screen.getByTestId("site-3d")).toBeInTheDocument();
     expect(screen.queryByTestId("mock-map")).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: new RegExp(`Station ${first.order}, ${first.id}`) }));

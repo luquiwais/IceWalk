@@ -65,6 +65,21 @@
       "height_px": 800,
       "credit": "THEMIS Day IR controlled mosaic, 100 m (NASA/JPL-Caltech/ASU, via NASA Mars Trek)",
       "bytes": 55468
+    },
+    "wide": {
+      "file": "/site/s1094b-wide.webp",
+      "product": "ESP_073578_2155_RED_C_01_ORTHO",
+      "box_m": {
+        "xmin": -3300.0,
+        "ymin": -6700.0,
+        "xmax": 3300.0,
+        "ymax": 4800.0
+      },
+      "m_per_px": 2.5,
+      "width_px": 2640,
+      "height_px": 4600,
+      "valid_fraction": 0.7852,
+      "bytes": 2256286
     }
   },
   "registration": {

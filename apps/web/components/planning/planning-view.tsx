@@ -64,6 +64,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const [jump, setJump] = useState<Jump>();
   // The step timeline opens on demand so the map keeps the space (closed by default).
   const [timelineOpen, setTimelineOpen] = useState(false);
+  // Plan approval belongs to one plan: a new plan (another goal, a replan) withdraws it.
+  const [approvedId, setApprovedId] = useState<string | null>(null);
   const [evaView, setEvaView] = useState<"ev" | "iv">(initialEvaView);
   // The EV and brief poses live here so a phase change never loses the walk.
   const [evPose, setEvPose] = useState<FreePose>(() => startPose(demoPlan));
@@ -89,6 +91,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     return renderIceView(iceMap.map, mapMode, HABITAT_XY, ICE_RADIUS_M);
   }, [iceMap.map, mapMode]);
   const helmet = phase === "execute" && evaView === "ev";
+  const approved = approvedId === plan.plan_id;
+  const compactPanel = (phase === "plan" && approved && !stationId) || phase === "rehearse";
   const evaPath = useMemo(() => walkPath(plan), [plan]);
   const onMap = phase === "plan" || phase === "debrief" || (phase === "execute" && evaView === "iv");
   const station = phase === "plan" && stationId ? stationById(plan, stationId) : undefined;
@@ -173,7 +177,9 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
     : phase === "plan" ? station
       ? <section className="mission-stack" aria-label="Station detail"><Footnote>{formatOdds(station.p_ice)} chance of ice at the STM threshold</Footnote><StationDetail plan={plan} station={station} /></section>
-      : <PlanPanel plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} planSource={session.source} pending={pending} onStrategy={(s) => { setStationId(null); void session.setStrategy(s); }} onSelect={selectStation} onHover={hoverStation} onNext={() => goTo("rehearse")} />
+      : <PlanPanel plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} planSource={session.source} pending={pending} approved={approved}
+        onApprove={() => { setApprovedId(plan.plan_id); setTimelineOpen(true); setAnnouncement("Plan approved."); }} onEdit={() => setApprovedId(null)}
+        onStrategy={(s) => { setStationId(null); setApprovedId(null); void session.setStrategy(s); }} onSelect={selectStation} onHover={hoverStation} onNext={() => goTo("rehearse")} />
       : phase === "rehearse" ? <RehearsePanel plan={plan} onJump={setJump} onNext={() => goTo("execute")} />
         : phase === "execute" ? <section className="mission-stack" aria-label="EVA">
           <SegmentedControl label="EVA view" value={evaView} options={[{ value: "ev", label: "EV1 helmet" }, { value: "iv", label: "IV console" }]} onValueChange={(v) => setEvaView(v as "ev" | "iv")} />
@@ -184,7 +190,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
         </section>
           : <DebriefPanel plan={plan} measurements={session.measurements} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
 
-  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); } }}>
+  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
     <div className="mission-scene">{scene}</div>
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
@@ -192,26 +198,32 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     {onMap ? <div className="mission-camera"><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></div> : null}
     <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
       <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}</Footnote><Title2 as="h2">{station ? `Station ${station.id}` : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
-      {onMap ? <div ref={statusRef}><MissionStatus plan={plan} elapsedMin={executing ? elapsedMin : 0} execution={executing} session={session} /></div> : null}
+      {phase === "plan" && session.error ? <Footnote role="status" className="mission-api-note">{session.source === "mock" ? "Planner API unavailable. Using bundled mock data." : "Replan failed. Showing the last plan."}</Footnote> : null}
+      {onMap && phase !== "plan" ? <div ref={statusRef}><MissionStatus plan={plan} elapsedMin={executing ? elapsedMin : 0} execution={executing} session={session} /></div> : null}
       <div className="mission-panel-scroll" tabIndex={-1} ref={contentRef}>
         <WindowContent contentKey={phase === "plan" ? stationId ?? "plan" : phase} direction={station ? "forward" : "back"}>{panel}</WindowContent>
       </div>
     </Window></div></WindowMotion>
     {mapFocus ? <Button ref={reopenRef} variant="glass" className="mission-show-panel" onClick={() => setMapFocus(false)}>Show {current.label.toLowerCase()} window</Button> : null}
     {onMap ? <div className="mission-map-tools" ref={toolsRef}>
-      <section className="mission-layer-position" aria-label="Map layers"><Window className="mission-layer-window">
+      <Window className="mission-legend-card">
+      <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
+        {iceMap.map && mapMode ? <IceViewLegend map={iceMap.map} mode={mapMode} /> : null}
+        <span className="mission-legend-keys">
+          <span><i data-key="hab" aria-hidden />Habitat</span><span><i data-key="route" aria-hidden />Traverse</span>
+          {layers.rings ? <span><i data-key="ring" aria-hidden />Distance rings</span> : null}{(reviewing || phase === "debrief") && session.previous ? <span><i data-key="previous" aria-hidden />Plan before the last result</span> : null}
+        </span>
+        <span className="mission-legend-source">Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>
+      </div>
+      </Window>
+      <Window className="mission-map-card">
+      <section className="mission-layer-position" aria-label="Map layers"><div className="mission-layer-window">
         {iceMap.map ? ICE_VIEW_MODES.filter((m) => m.value !== "change" || session.measurements.length).map((m) => <Button key={m.value} variant="plain" size="small" aria-pressed={mapMode === m.value} onClick={() => setMapMode((cur) => (cur === m.value ? null : m.value))}>{m.label}</Button>) : <Button variant="plain" size="small" disabled>{iceMap.loading ? "Ice map · loading" : "Ice map unavailable"}</Button>}
         {phase === "plan" || phase === "execute" ? <Button variant="plain" size="small" aria-pressed={timelineOpen} onClick={() => setTimelineOpen((v) => !v)}>Timeline</Button> : null}
         <Button variant="plain" size="small" aria-pressed={layers.rings} onClick={() => setLayers((s) => ({ ...s, rings: !s.rings }))}>Range rings</Button>
         <Button variant="plain" size="small" aria-pressed={layers.grid} onClick={() => setLayers((s) => ({ ...s, grid: !s.grid }))}>Grid</Button>
-      </Window></section>
-      <div className="mission-legend" role="group" aria-label="Map legend" ref={legendRef}>
-        {iceMap.map && mapMode ? <IceViewLegend map={iceMap.map} mode={mapMode} /> : null}
-        <span><i data-key="hab" aria-hidden />Habitat</span><span><i data-key="route" aria-hidden />Traverse</span>
-        {layers.rings ? <span><i data-key="ring" aria-hidden />Rings · distance from habitat</span> : null}{(reviewing || phase === "debrief") && session.previous ? <span><i data-key="previous" aria-hidden />Plan before the last result</span> : null}
-        <span>Model estimate{plan.summary.craters_in_model !== undefined ? ` · ${plan.summary.craters_in_model} craters` : ""} · {describeSource(session)}</span>
-      </div>
-    </div> : null}
+      </div></section>
+    </Window></div> : null}
     {timelineOpen && (phase === "plan" || (phase === "execute" && !helmet)) ? <div className="mission-timeline-position" ref={timelineRef}><Window className="mission-timeline-window"><PlanTimeline plan={plan} previousPlan={reviewing ? session.previous ?? undefined : undefined} stationId={sceneStationId} hoveredId={hoveredId} elapsedMin={executing ? elapsedMin : undefined} onSelectStation={selectStation} onHoverStation={hoverStation} /></Window></div> : null}
   </main>;
 }

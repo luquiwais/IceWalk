@@ -638,4 +638,12 @@
 .site-crew span { font: 700 11px/1 ui-monospace, monospace; color: #dff7ff; text-shadow: 0 0 3px #000, 0 1px 4px #000; }
 
 /* THEMIS context under HiRISE: a little softer so the HiRISE detail reads as the focus. */
-.site-image[data-kind="context"] { opacity: .85; }
+.site-image[data-kind="context"] { opacity: .45; }
+
+/* Wide HiRISE strip: same photo, feathered so the THEMIS edge never shows a seam. */
+.site-image[data-kind="wide"] {
+  mask-image:
+    linear-gradient(to right, transparent, #000 4%, #000 96%, transparent),
+    linear-gradient(to bottom, transparent, #000 3%, #000 97%, transparent);
+  mask-composite: intersect;
+}

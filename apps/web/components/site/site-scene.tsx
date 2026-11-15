@@ -852,6 +852,7 @@ export function SiteScene({
 
   const overview = SITE_IMAGERY.overview;
   const context = SITE_IMAGERY.context;
+  const wide = SITE_IMAGERY.wide;
   const detail = SITE_IMAGERY.detail;
   const rasterWidth = raster ? raster.bounds.xmax - raster.bounds.xmin : 0;
 
@@ -890,6 +891,18 @@ export function SiteScene({
           src={context.src}
           width={context.width}
           height={context.height}
+          alt=""
+          draggable={false}
+          decoding="async"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element -- transformed per frame; next/image adds nothing here */}
+        <img
+          ref={imageRef("wide", wide.box, wide.width)}
+          className="site-image"
+          data-kind="wide"
+          src={wide.src}
+          width={wide.width}
+          height={wide.height}
           alt=""
           draggable={false}
           decoding="async"

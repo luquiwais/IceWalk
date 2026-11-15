@@ -26,6 +26,13 @@ export const SITE_IMAGERY = {
     height: imagery.images.context.height_px,
     credit: imagery.images.context.credit,
   },
+  /** The whole HiRISE strip at 2.5 m (build-site-wide.py): sharp terrain when zooming out. */
+  wide: {
+    src: imagery.images.wide.file,
+    box: imagery.images.wide.box_m as Box,
+    width: imagery.images.wide.width_px,
+    height: imagery.images.wide.height_px,
+  },
   detail: {
     src: imagery.images.detail.file,
     box: imagery.images.detail.box_m as Box,
