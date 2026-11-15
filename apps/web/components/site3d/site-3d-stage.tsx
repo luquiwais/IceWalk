@@ -168,7 +168,7 @@ function ArrivalPrompt({ station, pending, onLog }: { station: Station; pending:
       <span className="site3d-update-line">{toolName(tool)} to {depth} m · P(ice) {Math.round(station.p_ice * 100)}% before measuring</span>
       <div className="site3d-hud-actions">
         <Button size="small" disabled={pending} onClick={() => onLog(station, "ice", depth, "EV1")}>Ice</Button>
-        <Button size="small" disabled={pending} onClick={() => onLog(station, "no_ice", depth, "EV1")}>No ice</Button>
+        <Button size="small" disabled={pending} onClick={() => onLog(station, "no_ice", depth, "EV1")} title={`No ice down to ${depth} m: ice, if any, is deeper`}>Not within {depth} m</Button>
         <Button size="small" disabled={pending} onClick={() => onLog(station, "inconclusive", depth, "EV1")}>Inconclusive</Button>
       </div>
       {pending ? <span className="site3d-update-line">Sending to the planner...</span> : null}
@@ -185,7 +185,7 @@ function PlanUpdate({ before, after, measurement, onAccept, onReturn, mapAfter, 
   const oldNext = nextStation(before, done);
   const newNext = nextStation(after, done);
   const back = r?.recommendation === "return_to_habitat";
-  const result = measurement.result === "no_ice" ? "No ice" : measurement.result === "ice" ? "Ice" : "Inconclusive";
+  const result = measurement.result === "no_ice" ? `No ice within ${measurement.depth_m ?? "reach"}${measurement.depth_m != null ? " m" : ""}` : measurement.result === "ice" ? "Ice" : "Inconclusive";
   const change = oldNext && newNext && oldNext.id !== newNext.id ? ` (was ${oldNext.id})` : oldNext?.id === newNext?.id ? " (unchanged)" : "";
   const mapBefore = before.stations.find((s) => s.id === measurement.station_id)?.p_ice;
   const unchanged = !!r && r.stations_added.length === 0 && r.stations_dropped.length === 0;
