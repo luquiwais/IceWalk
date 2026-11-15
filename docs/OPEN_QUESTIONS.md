@@ -52,6 +52,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 85 | El progreso de la expedición no se entiende (PET simulado que salta, "Now" en el timeline). ¿Una vista única de avance (estaciones hechas / total, adelanto o atraso contra el plan, margen, posición en la ruta) igual en el casco y en la consola del IV? | Sí, próxima tarea de la web | Frontend | 14/11 |
 | 86 | La rama de José (`web/rediseno-dc`) quedó superada por las 5 fases y choca con `main`. ¿Se rescata su "Key finding" del panel de Site y se le pide que parta de `main`? | Sí | Luqui + José | 14/11 |
 
+| 87 | Hábitat del 3D con un modelo de NASA 3D Resources: la búsqueda no encontró un hábitat de superficie en el catálogo oficial (solo naves e instalaciones; los hábitats que aparecen son de terceros, pagos o "editorial only"). ¿Se busca a mano en science.nasa.gov/3d-resources o queda el cilindro rotulado? | Buscar a mano; mientras, el cilindro | Luqui + Frontend | 14/11 |
+
 ## A averiguar
 
 | # | Cuestión | Quién |

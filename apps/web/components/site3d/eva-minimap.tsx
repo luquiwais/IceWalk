@@ -19,7 +19,7 @@ export function routeProgress(path: readonly PathPoint[], pose: { x: number; y: 
 }
 
 /**
- * Track map of the EVA, north up, like a race-broadcast inset: the planned route, the stations
+ * Track map of the EVA, heading up (what is ahead is up), like a race-broadcast inset: the planned route, the stations
  * (measured, next, remaining), the habitat and the EV with its heading; progress below.
  */
 export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin, marginMin }: {
@@ -42,7 +42,8 @@ export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin,
   const fmt = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
   return (
     <section className="eva-minimap" aria-label="EVA progress">
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Track map: ${done} of ${stations.length} stations measured, ${Math.round(progress * 100)}% of the route`}>
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label={`Track map, heading up: ${done} of ${stations.length} stations measured, ${Math.round(progress * 100)}% of the route`}>
+        <g transform={`rotate(${-pose.headingDeg} ${sx(pose.x)} ${sy(pose.y)})`}>
         <polyline points={line} className="eva-minimap-route" />
         {walked ? <polyline points={walked} className="eva-minimap-walked" /> : null}
         <rect x={sx(HABITAT_XY[0]) - 5} y={sy(HABITAT_XY[1]) - 5} width={10} height={10} className="eva-minimap-hab" />
@@ -53,10 +54,13 @@ export function EvaMinimap({ plan, path, measurements, pose, nextId, elapsedMin,
             <text x={sx(s.position[0]) + 8} y={sy(s.position[1]) + 3} className="eva-minimap-label">{s.order}</text>
           </g>;
         })}
-        <g transform={`translate(${sx(pose.x)} ${sy(pose.y)}) rotate(${pose.headingDeg})`}>
+        </g>
+        <g transform={`translate(${sx(pose.x)} ${sy(pose.y)})`}>
           <path d="M0 -8 L6 6 L0 3 L-6 6 Z" className="eva-minimap-ev" />
         </g>
-        <text x={SIZE - 8} y={14} textAnchor="end" className="eva-minimap-label">N ↑</text>
+        <g transform={`translate(${SIZE - 14} 14) rotate(${-pose.headingDeg})`}>
+          <path d="M0 -8 L3 0 L-3 0 Z" className="eva-minimap-north" /><text y={11} textAnchor="middle" className="eva-minimap-label">N</text>
+        </g>
       </svg>
       <div className="eva-progress">
         <div className="eva-progress-bar" aria-hidden><i style={{ width: `${Math.round(progress * 100)}%` }} /></div>

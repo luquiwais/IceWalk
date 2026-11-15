@@ -193,3 +193,4 @@
 .eva-progress dd { margin: 0; font-weight: 700; }
 /* Same tracker inside the IV console panel. */
 .mission-tracker .eva-minimap { position: static; width: 100%; max-width: 320px; }
+.eva-minimap-north { fill: #f06a5a; }
