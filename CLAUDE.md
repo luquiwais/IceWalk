@@ -6,6 +6,8 @@ Planificador de EVAs de prospección de hielo en Marte para el NASA Space Apps C
 
 El modelo dice qué sabemos y qué no: probabilidad de hielo hasta la profundidad que alcanza la herramienta (umbral de la STM; 3 m en el ejemplo de S1094b) e incertidumbre por celda, a partir de 349 cráteres reales. El planificador recomienda con qué herramienta ir (radar como principal, taladro para confirmar), arma la EVA dentro de los límites de seguridad y de la ventana climática, y re-planifica con cada medición. **No prometemos dónde está el hielo:** los cráteres reales no lo predicen a escala de sitio (ver `docs/EXPERIMENTS.md`, 2026-11-08). El lema anterior, «We plan what to learn», está en revisión. Traspaso del planificador: `docs/plans/planner.md`.
 
+**Estado actual y cómo retomar (hackatón, 14-15/11): `docs/plans/estado-2026-11-14.md`. Leelo primero en una sesión nueva.**
+
 ## Principios que no se negocian
 
 - **Todo alineado a prácticas documentadas de NASA**, con fuente. Nada de reglas inventadas: un valor sin fuente se marca `"assumption": true` y se anota en `docs/SOURCES.md`.
