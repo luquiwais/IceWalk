@@ -55,6 +55,8 @@ class EvaConfig:
     min_station_separation_m: float
     believer_error_m: float
     habitat_exclusion_m: float = 0.0
+    # Caja (xmin, xmax, ymin, ymax) donde se acepta un hábitat movido por el operador.
+    habitat_area_m: tuple[float, float, float, float] | None = None
 
 
 @lru_cache
@@ -68,7 +70,14 @@ def eva_config(path: Path = CONFIG) -> EvaConfig:
         min_station_separation_m=float(raw["min_station_separation_m"]["value"]),
         believer_error_m=float(raw["believer_error_m"]["value"]),
         habitat_exclusion_m=float(raw.get("habitat_exclusion_m", {}).get("value", 0.0)),
+        habitat_area_m=_area(raw.get("habitat_area_m", {}).get("value")),
     )
+
+
+def _area(v: dict | None) -> tuple[float, float, float, float] | None:
+    if not v:
+        return None
+    return (float(v["xmin"]), float(v["xmax"]), float(v["ymin"]), float(v["ymax"]))
 
 
 # --- requisitos de la STM ----------------------------------------------------------------------
@@ -704,6 +713,7 @@ def build(
         "mission_id": stm["mission_id"],
         "plan_id": f"plan-{uuid.uuid4().hex[:8]}",
         "replanned_from": replanned_from,
+        "habitat_xy": [round(float(v), 1) for v in planner.habitat_xy],
         "stations": stations,
         "route": {
             "type": "FeatureCollection",
