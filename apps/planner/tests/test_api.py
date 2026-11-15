@@ -112,3 +112,32 @@ def test_habitat_outside_the_planning_area_is_rejected_with_a_reason():
     r = client.post("/plan", json={"habitat_xy": [3000, 4000]})
     assert r.status_code == 422
     assert "planning area" in r.json()["detail"]
+
+
+
+def _walkback(plan_id, x, y):
+    return client.get("/walkback", params={"plan_id": plan_id, "x": x, "y": y})
+
+
+def test_walkback_validates_its_input():
+    pid = client.post("/plan", json={}).json()["plan_id"]
+    assert _walkback("plan-nope", 0, 0).status_code == 404
+    assert _walkback("../etc", 0, 0).status_code == 422
+    assert _walkback(pid, "nan", 0).status_code == 422
+    assert _walkback(pid, "a", 0).status_code == 422
+
+
+@needs_terrain
+def test_walkback_is_the_fastest_route_to_the_habitat():
+    plan = client.post("/plan", json={}).json()
+    far = max(plan["stations"], key=lambda s: s["order"])
+    fx, fy = far["position"]
+    r = _walkback(plan["plan_id"], fx, fy)
+    assert r.status_code == 200
+    body = r.json()
+    hx, hy = plan["habitat_xy"]
+    end = body["xy"][-1]
+    assert abs(end[0] - hx) <= 25 and abs(end[1] - hy) <= 25
+    straight = ((fx - hx) ** 2 + (fy - hy) ** 2) ** 0.5
+    assert body["distance_m"] >= straight * 0.95 and body["minutes"] > 0
+    assert _walkback(plan["plan_id"], 99999, 0).status_code == 422

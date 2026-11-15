@@ -84,6 +84,8 @@ export type SiteSceneProps = {
   plan: Plan;
   /** The plan before a re-plan: its route is drawn dashed and the diff is labeled. */
   previousPlan?: Plan;
+  /** EVA TERMINATE only: the fastest route back to the habitat, in grid meters. */
+  walkback?: RouteLine;
   measurements?: readonly Measurement[];
   /**
    * Oblique presentation of the ortho, heading up, pivoting on `focus` (grid
@@ -188,6 +190,8 @@ type Live = {
   spacingM: number;
   lines: RouteLine[];
   previousLines: RouteLine[];
+  /** EVA TERMINATE: the fastest route back to the habitat. */
+  walkbackLine: RouteLine | null;
   points: Map<string, [number, number]>;
   selected: string | null;
   layers: SiteLayers;
@@ -212,6 +216,7 @@ export function SiteScene({
   raster,
   crew,
   stale = false,
+  walkback,
   onMoveHabitat,
   className,
   ref,
@@ -268,6 +273,7 @@ export function SiteScene({
   const rings = useRef<(SVGCircleElement | null)[]>([]);
   const ringLabels = useRef<(SVGTextElement | null)[]>([]);
   const previousPath = useRef<SVGPathElement>(null);
+  const walkbackPath = useRef<SVGPathElement>(null);
   const haloPath = useRef<SVGPathElement>(null);
   const routePath = useRef<SVGPathElement>(null);
   const chevronPath = useRef<SVGPathElement>(null);
@@ -300,6 +306,7 @@ export function SiteScene({
     spacingM: STATION_CELL_M,
     lines,
     previousLines,
+    walkbackLine: null,
     points: new Map(),
     selected: selectedStationId,
     layers,
@@ -473,6 +480,7 @@ export function SiteScene({
     haloPath.current?.setAttribute("d", d);
     routePath.current?.setAttribute("d", d);
     previousPath.current?.setAttribute("d", L.previousLines.length ? pathOf(L.previousLines) : "");
+    walkbackPath.current?.setAttribute("d", L.walkbackLine ? pathOf([L.walkbackLine]) : "");
 
     // Direction chevrons every ~80 px, clear of the markers.
     const markerPts = [...L.points.values()].map(([x, y]) => toScreen(x, y));
@@ -663,6 +671,7 @@ export function SiteScene({
       spacingM: minSpacing([...stations, ...dropped].map((s) => s.position)),
       lines,
       previousLines,
+      walkbackLine: walkback ?? null,
       points: new Map([...stations, ...dropped].map((s) => [s.id, [s.position[0], s.position[1]]])),
       selected: selectedStationId,
       layers,
@@ -704,7 +713,7 @@ export function SiteScene({
       );
     }
     schedule();
-  }, [plan, framing, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera, crew, habitat]);
+  }, [plan, framing, lines, previousLines, walkback, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera, crew, habitat]);
 
   // Size, gestures and keys: native listeners, so wheel can be non-passive and
   // nothing goes through React per frame.
@@ -1020,6 +1029,7 @@ export function SiteScene({
         <path ref={previousPath} className="site-route-previous" />
         <path ref={haloPath} className="site-route-halo" />
         <path ref={routePath} className="site-route" />
+        <path ref={walkbackPath} className="site-route-walkback" />
         <path ref={chevronPath} className="site-chevrons" />
         <circle ref={rangeCircle} className="site-range" style={{ display: "none" }} />
         <text ref={rangeLabel} className="site-svg-label site-range-label" style={{ display: "none" }}>

@@ -665,3 +665,6 @@
 .site-hab-area { fill: rgb(10 132 255 / .06); stroke: rgb(255 255 255 / .7); stroke-width: 1.5; stroke-dasharray: 6 5; }
 .site-hab-ghost[data-outside] { background: var(--color-warning, #ff453a); }
 .site-hab-ghost[data-outside] span { color: var(--color-warning, #ff453a); }
+
+/* EVA TERMINATE: the fastest route back to the habitat (caution). Only drawn during the EVA. */
+.site-route-walkback { fill: none; stroke: var(--color-caution, #f0bf4f); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }

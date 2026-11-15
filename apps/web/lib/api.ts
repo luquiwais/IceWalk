@@ -105,6 +105,18 @@ export function getPlan(planId: string, options?: ApiOptions): Promise<Plan> {
   return request(`/plan/${encodeURIComponent(planId)}`, { method: "GET" }, isPlan, options);
 }
 
+/** GET /walkback: the fastest route from a point back to the plan's habitat over the DTM (EVA TERMINATE). */
+export type Walkback = { from: [number, number]; to: [number, number]; xy: [number, number][]; distance_m: number; minutes: number; max_slope_deg: number };
+
+export function getWalkback(planId: string, x: number, y: number, options?: ApiOptions): Promise<Walkback> {
+  const q = new URLSearchParams({ plan_id: planId, x: x.toFixed(1), y: y.toFixed(1) });
+  return request(`/walkback?${q}`, { method: "GET" }, isWalkback, options);
+}
+
+function isWalkback(body: unknown): body is Walkback {
+  return isObject(body) && Array.isArray(body.xy) && body.xy.length > 1 && typeof body.distance_m === "number" && typeof body.minutes === "number";
+}
+
 /** GET /campaign: P(ice confirmed) after 1..N EVAs, drilling blind against radar first. */
 export type CampaignSeries = { strategy: string; label: string; p_eva: number; evas_to_confirm: number; p_confirmed: number[] };
 export type Campaign = { site: string; drill_m: number; stations_per_eva: number; evas: number[]; series: CampaignSeries[]; speedup: number; is_assumption?: boolean; source?: string };

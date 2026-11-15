@@ -70,6 +70,10 @@ export type Site3DProps = {
   onError?: (message: string) => void;
   /** Starting pose of the free walk (kept by the parent across phase changes). */
   initialPose?: FreePose;
+  /** EVA TERMINATE: the fastest route back to the habitat, drawn in caution amber over the faded plan route. */
+  walkback?: PathPoint[];
+  /** False: the camera follows `teleport` only (the IV watching the EV's camera); no drag, no keys. */
+  interactive?: boolean;
   /** A new `key` moves the camera to this pose. */
   teleport?: FreePose & { key: number };
   /** The camera pose, about 6 times a second. */
@@ -85,10 +89,10 @@ type Ground = {
   toWorld: (x: number, y: number, lift?: number) => THREE.Vector3;
   addLabel: (text: string, pos: THREE.Vector3, kind: string) => () => void;
 };
-type Marker = { id: string; x: number; y: number; fill: THREE.MeshBasicMaterial; rings: THREE.LineBasicMaterial[]; beacon: THREE.MeshBasicMaterial; state: "active" | "planned" | "measured" };
+type Marker = { id: string; x: number; y: number; fill: THREE.MeshBasicMaterial; rings: THREE.MeshBasicMaterial[]; beacon: THREE.MeshBasicMaterial; state: "active" | "planned" | "measured" };
 
 /** Real S1094b terrain (HiRISE DTM + ortho), real boulders, the plan route and waypoint overlays, in WebGL. */
-export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove = true, exaggeration, measured, activeId, homeActive = false, ice, onError, initialPose, teleport, onMove }: Site3DProps) {
+export function Site3D({ data, level, plan, previousPlan, path, walkback, mode, allowMove = true, interactive = true, exaggeration, measured, activeId, homeActive = false, ice, onError, initialPose, teleport, onMove }: Site3DProps) {
   const host = useRef<HTMLDivElement>(null);
   const labelsHost = useRef<HTMLDivElement>(null);
   const modeRef = useRef({ mode, allowMove });
@@ -112,7 +116,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
 
   // Free walk input: keys held (ignored while typing in a field) and drag to look.
   useEffect(() => {
-    if (mode !== "free") return;
+    if (mode !== "free" || !interactive) return;
     const el = host.current;
     const held = keys.current;
     const typing = (e: KeyboardEvent) => e.target instanceof HTMLElement && e.target.closest("input, textarea, select, [contenteditable]");
@@ -149,7 +153,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       el?.removeEventListener("pointercancel", pup);
       held.clear();
     };
-  }, [mode]);
+  }, [mode, interactive]);
 
   // Ground: terrain, boulders, habitat, crater, walkback ring, camera and the render loop.
   useEffect(() => {
@@ -344,10 +348,12 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
         for (const mk of markers.current) {
           const d = m === "free" ? Math.hypot(f.x - mk.x, f.y - mk.y) : Infinity;
           const near = Math.max(0, Math.min(1, (radii[2] - d) / (radii[2] - ARRIVE_M)));
-          mk.fill.opacity = mk.state === "measured" ? 0.12 : near * 0.55;
-          const lit = mk.state === "active" ? 0.95 : mk.state === "planned" ? 0.5 : 0.18;
-          mk.rings.forEach((r, i) => { r.opacity = Math.min(1, lit + (d <= radii[i] ? 0.4 : 0)); });
-          mk.beacon.opacity = (mk.state === "active" ? 0.55 : mk.state === "planned" ? 0.22 : 0.06) * pulse * (d < radii[2] ? 0.35 : 1);
+          // The working area is always faintly lit, so stations read from afar; it fills on approach.
+          const base = mk.state === "active" ? 0.28 : mk.state === "planned" ? 0.14 : 0.1;
+          mk.fill.opacity = mk.state === "measured" ? 0.1 : Math.max(base, near * 0.55);
+          const lit = mk.state === "active" ? 1 : mk.state === "planned" ? 0.7 : 0.25;
+          mk.rings.forEach((r, i) => { r.opacity = Math.min(1, lit + (d <= radii[i] ? 0.3 : 0)); });
+          mk.beacon.opacity = (mk.state === "active" ? 0.7 : mk.state === "planned" ? 0.35 : 0.08) * pulse * (d < radii[2] ? 0.35 : 1);
         }
         renderer.render(scene, camera);
         placeLabels(labels, camera, el.getBoundingClientRect(), v);
@@ -392,7 +398,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
     const overview = level === "overview";
 
     const tube = (pts: { x: number; y: number }[], color: string, opacity: number, radius: number) => {
-      const world = pts.filter((p) => inBox(p.x, p.y)).map((p) => toWorld(p.x, p.y, overview ? 1.5 : 0.05));
+      const world = pts.filter((p) => inBox(p.x, p.y)).map((p) => toWorld(p.x, p.y, overview ? 1.5 : 0.15));
       if (world.length < 2) return;
       const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(world, false, "catmullrom", 0), world.length * 2, radius, 6, false);
       const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity, depthWrite: false });
@@ -400,26 +406,41 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       geos.push(geo); mats.push(mat);
     };
     if (previousPlan) tube(walkPath(previousPlan, 4), "#ffffff", 0.22, overview ? 1.6 : 0.035);
-    tube(path, "#f5f8ff", overview ? 0.95 : 0.85, overview ? 3.2 : 0.09); // a ground line, a little wider so it reads
+    tube(path, "#f5f8ff", walkback?.length ? 0.3 : overview ? 0.95 : 0.85, overview ? 3.2 : 0.09); // a ground line, a little wider so it reads
+    if (walkback?.length) tube(walkback, "#f0bf4f", 0.95, overview ? 3.6 : 0.11);
 
     const beamTexture = beamGradient();
     const done = new Set(measuredKey ? measuredKey.split(",") : []);
     const list: Marker[] = [];
     const [r1, r2, r3] = RINGS_M[level];
     const beacon = BEACON[level];
-    const lift = overview ? 1 : 0.06;
+    const lift = overview ? 1.5 : 0.12;
+    // Rings are flat bands on the ground (a 1 px line vanishes in the relief), following its height.
+    const band = (center: readonly [number, number], r: number, width: number, color: string, opacity: number) => {
+      const pts = circle(center, r, 96);
+      const verts: THREE.Vector3[] = [];
+      for (const [px, py] of pts) {
+        const dx = px - center[0], dy = py - center[1], d = Math.hypot(dx, dy) || 1;
+        verts.push(toWorld(center[0] + (dx / d) * (r - width / 2), center[1] + (dy / d) * (r - width / 2), lift));
+        verts.push(toWorld(center[0] + (dx / d) * (r + width / 2), center[1] + (dy / d) * (r + width / 2), lift));
+      }
+      const idx: number[] = [];
+      const n = pts.length;
+      for (let i = 0; i < n; i++) { const a = 2 * i, b = 2 * ((i + 1) % n); idx.push(a, a + 1, b, b, a + 1, b + 1); }
+      const geo = new THREE.BufferGeometry().setFromPoints(verts);
+      geo.setIndex(idx);
+      const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity, depthWrite: false, side: THREE.DoubleSide });
+      group.add(new THREE.Mesh(geo, mat));
+      geos.push(geo); mats.push(mat);
+      return mat;
+    };
+    const bandW = overview ? 3 : 0.16;
     for (const st of orderedStations(plan)) {
       const [x, y] = st.position;
       if (!inBox(x, y)) continue;
       const state: Marker["state"] = done.has(st.id) ? "measured" : st.id === activeId ? "active" : "planned";
       const color = state === "active" ? "#9fe8ff" : "#ffffff";
-      const rings = [r1, r2, r3].map((r) => {
-        const geo = new THREE.BufferGeometry().setFromPoints(circle([x, y], r, 72).map(([px, py]) => toWorld(px, py, lift)));
-        const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6, depthWrite: false });
-        group.add(new THREE.LineLoop(geo, mat));
-        geos.push(geo); mats.push(mat);
-        return mat;
-      });
+      const rings = [r1, r2, r3].map((r, i) => band([x, y], r, i === 0 ? bandW * 1.4 : bandW, color, 0.7));
       // Inner disc that fills on approach: a fan that follows the ground.
       const fanPts = [toWorld(x, y, lift + 0.01), ...circle([x, y], r1, 48).map(([px, py]) => toWorld(px, py, lift + 0.01))];
       const idx: number[] = [];
@@ -450,13 +471,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       mesh.position.copy(toWorld(home[0], home[1], beacon.height / 2));
       group.add(mesh);
       geos.push(beamGeo); mats.push(beam);
-      const ringMats = [r1 * 2, r2 * 2, r3 * 2].map((r) => {
-        const geo = new THREE.BufferGeometry().setFromPoints(circle(home, r, 72).map(([px, py]) => toWorld(px, py, lift)));
-        const mat = new THREE.LineBasicMaterial({ color: "#9fe8ff", transparent: true, opacity: 0.9, depthWrite: false });
-        group.add(new THREE.LineLoop(geo, mat));
-        geos.push(geo); mats.push(mat);
-        return mat;
-      });
+      const ringMats = [r1 * 2, r2 * 2, r3 * 2].map((r) => band(home, r, bandW, "#9fe8ff", 0.9));
       const fill = new THREE.MeshBasicMaterial({ color: "#9fe8ff", transparent: true, opacity: 0, depthWrite: false });
       mats.push(fill);
       list.push({ id: "@habitat", x: home[0], y: home[1], fill, rings: ringMats, beacon: beam, state: "active" });
@@ -471,7 +486,7 @@ export function Site3D({ data, level, plan, previousPlan, path, mode, allowMove 
       removers.forEach((r) => r());
       markers.current = [];
     };
-  }, [ready, plan, previousPlan, path, measuredKey, activeId, homeActive, level]);
+  }, [ready, plan, previousPlan, path, walkback, measuredKey, activeId, homeActive, level]);
 
   // Ice map draped on the terrain: a copy of the terrain mesh with UVs in the raster's bounds.
   useEffect(() => {
@@ -577,12 +592,14 @@ let habitatGltf: Promise<THREE.Group | null> | null = null;
 function loadHabitat(): Promise<THREE.Group | null> {
   // The NASA file is Draco-compressed: the decoder ships with three (copied to public/draco).
   habitatGltf ??= new GLTFLoader().setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/")).loadAsync(HABITAT_MODEL).then((g) => {
-    // Its glass-like material (transmission, specular) renders black without an environment map:
-    // keep its texture on a matte material lit by the scene's sun, like the terrain.
+    // Only the shape: its texture carries the NASA insignia and flag, which the Space Apps rules do
+    // not allow, and its glass-like material renders black without an environment map. A plain
+    // matte off-white, lit by the scene's sun like the terrain.
     g.scene.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
       const old = o.material as THREE.MeshStandardMaterial;
-      o.material = new THREE.MeshStandardMaterial({ map: old.map ?? null, color: old.map ? "#ffffff" : "#e8e8e8", roughness: 0.75, metalness: 0 });
+      o.material = new THREE.MeshStandardMaterial({ color: "#e6e3dd", roughness: 0.8, metalness: 0 });
+      old.map?.dispose();
       old.dispose();
     });
     return g.scene;

@@ -101,7 +101,7 @@ export function RehearsePanel({ plan, at, onStand, onNext }: Props) {
         <div className="mission-brief-go">
           {confirming ? <>
             <Button variant="platter" onClick={() => setConfirming(false)}>Cancel</Button>
-            <Button variant="prominent" onClick={onNext}>Confirm, go for EVA</Button>
+            <Button variant="prominent" onClick={onNext}>Confirm EVA</Button>
           </> : <>
             <a className="mission-cuff" href={`/cuff?plan=${encodeURIComponent(plan.plan_id)}`} target="_blank" rel="noopener" aria-label="Print the EVA cuff checklist" title="Print the EVA cuff checklist"><Printer aria-hidden />Cuff checklist</a>
             <Button variant="prominent" onClick={() => setConfirming(true)}>Go for EVA</Button>
@@ -116,11 +116,11 @@ export function RehearsePanel({ plan, at, onStand, onNext }: Props) {
 function expectation(station: Station, tool: string, reach: number | undefined): string {
   const depth = station.depth_median_m;
   const name = toolName(tool).replace("Powered hand core drill", "core drill");
-  if (depth == null) return `Ice depth unknown here; the ${name} samples ${reach ? `to ${reach} m` : "the near subsurface"}.`;
-  if (reach == null) return `Ice expected at ${formatNumber(depth, 1)} m (model median).`;
+  if (depth == null) return `ice depth unknown here; the ${name} samples ${reach ? `to ${reach} m` : "the near subsurface"}.`;
+  if (reach == null) return `ice at about ${formatNumber(depth, 1)} m (model median).`;
   return depth <= reach
-    ? `Ice expected at ${formatNumber(depth, 1)} m, within the ${reach} m ${name}: a likely ice result.`
-    : `Ice expected at ${formatNumber(depth, 1)} m, below the ${reach} m ${name}: "not within ${reach} m" is likely.`;
+    ? `ice at about ${formatNumber(depth, 1)} m, within the ${reach} m ${name}.`
+    : `ice at about ${formatNumber(depth, 1)} m, below the ${reach} m ${name}: "not within ${reach} m" is likely.`;
 }
 
 /** What the crew will find and do at the station: the ground truth they are walking to. */
@@ -150,7 +150,7 @@ function StationBrief({ plan, station }: { plan: Plan; station: Station }) {
         <div><dt>Comms</dt><dd>{station.comm_los == null ? "Unknown" : station.comm_los ? "In view" : "Relay EV2"}</dd></div>
         <div><dt>Bingo</dt><dd>{point ? clock(point.decide_by_min) : "—"}</dd></div>
       </dl>
-      {tasks.length ? <ul className="mission-brief-crew" aria-label="Crew tasks">{tasks.map(([m, t]) => <li key={m}><b>{m}</b>{t.join(" · ")}</li>)}</ul> : null}
+      {tasks.length ? <p className="mission-brief-crew" aria-label="Crew tasks">{tasks.map(([m, t]) => <span key={m}><b>{m}</b>{t.join(" · ")}</span>)}</p> : null}
       <p className="mission-after"><strong>Then:</strong> {then}.</p>
     </section>
   );

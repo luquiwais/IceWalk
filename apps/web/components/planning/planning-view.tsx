@@ -11,8 +11,9 @@ import { type Insets } from "@/components/site/camera";
 import { Site3DStage } from "@/components/site3d/site-3d-stage";
 import type { FreePose } from "@/components/site3d/site-3d";
 import { EvaMinimap } from "@/components/site3d/eva-minimap";
-import { walkPath } from "@/lib/site3d";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
+import { getWalkback } from "@/lib/api";
+import { polylinePath, walkPath, type PathPoint } from "@/lib/site3d";
 import { Body } from "@icewalk/ui/text";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
 import { useIceMap } from "@/lib/use-ice-map";
@@ -28,6 +29,7 @@ import { PHASES, phaseIndex, type Phase } from "./phases";
 import { SitePanel } from "./site-panel";
 import { PlanPanel } from "./plan-panel";
 import { AT_HABITAT, RehearsePanel, nextJumpKey, type Jump } from "./rehearse-panel";
+import { RoleSelect, type EvaRole } from "./role-select";
 import { ExecutePanel } from "./execute-panel";
 import { DebriefPanel } from "./debrief-panel";
 
@@ -39,17 +41,27 @@ function subscribeCompact(listener: () => void) {
 }
 const TABS = PHASES.map((p, i) => ({ value: p.value, label: `${i + 1} ${p.label}`, icon: p.icon }));
 /** Where the EV starts: at the habitat, facing the first station. */
+/** The EV steps out of the habitat: this far from its centre (m), clear of the model, toward the first station. */
+const EGRESS_M = 15;
+
 function startPose(plan: Plan): FreePose {
   const first = orderedStations(plan)[0];
   const hab = habitatOf(plan);
-  return { x: hab[0], y: hab[1], headingDeg: first ? bearing(hab, first.position).deg : 0 };
+  if (!first) return { x: hab[0], y: hab[1], headingDeg: 0 };
+  const dir = bearing(hab, first.position);
+  const rad = (dir.deg * Math.PI) / 180;
+  return { x: hab[0] + Math.sin(rad) * EGRESS_M, y: hab[1] + Math.cos(rad) * EGRESS_M, headingDeg: dir.deg };
 }
 
 /**
  * IceWalk: the EVA in five phases (phases.tsx). The scene changes with the phase (globe, 2D map,
  * 3D terrain); the right column always holds the phase's question, its content and the next step.
  */
-export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: { initialPhase?: Phase; initialEvaView?: "ev" | "iv" }) {
+/**
+ * `initialEvaView` opens the EVA in that seat (a window of its own, `/?phase=eva&role=iv`); without
+ * it the EVA starts on the role choice.
+ */
+export function PlanningView({ initialPhase = "site", initialEvaView }: { initialPhase?: Phase; initialEvaView?: EvaRole }) {
   const compact = useSyncExternalStore(subscribeCompact, () => window.matchMedia?.(COMPACT_QUERY).matches ?? false, () => false);
   const [phase, setPhase] = useState<Phase>(initialPhase);
   const [flying, setFlying] = useState(false);
@@ -71,7 +83,11 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const refitOnPlan = useRef(false);
   // Plan approval belongs to one plan: a new plan (another goal, a replan) withdraws it.
   const [approvedId, setApprovedId] = useState<string | null>(null);
-  const [evaView, setEvaView] = useState<"ev" | "iv">(initialEvaView);
+  // The EVA seat: EV1 in the helmet or the IV console; null until chosen.
+  const [evaView, setEvaView] = useState<EvaRole | null>(initialEvaView ?? null);
+  const [ivScene, setIvScene] = useState<"map" | "camera">("map");
+  // EVA TERMINATE: the planner's fastest route back from where the EV was (GET /walkback); null if unknown.
+  const [walkback, setWalkback] = useState<{ path: PathPoint[]; line: [number, number][]; distanceM: number; minutes: number } | null>(null);
   // The EV and brief poses live here so a phase change never loses the walk.
   const [evPose, setEvPose] = useState<FreePose>(() => startPose(demoPlan));
   const [briefPose, setBriefPose] = useState<FreePose>(() => startPose(demoPlan));
@@ -95,10 +111,16 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     return renderIceView(iceMap.map, mapMode, habitatOf(plan), ICE_RADIUS_M);
   }, [iceMap.map, mapMode, plan]);
   const helmet = phase === "execute" && evaView === "ev";
+  const choosing = phase === "execute" && evaView === null;
+  // The IV can look through the EV's camera (view only) instead of the site map.
+  const ivCamera = phase === "execute" && evaView === "iv" && ivScene === "camera";
   const approved = approvedId === plan.plan_id;
   const compactPanel = (phase === "plan" && approved && !stationId) || phase === "rehearse";
   const evaPath = useMemo(() => walkPath(plan), [plan]);
-  const onMap = phase === "plan" || phase === "debrief" || (phase === "execute" && evaView === "iv");
+  const previousPath = useMemo(() => (reviewing && session.previous ? walkPath(session.previous) : undefined), [reviewing, session.previous]);
+  const onMap = phase === "plan" || phase === "debrief" || (phase === "execute" && evaView === "iv" && ivScene === "map");
+  // The status dock (PET, margin, bingo, the day's bar) stays in every EVA view.
+  const withDock = onMap || helmet || ivCamera;
   const station = phase === "plan" && stationId ? stationById(plan, stationId) : undefined;
   // A replan can drop the station the brief stood at: then the brief is back at the fly-over.
   const briefStation = phase === "rehearse" && briefAt && briefAt !== AT_HABITAT ? stationById(plan, briefAt) : undefined;
@@ -188,9 +210,21 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     if (target === "debrief") requestAnimationFrame(() => sceneRef.current?.fit());
   }
   const arrive = useCallback(() => { setFlying(false); setPhase("plan"); }, []);
-  function reset() { session.reset(); setStationId(null); setReviewing(false); setReturning(false); setEvPose(startPose(demoPlan)); setAnnouncement("Session reset to the nominal plan."); }
+  function reset() { session.reset(); setStationId(null); setReviewing(false); setReturning(false); setWalkback(null); setEvPose(startPose(demoPlan)); setAnnouncement("Session reset to the nominal plan."); }
   const accept = () => { setReviewing(false); setAnnouncement("Replan accepted."); };
-  const terminate = () => { setReviewing(false); setReturning(true); setAnnouncement("EVA terminated: walking back to the habitat."); };
+  const terminate = () => {
+    setReviewing(false); setReturning(true); setWalkback(null);
+    setAnnouncement("EVA terminated: walking back to the habitat.");
+    // The fastest route back over the DTM, from where the EV is now; without the planner, no route is invented.
+    if (session.source !== "api") return;
+    const from = evPose;
+    getWalkback(plan.plan_id, from.x, from.y)
+      .then((w) => {
+        setWalkback({ path: polylinePath(w.xy), line: w.xy, distanceM: w.distance_m, minutes: w.minutes });
+        setAnnouncement(`EVA terminated: fastest walkback ${Math.round(w.distance_m)} m, ${Math.round(w.minutes)} min.`);
+      })
+      .catch(() => setAnnouncement("EVA terminated: walkback route unavailable, follow the habitat light."));
+  };
   async function logMeasurement(target: Station, result: Measurement["result"], depth: number, crew: "EV1" | "EV2") {
     if (pending) return;
     const measurement: Measurement = { station_id: target.id, position: target.position, tool: measuringTool(target), result, depth_m: depth, timestamp: new Date().toISOString(), crew_member: crew };
@@ -204,10 +238,11 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
 
   const scene = phase === "site" ? <GlobeEntry plan={plan} flying={flying} onArrive={arrive} />
     : phase === "rehearse" ? <Site3DStage mode="brief" plan={plan} measurements={session.measurements} source={session.source} jump={jump} pose={briefPose} onPose={setBriefPose} />
-      : helmet ? <Site3DStage mode="helmet" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} previousPlan={session.previous ?? undefined}
-        reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} onLog={logMeasurement} onAccept={accept} onReturn={terminate} onLeave={() => setEvaView("iv")}
+      : ivCamera ? <Site3DStage mode="watch" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} returning={returning} walkback={walkback} />
+      : helmet ? <Site3DStage mode="helmet" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} previousPlan={session.previous ?? undefined} walkback={walkback}
+        reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} onLog={logMeasurement} onAccept={accept} onReturn={terminate} onLeave={() => setEvaView(null)}
         onComplete={() => { setReturning(false); setEvaView("iv"); goTo("debrief"); setAnnouncement("EVA complete: back at the habitat."); }} />
-      : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} onMoveHabitat={canMoveHabitat ? pickHabitat : undefined} stale={replanning} />;
+      : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} walkback={phase === "execute" && returning ? walkback?.line : undefined} onMoveHabitat={canMoveHabitat ? pickHabitat : undefined} stale={replanning} />;
 
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
     : phase === "plan" ? station
@@ -218,23 +253,28 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
         onSelect={selectStation} onTimeline={() => { if (!timelineOpen) toggleTimeline(); }} />
       : phase === "rehearse" ? <RehearsePanel plan={plan} at={briefPoint} onStand={(at, j) => { setBriefAt(at); setJump(j); }} onNext={() => goTo("execute")} />
         : phase === "execute" ? <section className="mission-stack" aria-label="EVA">
-          <SegmentedControl label="EVA view" value={evaView} options={[{ value: "ev", label: "EV1 helmet" }, { value: "iv", label: "IV console" }]} onValueChange={(v) => setEvaView(v as "ev" | "iv")} />
+          {/* The helmet has its own switch in its top bar; this row is the IV's. */}
+          {!helmet ? <div className="mission-role-row">
+            <SegmentedControl label="IV view" value={ivScene} options={[{ value: "map", label: "Site map" }, { value: "camera", label: "EV1 camera" }]} onValueChange={(v) => setIvScene(v as "map" | "camera")} />
+            <button type="button" className="mission-text-link" onClick={() => setEvaView(null)}>Switch role</button>
+          </div> : null}
           {helmet ? <EvGuide plan={plan} measurements={session.measurements} returning={returning} reviewing={reviewing} onDebrief={() => goTo("debrief")} />
-            : <ExecutePanel plan={plan} previous={session.previous} measurements={session.measurements} pending={pending} reviewing={reviewing} returning={returning}
+            : <ExecutePanel plan={plan} previous={session.previous} measurements={session.measurements} pending={pending} reviewing={reviewing} returning={returning} walkback={walkback}
               onAccept={accept} onReturn={terminate} onDebrief={() => goTo("debrief")}
-              tracker={<div className="mission-tracker"><EvaMinimap plan={plan} path={evaPath} measurements={session.measurements} pose={evPose} nextId={returning ? undefined : next?.id} elapsedMin={elapsedMin} marginMin={plan.summary.min_walkback_margin_min} /></div>} />}
+              tracker={<div className="mission-tracker"><EvaMinimap plan={plan} path={evaPath} measurements={session.measurements} pose={evPose} nextId={returning ? undefined : next?.id} elapsedMin={elapsedMin} marginMin={plan.summary.min_walkback_margin_min} orientation="north" layout="panel" previousPath={previousPath} walkback={returning ? walkback?.path : undefined} /></div>} />}
         </section>
           : <DebriefPanel plan={plan} measurements={session.measurements} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
 
-  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); else if (briefPoint) backToFlyOver(); } }}>
+  return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-choosing={choosing} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); else if (briefPoint) backToFlyOver(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
     <div className="mission-scene">{scene}</div>
+    {choosing ? <RoleSelect plan={plan} onJoin={(role) => { setEvaView(role); setAnnouncement(role === "ev" ? "Joined as EV1: helmet view." : "Joined as IV: habitat console."); }} /> : null}
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
     <div className="mission-tabs" ref={tabsRef}><TabBar label="Mission phase" layout={compact ? "compact" : "regular"} value={phase} tabs={TABS} onValueChange={goTo} /></div>
     {onMap ? <div className="mission-camera"><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></div> : null}
     {onMap && replanning ? <p className="mission-map-banner" role="status">Building a new plan…</p> : canMoveHabitat && session.habitatError ? <p className="mission-map-banner" role="status" data-level="caution">Habitat not moved: {session.habitatError}</p> : null}
-    <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
-      <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : briefPoint ? <IconButton label="Back to fly-over" variant="plain" onClick={backToFlyOver}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}</Footnote><Title2 as="h2">{station ? `Station ${station.order} · ${station.id}` : briefStation ? `Station ${briefStation.order} · ${briefStation.id}` : briefPoint === AT_HABITAT ? "Habitat · egress" : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
+    <WindowMotion open={!mapFocus && !choosing} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
+      <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : briefPoint ? <IconButton label="Back to fly-over" variant="plain" onClick={backToFlyOver}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}{phase === "execute" && evaView === "iv" ? " · IV console" : ""}</Footnote><Title2 as="h2">{station ? `Station ${station.order} · ${station.id}` : briefStation ? `Station ${briefStation.order} · ${briefStation.id}` : briefPoint === AT_HABITAT ? "Habitat · egress" : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
       {phase === "plan" && session.error ? <Footnote role="status" className="mission-api-note">{session.source === "mock" ? "Planner API unavailable. Using bundled mock data." : "Replan failed. Showing the last plan."}</Footnote> : null}
       <div className="mission-panel-scroll" tabIndex={-1} ref={contentRef}>
         <WindowContent contentKey={phase === "plan" ? stationId ?? "plan" : phase === "rehearse" ? briefPoint ?? "rehearse" : phase} direction={station || briefPoint ? "forward" : "back"}>{panel}</WindowContent>
@@ -262,7 +302,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
       </Window>
     </div> : null}
     {onMap ? <p className="mission-map-credit">{SITE_IMAGERY.credit} · context: THEMIS Day IR (NASA/JPL-Caltech/ASU)</p> : null}
-    {onMap ? <div className="mission-dock-position" ref={timelineRef}><Window className="mission-dock-window">
+    {withDock ? <div className="mission-dock-position" ref={timelineRef}><Window className="mission-dock-window">
       <MissionDock plan={plan} previousPlan={reviewing ? session.previous ?? undefined : undefined} measurements={session.measurements} session={session} execution={executing} elapsedMin={elapsedMin}
         open={timelineOpen} onToggle={toggleTimeline} stationId={sceneStationId} hoveredId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} />
     </Window></div> : null}

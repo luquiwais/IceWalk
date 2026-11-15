@@ -5,33 +5,65 @@ import { PRECURSOR_LABEL, RADAR_FIRST } from "@/lib/evidence";
 import { toolName, type SiteAssessment } from "@/lib/plan";
 import { RowLabel, Value } from "./parts";
 
-const VERDICT_LABEL = { GO: "GO", CONDITIONAL: "Conditional", NO_GO: "No-go", INSUFFICIENT_DATA: "Insufficient data" } as const;
+/** Verdict words; "No-go" reads as "Out of reach" (the tool cannot reach the ice), never in red: it is not a warning. */
+const VERDICT_LABEL = { GO: "GO", CONDITIONAL: "Conditional", NO_GO: "Out of reach", INSUFFICIENT_DATA: "No data" } as const;
+
+/** Short tool names for the table, so none is cut. */
+const SHORT: Record<string, string> = {
+  neutron_spectrometer: "Neutron spectrometer",
+  core_drill: "Core drill",
+  gpr: "Ground radar (GPR)",
+  skyfall_radar: "SkyFall radar (aerial)",
+};
 
 function name(id: string) {
-  return PRECURSOR_LABEL[id] ?? toolName(id);
+  return SHORT[id] ?? PRECURSOR_LABEL[id] ?? toolName(id);
 }
 
-/** "Is it worth going, and with which tool?" from plan.site_assessment. */
+/**
+ * "Is it worth going, and with which tool?" from plan.site_assessment: the verdict first, then one
+ * compact row per tool (reach, P(ice within reach), verdict). The model notes live in their own view.
+ */
 export function SiteCard({ card }: { card: SiteAssessment | undefined }) {
   if (!card) return <Footnote tone="secondary">Site card unavailable for this plan.</Footnote>;
   const rows = Object.entries(card.tools).sort(([, a], [, b]) => a.depth_m - b.depth_m);
+  const best = [...rows].filter(([, t]) => !t.precursor).sort(([, a], [, b]) => b.p_ice - a.p_ice)[0];
+  return (
+    <section aria-label="Site card" className="mission-stack mission-site-card">
+      <section className="mission-why" aria-label="Verdict">
+        <span>
+          {card.verdict && best ? <><strong>{VERDICT_LABEL[card.verdict]}</strong> with {name(best[0]).replace(/ \(.*\)/, "").toLowerCase()}: {formatPercent(best[1].p_ice)} within {formatNumber(best[1].depth_m, 0)} m · </> : null}
+          median depth {card.median_depth_m ? `${formatNumber(card.median_depth_m, 1)} m` : "unknown"}
+          {card.median_depth_90_m ? ` (90 %: ${formatNumber(card.median_depth_90_m[0], 1)}–${formatNumber(card.median_depth_90_m[1], 1)})` : ""}.
+        </span>
+      </section>
+      <table className="mission-site-tools">
+        <caption className="sr-only">P(ice within each tool&apos;s reach), regional prior before landing</caption>
+        <thead><tr><th scope="col">Tool</th><th scope="col">Reach</th><th scope="col">P(ice)</th><th scope="col">Verdict</th></tr></thead>
+        <tbody>
+          {rows.map(([id, t]) => (
+            <tr key={id} title={`90 %: ${formatPercent(t.p_ice_90[0])}–${formatPercent(t.p_ice_90[1])}${t.precursor ? " · flies before the EVA (2030)" : ""}`}>
+              <th scope="row">{name(id)}</th>
+              <td>{formatNumber(t.depth_m, t.depth_m < 1 ? 1 : 0)} m</td>
+              <td>{formatPercent(t.p_ice)}</td>
+              <td><span className="mission-verdict" data-verdict={t.verdict}>{t.verdict ? VERDICT_LABEL[t.verdict] : "—"}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+/** The model notes behind the card: what the numbers assume and where they extrapolate. */
+export function SiteNotes({ card }: { card: SiteAssessment | undefined }) {
+  if (!card) return null;
   const local = card.nearby_impacts;
   return (
-    <section aria-label="Site card" className="mission-stack">
-      <Body>
-        {card.verdict ? <><span className="mission-verdict" data-verdict={card.verdict}>{VERDICT_LABEL[card.verdict]}</span> with the best tool. </> : null}
-        Median depth to ice {card.median_depth_m ? `${formatNumber(card.median_depth_m, 1)} m` : "unknown"}
-        {card.median_depth_90_m ? ` (90 %: ${formatNumber(card.median_depth_90_m[0], 1)}–${formatNumber(card.median_depth_90_m[1], 1)} m)` : ""}.
-      </Body>
-      <ListSection footer={`Probability that ice is within each tool's reach, regional prior before landing.${card.min_p ? ` GO needs the whole 90 % interval above ${formatPercent(card.min_p)} (mission threshold, an assumption).` : ""}`}>
-        {rows.map(([id, t]) => (
-          <ListRow key={id} trailing={<Value><span className="mission-verdict" data-verdict={t.verdict}>{t.verdict ? VERDICT_LABEL[t.verdict] : ""}</span> {formatPercent(t.p_ice)}</Value>}>
-            <RowLabel title={`${name(id)} · ≤ ${formatNumber(t.depth_m, t.depth_m < 1 ? 1 : 0)} m`} detail={`90 %: ${formatPercent(t.p_ice_90[0])}–${formatPercent(t.p_ice_90[1])}${t.precursor ? " · flies before the EVA" : ""}`} />
-          </ListRow>
-        ))}
-      </ListSection>
+    <section aria-label="Model notes" className="mission-stack mission-site-notes">
+      <Footnote tone="secondary">P(ice within each tool&apos;s reach) from the regional prior, before landing.{card.min_p ? ` GO needs the whole 90 % interval above ${formatPercent(card.min_p)} (mission threshold, an assumption).` : ""}</Footnote>
       {local ? <Footnote tone="secondary">Nearby fresh impacts (±{local.window_deg[0]}° lat, ±{local.window_deg[1]}° lon): {local.ice} with ice vs {formatNumber(local.expected_ice, 1)} expected.</Footnote> : null}
-      {card.warnings.map((w) => <Footnote key={w} tone="secondary">Note · {w}</Footnote>)}
+      {card.warnings.map((w) => <Footnote key={w} tone="secondary">{w}</Footnote>)}
     </section>
   );
 }

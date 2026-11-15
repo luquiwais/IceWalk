@@ -258,6 +258,40 @@ def get_plan(plan_id: str) -> dict:
     return entry["plan"]
 
 
+@app.get("/walkback")
+def walkback(plan_id: str, x: float, y: float) -> dict:
+    """Ruta más rápida al hábitat del plan desde (x, y), sobre el DTM: la de EVA TERMINATE.
+
+    Es la misma búsqueda que arma cada tramo del plan (TraverseMap.route). Todo input es
+    malicioso: plan existente, números finitos, dentro de la grilla y sobre suelo transitable.
+    """
+    if not PLAN_ID.fullmatch(plan_id):
+        raise HTTPException(422, "Invalid plan_id")
+    entry = _PLANS.get(plan_id)
+    if entry is None:
+        raise HTTPException(404, "Unknown plan_id")
+    if not (math.isfinite(x) and math.isfinite(y)):
+        raise HTTPException(422, "Position must be two finite numbers in grid meters")
+    tmap = _traverse_map(entry["stm"])
+    if tmap is None:
+        raise HTTPException(503, "The walkback route needs the terrain layers")
+    hab = entry["plan"].get("habitat_xy") or entry["config"].habitat_xy
+    try:
+        route = tmap.route((x, y), (float(hab[0]), float(hab[1])))
+    except ValueError:
+        raise HTTPException(422, "Position outside the terrain grid") from None
+    except NoRouteError:
+        raise HTTPException(422, "No walkable route to the habitat from that point") from None
+    return {
+        "from": [x, y],
+        "to": [float(hab[0]), float(hab[1])],
+        "xy": [[round(px, 1), round(py, 1)] for px, py in route.xy],
+        "distance_m": round(route.distance_m, 1),
+        "minutes": round(route.time_s / 60, 1),
+        "max_slope_deg": round(route.max_slope_deg, 1),
+    }
+
+
 @app.get("/campaign")
 def campaign_endpoint(drill_m: float = 1.0, evas: int = 6) -> dict:
     """P(hielo confirmado) tras 1..N EVAs: perforar a ciegas contra radar primero."""
