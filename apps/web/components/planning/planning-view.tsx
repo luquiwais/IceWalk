@@ -184,7 +184,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
     : phase === "plan" ? station
       ? <StationDetail plan={plan} station={station} source={session.source} onSelect={selectStation} />
-      : <PlanPanel plan={plan} source={describeSource(session)} planSource={session.source} pending={pending} approved={approved}
+      : <PlanPanel plan={plan} planSource={session.source} pending={pending} approved={approved}
         onApprove={() => { setApprovedId(plan.plan_id); if (!timelineOpen) toggleTimeline(); setAnnouncement("Plan approved."); }} onEdit={() => setApprovedId(null)}
         onStrategy={(s) => { setStationId(null); setApprovedId(null); void session.setStrategy(s); }} onNext={() => goTo("rehearse")}
         onSelect={selectStation} onTimeline={() => { if (!timelineOpen) toggleTimeline(); }} />

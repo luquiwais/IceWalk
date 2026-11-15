@@ -28,8 +28,8 @@ function answer(plan: Plan, rules: readonly FlightRule[]) {
  * rules, value against limit; each rule opens what supports it. Stations live on the map and in the dock;
  * selecting one opens its composition (station-detail.tsx). After approval it folds to a card.
  */
-export function PlanPanel({ plan, source, planSource, pending, approved, onApprove, onEdit, onStrategy, onNext, onSelect, onTimeline }: {
-  plan: Plan; source: string; planSource: PlanSource; pending?: boolean;
+export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEdit, onStrategy, onNext, onSelect, onTimeline }: {
+  plan: Plan; planSource: PlanSource; pending?: boolean;
   approved: boolean; onApprove: () => void; onEdit: () => void;
   onStrategy?: (strategy: "learn" | "confirm") => void; onNext: () => void;
   /** Open a station's composition (and zoom the map to it). */
@@ -60,7 +60,7 @@ export function PlanPanel({ plan, source, planSource, pending, approved, onAppro
     return (
       <section aria-label={open.name} className="mission-stack mission-plan-detail">
         <button type="button" className="mission-back-link" onClick={() => setDetail(null)}><ChevronLeft aria-hidden />Flight rules</button>
-        <RuleDetail rule={open} plan={plan} window={evaWindow} source={source} onTimeline={onTimeline} />
+        <RuleDetail rule={open} plan={plan} window={evaWindow} onTimeline={onTimeline} />
       </section>
     );
   }

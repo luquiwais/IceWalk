@@ -21,7 +21,7 @@ function Fact({ label, value, note }: { label: string; value: string; note?: str
  * The detail of one flight rule: what supports that number, from the plan, the planner's feasibility, the
  * STM and the EVA window. Each rule shows its own evidence; nothing repeats the tile's headline.
  */
-export function RuleDetail({ rule, plan, window, source, onTimeline }: { rule: FlightRule; plan: Plan; window: EvaWindow; source: string; onTimeline: () => void }) {
+export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRule; plan: Plan; window: EvaWindow; onTimeline: () => void }) {
   const f = plan.summary.feasibility;
   const stations = orderedStations(plan);
   const head = <h3 className="mission-detail-title">{rule.name} <span className="mission-detail-value">{rule.value} · {rule.limit.replace("*", "")}</span></h3>;
@@ -106,12 +106,17 @@ export function RuleDetail({ rule, plan, window, source, onTimeline }: { rule: F
   if (rule.id === "carry") {
     const equipment = plan.equipment ?? [];
     const mass = totalEquipmentMass(equipment);
+    const crew = plan.summary.crew;
+    const heaviest = f?.carry.heaviest;
+    const perEv = f?.carry.per_crew_kg;
     return <section className="mission-detail" aria-label="Gear list">{head}
-      <table className="mission-table">
-        <thead><tr><th>Tool</th><th>Count</th><th>Mass</th><th>For</th></tr></thead>
-        <tbody>{equipment.map((item) => <tr key={item.tool}><td>{toolName(item.tool)}</td><td>{item.count}</td><td>{item.mass_kg == null ? "Unknown" : `${item.mass_kg} kg`}</td><td>{(item.justification ?? "").replace("Objectives", "Obj.").replace("Objective", "Obj.")}</td></tr>)}</tbody>
+      <p className="mission-detail-lead">{formatNumber(mass.known_kg, 1)} kg known across {equipment.length} items, split evenly{crew != null ? ` between ${crew} EVs` : ""}{mass.unknown ? `; ${mass.unknown} item${mass.unknown === 1 ? " has" : "s have"} no mass yet` : ""}.</p>
+      <table className="mission-table mission-table-fixed">
+        <colgroup><col /><col style={{ width: "4.5rem" }} /><col style={{ width: "6.5rem" }} /></colgroup>
+        <thead><tr><th>Tool</th><th>Mass</th><th>Used</th></tr></thead>
+        <tbody>{equipment.map((item) => <tr key={item.tool}><td className="mission-wrap">{item.count > 1 ? `${item.count} × ` : ""}{toolName(item.tool)}</td><td>{item.mass_kg == null ? "Unknown" : `${formatNumber(item.mass_kg, 1)} kg`}</td><td>{/while walking/i.test(item.justification ?? "") ? "While walking" : "At stations"}</td></tr>)}</tbody>
       </table>
-      <Footnote tone="secondary">{formatNumber(mass.known_kg, 1)} kg known{mass.unknown ? `, ${mass.unknown} item${mass.unknown === 1 ? "" : "s"} without a mass yet` : ""}, {plan.summary.crew != null ? `shared by ${plan.summary.crew} EVs` : "per EVA"}{f?.carry.heaviest ? `; heaviest: ${toolName(f.carry.heaviest.tool)}` : ""}. {plan.plan_id} · {source}</Footnote>
+      <Footnote tone="secondary">{heaviest && perEv != null && heaviest.mass_kg > perEv ? `The even split is an average: the ${toolName(heaviest.tool).toLowerCase()} alone weighs more, so one EV carries it. ` : ""}Allowance: 50 lbm of tools and samples per crewmember (NASA ICES-2026-127).</Footnote>
     </section>;
   }
 
