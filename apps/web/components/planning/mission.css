@@ -513,3 +513,12 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
 .mission-map-banner { position: absolute; z-index: 3; top: calc(var(--dc-header, 5rem) + .75rem); left: calc(var(--mission-edge) + 4.5rem); max-width: min(30rem, calc(100% - var(--dc-col, 400px) - 9rem)); margin: 0; padding: .5rem .875rem; border-radius: 999px; background: rgb(20 20 24 / .82); border: 1px solid rgb(255 255 255 / .2); font-size: .8125rem; color: #fff; text-align: center; backdrop-filter: blur(12px); }
 .mission-map-banner[data-level=caution] { border-color: var(--color-caution); color: var(--color-caution); }
 @media (max-width: 759px) { .mission-map-banner { left: 1rem; right: 1rem; max-width: none; border-radius: 1rem; } }
+/* Building a new plan: placeholders the size of the real content, so nothing jumps and nothing stale shows. */
+@keyframes mission-pulse { 0%, 100% { opacity: .45; } 50% { opacity: .8; } }
+.mission-skeleton { border-radius: .75rem; background: rgb(255 255 255 / .08); animation: mission-pulse 1.4s ease-in-out infinite; }
+.mission-skeleton-goal { height: 2.25rem; }
+.mission-skeleton-strip { height: 2.25rem; }
+.mission-skeleton-line { display: block; height: .75rem; width: 70%; margin-top: .2rem; border-radius: .375rem; }
+.mission-skeleton-rule { min-height: 2.625rem; }
+@media (prefers-reduced-motion: reduce) { .mission-skeleton { animation: none; } }
+.mission-dock[data-pending] .mission-dock-cell strong { color: var(--color-label-secondary); }

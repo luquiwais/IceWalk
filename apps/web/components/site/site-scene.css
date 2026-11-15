@@ -658,3 +658,7 @@
 .site-hab-drag line { stroke: #fff; stroke-width: 1.5; stroke-dasharray: 5 4; }
 .site-hab-ghost { position: absolute; transform: translate(-50%, -50%); display: grid; place-items: center; width: var(--site-hab, 1.75rem); height: var(--site-hab, 1.75rem); border-radius: .4375rem; background: #0a84ff; box-shadow: 0 0 0 2px #fff; font-size: .5625rem; font-weight: 600; letter-spacing: .06em; color: #fff; }
 .site-hab-ghost span { position: absolute; top: calc(100% + .375rem); white-space: nowrap; padding: .125rem .4rem; border-radius: .375rem; background: rgb(20 20 24 / .85); font-size: .6875rem; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+
+/* A new plan is being built: hide the old route and stations rather than show them frozen. */
+.site-scene :is(.site-route, .site-route-halo, .site-route-previous, .site-chevrons, .site-station, .site-dropped, .site-leader) { transition: opacity .15s ease; }
+.site-scene[data-stale] :is(.site-route, .site-route-halo, .site-route-previous, .site-chevrons, .site-station, .site-dropped, .site-range, .site-range-label, .site-leader) { opacity: 0; pointer-events: none; }

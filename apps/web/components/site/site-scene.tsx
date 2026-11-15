@@ -100,6 +100,8 @@ export type SiteSceneProps = {
   raster?: SiteRaster;
   /** Where the EV is during the EVA (grid meters, heading clockwise from north), for the IV. */
   crew?: { x: number; y: number; headingDeg: number };
+  /** A new plan is being built: the old route and stations are hidden instead of shown frozen. */
+  stale?: boolean;
   /** While set, the habitat marker can be dragged; on release it reports the new grid point. */
   onMoveHabitat?: (xy: [number, number]) => void;
   className?: string;
@@ -209,6 +211,7 @@ export function SiteScene({
   insets = NO_INSETS,
   raster,
   crew,
+  stale = false,
   onMoveHabitat,
   className,
   ref,
@@ -216,7 +219,9 @@ export function SiteScene({
   const helpId = useId();
   const habitat = useMemo(() => habitatOf(plan), [plan]);
   // Dragging the habitat: where the pointer started and is (screen px) and the grid point under it.
-  const [habDrag, setHabDrag] = useState<{ ox: number; oy: number; sx: number; sy: number; wx: number; wy: number } | null>(null);
+  const [habDrag, setHabDrag] = useState<{ ox: number; oy: number; sx: number; sy: number; wx: number; wy: number; released?: string } | null>(null);
+  // The ghost shows while dragging, and after release until this plan is replaced (or the move is refused).
+  const ghost = habDrag && (!habDrag.released || (stale && habDrag.released === plan.plan_id)) ? habDrag : null;
   const localPoint = (e: { clientX: number; clientY: number }): [number, number] => {
     const rect = root.current?.getBoundingClientRect();
     return rect ? [e.clientX - rect.left, e.clientY - rect.top] : [0, 0];
@@ -883,6 +888,8 @@ export function SiteScene({
       className={["site-scene", className].filter(Boolean).join(" ")}
       data-ready={ready ? "" : undefined}
       data-projected={projection ? "" : undefined}
+      data-stale={stale ? "" : undefined}
+      aria-busy={stale || undefined}
       tabIndex={projection ? -1 : 0}
       role="group"
       aria-roledescription="map"
@@ -1044,15 +1051,15 @@ export function SiteScene({
             </div>
           </div>
         ) : null}
-        {habDrag ? (
+        {ghost ? (
           <div className="site-hab-drag" aria-hidden>
-            <svg width="100%" height="100%"><line x1={habDrag.ox} y1={habDrag.oy} x2={habDrag.sx} y2={habDrag.sy} /></svg>
-            <div className="site-hab-ghost" style={{ left: habDrag.sx, top: habDrag.sy }}>HAB<span>x {signed(habDrag.wx)} m · y {signed(habDrag.wy)} m</span></div>
+            <svg width="100%" height="100%"><line x1={ghost.ox} y1={ghost.oy} x2={ghost.sx} y2={ghost.sy} /></svg>
+            <div className="site-hab-ghost" style={{ left: ghost.sx, top: ghost.sy }}>HAB<span>x {signed(ghost.wx)} m · y {signed(ghost.wy)} m</span></div>
           </div>
         ) : null}
         <div ref={anchorRef("@habitat")} className="site-anchor">
           <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(habitat[0])} m, y ${signed(habitat[1])} m${onMoveHabitat ? ". Drag to move it and re-plan" : ""}`} data-site-object
-            data-draggable={onMoveHabitat ? "" : undefined} data-dragging={habDrag ? "" : undefined}
+            data-draggable={onMoveHabitat ? "" : undefined} data-dragging={ghost ? "" : undefined}
             title={onMoveHabitat ? "Drag to move the habitat and re-plan" : undefined}
             onPointerDown={onMoveHabitat ? (e) => {
               if (e.button !== 0) return;
@@ -1062,14 +1069,16 @@ export function SiteScene({
               dragTo(sx, sy, sx, sy);
             } : undefined}
             onPointerMove={onMoveHabitat ? (e) => {
-              if (!habDrag) return;
+              if (!habDrag || habDrag.released) return;
               const [sx, sy] = localPoint(e);
               dragTo(sx, sy, habDrag.ox, habDrag.oy);
             } : undefined}
             onPointerUp={onMoveHabitat ? () => {
               const d = habDrag;
-              setHabDrag(null);
-              if (d && Math.hypot(d.sx - d.ox, d.sy - d.oy) > 6) onMoveHabitat([d.wx, d.wy]);
+              if (d && !d.released && Math.hypot(d.sx - d.ox, d.sy - d.oy) > 6) {
+                setHabDrag({ ...d, released: plan.plan_id });
+                onMoveHabitat([d.wx, d.wy]);
+              } else setHabDrag(null);
             } : undefined}
             onPointerCancel={onMoveHabitat ? () => setHabDrag(null) : undefined}>
             HAB

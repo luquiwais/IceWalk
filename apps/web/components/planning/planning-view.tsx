@@ -103,6 +103,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const executing = phase === "execute";
   const pending = session.status === "loading" || session.status === "idle";
   const sceneStationId = phase === "plan" ? stationId : null;
+  // The planner is building a new plan (start, habitat, goal or a result): the old one is hidden, not frozen.
+  const replanning = pending && session.apiConfigured;
   const current = PHASES[phaseIndex(phase)];
 
   useLayoutEffect(() => {
@@ -195,7 +197,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
       : helmet ? <Site3DStage mode="helmet" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} previousPlan={session.previous ?? undefined}
         reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} onLog={logMeasurement} onAccept={accept} onReturn={terminate} onLeave={() => setEvaView("iv")}
         onComplete={() => { setReturning(false); setEvaView("iv"); goTo("debrief"); setAnnouncement("EVA complete: back at the habitat."); }} />
-      : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} onMoveHabitat={canMoveHabitat ? pickHabitat : undefined} />;
+      : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} onMoveHabitat={canMoveHabitat ? pickHabitat : undefined} stale={replanning} />;
 
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
     : phase === "plan" ? station
@@ -220,7 +222,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
     <div className="mission-tabs" ref={tabsRef}><TabBar label="Mission phase" layout={compact ? "compact" : "regular"} value={phase} tabs={TABS} onValueChange={goTo} /></div>
     {onMap ? <div className="mission-camera"><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></div> : null}
-    {canMoveHabitat && session.habitatError ? <p className="mission-map-banner" role="status" data-level="caution">Habitat not moved: {session.habitatError}</p> : null}
+    {onMap && replanning ? <p className="mission-map-banner" role="status">Building a new plan…</p> : canMoveHabitat && session.habitatError ? <p className="mission-map-banner" role="status" data-level="caution">Habitat not moved: {session.habitatError}</p> : null}
     <WindowMotion open={!mapFocus} initialFocus={contentRef} restoreFocus={reopenRef} className="mission-panel-presence"><div className="mission-panel" ref={panelRef}><Window className="mission-panel-window" aria-label="Phase window">
       <header className="mission-panel-heading">{station ? <IconButton label="Back to plan" variant="plain" onClick={backToPlan}><ArrowLeft /></IconButton> : null}<div className="mission-panel-title"><Footnote tone="secondary">Step {phaseIndex(phase) + 1} of {PHASES.length} · {current.label}</Footnote><Title2 as="h2">{station ? `Station ${station.order} · ${station.id}` : current.question}</Title2></div>{onMap ? <IconButton label="Map focus" variant="plain" onClick={() => setMapFocus(true)}><Maximize2 /></IconButton> : null}</header>
       {phase === "plan" && session.error ? <Footnote role="status" className="mission-api-note">{session.source === "mock" ? "Planner API unavailable. Using bundled mock data." : "Replan failed. Showing the last plan."}</Footnote> : null}
