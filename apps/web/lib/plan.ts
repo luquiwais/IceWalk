@@ -7,6 +7,7 @@ import type { AlertLevel } from "@icewalk/ui/status-badge";
 import mockMeasurement from "@/mock/measurement.json";
 import mockPlan from "@/mock/plan.json";
 import mockReplan from "@/mock/replan.json";
+import mockConfirm from "@/mock/plan-confirm.json";
 import toolsCatalog from "../../../packages/contracts/examples/tools.catalog.json";
 import defaultStm from "../../../packages/contracts/examples/stm.s1094b.json";
 
@@ -41,6 +42,8 @@ export type Station = {
   comm_los?: boolean | null;
   /** THEMIS thermal inertia at the station (J m-2 K-1 s-1/2); below 100 is dust. */
   soil_ti?: number | null;
+  /** Why the planner put the station here, in words. */
+  reason?: string;
 };
 
 /** "Can we walk it?" from app/feasibility.py (all values are planning assumptions). */
@@ -76,6 +79,8 @@ export type PlanSummary = {
   ice_threshold_m?: number;
   craters_in_model?: number;
   feasibility?: Feasibility;
+  /** learn: reduce the map's uncertainty; confirm: go where ice is likeliest. */
+  strategy?: "learn" | "confirm";
 };
 
 export type PlanAlert = {
@@ -173,6 +178,8 @@ export type Measurement = {
  */
 export const demoPlan = mockPlan as unknown as Plan;
 export const demoReplan = mockReplan as unknown as Plan;
+/** The same EVA planned to confirm ice (strategy "confirm"). */
+export const demoConfirm = mockConfirm as unknown as Plan;
 export const demoMeasurement = mockMeasurement as unknown as Measurement;
 
 export function orderedStations(plan: Plan): Station[] {

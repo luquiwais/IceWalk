@@ -107,7 +107,7 @@ describe("plan session against the API", () => {
       error: null,
     });
     const [, init] = fetch.mock.calls.find(([url]) => String(url).endsWith("/plan"))!;
-    expect(JSON.parse(init!.body as string)).toEqual({ measurements: [] });
+    expect(JSON.parse(init!.body as string)).toEqual({ measurements: [], strategy: "learn" });
   });
 
   it("falls back to the bundled mock when the API does not respond", async () => {

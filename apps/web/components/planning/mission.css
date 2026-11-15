@@ -314,3 +314,8 @@
 .mission-ice-matrix > .mission-ice-axis:nth-child(3) { grid-column: 1; grid-row: 2; }
 .mission-ice-axis { font-size: .6875rem; color: var(--color-label-secondary); text-align: right; }
 .mission-ice-scale-labels { grid-column: 2; grid-row: 3; display: flex; justify-content: space-between; font-size: .6875rem; color: var(--color-label-secondary); }
+
+/* Why the planner chose a station (station-detail.tsx, plan-panel.tsx). */
+.mission-why { display: flex; flex-direction: column; gap: .25rem; padding: .625rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); font-size: .875rem; line-height: 1.4; }
+.mission-kicker { font-size: .6875rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-label-secondary); }
+.mission-station-why { display: block; font-size: .75rem; color: var(--color-label-tertiary, var(--color-label-secondary)); white-space: normal; }

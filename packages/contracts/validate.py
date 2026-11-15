@@ -25,6 +25,7 @@ PAIRS = [
     ("schemas/eva_window.schema.json", ROOT / "apps/web/mock/eva-window.json"),
     ("schemas/plan.schema.json", ROOT / "apps/web/mock/plan.json"),
     ("schemas/plan.schema.json", ROOT / "apps/web/mock/replan.json"),
+    ("schemas/plan.schema.json", ROOT / "apps/web/mock/plan-confirm.json"),
 ]
 
 

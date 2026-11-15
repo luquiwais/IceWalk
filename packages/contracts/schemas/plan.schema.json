@@ -37,6 +37,7 @@
           "terrain_unit": { "type": "integer" },
           "kind": { "enum": ["survey", "target"], "description": "survey: elegida por el mapa de hielo; target: posición fija de la STM" },
           "depth_median_m": { "type": "number", "minimum": 0, "description": "Mediana de la profundidad del hielo según el GP" },
+          "reason": { "type": "string", "description": "Por que la estacion esta aca, en palabras (unidad de terreno, valor por minuto, chance de hielo o objetivo fijo)" },
           "depth_shallow_m": { "type": "number", "minimum": 0, "description": "Profundidad optimista: un desvío más somera que la media de log d" },
           "comm_los": { "type": ["boolean", "null"], "description": "Línea de vista entre la antena del hábitat y la del traje sobre el DTM; null sin DTM (app/feasibility.py)" },
           "soil_ti": { "type": ["number", "null"], "description": "Inercia térmica de THEMIS en la estación (J m-2 K-1 s-1/2); < 100 es polvo" }
@@ -140,6 +141,7 @@
           "description": "Unidades de terreno del objetivo con coverage all_terrain_units: tercios de inercia térmica de THEMIS en la zona alcanzable (stations[].terrain_unit)",
           "items": { "type": "object", "required": ["unit", "label"], "properties": { "unit": { "type": "integer" }, "label": { "type": "string" }, "ti_min": { "type": "number" }, "ti_max": { "type": "number" } } }
         },
+        "strategy": { "enum": ["learn", "confirm"], "description": "learn: bajar la incertidumbre del mapa; confirm: ir donde es mas probable encontrar hielo" },
         "feasibility": {
           "type": "object",
           "description": "¿Se puede hacer caminando? Esfuerzo, carga, suelo, comunicaciones y movilidad (app/feasibility.py, config/feasibility.yaml; supuestos)",
