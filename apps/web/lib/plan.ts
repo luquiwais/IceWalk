@@ -305,7 +305,9 @@ export function stationWithNeighbors(plan: Plan, id: string): string[] {
   const order = orderedStations(plan);
   const i = order.findIndex((s) => s.id === id);
   if (i < 0) return [id];
-  return order.slice(Math.max(0, i - 1), i + 2).map((s) => s.id);
+  // Three stations, centered on this one when it can be; at either end, the three nearest.
+  const start = Math.min(Math.max(0, i - 1), Math.max(0, order.length - 3));
+  return order.slice(start, start + 3).map((s) => s.id);
 }
 
 /** The STM constraints of this plan's mission, when the web bundles that STM. */

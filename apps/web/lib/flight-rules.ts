@@ -4,7 +4,7 @@ import type { EvaWindow } from "@/lib/use-eva-window";
 
 export type RuleLevel = "go" | "advisory" | "caution" | "warning" | "unknown";
 /** Which detail view explains the rule: the walk (effort, load, soil, comms), the EVA window, or none. */
-export type RuleDetail = "walk" | "window" | "gear";
+export type RuleDetail = "walk" | "window" | "gear" | "timeline";
 export type FlightRule = {
   id: string;
   name: string;
@@ -37,6 +37,7 @@ export function flightRules(plan: Plan, window?: EvaWindow): FlightRule[] {
     limit: budget ? `≤ ${hm(budget)}` : "limit unknown",
     explain: c ? `Egress to ingress, walking included. ${c.eva_max_h} h minus a ${Math.round(c.reserve * 100)} % reserve (STM).` : "Egress to ingress, walking included.",
     level: budget == null ? "unknown" : s.duration_min > budget ? "warning" : "go",
+    detail: "timeline",
   });
 
   const margin = s.min_walkback_margin_min;
@@ -46,7 +47,7 @@ export function flightRules(plan: Plan, window?: EvaWindow): FlightRule[] {
     limit: caution != null ? `≥ ${formatNumber(caution, 0)} min*` : "> 0 min",
     explain: "Spare time if the crew had to turn back at the worst point of the plan. Below 15 min is a caution; the threshold is an assumption.",
     level: margin == null ? "unknown" : margin < 0 ? "warning" : caution != null && margin < caution ? "caution" : "go",
-    assumption: true,
+    detail: "timeline", assumption: true,
   });
 
   const out = s.max_distance_from_habitat_km;
@@ -65,6 +66,7 @@ export function flightRules(plan: Plan, window?: EvaWindow): FlightRule[] {
     limit: c ? `≤ ${c.max_slope_deg}°` : "limit unknown",
     explain: "Steepest leg of the traverse on the HiRISE terrain model.",
     level: slope == null || !c ? "unknown" : slope > c.max_slope_deg ? "warning" : "go",
+    detail: "walk",
   });
 
   const gap = f?.comms.max_min_without_los;
