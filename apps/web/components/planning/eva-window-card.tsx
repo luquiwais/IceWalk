@@ -1,9 +1,6 @@
-"use client";
-
 import { Footnote } from "@icewalk/ui/text";
 import { formatNumber } from "@/lib/format";
-import type { PlanSource } from "@/lib/use-plan-session";
-import { useEvaWindow, type EvaWindow, type WindowLevel } from "@/lib/use-eva-window";
+import type { EvaWindow, WindowLevel } from "@/lib/use-eva-window";
 
 type Level = WindowLevel;
 
@@ -20,8 +17,7 @@ function dustDetail(dust: EvaWindow["dust"]): string {
 const LEVEL_LABEL: Record<Level, string> = { none: "Nominal", advisory: "Advisory", caution: "Caution", warning: "Warning" };
 
 /** Best EVA start in the next sols and conditions at each station (GET /eva-window). */
-export function EvaWindowCard({ planId, source }: { planId: string; source: PlanSource }) {
-  const data = useEvaWindow(planId, source);
+export function EvaWindowCard({ data }: { data: EvaWindow }) {
   const rec = data.recommended;
   const sw = data.space_weather;
   return (

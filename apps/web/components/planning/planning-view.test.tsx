@@ -84,13 +84,19 @@ describe("Mission flow", () => {
     expect(screen.getByRole("region", { name: "After this station" })).toBeInTheDocument();
   });
 
-  it("opens what supports a rule: the walk and the EVA window, then back to the rules", async () => {
+  it("opens each rule's own evidence, never the same view twice", async () => {
     render(<PlanningView initialPhase="plan" />);
+    const back = () => userEvent.click(screen.getByRole("button", { name: "Flight rules" }));
     await userEvent.click(screen.getByRole("button", { name: /^Distance out/ }));
-    const card = screen.getByRole("region", { name: "Feasibility" });
-    expect(card).toHaveTextContent("Soil firmness");
-    expect(card).toHaveTextContent("ICES-2026-127");
-    await userEvent.click(screen.getByRole("button", { name: "Flight rules" }));
+    expect(screen.getByRole("region", { name: "Distance detail" })).toHaveTextContent("ICES-2026-127");
+    await back();
+    await userEvent.click(screen.getByRole("button", { name: /^Route slope/ }));
+    expect(screen.getByRole("region", { name: "Slope detail" })).toHaveTextContent("Soil firmness");
+    expect(screen.queryByRole("region", { name: "Distance detail" })).not.toBeInTheDocument();
+    await back();
+    await userEvent.click(screen.getByRole("button", { name: /^Comms gap/ }));
+    expect(screen.getByRole("region", { name: "Comms detail" })).toHaveTextContent("Line of sight to habitat");
+    await back();
     await userEvent.click(screen.getByRole("button", { name: /^EVA window/ }));
     expect(screen.getByRole("region", { name: "EVA window and weather" })).toHaveTextContent("Hope EMIRS (UAE)");
   });

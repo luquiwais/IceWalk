@@ -504,3 +504,6 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
 .mission-table td { padding: .12rem .3rem; border-bottom: 1px solid rgb(255 255 255 / .06); white-space: nowrap; }
 .mission-table tr[data-level=caution] td:last-child { color: var(--color-caution); font-weight: 600; }
 .mission-table tr[data-level=warning] td:last-child { color: var(--color-warning, #ff453a); font-weight: 600; }
+.mission-detail-title .mission-detail-value { font-size: .8125rem; font-weight: 500; color: var(--color-label-secondary); margin-left: .25rem; }
+.mission-detail .mission-text-link { display: inline-flex; align-items: center; gap: .125rem; }
+.mission-detail .mission-text-link svg { width: .875rem; height: .875rem; }
