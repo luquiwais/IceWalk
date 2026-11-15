@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { IceMap } from "./ice-map";
-import { blocks, hotspots, knownFraction, KNOWN_BELOW } from "./ice-view";
+import { bandOf, blocks, cellColor, hotspots, knownFraction, KNOWN_BELOW } from "./ice-view";
 import mockMap from "@/mock/map.json";
 
 /** A 40 x 40 m map at 10 m cells, prior 0.6: the north-west 20 m block has a crater. */
@@ -49,5 +49,14 @@ describe("ice view", () => {
     expect(share).toBeLessThan(0.2);
     expect(list.every((b) => b.known === b.u < KNOWN_BELOW)).toBe(true);
     expect(hotspots(list).length).toBeGreaterThan(0);
+  });
+  it("colors by probability and certainty together: likelier is brighter, uncertain is dim", () => {
+    expect(bandOf(0.5)).toBe(0);
+    expect(bandOf(0.67)).toBeLessThan(bandOf(0.9));
+    const lum = ([r, g, b]: number[]) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    expect(lum(cellColor(0.9, 0.1))).toBeGreaterThan(lum(cellColor(0.68, 0.1)));
+    const firm = cellColor(0.9, 0.1), vague = cellColor(0.9, 1);
+    expect(vague[3]).toBeLessThan(firm[3]); // more transparent where uncertain
+    expect(Math.max(...vague.slice(0, 3)) - Math.min(...vague.slice(0, 3))).toBeLessThan(Math.max(...firm.slice(0, 3)) - Math.min(...firm.slice(0, 3)));
   });
 });
