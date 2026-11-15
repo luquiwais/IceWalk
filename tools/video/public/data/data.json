@@ -1,0 +1,2210 @@
+{
+ "rule": "Every number on screen comes from this file. Generated from IceWalk planner outputs (simulated measurement).",
+ "site": {
+  "id": "s1094b",
+  "threshold_m": 3.0,
+  "cell_size_m": 10,
+  "craters_in_model": 349,
+  "prior_probability": 0.6687,
+  "credit": "HiRISE ESP_073578_2155 · NASA/JPL-Caltech/UArizona"
+ },
+ "view_box_m": {
+  "xmin": -1200.0,
+  "xmax": 1800.0,
+  "ymin": -3300.0,
+  "ymax": -700.0
+ },
+ "hirise": {
+  "file": "hirise_view.png",
+  "product": "ESP_073578_2155_RED_C_01_ORTHO",
+  "box_m": {
+   "xmin": -1200.0,
+   "xmax": 1800.0,
+   "ymin": -3300.0,
+   "ymax": -700.0
+  },
+  "px": [
+   2000,
+   1733
+  ],
+  "source_sha256": "89ad318abd70bffcc6d89796402a48a72bcbb8755c622047d2395be8c3d18739"
+ },
+ "hirise_detail": {
+  "file": "hirise_detail.png",
+  "product": "ESP_073578_2155_RED_A_01_ORTHO",
+  "box_m": {
+   "xmin": -100.0,
+   "ymin": -2800.0,
+   "xmax": 800.0,
+   "ymax": -1900.0
+  },
+  "px": [
+   2000,
+   2000
+  ],
+  "source_sha256": "64adeb5c0d2828caf8edef29a2341766a2b5859d6952fb2a1e898d5c5c607518"
+ },
+ "map": {
+  "palette_probability": {
+   "label": "P(ice within 3 m)",
+   "units": "probability",
+   "min": 0.0,
+   "max": 1.0,
+   "stops": [
+    {
+     "value": 0.0,
+     "color": "#f4f8fd"
+    },
+    {
+     "value": 0.2,
+     "color": "#cde2fb"
+    },
+    {
+     "value": 0.4,
+     "color": "#86b6ef"
+    },
+    {
+     "value": 0.6,
+     "color": "#3987e5"
+    },
+    {
+     "value": 0.8,
+     "color": "#1c5cab"
+    },
+    {
+     "value": 1.0,
+     "color": "#0d366b"
+    }
+   ]
+  },
+  "palette_uncertainty": {
+   "label": "Uncertainty left (1 = prior only)",
+   "units": "fraction_of_prior",
+   "min": 0.0,
+   "max": 1.0,
+   "stops": [
+    {
+     "value": 0.0,
+     "color": "#f4f8fd"
+    },
+    {
+     "value": 0.2,
+     "color": "#cde2fb"
+    },
+    {
+     "value": 0.4,
+     "color": "#86b6ef"
+    },
+    {
+     "value": 0.6,
+     "color": "#3987e5"
+    },
+    {
+     "value": 0.8,
+     "color": "#1c5cab"
+    },
+    {
+     "value": 1.0,
+     "color": "#0d366b"
+    }
+   ]
+  },
+  "change": {
+   "cells": 295,
+   "max_abs": 0.0197,
+   "bbox_xy_m": {
+    "xmin": 210,
+    "xmax": 390,
+    "ymax": -2250,
+    "ymin": -2490
+   }
+  },
+  "uncertainty_cells_changed": 164
+ },
+ "stations_before": [
+  {
+   "xy": [
+    300.0,
+    -2400.0
+   ],
+   "id": "E03S24",
+   "order": 1,
+   "p_ice": 0.669,
+   "uncertainty": 0.916,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 1,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    300.0,
+    -2500.0
+   ],
+   "id": "E03S25",
+   "order": 2,
+   "p_ice": 0.669,
+   "uncertainty": 0.916,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    300.0,
+    -2600.0
+   ],
+   "id": "E03S26",
+   "order": 3,
+   "p_ice": 0.67,
+   "uncertainty": 0.915,
+   "duration_min": 53.0,
+   "tools": [
+    "core_drill",
+    "camera_spectrometer",
+    "sample_kit"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill",
+     "Run Handheld camera / spectrometer"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Run Clean sample containers",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    300.0,
+    -2700.0
+   ],
+   "id": "E03S27",
+   "order": 4,
+   "p_ice": 0.698,
+   "uncertainty": 0.884,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.26,
+   "depth_shallow_m": 1.31,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    200.0,
+    -2700.0
+   ],
+   "id": "E02S27",
+   "order": 5,
+   "p_ice": 0.669,
+   "uncertainty": 0.916,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    200.0,
+    -2600.0
+   ],
+   "id": "E02S26",
+   "order": 6,
+   "p_ice": 0.669,
+   "uncertainty": 0.916,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 3,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  }
+ ],
+ "stations_after": [
+  {
+   "xy": [
+    300.0,
+    -2500.0
+   ],
+   "id": "E03S25",
+   "order": 1,
+   "p_ice": 0.668,
+   "uncertainty": 0.917,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.37,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    300.0,
+    -2600.0
+   ],
+   "id": "E03S26",
+   "order": 2,
+   "p_ice": 0.67,
+   "uncertainty": 0.915,
+   "duration_min": 53.0,
+   "tools": [
+    "core_drill",
+    "camera_spectrometer",
+    "sample_kit"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill",
+     "Run Handheld camera / spectrometer"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Run Clean sample containers",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    300.0,
+    -2700.0
+   ],
+   "id": "E03S27",
+   "order": 3,
+   "p_ice": 0.698,
+   "uncertainty": 0.884,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.26,
+   "depth_shallow_m": 1.31,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    200.0,
+    -2700.0
+   ],
+   "id": "E02S27",
+   "order": 4,
+   "p_ice": 0.669,
+   "uncertainty": 0.916,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 2,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  },
+  {
+   "xy": [
+    200.0,
+    -2600.0
+   ],
+   "id": "E02S26",
+   "order": 5,
+   "p_ice": 0.669,
+   "uncertainty": 0.916,
+   "duration_min": 40.0,
+   "tools": [
+    "core_drill"
+   ],
+   "tasks": {
+    "EV1": [
+     "Run Powered hand core drill"
+    ],
+    "EV2": [
+     "Assist Powered hand core drill",
+     "Monitor consumables and walkback margin"
+    ]
+   },
+   "depth_median_m": 2.36,
+   "depth_shallow_m": 1.37,
+   "terrain_unit": 3,
+   "priority": "high",
+   "hypothesis": "Ice excavated by the impact continues beyond the crater and varies over 100-300 m scales."
+  }
+ ],
+ "route_before_xy": [
+  [
+   [
+    305.0,
+    -2205.0
+   ],
+   [
+    305.0,
+    -2405.0
+   ],
+   [
+    305.0,
+    -2505.0
+   ],
+   [
+    305.0,
+    -2605.0
+   ],
+   [
+    305.0,
+    -2705.0
+   ],
+   [
+    205.0,
+    -2705.0
+   ],
+   [
+    205.0,
+    -2605.0
+   ],
+   [
+    205.0,
+    -2585.0
+   ],
+   [
+    215.0,
+    -2575.0
+   ],
+   [
+    215.0,
+    -2475.0
+   ],
+   [
+    225.0,
+    -2465.0
+   ],
+   [
+    225.0,
+    -2415.0
+   ],
+   [
+    235.0,
+    -2405.0
+   ],
+   [
+    235.0,
+    -2375.0
+   ],
+   [
+    255.0,
+    -2355.0
+   ],
+   [
+    255.0,
+    -2345.0
+   ],
+   [
+    265.0,
+    -2335.0
+   ],
+   [
+    265.0,
+    -2285.0
+   ],
+   [
+    295.0,
+    -2255.0
+   ],
+   [
+    295.0,
+    -2235.0
+   ],
+   [
+    305.0,
+    -2225.0
+   ],
+   [
+    305.0,
+    -2205.0
+   ]
+  ]
+ ],
+ "route_after_xy": [
+  [
+   [
+    305.0,
+    -2405.0
+   ],
+   [
+    305.0,
+    -2505.0
+   ],
+   [
+    305.0,
+    -2605.0
+   ],
+   [
+    305.0,
+    -2705.0
+   ],
+   [
+    205.0,
+    -2705.0
+   ],
+   [
+    205.0,
+    -2605.0
+   ],
+   [
+    205.0,
+    -2585.0
+   ],
+   [
+    215.0,
+    -2575.0
+   ],
+   [
+    215.0,
+    -2475.0
+   ],
+   [
+    225.0,
+    -2465.0
+   ],
+   [
+    225.0,
+    -2415.0
+   ],
+   [
+    235.0,
+    -2405.0
+   ],
+   [
+    235.0,
+    -2375.0
+   ],
+   [
+    255.0,
+    -2355.0
+   ],
+   [
+    255.0,
+    -2345.0
+   ],
+   [
+    265.0,
+    -2335.0
+   ],
+   [
+    265.0,
+    -2285.0
+   ],
+   [
+    295.0,
+    -2255.0
+   ],
+   [
+    295.0,
+    -2235.0
+   ],
+   [
+    305.0,
+    -2225.0
+   ],
+   [
+    305.0,
+    -2205.0
+   ]
+  ]
+ ],
+ "measurement": {
+  "station_id": "E03S24",
+  "tool": "core_drill",
+  "result": "no_ice",
+  "depth_m": 1,
+  "weh_percent": null,
+  "position": [
+   300.0,
+   -2400.0
+  ],
+  "timestamp": "2040-03-12T14:35:00Z",
+  "crew_member": "EV1",
+  "notes": "Demo scenario: no ice down to 1 m at the first station; triggers replan."
+ },
+ "timeline": {
+  "egress_end_min": 45.0,
+  "arrive_E03S24_min": 51.3,
+  "depart_E03S24_min": 91.3,
+  "walkback_margin_E03S24_min": 256.5
+ },
+ "decision": {
+  "station_id": "E03S24",
+  "decide_by_min": 347.7,
+  "p_no_ice_branch": 0.942,
+  "rationale": "No ice within 1 m lowers P(ice) around E03S24; next station 100 m away.",
+  "hard_stop": "Return to the habitat if the walkback margin reaches 0, on a solar particle event warning (DONKI), or at the decide-by time."
+ },
+ "clock": {
+  "arrival": {
+   "pet_min": 51.3,
+   "available_min": 296.4,
+   "h": 4,
+   "m": 56
+  },
+  "station_end": {
+   "pet_min": 91.3,
+   "available_min": 256.4,
+   "h": 4,
+   "m": 16
+  },
+  "formula": "decide_by_min - PET (reserve already in the EVA budget)"
+ },
+ "next": {
+  "id": "E03S25",
+  "distance_m": 100,
+  "duration_min": 40.0
+ },
+ "replan": {
+  "from_plan_id": "plan-demo0001",
+  "trigger": {
+   "station_id": "E03S24",
+   "result": "no_ice"
+  },
+  "stations_kept": [
+   "E03S25",
+   "E03S26",
+   "E03S27",
+   "E02S27",
+   "E02S26"
+  ],
+  "stations_added": [],
+  "stations_dropped": [],
+  "changed_fraction": 0.0,
+  "changed_fraction_limit": 0.5,
+  "margin_before_min": 20.6,
+  "margin_after_min": 20.5,
+  "objective_met": false,
+  "recommendation": "continue",
+  "reasons": [
+   "Changes are within the briefed plan and the walkback margin holds."
+  ],
+  "is_assumption": true,
+  "iv_decision": false,
+  "plan_id": "plan-demo0002"
+ },
+ "plan_summary": {
+  "duration_min": 363.4,
+  "distance_km": 1.14,
+  "max_distance_from_habitat_km": 0.51,
+  "min_walkback_margin_min": 20.6,
+  "crew": 2,
+  "ice_threshold_m": 3.0,
+  "craters_in_model": 349
+ },
+ "replan_summary": {
+  "duration_min": 363.5,
+  "distance_km": 0.94,
+  "min_walkback_margin_min": 20.5
+ },
+ "site_tools": {
+  "neutron_spectrometer": {
+   "depth_m": 0.6,
+   "p_ice": 0.0096,
+   "p_ice_90": [
+    0.0007,
+    0.0313
+   ],
+   "verdict": "NO_GO"
+  },
+  "gpr": {
+   "depth_m": 10.0,
+   "p_ice": 0.968,
+   "p_ice_90": [
+    0.9089,
+    0.9961
+   ],
+   "verdict": "GO"
+  },
+  "core_drill": {
+   "depth_m": 1.0,
+   "p_ice": 0.057,
+   "p_ice_90": [
+    0.0089,
+    0.149
+   ],
+   "verdict": "NO_GO"
+  },
+  "skyfall_radar": {
+   "depth_m": 3.0,
+   "p_ice": 0.5229,
+   "p_ice_90": [
+    0.2735,
+    0.7661
+   ],
+   "verdict": "CONDITIONAL",
+   "precursor": true
+  }
+ },
+ "equipment": [
+  {
+   "tool": "core_drill",
+   "count": 1,
+   "mass_kg": 13.6,
+   "justification": "Objectives 1, 2, 3"
+  },
+  {
+   "tool": "camera_spectrometer",
+   "count": 1,
+   "mass_kg": 2.5,
+   "justification": "Objectives 1, 2, 3"
+  },
+  {
+   "tool": "sample_kit",
+   "count": 1,
+   "mass_kg": null,
+   "justification": "Objectives 1, 2, 3"
+  },
+  {
+   "tool": "gpr",
+   "count": 1,
+   "mass_kg": 3.455,
+   "justification": "Objective 1: measures ice_presence while walking"
+  }
+ ],
+ "campaign": {
+  "site": "S1094b",
+  "drill_m": 1.0,
+  "stations_per_eva": 6,
+  "evas": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "series": [
+   {
+    "strategy": "blind_drill",
+    "label": "Drill without radar",
+    "p_eva": 0.301,
+    "evas_to_confirm": 3.32,
+    "p_confirmed": [
+     0.301,
+     0.511,
+     0.658,
+     0.761,
+     0.833,
+     0.883
+    ]
+   },
+   {
+    "strategy": "radar_first_50",
+    "label": "Radar first, 50 soundings/EVA",
+    "p_eva": 0.859,
+    "evas_to_confirm": 1.16,
+    "p_confirmed": [
+     0.859,
+     0.98,
+     0.997,
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   {
+    "strategy": "radar_first_20",
+    "label": "Radar first, 20 soundings/EVA",
+    "p_eva": 0.633,
+    "evas_to_confirm": 1.58,
+    "p_confirmed": [
+     0.633,
+     0.865,
+     0.951,
+     0.982,
+     0.993,
+     0.998
+    ]
+   }
+  ],
+  "speedup": 2.9,
+  "is_assumption": true,
+  "source": "Monte Carlo, gp/tool_strategy.py; EVAs assumed independent"
+ },
+ "eva_window": {
+  "mode": "demo",
+  "requested_utc": "2023-08-08T12:00:00Z",
+  "recommended": {
+   "sol": 2,
+   "start_utc": "2023-08-10T06:30:41Z",
+   "end_utc": "2023-08-10T12:32:47Z",
+   "start_ltst": "06:00",
+   "end_ltst": "12:00",
+   "level": "none",
+   "go": true,
+   "reasons": []
+  },
+  "climate_source": "Viking Lander 2 meteorology, PDS VL1/VL2-M-MET-4-BINNED-P-T-V-V1.0 (Tillman et al.), https://atmos.nmsu.edu/PDS/data/vl_1001/data/vl_tbin.dat",
+  "dust": {
+   "tau": 0.27,
+   "reported": false,
+   "source": "hope_emirs",
+   "ls_deg": 101.8,
+   "note": "No Hope map within 20 deg of Ls; interpolated between Ls 54 and 123"
+  },
+  "hours": [
+   {
+    "sol": 0,
+    "ltst": "00:00",
+    "sun_elevation_deg": -29.7,
+    "temperature_k": 201.8,
+    "wind_p95_mps": 1.6,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 200 K on 1 sol in 10 (-73 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "01:00",
+    "sun_elevation_deg": -28.0,
+    "temperature_k": 197.8,
+    "wind_p95_mps": 1.9,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 196 K on 1 sol in 10 (-77 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "02:00",
+    "sun_elevation_deg": -23.3,
+    "temperature_k": 195.7,
+    "wind_p95_mps": 2.2,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 194 K on 1 sol in 10 (-79 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "03:00",
+    "sun_elevation_deg": -16.2,
+    "temperature_k": 193.6,
+    "wind_p95_mps": 3.0,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 192 K on 1 sol in 10 (-81 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "04:00",
+    "sun_elevation_deg": -7.2,
+    "temperature_k": 194.8,
+    "wind_p95_mps": 3.7,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 193 K on 1 sol in 10 (-80 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "05:00",
+    "sun_elevation_deg": 3.0,
+    "temperature_k": 200.9,
+    "wind_p95_mps": 4.8,
+    "level": "warning",
+    "levels": {
+     "light": "caution",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Low sun (3 deg): long shadows",
+     "Cold: 199 K on 1 sol in 10 (-74 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "06:00",
+    "sun_elevation_deg": 14.1,
+    "temperature_k": 208.3,
+    "wind_p95_mps": 6.3,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "07:00",
+    "sun_elevation_deg": 25.8,
+    "temperature_k": 217.0,
+    "wind_p95_mps": 6.8,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "08:00",
+    "sun_elevation_deg": 37.9,
+    "temperature_k": 224.9,
+    "wind_p95_mps": 5.2,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "09:00",
+    "sun_elevation_deg": 50.1,
+    "temperature_k": 233.6,
+    "wind_p95_mps": 5.0,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "10:00",
+    "sun_elevation_deg": 62.1,
+    "temperature_k": 235.5,
+    "wind_p95_mps": 4.4,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "11:00",
+    "sun_elevation_deg": 73.3,
+    "temperature_k": 235.7,
+    "wind_p95_mps": 4.0,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "12:00",
+    "sun_elevation_deg": 79.4,
+    "temperature_k": 236.2,
+    "wind_p95_mps": 3.7,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "13:00",
+    "sun_elevation_deg": 73.3,
+    "temperature_k": 239.2,
+    "wind_p95_mps": 3.5,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "14:00",
+    "sun_elevation_deg": 62.1,
+    "temperature_k": 243.2,
+    "wind_p95_mps": 3.4,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "15:00",
+    "sun_elevation_deg": 50.0,
+    "temperature_k": 245.4,
+    "wind_p95_mps": 3.5,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "16:00",
+    "sun_elevation_deg": 37.8,
+    "temperature_k": 246.0,
+    "wind_p95_mps": 3.4,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "17:00",
+    "sun_elevation_deg": 25.8,
+    "temperature_k": 244.9,
+    "wind_p95_mps": 3.7,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "18:00",
+    "sun_elevation_deg": 14.1,
+    "temperature_k": 241.3,
+    "wind_p95_mps": 3.3,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "19:00",
+    "sun_elevation_deg": 3.0,
+    "temperature_k": 230.0,
+    "wind_p95_mps": 2.2,
+    "level": "warning",
+    "levels": {
+     "light": "caution",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Low sun (3 deg): long shadows",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "20:00",
+    "sun_elevation_deg": -7.3,
+    "temperature_k": 215.2,
+    "wind_p95_mps": 1.6,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "21:00",
+    "sun_elevation_deg": -16.2,
+    "temperature_k": 207.7,
+    "wind_p95_mps": 1.9,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "22:00",
+    "sun_elevation_deg": -23.4,
+    "temperature_k": 204.3,
+    "wind_p95_mps": 1.8,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 203 K on 1 sol in 10 (-70 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 0,
+    "ltst": "23:00",
+    "sun_elevation_deg": -28.1,
+    "temperature_k": 201.8,
+    "wind_p95_mps": 1.6,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 200 K on 1 sol in 10 (-73 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "00:00",
+    "sun_elevation_deg": -29.7,
+    "temperature_k": 199.5,
+    "wind_p95_mps": 2.1,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 198 K on 1 sol in 10 (-75 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "01:00",
+    "sun_elevation_deg": -28.1,
+    "temperature_k": 197.8,
+    "wind_p95_mps": 1.9,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 196 K on 1 sol in 10 (-77 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "02:00",
+    "sun_elevation_deg": -23.4,
+    "temperature_k": 195.7,
+    "wind_p95_mps": 2.2,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 194 K on 1 sol in 10 (-79 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "03:00",
+    "sun_elevation_deg": -16.2,
+    "temperature_k": 193.6,
+    "wind_p95_mps": 3.0,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 192 K on 1 sol in 10 (-81 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "04:00",
+    "sun_elevation_deg": -7.2,
+    "temperature_k": 194.8,
+    "wind_p95_mps": 3.7,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 193 K on 1 sol in 10 (-80 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "05:00",
+    "sun_elevation_deg": 3.0,
+    "temperature_k": 200.9,
+    "wind_p95_mps": 4.8,
+    "level": "warning",
+    "levels": {
+     "light": "caution",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Low sun (3 deg): long shadows",
+     "Cold: 199 K on 1 sol in 10 (-74 C)",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "06:00",
+    "sun_elevation_deg": 14.1,
+    "temperature_k": 208.3,
+    "wind_p95_mps": 6.3,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "07:00",
+    "sun_elevation_deg": 25.8,
+    "temperature_k": 217.0,
+    "wind_p95_mps": 6.8,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "08:00",
+    "sun_elevation_deg": 37.9,
+    "temperature_k": 224.9,
+    "wind_p95_mps": 5.2,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "09:00",
+    "sun_elevation_deg": 50.1,
+    "temperature_k": 233.6,
+    "wind_p95_mps": 5.0,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "10:00",
+    "sun_elevation_deg": 62.1,
+    "temperature_k": 235.5,
+    "wind_p95_mps": 4.4,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "11:00",
+    "sun_elevation_deg": 73.3,
+    "temperature_k": 235.7,
+    "wind_p95_mps": 4.0,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "12:00",
+    "sun_elevation_deg": 79.4,
+    "temperature_k": 236.2,
+    "wind_p95_mps": 3.7,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "13:00",
+    "sun_elevation_deg": 73.2,
+    "temperature_k": 239.2,
+    "wind_p95_mps": 3.5,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI); CME at Mars around 2023-08-09 02:00Z (WSA-Enlil, DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "14:00",
+    "sun_elevation_deg": 62.1,
+    "temperature_k": 243.2,
+    "wind_p95_mps": 3.4,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "15:00",
+    "sun_elevation_deg": 50.0,
+    "temperature_k": 245.4,
+    "wind_p95_mps": 3.5,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "16:00",
+    "sun_elevation_deg": 37.8,
+    "temperature_k": 246.0,
+    "wind_p95_mps": 3.4,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "17:00",
+    "sun_elevation_deg": 25.7,
+    "temperature_k": 244.9,
+    "wind_p95_mps": 3.7,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "18:00",
+    "sun_elevation_deg": 14.0,
+    "temperature_k": 241.3,
+    "wind_p95_mps": 3.3,
+    "level": "warning",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "19:00",
+    "sun_elevation_deg": 2.9,
+    "temperature_k": 230.0,
+    "wind_p95_mps": 2.2,
+    "level": "warning",
+    "levels": {
+     "light": "caution",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Low sun (3 deg): long shadows",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "20:00",
+    "sun_elevation_deg": -7.3,
+    "temperature_k": 215.2,
+    "wind_p95_mps": 1.6,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "21:00",
+    "sun_elevation_deg": -16.3,
+    "temperature_k": 207.7,
+    "wind_p95_mps": 1.9,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "warning"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Solar particle event since 2023-08-07 22:09Z (DONKI)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "22:00",
+    "sun_elevation_deg": -23.4,
+    "temperature_k": 204.3,
+    "wind_p95_mps": 1.8,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 203 K on 1 sol in 10 (-70 C)"
+    ]
+   },
+   {
+    "sol": 1,
+    "ltst": "23:00",
+    "sun_elevation_deg": -28.1,
+    "temperature_k": 201.8,
+    "wind_p95_mps": 1.6,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 200 K on 1 sol in 10 (-73 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "00:00",
+    "sun_elevation_deg": -29.8,
+    "temperature_k": 199.5,
+    "wind_p95_mps": 2.1,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 198 K on 1 sol in 10 (-75 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "01:00",
+    "sun_elevation_deg": -28.1,
+    "temperature_k": 197.8,
+    "wind_p95_mps": 1.9,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 196 K on 1 sol in 10 (-77 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "02:00",
+    "sun_elevation_deg": -23.4,
+    "temperature_k": 195.7,
+    "wind_p95_mps": 2.2,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 194 K on 1 sol in 10 (-79 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "03:00",
+    "sun_elevation_deg": -16.2,
+    "temperature_k": 193.6,
+    "wind_p95_mps": 3.0,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 192 K on 1 sol in 10 (-81 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "04:00",
+    "sun_elevation_deg": -7.2,
+    "temperature_k": 194.8,
+    "wind_p95_mps": 3.7,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 193 K on 1 sol in 10 (-80 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "05:00",
+    "sun_elevation_deg": 3.0,
+    "temperature_k": 200.9,
+    "wind_p95_mps": 4.8,
+    "level": "caution",
+    "levels": {
+     "light": "caution",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Low sun (3 deg): long shadows",
+     "Cold: 199 K on 1 sol in 10 (-74 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "06:00",
+    "sun_elevation_deg": 14.1,
+    "temperature_k": 208.3,
+    "wind_p95_mps": 6.3,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "07:00",
+    "sun_elevation_deg": 25.8,
+    "temperature_k": 217.0,
+    "wind_p95_mps": 6.8,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "08:00",
+    "sun_elevation_deg": 37.9,
+    "temperature_k": 224.9,
+    "wind_p95_mps": 5.2,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "09:00",
+    "sun_elevation_deg": 50.1,
+    "temperature_k": 233.6,
+    "wind_p95_mps": 5.0,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "10:00",
+    "sun_elevation_deg": 62.2,
+    "temperature_k": 235.5,
+    "wind_p95_mps": 4.4,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "11:00",
+    "sun_elevation_deg": 73.3,
+    "temperature_k": 235.7,
+    "wind_p95_mps": 4.0,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "12:00",
+    "sun_elevation_deg": 79.3,
+    "temperature_k": 236.2,
+    "wind_p95_mps": 3.7,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "13:00",
+    "sun_elevation_deg": 73.2,
+    "temperature_k": 239.2,
+    "wind_p95_mps": 3.5,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "14:00",
+    "sun_elevation_deg": 62.0,
+    "temperature_k": 243.2,
+    "wind_p95_mps": 3.4,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "15:00",
+    "sun_elevation_deg": 49.9,
+    "temperature_k": 245.4,
+    "wind_p95_mps": 3.5,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "16:00",
+    "sun_elevation_deg": 37.7,
+    "temperature_k": 246.0,
+    "wind_p95_mps": 3.4,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "17:00",
+    "sun_elevation_deg": 25.7,
+    "temperature_k": 244.9,
+    "wind_p95_mps": 3.7,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "18:00",
+    "sun_elevation_deg": 14.0,
+    "temperature_k": 241.3,
+    "wind_p95_mps": 3.3,
+    "level": "none",
+    "levels": {
+     "light": "none",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": []
+   },
+   {
+    "sol": 2,
+    "ltst": "19:00",
+    "sun_elevation_deg": 2.9,
+    "temperature_k": 230.0,
+    "wind_p95_mps": 2.2,
+    "level": "caution",
+    "levels": {
+     "light": "caution",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Low sun (3 deg): long shadows"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "20:00",
+    "sun_elevation_deg": -7.4,
+    "temperature_k": 215.2,
+    "wind_p95_mps": 1.6,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "21:00",
+    "sun_elevation_deg": -16.3,
+    "temperature_k": 207.7,
+    "wind_p95_mps": 1.9,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "none",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "22:00",
+    "sun_elevation_deg": -23.5,
+    "temperature_k": 204.3,
+    "wind_p95_mps": 1.8,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 203 K on 1 sol in 10 (-70 C)"
+    ]
+   },
+   {
+    "sol": 2,
+    "ltst": "23:00",
+    "sun_elevation_deg": -28.2,
+    "temperature_k": 201.8,
+    "wind_p95_mps": 1.6,
+    "level": "warning",
+    "levels": {
+     "light": "warning",
+     "temperature": "advisory",
+     "wind": "none",
+     "dust": "none",
+     "space_weather": "none"
+    },
+    "reasons": [
+     "Sun below the horizon",
+     "Cold: 200 K on 1 sol in 10 (-73 C)"
+    ]
+   }
+  ]
+ },
+ "sources": {
+  "map": {
+   "path": "apps/web/mock/map.json",
+   "sha256": "edcb0dd3c15749ec461ede424fd31264d47b371197566e53970b3131845a1c35"
+  },
+  "map-replan": {
+   "path": "apps/web/mock/map-replan.json",
+   "sha256": "5a93b3db18525702a3a6a8cd939a3de341825c6cd5cc3d22255752d5e7a858d9"
+  },
+  "plan": {
+   "path": "apps/web/mock/plan.json",
+   "sha256": "a1326bd037be71e11c6ad6885543bfac9afadf6ceb9255efac163201698bb14f"
+  },
+  "replan": {
+   "path": "apps/web/mock/replan.json",
+   "sha256": "f32b8350644b7167d24db76df745eb40003e2d7ea0f67a89eef1d7510f9bf557"
+  },
+  "measurement": {
+   "path": "apps/web/mock/measurement.json",
+   "sha256": "909de7877371c60aa1e766a7c1ab2a6667a7f16f6dc651186eac4869f48eb624"
+  },
+  "campaign": {
+   "path": "apps/web/mock/campaign.json",
+   "sha256": "aaf6f460f2d8ac49cc43e5bd2b3d1dd7ef189a8e39da21e9ef8f69d8b93b07ac"
+  },
+  "eva-window": {
+   "path": "apps/web/mock/eva-window.json",
+   "sha256": "519a7993f1eeef812a9c3b47618b31d57aa1e2fcc3004651c800babfc0b88695"
+  },
+  "site": {
+   "path": "apps/web/public/site/s1094b.json",
+   "sha256": "99381c6c8f3061d63d33478e9f1e5ce8a130a0bb57ab02eede68e165a391f1fc"
+  }
+ }
+}

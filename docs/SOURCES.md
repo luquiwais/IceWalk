@@ -237,3 +237,32 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 | Color del cielo de Marte de día: marrón amarillento, más rojo lejos del Sol y hacia el horizonte (sin valor citable; el cielo del 3D es ilustrativo) | Maki et al. (1999), JGR 104(E4); Thomas et al. (1999), JGR 104(E4) (Mars Pathfinder) |
 | Orto IRB de HiRISE registrado sobre el DTM del sitio (probado para color; descartado) | NASA/JPL-Caltech/UArizona, https://hirise.lpl.arizona.edu/PDS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/ |
 | EVA TERMINATE frente a EVA ABORT; separación probabilidad / incertidumbre / cambio en mapas de hielo | Ver `docs/research/flujo-ui-nasa-2026-11-14.md` (xEVA Con Ops; Courville et al. 2026) |
+
+## Entrega, landing y videos: fuentes revalidadas por Codex el 14/11
+
+Inventario y explicación completos en [`research/submission-brief-2026-11-14.md`](research/submission-brief-2026-11-14.md). Las copias de correos y canales están fuera del repo; aquí se enlazan fuentes y hallazgos relevantes.
+
+| Uso | Fuente primaria |
+| --- | --- |
+| Campos, inglés, demo de 30 s / 7 slides, cierre 15/11 23:59 local, permisos, SI y envío | [Project Submission Guide, 13/11/2026](https://www.spaceappschallenge.org/resources/project-submission-guide/) |
+| Cinco criterios en todos los niveles y calendario global | [Judging & Awards Guide, 13/11/2026](https://www.spaceappschallenge.org/resources/judging-awards-guide/) |
+| Enunciado y lista oficial de recursos | [Martian Map](https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/) |
+| Video local de 3 min castellano y Drive de organización; diferencias con global | [Santi, Discord 14/11 09:50](https://discord.com/channels/940389167035207760/998222622468882472/1571145271931306176) |
+| Solo video local, sin vivo, más tiempo y anuncio pendiente | [Santi, Discord 14/11 18:02](https://discord.com/channels/940389167035207760/998222622468882472/1571269148414320652) |
+| Recurso de la lista del desafío requerido para premios globales | [GO Team, discusión #1827](https://github.com/nasa/spaceapps/discussions/1827#discussioncomment-19421469) |
+| Cronograma publicado de sede; contrastar con instrucciones posteriores de Discord | [Buenos Aires en Space Apps](https://www.spaceappschallenge.org/2026/local-events/buenos-aires/), [UP](https://www.palermo.edu/ingenieria/2026/noviembre/nasa-space-apps-challenge.html) |
+| Marca oficial y descargas de logos | [Space Apps Brand Guidelines](https://www.spaceappschallenge.org/brand/) |
+| Sonificación sísmica de impacto del 24/12/2021, acelerada ×100; crédito NASA/JPL-Caltech/CNES/Imperial College London | [PIA25582](https://science.nasa.gov/photojournal/nasas-insight-records-the-sound-of-a-martian-impact/) |
+| Imagen real de hielo alrededor del cráter; crédito NASA/JPL-Caltech/University of Arizona | [PIA25583](https://science.nasa.gov/photojournal/hirise-views-a-mars-impact-crater-surrounded-by-water-ice/) |
+| Referencia de tono y estructura para los videos (sin reutilizar material; derechos de IBM) | IBM, «Apollo 11: The Untold Story Of the IBM Team Behind the Moon Landing», YouTube, 12/07/2019, https://www.youtube.com/watch?v=XPgtfOwuUGY. Análisis en `submission/video/references.md` |
+
+### Inventario de producción de video (reubicado el 14/11 noche)
+
+[Manifiesto](submission/video/assets.json): rutas, tamaños y hashes de los medios
+locales. Fuentes por recurso registradas desde el material recuperado; esta
+reorganización no vuelve a validar derechos ni publica medios. NASA 3D Resources,
+reels CHAPEA/xEMU/Desert RATS y Poly Haven quedaron locales e ignorados. Revisar
+créditos y términos por recurso antes del corte final. El episodio usa las ocho
+fuentes de `tools/video/fixtures/` (commit `2a633fb`), con sus hashes originales.
+PIA25582.wav y PIA25583.jpg se movieron a `tools/video/assets/nasa/mars/`; correos
+y copias raw de canales permanecen fuera del repo.

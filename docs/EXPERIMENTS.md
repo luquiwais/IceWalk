@@ -790,3 +790,28 @@ Se mide la diferencia con un bootstrap pareado y estratificado (2000 remuestreos
   - "sin hielo" puede ser hielo no visible.
 
 **Conclusión: no.** La TI no predice el hielo de los impactos frescos mejor que la latitud sola, ni con TES (3 km) ni con THEMIS (100 m): la diferencia de log-loss es de ±0.003 sobre 0.106, con p = 0.28. Hay una señal física débil (a más TI, hielo más somero) que no se traduce en predicción. **No entra como covariable del prior.** Donde podría aportar es al norte de 35°N; se revisaría con más impactos con hielo (catálogos posteriores a 2022) o con TI estacional, que llega más hondo.
+
+
+## 2026-11-14 — Migración del proyecto de video (Codex)
+
+- Recuperado el pedido que Claude no inició por cuota: pull y organización, sin
+  nueva producción. `git fetch origin` y fast-forward de `2a633fb` a `ad2eaba`
+  (17 commits). Dos conflictos documentales integrados: se preservaron las filas
+  remotas nuevas y las decisiones locales; #68 continuó resuelta según investigación.
+  Primer pull abortó porque faltaba preparar el log anidado; no cambió HEAD.
+  Segundo pull exitoso; los cuatro docs locales se restauraron integrados.
+- Proyecto Remotion/Blender trasladado de `~/Developer/icewalk-video` a `tools/video`.
+  Hash de cada archivo original calculado antes del traslado; 163 archivos del
+  inventario coinciden después. Historial `.git` independiente respaldado fuera;
+  ningún repositorio anidado ni binario entre los candidatos de Git. Ruta anterior
+  enlaza al nuevo proyecto para compatibilidad con rutas de los `.blend`.
+- `bun run lint` inicial falló por dos props `from={0}` redundantes de Remotion.
+  Eliminadas sin cambiar el montaje; lint y TypeScript pasan después.
+- `bun run build` pasa desde la nueva ruta (Rspack, salida `out/bundle` ignorada).
+  Es compilación, no render ni validación visual. No se generaron planos ni voces.
+- Ocho fixtures originales coinciden con los hashes de `public/data/data.json`.
+  No regenerados con los mocks nuevos de main. Enlaces de documentación vigente
+  comprobados. Código de aplicación y workspaces/lock raíz sin cambios propios.
+- Siguen sin verificar: defectos visuales 3D heredados, logos, actuación y voces,
+  lectura cronometrada, composición local y puesta final. El animatic conserva
+  placeholders; build/lint no prueban que esté listo para entrega.

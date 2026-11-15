@@ -1,0 +1,1551 @@
+{
+  "schema_version": 1,
+  "episode_commit": "2a633fb6b13232d9ddceb2363c507ef3dda6d272",
+  "release": null,
+  "note": "Local inventory, not publication or license clearance. Paths relative to repository root. Personal job IDs and raw metadata stay ignored. Excludes dependency caches, disposable build bundles and the private generation tracker.",
+  "files": [
+    {
+      "path": "tools/video/assets/clips/S02_drill_overhead_v1.mp4",
+      "bytes": 1623784,
+      "sha256": "4d5f9c297dfebda937a191ab4b0919375d97e5c5793db6e1f07d8da754e637d3",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/assets/frames/F01_drill_overhead.png",
+      "bytes": 7924205,
+      "sha256": "c9462db07ef3afe63cd169362c5cdf7c16fdabda3a3ee1b957e01079560132af",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Astronaut.glb",
+      "bytes": 762988,
+      "sha256": "d18c141410542b935113d1c25a9271d90c40d44015a64295b7b68a30f0ce2820",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Astronaut.png",
+      "bytes": 1109191,
+      "sha256": "5d44c49cb9803ec18b408d43dbd93adc3828e1b5e5f477bd85654f6f357933d9",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Habitat Demonstration Unit (part 1).glb",
+      "bytes": 516748,
+      "sha256": "3106557bea24c9ba012556ddbecf3740c39276dc369cf359b77225de97458cfe",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Habitat Demonstration Unit (part 1).png",
+      "bytes": 835045,
+      "sha256": "24f2e30cbc59011cf5f369ab35b98c85428fcaf2d88b709b2f967368d26b80aa",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Habitat Demonstration Unit (part 2).glb",
+      "bytes": 710988,
+      "sha256": "616226ee31094ae1d71d1a4f974d6c7421c0227bca28b118de4dd97ce0495649",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Habitat Demonstration Unit (part 2).png",
+      "bytes": 808253,
+      "sha256": "6578b27fd66c9204cdb4fef124e936819169b1f8ba1da54b1d57b33c3b925bb6",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Mark III Spacesuit.glb",
+      "bytes": 894092,
+      "sha256": "885a4a83bd9d18f3886c8201845e384c0a9acb0cb487fb2897846d9f0438ab51",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Mark III Spacesuit.png",
+      "bytes": 264610,
+      "sha256": "f3f33628f3b644ca675bc12e9f5de6c3caca5838bcec273568de72c6961f0aa0",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Mars Reconnaissance Orbiter (MRO) (A).glb",
+      "bytes": 2652460,
+      "sha256": "b195c566d227dec8e42ca2fafcc2a8cc26a127e04ed577e4b9515199d2002d9e",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Mars Reconnaissance Orbiter (MRO) (A).png",
+      "bytes": 1026954,
+      "sha256": "529bc6463d2b3436ba1d0d692db24afa83dc4dc822fde893647edd621b0f1bb9",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Z2 Spacesuit.glb",
+      "bytes": 16933148,
+      "sha256": "4199762c27f8e730030a7bf9f1a453c203457e84c33b36247c0237a74f9a0c2a",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/3d/Z2 Spacesuit.png",
+      "bytes": 485424,
+      "sha256": "6deaf6c0b6bdb2e8d2d62a448bb603efa13a91a0595904ef696d8ba74dff8a8f",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/CHAPEA_reel.metadata.json",
+      "bytes": 33933,
+      "sha256": "6653e5c8d835d175bda02a2496dbffd95fd0c4e4b7296c19f5092e31319d45b7",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/CHAPEA_reel.mp4",
+      "bytes": 308782229,
+      "sha256": "1064cb374ffb9f156be686c695c461f0b65baa1b65da8a964f51ed14dbd9b618",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://images.nasa.gov/details/jsc2023m000115_CHAPEA_Resource Reel_230501-4K-YT",
+      "review": "pending_item_review",
+      "credit": "JSC",
+      "nasa_id": "jsc2023m000115_CHAPEA_Resource Reel_230501-4K-YT"
+    },
+    {
+      "path": "tools/video/assets/nasa/DesertRATS_2010.metadata.json",
+      "bytes": 8329,
+      "sha256": "53401353b3dc9717087f49538461e79356e74a2c984d0f9de8f84611d4161dd6",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/DesertRATS_2010.mp4",
+      "bytes": 57523929,
+      "sha256": "f3e28a9383560b388a117c529876c06b8eaea029dfdd719fb635d40468965437",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://images.nasa.gov/details/GSFC_20100909_Desert_m10641_RATS",
+      "review": "pending_item_review",
+      "credit": "GSFC",
+      "nasa_id": "GSFC_20100909_Desert_m10641_RATS"
+    },
+    {
+      "path": "tools/video/assets/nasa/mars/PIA16685.jpg",
+      "bytes": 339886,
+      "sha256": "6e969c3c408dceb637e7eb46f801bde1db850034ca67dd3a8a1e0f75bf637644",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://photojournal.jpl.nasa.gov/catalog/PIA16685",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/mars/PIA23727.jpg",
+      "bytes": 367133,
+      "sha256": "ff925561d5b583d6e2c10a80bcd9f6a7458cc9c6fa0955b2d7d789cdfab80b9b",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://photojournal.jpl.nasa.gov/catalog/PIA23727",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/mars/PIA24264.jpg",
+      "bytes": 2729297,
+      "sha256": "2b9e68c713700bc713dea9ce532e10bb0889061b7374575bee8a1d95791f48a2",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://photojournal.jpl.nasa.gov/catalog/PIA24264",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/mars/PIA24663.jpg",
+      "bytes": 15369037,
+      "sha256": "5df955f61cd471377ade2370d568eb6cf306e25948f24d19b5e980d9efc8e798",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://photojournal.jpl.nasa.gov/catalog/PIA24663",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/mars/PIA25582.wav",
+      "bytes": 5391020,
+      "sha256": "06b284194622eee99c6f92d877e59f6b20c390345cfd2381bb9abd50aaea228c",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://photojournal.jpl.nasa.gov/catalog/PIA25582",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/mars/PIA25583.jpg",
+      "bytes": 341186,
+      "sha256": "9618be8abfce0c63f5ed598850ade93fe2c420f9201d57a146849414e303a9bb",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://photojournal.jpl.nasa.gov/catalog/PIA25583",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/xEMU_reel.metadata.json",
+      "bytes": 299209,
+      "sha256": "55c8c23681695057c14e1f4fe42715f67a95f3e327229498246103ef3cb99c2e",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/assets/nasa/xEMU_reel.mp4",
+      "bytes": 2376075081,
+      "sha256": "0785903ea4206b2d2699ac21b4c5ccc80f4a4f8a68cdc32fa05e44c0f4034150",
+      "git": "local_ignored",
+      "origin": "NASA media / NASA 3D Resources",
+      "license": "NASA media guidelines; per-item third-party credits require review",
+      "source_url": "https://images.nasa.gov/details/jsc2019m000727_xEMU_NextGenerationSpacesuitResourceReel01_MP4",
+      "review": "pending_item_review",
+      "credit": "JSC",
+      "nasa_id": "jsc2019m000727_xEMU_NextGenerationSpacesuitResourceReel01_MP4"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/boulder_01/boulder_01.bin",
+      "bytes": 2938808,
+      "sha256": "7f5b06503d62bd95bfe9c6b8a354a5cc8ff04a4d271a8cf87a3e3125db4232d7",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/boulder_01/boulder_01.gltf",
+      "bytes": 2773,
+      "sha256": "52d118b56748a18509e4ec0075d07b254d72a0401793f22363c0bb3a682e7361",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/boulder_01/textures/boulder_01_arm_2k.jpg",
+      "bytes": 2273068,
+      "sha256": "ab52859dde519b4822111aa60916b6d21f8a6966c67b6cec44d1cd0775b8a86a",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/boulder_01/textures/boulder_01_diff_2k.jpg",
+      "bytes": 3672483,
+      "sha256": "90bbaa17c1fe0254d2b0b6e5148264fa834953a72724d566f14af029eebe3ca3",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/boulder_01/textures/boulder_01_nor_gl_2k.jpg",
+      "bytes": 4649207,
+      "sha256": "5174b318712ac7725cbcb55d422607f9c66d7f8d035c5412ab897b5939e2db6b",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/boulder_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_01/moon_rock_01.bin",
+      "bytes": 448168,
+      "sha256": "c6671327046efd27ab1a97c4c716412f209a063184e65f0376e3be6583e8f52a",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_01/moon_rock_01.gltf",
+      "bytes": 7088,
+      "sha256": "d3cbe420cfb38d68aaf2c54433b734fb13a637ed1a8c6429137308483af12e04",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_01/textures/moon_rock_01_arm_2k.jpg",
+      "bytes": 1129038,
+      "sha256": "52da39356a69a827ad2abf6634a029079659bb29647daa1feccd97f59a3e8fa6",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_01/textures/moon_rock_01_diff_2k.jpg",
+      "bytes": 928294,
+      "sha256": "9b2c7498bc62c00d8c8c4c8a52bcabbfbd6018464fdc6871af439513cf160c74",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_01/textures/moon_rock_01_nor_gl_2k.jpg",
+      "bytes": 2202559,
+      "sha256": "9aaedd37f18031a7717207947cb5a211f91db21fe769d977ca0c13919bd36405",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_01",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_03/moon_rock_03.bin",
+      "bytes": 131060,
+      "sha256": "b9e79d1c12719515f48b8e27ddf692f9e2076ad4eafd1cf4a4d12d1bcc6d85df",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_03",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_03/moon_rock_03.gltf",
+      "bytes": 2789,
+      "sha256": "f8db505c924ee208ba1976b0873197d5f231aaa5ba28f7ed6ce3ea95103167e4",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_03",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_03/textures/moon_rock_03_arm_2k.jpg",
+      "bytes": 1220691,
+      "sha256": "6c3678dd44f4fe2a72720064a8c7a47627022ae172d3b15fc3601fc76a9c38c7",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_03",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_03/textures/moon_rock_03_diff_2k.jpg",
+      "bytes": 1120682,
+      "sha256": "39263db4e93590abf0a3b295beca8e6920ae2c7e0828cad2958eea335b93d674",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_03",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_03/textures/moon_rock_03_nor_gl_2k.jpg",
+      "bytes": 2414460,
+      "sha256": "6c8b6bdd4269a8265a5cee451420289ee5afeb72fbdfe50c7288c420140aff47",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_03",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_05/moon_rock_05.bin",
+      "bytes": 226972,
+      "sha256": "15fd7e9cc1a2636c432a5f7cf3112dcf60bca059068db0f18e212e693c7af07e",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_05",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_05/moon_rock_05.gltf",
+      "bytes": 2789,
+      "sha256": "d1f362694a636dc4ef48aec60480459badedc4e3846e0279571122e03d577265",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_05",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_05/textures/moon_rock_05_arm_2k.jpg",
+      "bytes": 1198757,
+      "sha256": "10f1f3c01017404236323e714180bd3ad4727409c5f16a50492f6082946d97c5",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_05",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_05/textures/moon_rock_05_diff_2k.jpg",
+      "bytes": 1087919,
+      "sha256": "0e1f938ffb260e2a6ef84128e6e68907949017dbee381f72e18621b40950f7a0",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_05",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/moon_rock_05/textures/moon_rock_05_nor_gl_2k.jpg",
+      "bytes": 2272391,
+      "sha256": "b4510dea5306b208aa408aa1e995717735a5b0b23a6b38033a05708ec0dc1a72",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/moon_rock_05",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_laterite_soil_stones/diff.jpg",
+      "bytes": 3593564,
+      "sha256": "db3568338ecdf4467ca74f88178a60ebdb5a98f9b644db73b411913e7044fef6",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_laterite_soil_stones",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_laterite_soil_stones/disp.jpg",
+      "bytes": 2169376,
+      "sha256": "b11389ea93d9bc56ce534ed7361eefb432e796eb4d5b1e9be9a9566ff3c7c83b",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_laterite_soil_stones",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_laterite_soil_stones/nor.jpg",
+      "bytes": 5924499,
+      "sha256": "1b2e238e375c31719169428b318916a8c9ba72b5202d2f36eac46b3d861319b6",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_laterite_soil_stones",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_laterite_soil_stones/rough.jpg",
+      "bytes": 2819770,
+      "sha256": "b273fa011a704f23e293658ab4e06d924253cb07b3b2eff24366d5d87b120c69",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_laterite_soil_stones",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_sand/diff.jpg",
+      "bytes": 2284307,
+      "sha256": "edc4db33e3edbb7b2d1dfad6c9f6337046fe11b75e8943c0fec38b86d14280a4",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_sand",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_sand/disp.jpg",
+      "bytes": 1626602,
+      "sha256": "dfc9c5e81e4d70ccfd4f6e7aedc89e9476249da8a99ca071857fbe1d754a3000",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_sand",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_sand/nor.jpg",
+      "bytes": 4550804,
+      "sha256": "45ce515b4f96833d4182b349ab1114a9f50b6a273ebae021fd1eb7a0fa5c5311",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_sand",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/red_sand/rough.jpg",
+      "bytes": 2271870,
+      "sha256": "bb8ab07a8ff0d53750631bb4b2a4ee9d310ceb15d29dd89f13aadfd305283104",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/red_sand",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/rocky_terrain_02/diff.jpg",
+      "bytes": 3232826,
+      "sha256": "9b042fe0618ffbc3650592456d7d8d265ba9a1cb5ce802f5f1d86b7ee79508a1",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/rocky_terrain_02",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/rocky_terrain_02/disp.jpg",
+      "bytes": 759583,
+      "sha256": "84a544dad4d12da56962297dbc7c64813c918ca4942cc8b71b5a18799e454c24",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/rocky_terrain_02",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/rocky_terrain_02/nor.jpg",
+      "bytes": 4149208,
+      "sha256": "556ed903180a9431b253fc1c334c769dc4615c5c0f4ef1cedf20533ae8409ce8",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/rocky_terrain_02",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/polyhaven/rocky_terrain_02/rough.jpg",
+      "bytes": 1589303,
+      "sha256": "89f3c7b9e467160a821cbac32a1fdfd75f13cb87c9deeb22099d16677a711126",
+      "git": "local_ignored",
+      "origin": "Poly Haven",
+      "source_url": "https://polyhaven.com/a/rocky_terrain_02",
+      "license": "CC0 per prior research; individual download not rechecked",
+      "review": "source_recorded"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/hercode-links.json",
+      "bytes": 188,
+      "sha256": "61a84b1a876653da603208ee2ff7f9be1dba96adadf9f6227343b8f4dac55260",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/hercode-page.txt",
+      "bytes": 6481,
+      "sha256": "489c15d7d7e9ed9e4c3b9b4f903a34adb31e04d9122308c7fc4554c58a2262e5",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-00.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-04.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-08.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-12.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-16.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-20.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-24.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-28.png",
+      "bytes": 526437,
+      "sha256": "ea12f776431fab7089a0f52b6581a436e9ce0d909f044212c8c6358691c5b5d2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-contact.jpg",
+      "bytes": 140347,
+      "sha256": "937aa117839cacb238a1d0c56f90bedd5e920fd3645a6a0fc02e8bbfde0ca89a",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-links.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-page.txt",
+      "bytes": 1409,
+      "sha256": "e3c80bf3ee01e60e36f554a676fcf72725a3c0bc09029138317ff462a0aaa46f",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/landsat-team-site.txt",
+      "bytes": 7998,
+      "sha256": "6cfe8b03f8588aa141b1041862f16852b6d9d600b13643a6c31a95f0396b5108",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-00.png",
+      "bytes": 686256,
+      "sha256": "ecdbc038088e9671291fe41117ddf2f3a8af744f50bf45b60ac77c926b49a297",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-04.png",
+      "bytes": 869238,
+      "sha256": "5733df73fe10bdd1c9cc1ae04fc8ecfc517bc7cc194260789b2c6ab7619bbf4f",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-05.png",
+      "bytes": 1720775,
+      "sha256": "da3b3d0e87890c5df2d227d2a0347b972676f7f640e37352d7a23592cc429acd",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-08.png",
+      "bytes": 780694,
+      "sha256": "b842a48a70b87d6723bafecf6a46e62be1708004bb340d2ffe189d9574de35f1",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-12.png",
+      "bytes": 784971,
+      "sha256": "0c925f0bfe75f1a52452cd3fe0cb77adaf42c20c1217b8473f5a646a18f6c59e",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-16.png",
+      "bytes": 749691,
+      "sha256": "5ec7ab32e0db943150ff1eb775cdb2ae15f2499c504ab504faf0f6969e9d7517",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-20.png",
+      "bytes": 765668,
+      "sha256": "5ddcd19cbc36fa970ade33e23b0493331fe981b3e6fa00e8fc0add2c2c0a499b",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-24.png",
+      "bytes": 1006910,
+      "sha256": "42082900d5b39bea1b6132ccde75eb11e158828cf130977bfee0f08be422928d",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-28.png",
+      "bytes": 963140,
+      "sha256": "f18cc4431cce855cffade282c62d1121b61b01b69911515590939176c164928f",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-browser.png",
+      "bytes": 1338927,
+      "sha256": "546c51e306a668a718a81c0dec28fb626bf146664d54413f4578d23aad03923a",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-contact.jpg",
+      "bytes": 263393,
+      "sha256": "8e1dd6d7426115128a554b3a23702d2e2d0e58703aaf19bbcaea30c3d0ec4bf7",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-links.json",
+      "bytes": 373,
+      "sha256": "313a8724d94cf9b99f2f0c0516a3016af7530d899bcea02421e4289bccfb1f17",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/pureflow-page.txt",
+      "bytes": 8092,
+      "sha256": "6a6a6e5cb72a075ceecf5ed188b0736be59fc4c8e0d735ae7910193160ceb849",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/resonant-contact.jpg",
+      "bytes": 141712,
+      "sha256": "4ddcf32d7b4704e5500770eb138efeb7f588d50912139b4de730cb78bfcfd6c9",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/resonant-links.json",
+      "bytes": 314,
+      "sha256": "488976466c6cf92e27275f23c01f2c55ea794e48c00ffda453adaabe8f71a6f2",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/resonant-page.txt",
+      "bytes": 12123,
+      "sha256": "e97d3851b622e11b2855ff0347db88bd950e13a97b6405cfe81c36a53403a111",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/resonant.en-orig.vtt",
+      "bytes": 5918,
+      "sha256": "27e8bedb2168d7fb9b83449ab5f566d43e243410bb5e31f661c7c64caad253f3",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/resonant.en.vtt",
+      "bytes": 5918,
+      "sha256": "27e8bedb2168d7fb9b83449ab5f566d43e243410bb5e31f661c7c64caad253f3",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/resonant.info.json",
+      "bytes": 568441,
+      "sha256": "0ed327f1828fefdffe049c10f19287b51ae536839751012a22bc5bb58935e738",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/resonant.webm",
+      "bytes": 1397405,
+      "sha256": "72283a31a0cae7576508e6d8f53b6a0816f29aa7753378f1a4186d8329bb618c",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/skyshield-links.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/skyshield-page.txt",
+      "bytes": 1395,
+      "sha256": "346581b6e789e06a33517ee00afefdbe7ca6aadcd4b3744f4b3c83a7ee1961d3",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/spacegenes-page.txt",
+      "bytes": 9111,
+      "sha256": "369071402501f71e7fdebe4738febe4e498c6f703b80c21d96eb881d8d4573c0",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/twisters-links.json",
+      "bytes": 296,
+      "sha256": "a20dbc6961adadb0a6119e0bc6eb66b51ff8970b618e9228de9447a658862328",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/twisters-page.txt",
+      "bytes": 10152,
+      "sha256": "fe5b1bb7c186ea81408f42778a252a29786fe50e29fe00fb4d025b6cd7bec651",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/waterwise-links.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/references/winning-demos/waterwise-page.txt",
+      "bytes": 1401,
+      "sha256": "cb30173940b38159f38e5824ba059f8772c45eabd0f33f1a67d4ff68203e58b5",
+      "git": "local_ignored",
+      "origin": "Space Apps demo research; original teams retain rights",
+      "license": "Not cleared for redistribution",
+      "review": "reference_only_do_not_publish"
+    },
+    {
+      "path": "tools/video/assets/refs/R1_EV1.png",
+      "bytes": 1597416,
+      "sha256": "5fef46e0d8289b5a04bbe7bfb9b587122e37bcbe30ea8d4f1bb4c02c8a0cd004",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/assets/refs/R2_EV2.png",
+      "bytes": 1689793,
+      "sha256": "ec6448c0e9c712334dd704769ad481b753a3c021ac661aa6b7b4351bdd6281a3",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/assets/refs/R3_IV.png",
+      "bytes": 1574055,
+      "sha256": "db9d4a8bd6d175d39dc8557603028071cdd09b1e0248974b088b73e328142086",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/assets/refs/R4_HAB.png",
+      "bytes": 1351772,
+      "sha256": "229e804e828a84513187437b19c48d703dc725f3c1473210cf03148e35811171",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/assets/refs/R5_SITE.png",
+      "bytes": 1608600,
+      "sha256": "b7d25a2ca155f2f3de4c471c90b9bdbea3b1ea3a6239cd82944fe194e27c0232",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0001.png",
+      "bytes": 677010,
+      "sha256": "3beb98549c0c9c33f7faac43ba1c3eda24839ab37c8d72302ad0cb2dc10c6bc4",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0013.png",
+      "bytes": 677572,
+      "sha256": "46aec13708bbea664990b1c48171cac64d1a86f58519086769ff65f9376a49eb",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0025.png",
+      "bytes": 677084,
+      "sha256": "6728e42b86fff1e70ff336bd7fb62d5202c49f5b5b34e1dd6fc694e594e96e0a",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0037.png",
+      "bytes": 677769,
+      "sha256": "60cee8f7c028b0d4245684fc72cc7a2a5a79bfa27c049602bab0da1ae45e1a08",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0049.png",
+      "bytes": 677921,
+      "sha256": "4f31b5e85c78bc180013aecf61dfae1c02e59be9681a283f339139610629c1e2",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0061.png",
+      "bytes": 677969,
+      "sha256": "c51850a7b3ebee5512c88715d2dc9dba04ed674cdaf794a0d87994ec3e630d7d",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0073.png",
+      "bytes": 678113,
+      "sha256": "4b84cb7d9967005c3700c462d316a262e40018df7e2f1f6778ccbe20b37bc99b",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0085.png",
+      "bytes": 678762,
+      "sha256": "f936da6f8434e7ef4ea068533fc6c923d950d17ea9f7dbf8c2032be6c5dd2aff",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0097.png",
+      "bytes": 679133,
+      "sha256": "da3c3511c0160e0695595fedb486dc8810eeb724522424be7e4ea02a0687fccc",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/assets/renders/W1_preview/0109.png",
+      "bytes": 678065,
+      "sha256": "28676a23f8336791fe6f00d2f98160a25177941dad347110ed1ef4c885e8a301",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/public/clips/S02_drill_overhead_v1.mp4",
+      "bytes": 1623784,
+      "sha256": "4d5f9c297dfebda937a191ab4b0919375d97e5c5793db6e1f07d8da754e637d3",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/public/data/change.png",
+      "bytes": 608,
+      "sha256": "0d12ca41bc8f4ba7d89603bdef5ac93d0ff753178af9f12ae3f9b24f59b7cc50",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/data/data.json",
+      "bytes": 45781,
+      "sha256": "ab958e3e7ddc5f3a51df08598dd14783901103421e620e9b1196ef7f93ba0405",
+      "git": "source_json",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/data/hirise_detail.png",
+      "bytes": 3989046,
+      "sha256": "67380c201197834ca444e0e36fe4ad3dfe619d63393b324d4f1ec6395cde883c",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/data/hirise_view.png",
+      "bytes": 4257798,
+      "sha256": "55b71869eb9e23890409b2838dda03675395cb5b3cabfc70a0acbbbb53a1bd3e",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/data/prob_after.png",
+      "bytes": 13716,
+      "sha256": "94e38acfe0331eba5ec3b50d393673f91c91bc3b05b8f2ba80873321485e7d59",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/data/prob_before.png",
+      "bytes": 13619,
+      "sha256": "6c33993804c34d77d688ef01fba64ea98f823c9e0cc7f0c07a1831997a1398fd",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/data/unc_after.png",
+      "bytes": 14360,
+      "sha256": "68bda8f6f5e8898d3b9e6c7df9a1ec7689addf1ac7066f74ec756f8955d56903",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/data/unc_before.png",
+      "bytes": 14239,
+      "sha256": "742e49b17439a4b844ef915739bf69dac4102130b5425f8149a5453d6b36e274",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/models/hdu1.glb",
+      "bytes": 516748,
+      "sha256": "3106557bea24c9ba012556ddbecf3740c39276dc369cf359b77225de97458cfe",
+      "git": "local_ignored",
+      "origin": "NASA 3D Resources; local copy",
+      "license": "Review source terms and remove visible logos before use",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/public/models/hdu2.glb",
+      "bytes": 710988,
+      "sha256": "616226ee31094ae1d71d1a4f974d6c7421c0227bca28b118de4dd97ce0495649",
+      "git": "local_ignored",
+      "origin": "NASA 3D Resources; local copy",
+      "license": "Review source terms and remove visible logos before use",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/public/models/z2.glb",
+      "bytes": 16933148,
+      "sha256": "4199762c27f8e730030a7bf9f1a453c203457e84c33b36247c0237a74f9a0c2a",
+      "git": "local_ignored",
+      "origin": "NASA 3D Resources; local copy",
+      "license": "Review source terms and remove visible logos before use",
+      "review": "pending_item_review"
+    },
+    {
+      "path": "tools/video/public/plates/F01_drill_overhead.png",
+      "bytes": 7924205,
+      "sha256": "c9462db07ef3afe63cd169362c5cdf7c16fdabda3a3ee1b957e01079560132af",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/public/plates/R1_EV1.png",
+      "bytes": 1597416,
+      "sha256": "5fef46e0d8289b5a04bbe7bfb9b587122e37bcbe30ea8d4f1bb4c02c8a0cd004",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/public/plates/R2_EV2.png",
+      "bytes": 1689793,
+      "sha256": "ec6448c0e9c712334dd704769ad481b753a3c021ac661aa6b7b4351bdd6281a3",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/public/plates/R3_IV.png",
+      "bytes": 1574055,
+      "sha256": "db9d4a8bd6d175d39dc8557603028071cdd09b1e0248974b088b73e328142086",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/public/plates/R4_HAB.png",
+      "bytes": 1351772,
+      "sha256": "229e804e828a84513187437b19c48d703dc725f3c1473210cf03148e35811171",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/public/plates/R5_SITE.png",
+      "bytes": 1608600,
+      "sha256": "b7d25a2ca155f2f3de4c471c90b9bdbea3b1ea3a6239cd82944fe194e27c0232",
+      "git": "local_ignored",
+      "origin": "Higgsfield generation; existing material only",
+      "license": "AI-generated; account terms and disclosure apply",
+      "review": "pending_final_use"
+    },
+    {
+      "path": "tools/video/public/site/s1094b-3d.json",
+      "bytes": 90512,
+      "sha256": "28e089405716cdeba4f7ffb4ea77b0b5a82f826c71b4480ff15482fb0a13bddb",
+      "git": "source_json",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/site/s1094b-detail.webp",
+      "bytes": 1304650,
+      "sha256": "64adeb5c0d2828caf8edef29a2341766a2b5859d6952fb2a1e898d5c5c607518",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/site/s1094b-dtm-detail.bin",
+      "bytes": 405000,
+      "sha256": "750a2e5f6d3f4d60381f357c75925c13185755b09985770bc0c42ddd9bfaa6f3",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/site/s1094b-dtm-overview.bin",
+      "bytes": 840000,
+      "sha256": "219d359b866b4a1e20509c0b743ae13629085f717d4d74ae81e78f21b6eb8d64",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/site/s1094b-overview.webp",
+      "bytes": 1156292,
+      "sha256": "89ad318abd70bffcc6d89796402a48a72bcbb8755c622047d2395be8c3d18739",
+      "git": "local_ignored",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/public/site/s1094b.json",
+      "bytes": 1927,
+      "sha256": "99381c6c8f3061d63d33478e9f1e5ce8a130a0bb57ab02eede68e165a391f1fc",
+      "git": "source_json",
+      "origin": "IceWalk planner / HiRISE derived assets, episode 2a633fb",
+      "credit": "NASA/JPL-Caltech/UArizona (imagery); IceWalk (planner)",
+      "license": "See docs/SOURCES.md; simulated measurement",
+      "review": "episode_frozen"
+    },
+    {
+      "path": "tools/video/out/check/g_100.png",
+      "bytes": 917796,
+      "sha256": "af442361ff5d3089f105f98a97272558a26cd3eb2a9194405caa29afcbc8a2da",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/check/g_225.png",
+      "bytes": 939049,
+      "sha256": "95499c5c1297dc9c581cd1af20079ae2734187a85d6443430b60860a357140f7",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/check/g_280.png",
+      "bytes": 914014,
+      "sha256": "06b74fc451e588073980b9f45a56c7f9deb37036593aebbc2d2d6396023d035a",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/check/g_350.png",
+      "bytes": 580999,
+      "sha256": "6c38d9b4d933c79aa24aad563136ee2f80299a02eb4d26f313716b3245564db8",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/check/g_40.png",
+      "bytes": 883556,
+      "sha256": "2ccef7b95071cc5bcc22c28a466b32430b752829327067e9475ffd9707a32fde",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/check/g_440.png",
+      "bytes": 971453,
+      "sha256": "9fc54cea07ee8c7daf5e623701794207c509f82ca9e171358bc2dee5c0f0a7a5",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/check/g_570.png",
+      "bytes": 562271,
+      "sha256": "a8de90a15657b4ff1ecb83156b0b2935f0f6c4376defdabcff3715f963410cb2",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/check/g_690.png",
+      "bytes": 654680,
+      "sha256": "5f82f70d121b28329a55bc09aca917b850b5950f781f960fc989ea56eecb19c1",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/global_preview_v1.mp4",
+      "bytes": 7239734,
+      "sha256": "d98580d8b5a0490cdbf8cfaf963a549547fabee80f673d7ae352bc22111c5168",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/ArHud.png",
+      "bytes": 199016,
+      "sha256": "2b277620d998b4bce4de27a4f4908d967918754cc0efc1330449f22ac3dd5afe",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/Campaign.png",
+      "bytes": 110838,
+      "sha256": "e944eb269002b189996217ee2a46af16f17c158ded408a7b0baa219ece12aee2",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/ConsoleMapAfter.png",
+      "bytes": 2376643,
+      "sha256": "ed09ee54510f643584062d18abb7d98e28146e9c4bd9d7b6d6bb24d65231c9d0",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/ConsoleMapBefore.png",
+      "bytes": 2365843,
+      "sha256": "9fdc5520e4e3905f9bc7f27aae32a7d9e8280f6a0aeef2a641b3c47e9474632e",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/DepthColumn.png",
+      "bytes": 405228,
+      "sha256": "1103dc69e1ea41b8643be9d0bcbc431e511727423c3058b3f3dbb65e7062a761",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/EvaWindow.png",
+      "bytes": 122758,
+      "sha256": "2f2ee08546e11bddaa360c5e6d8bc276e16c606f97e34d0f15ff8e3d7ffc8874",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/ProofConsole.png",
+      "bytes": 2779397,
+      "sha256": "84e792cc878ad371494e8741773c33134e985b611d19efe71b1216118fe819c4",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/Review.png",
+      "bytes": 152771,
+      "sha256": "dcc788366371f50e476b4540a4a4f02770af6bdd6b181620f7bed22d6444b68b",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/Tools.png",
+      "bytes": 100532,
+      "sha256": "78760e7508c7112376f9176f6cbf64db9d2da0f399d81e2af84d8dcbcbfd2957",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/out/ui/WristResult.png",
+      "bytes": 36975,
+      "sha256": "5ee4b582aff80f4afb26804446cfcde1c3f2d9dc379e1f439be11937477fe6ce",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/blender/renders/wide_eevee.png",
+      "bytes": 472374,
+      "sha256": "29950be89bdca88d6a90e263d762b6722ad8a8f46153364224f87fe3246602e5",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/blender/renders/wide_novol.png",
+      "bytes": 662455,
+      "sha256": "06a3f41e6edbeac68c235a20ea11d0f0606e590631a61bccaa9685548d274d08",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/blender/renders/wide_v2.png",
+      "bytes": 2673574,
+      "sha256": "c25e6cdf89a65cd2e81f3d85bbe15af05e11b379e9622d574e93da525844eec4",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/blender/renders/wide_v3.png",
+      "bytes": 2683243,
+      "sha256": "afae8bcae4972dce72b343fddc2bf92c5b0b39f3f7e5f1b8e4822420629601d5",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/blender/site.blend",
+      "bytes": 104201921,
+      "sha256": "49d3756d15002274b631cecd01c561bbbabc48f4cba5d9fd03ad6a7afbaf7e0d",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    },
+    {
+      "path": "tools/video/blender/site.blend1",
+      "bytes": 103479340,
+      "sha256": "bbe83a46f46fac0257e549b569d405b075d38fa7975641ee9f77efc9602718a0",
+      "git": "local_ignored",
+      "origin": "IceWalk production work",
+      "license": "Project work; review before final distribution",
+      "review": "pending"
+    }
+  ]
+}
