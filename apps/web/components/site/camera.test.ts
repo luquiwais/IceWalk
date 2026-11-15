@@ -73,7 +73,8 @@ describe("fitCamera", () => {
 describe("clampCamera", () => {
   it("keeps the zoom within 0.15 to 6 px/m", () => {
     expect(clampCamera({ cx: 300, cy: -2200, pxPerM: 50 }, VIEW, NO_INSETS, BOUNDS).pxPerM).toBe(MAX_PX_PER_M);
-    expect(clampCamera({ cx: 300, cy: -2200, pxPerM: 0.01 }, VIEW, NO_INSETS, BOUNDS).pxPerM).toBe(MIN_PX_PER_M);
+    const cover = Math.max(VIEW.width / (BOUNDS.xmax - BOUNDS.xmin), VIEW.height / (BOUNDS.ymax - BOUNDS.ymin));
+    expect(clampCamera({ cx: 300, cy: -2200, pxPerM: 0.01 }, VIEW, NO_INSETS, BOUNDS).pxPerM).toBe(Math.max(MIN_PX_PER_M, cover));
   });
 
   it("does not let the view leave the overview box", () => {
@@ -83,13 +84,14 @@ describe("clampCamera", () => {
     expect(top).toBeCloseTo(BOUNDS.ymax);
   });
 
-  it("centers the box in the free area when it is smaller than the view", () => {
-    const insets = { top: 0, right: 400, bottom: 0, left: 0 };
-    const cam = clampCamera({ cx: 9999, cy: 9999, pxPerM: MIN_PX_PER_M }, VIEW, insets, BOUNDS);
-    const free = freeArea(VIEW, insets);
-    const [sx, sy] = worldToScreen(cam, VIEW, (BOUNDS.xmin + BOUNDS.xmax) / 2, (BOUNDS.ymin + BOUNDS.ymax) / 2);
-    expect(sx).toBeCloseTo(free.cx);
-    expect(sy).toBeCloseTo(free.cy);
+  it("never zooms out past the imagery: the whole view stays covered", () => {
+    const cam = clampCamera({ cx: 9999, cy: 9999, pxPerM: MIN_PX_PER_M }, VIEW, NO_INSETS, BOUNDS);
+    const [left, top] = screenToWorld(cam, VIEW, 0, 0);
+    const [right, bottom] = screenToWorld(cam, VIEW, VIEW.width, VIEW.height);
+    expect(left).toBeGreaterThanOrEqual(BOUNDS.xmin - 1e-6);
+    expect(right).toBeLessThanOrEqual(BOUNDS.xmax + 1e-6);
+    expect(top).toBeLessThanOrEqual(BOUNDS.ymax + 1e-6);
+    expect(bottom).toBeGreaterThanOrEqual(BOUNDS.ymin - 1e-6);
   });
 });
 

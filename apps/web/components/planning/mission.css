@@ -329,3 +329,42 @@
 .mission-panel-window .mission-provenance { font-size: .625rem; color: var(--color-label-tertiary, var(--color-label-secondary)); }
 .mission-app .mission-panel-window .mission-status-values { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .mission-app .mission-panel-window .mission-status-values > :last-child { grid-column: auto; }
+
+/* A soft shade under the header and the right column, so the panels read on any terrain. */
+.mission-scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / .45), transparent 7rem),
+    linear-gradient(to left, rgb(0 0 0 / .45), transparent 32rem); }
+.mission-app[data-helmet="true"] .mission-scene::after, .mission-app[data-phase="site"] .mission-scene::after { display: none; }
+
+/* Map card (bottom left): layers on top, the legend under them, one glass window, nothing floating. */
+.mission-app .mission-map-tools { left: calc(var(--mission-edge) + 4rem); bottom: calc(var(--mission-timeline-y, 0px) + var(--mission-edge)); max-width: min(30rem, calc(100% - var(--dc-col, 400px) - 7rem)); }
+.mission-map-card { display: flex; flex-direction: column; gap: .5rem; padding: .5rem .625rem .625rem; border-radius: 1.25rem; }
+.mission-map-card .mission-layer-window { display: flex; flex-wrap: wrap; gap: .125rem; padding: 0; background: none; box-shadow: none; }
+.mission-map-card .mission-legend { pointer-events: auto; text-shadow: none; padding-inline: .25rem; flex-direction: column; align-items: start; gap: .375rem; color: var(--color-label); }
+.mission-legend-keys { display: flex; flex-wrap: wrap; gap: .25rem .875rem; }
+.mission-legend-keys > span { display: inline-flex; align-items: center; gap: .375rem; }
+.mission-legend-source { font-size: .625rem; color: var(--color-label-secondary); }
+.mission-map-card .mission-ice-legend { gap: .3rem; }
+.mission-map-card .mission-ice-known { font-size: .6875rem; color: var(--color-label-secondary); white-space: normal; }
+
+/* Plan panel: chips for the checks, compact numbers, a sticky approve bar. */
+.mission-objective-line { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mission-metrics-compact { gap: .5rem 1rem; }
+.mission-metrics-compact [data-slot=metric-value], .mission-metrics-compact dd { font-size: 1.25rem; }
+.mission-chips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .375rem; }
+.mission-chips > li { display: flex; flex-direction: column; gap: .125rem; padding: .375rem .5rem; border-radius: 10px; background: rgb(255 255 255 / .06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); min-width: 0; }
+.mission-chips > li > span { font-size: .625rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-label-secondary); }
+.mission-chips > li > strong { font-size: .8125rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+.mission-chips > li[data-level=advisory] { box-shadow: inset 0 0 0 1px var(--color-advisory, #9fe0f2); }
+.mission-chips > li[data-level=caution] { box-shadow: inset 0 0 0 1px var(--color-caution, #f0bf4f); }
+.mission-chips > li[data-level=warning] { box-shadow: inset 0 0 0 1px var(--color-warning, #f06a5a); }
+.mission-plan-footer { position: sticky; bottom: -1px; margin-top: .25rem; padding: .75rem 0 .25rem; display: flex; flex-direction: column; gap: .375rem; background: linear-gradient(to top, var(--mission-panel-bg, rgb(30 30 34 / .96)) 70%, transparent); }
+.mission-plan-footer > button { width: 100%; }
+/* After approval (and in the brief) the panel shrinks so the map and the timeline lead. */
+@media (min-width: 760px) { .mission-app[data-panel="compact"] { --dc-col: 330px; } }
+
+/* Legend in its own card above the layer buttons: border and solid ground so it always reads. */
+.mission-legend-card { padding: .625rem .75rem; border-radius: 1rem; background: rgb(18 20 26 / .82) !important; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .16) !important; }
+.mission-legend-card .mission-legend { pointer-events: auto; text-shadow: none; padding-inline: 0; flex-direction: column; align-items: start; gap: .375rem; color: var(--color-label); }
+.mission-legend-card .mission-ice-known { font-size: .6875rem; color: var(--color-label-secondary); white-space: normal; }

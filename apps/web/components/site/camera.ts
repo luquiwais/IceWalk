@@ -47,7 +47,9 @@ export function freeArea(view: Size, insets: Insets) {
  * it on that axis instead.
  */
 export function clampCamera(cam: Camera, view: Size, insets: Insets, bounds: Box): Camera {
-  const k = clamp(cam.pxPerM, MIN_PX_PER_M, MAX_PX_PER_M);
+  // Never zoom out past the imagery: the whole view stays covered, no black around it.
+  const cover = Math.max(view.width / (bounds.xmax - bounds.xmin), view.height / (bounds.ymax - bounds.ymin));
+  const k = clamp(cam.pxPerM, Math.min(Math.max(MIN_PX_PER_M, cover), MAX_PX_PER_M), MAX_PX_PER_M);
   const free = freeArea(view, insets);
   // World coordinates at the free area's edges for a given center.
   const dx = (free.cx - view.width / 2) / k; // world x offset of the free center from cx

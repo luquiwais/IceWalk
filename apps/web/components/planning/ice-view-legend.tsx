@@ -23,14 +23,15 @@ export function IceViewLegend({ map, mode }: { map: IceMap; mode: IceViewMode })
         <span className="mission-ice-axis" aria-hidden>Certain</span>
         <span className="mission-ice-grid" aria-hidden>
           {U_SAMPLES.map((u) => P_SAMPLES.map((p) => {
-            const [r, g, b, a] = cellColor(p, u);
-            return <i key={`${u}-${p}`} style={{ background: `rgb(${r} ${g} ${b} / ${(a / 255).toFixed(2)})` }} />;
+            // Legend swatches drawn opaque, so they read on the glass card (the map draws them translucent).
+            const [r, g, b] = cellColor(p, u);
+            return <i key={`${u}-${p}`} style={{ background: `rgb(${r} ${g} ${b})` }} />;
           }))}
         </span>
         <span className="mission-ice-axis" aria-hidden>Prior only</span>
         <span className="mission-ice-scale-labels" aria-hidden><span>Less likely</span><span>Likelier</span></span>
       </span>
-      <span className="mission-ice-known">Background {Math.round(map.prior_probability * 100)}%: regional prior · local evidence near craters and measurements covers {Math.round(known * 100)}% of the area · labels: real peak; halos drawn wider than the model&apos;s reach</span>
+      <span className="mission-ice-known" title={`Local evidence near craters and measurements covers ${Math.round(known * 100)}% of the area. Labels give each zone's real peak; halos are drawn wider than the model's reach.`}>Background {Math.round(map.prior_probability * 100)}% = regional prior · numbers = real peaks</span>
     </span>
   );
 }
