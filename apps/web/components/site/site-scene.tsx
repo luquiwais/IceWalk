@@ -100,8 +100,8 @@ export type SiteSceneProps = {
   raster?: SiteRaster;
   /** Where the EV is during the EVA (grid meters, heading clockwise from north), for the IV. */
   crew?: { x: number; y: number; headingDeg: number };
-  /** While set, a click on the map (not a drag) reports its grid point: used to place the habitat. */
-  onPick?: (xy: [number, number]) => void;
+  /** While set, the habitat marker can be dragged; on release it reports the new grid point. */
+  onMoveHabitat?: (xy: [number, number]) => void;
   className?: string;
   ref?: Ref<SiteSceneHandle>;
 };
@@ -209,14 +209,24 @@ export function SiteScene({
   insets = NO_INSETS,
   raster,
   crew,
-  onPick,
+  onMoveHabitat,
   className,
   ref,
 }: SiteSceneProps) {
   const helpId = useId();
   const habitat = useMemo(() => habitatOf(plan), [plan]);
-  const pickRef = useRef(onPick);
-  useEffect(() => { pickRef.current = onPick; }, [onPick]);
+  // Dragging the habitat: where the pointer started and is (screen px) and the grid point under it.
+  const [habDrag, setHabDrag] = useState<{ ox: number; oy: number; sx: number; sy: number; wx: number; wy: number } | null>(null);
+  const localPoint = (e: { clientX: number; clientY: number }): [number, number] => {
+    const rect = root.current?.getBoundingClientRect();
+    return rect ? [e.clientX - rect.left, e.clientY - rect.top] : [0, 0];
+  };
+  const dragTo = (sx: number, sy: number, ox: number, oy: number) => {
+    const cam = camera.current;
+    if (!cam) return;
+    const [wx, wy] = screenToWorld(cam, size.current, sx, sy);
+    setHabDrag({ ox, oy, sx, sy, wx: Math.round(wx), wy: Math.round(wy) });
+  };
   const crewRef = useRef(crew);
   useEffect(() => { crewRef.current = crew; }, [crew]);
   const { stations, dropped } = useMemo(() => sceneStations(plan, previousPlan), [plan, previousPlan]);
@@ -715,12 +725,10 @@ export function SiteScene({
       return { dist: Math.hypot(a[0] - b[0], a[1] - b[1]), mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] as [number, number] };
     };
 
-    let downAt: [number, number] | null = null;
     const onPointerDown = (e: PointerEvent) => {
       if (live.current.projection) return;
       autoFrame.current = false;
       if (e.button !== 0 || onObject(e)) return;
-      downAt = local(e);
       el.setPointerCapture?.(e.pointerId);
       pointers.set(e.pointerId, local(e));
       anim.current = null;
@@ -749,13 +757,6 @@ export function SiteScene({
       schedule();
     };
     const onPointerUp = (e: PointerEvent) => {
-      const up = local(e);
-      const cam = camera.current;
-      if (pickRef.current && downAt && cam && Math.hypot(up[0] - downAt[0], up[1] - downAt[1]) < 5) {
-        const [wx, wy] = screenToWorld(cam, size.current, up[0], up[1]);
-        pickRef.current([Math.round(wx), Math.round(wy)]);
-      }
-      downAt = null;
       pointers.delete(e.pointerId);
       pinch = pointers.size === 2 ? pinchState() : null;
       if (!pointers.size) delete el.dataset.dragging;
@@ -1043,8 +1044,34 @@ export function SiteScene({
             </div>
           </div>
         ) : null}
+        {habDrag ? (
+          <div className="site-hab-drag" aria-hidden>
+            <svg width="100%" height="100%"><line x1={habDrag.ox} y1={habDrag.oy} x2={habDrag.sx} y2={habDrag.sy} /></svg>
+            <div className="site-hab-ghost" style={{ left: habDrag.sx, top: habDrag.sy }}>HAB<span>x {signed(habDrag.wx)} m · y {signed(habDrag.wy)} m</span></div>
+          </div>
+        ) : null}
         <div ref={anchorRef("@habitat")} className="site-anchor">
-          <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(habitat[0])} m, y ${signed(habitat[1])} m`} data-site-object>
+          <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(habitat[0])} m, y ${signed(habitat[1])} m${onMoveHabitat ? ". Drag to move it and re-plan" : ""}`} data-site-object
+            data-draggable={onMoveHabitat ? "" : undefined} data-dragging={habDrag ? "" : undefined}
+            title={onMoveHabitat ? "Drag to move the habitat and re-plan" : undefined}
+            onPointerDown={onMoveHabitat ? (e) => {
+              if (e.button !== 0) return;
+              e.stopPropagation();
+              try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* no capture: the drag still works over the marker */ }
+              const [sx, sy] = localPoint(e);
+              dragTo(sx, sy, sx, sy);
+            } : undefined}
+            onPointerMove={onMoveHabitat ? (e) => {
+              if (!habDrag) return;
+              const [sx, sy] = localPoint(e);
+              dragTo(sx, sy, habDrag.ox, habDrag.oy);
+            } : undefined}
+            onPointerUp={onMoveHabitat ? () => {
+              const d = habDrag;
+              setHabDrag(null);
+              if (d && Math.hypot(d.sx - d.ox, d.sy - d.oy) > 6) onMoveHabitat([d.wx, d.wy]);
+            } : undefined}
+            onPointerCancel={onMoveHabitat ? () => setHabDrag(null) : undefined}>
             HAB
           </div>
         </div>

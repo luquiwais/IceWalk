@@ -509,10 +509,7 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
 .mission-detail .mission-text-link svg { width: .875rem; height: .875rem; }
 .mission-table-fixed { table-layout: fixed; }
 .mission-table td.mission-wrap { white-space: normal; line-height: 1.25; }
-/* Move habitat: a labeled button under the camera, a banner over the map while placing, crosshair cursor. */
-.mission-habitat-button { position: absolute; left: calc(100% + .625rem); top: .25rem; white-space: nowrap; }
-.mission-habitat-button[aria-pressed=true] { background: #0a84ff; color: #fff; }
-.mission-map-banner { position: absolute; z-index: 3; top: calc(var(--dc-header, 5rem) + .75rem); left: calc(var(--mission-edge) + 13rem); max-width: min(30rem, calc(100% - var(--dc-col, 400px) - 18rem)); margin: 0; padding: .5rem .875rem; border-radius: 999px; background: rgb(20 20 24 / .82); border: 1px solid rgb(255 255 255 / .2); font-size: .8125rem; color: #fff; text-align: center; backdrop-filter: blur(12px); }
+/* The planner's answer when it refuses a dragged habitat. */
+.mission-map-banner { position: absolute; z-index: 3; top: calc(var(--dc-header, 5rem) + .75rem); left: calc(var(--mission-edge) + 4.5rem); max-width: min(30rem, calc(100% - var(--dc-col, 400px) - 9rem)); margin: 0; padding: .5rem .875rem; border-radius: 999px; background: rgb(20 20 24 / .82); border: 1px solid rgb(255 255 255 / .2); font-size: .8125rem; color: #fff; text-align: center; backdrop-filter: blur(12px); }
 .mission-map-banner[data-level=caution] { border-color: var(--color-caution); color: var(--color-caution); }
-.mission-app[data-placing] .mission-scene { cursor: crosshair; }
 @media (max-width: 759px) { .mission-map-banner { left: 1rem; right: 1rem; max-width: none; border-radius: 1rem; } }
