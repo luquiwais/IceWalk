@@ -69,7 +69,7 @@ describe("Mission flow", () => {
     for (const name of ["Duration", "Walkback margin", "Distance out", "Route slope", "Comms gap", "Metabolic rate", "Carry per EV", "EVA window"]) expect(rules).toHaveTextContent(name);
     expect(screen.queryByRole("group", { name: "Plan timeline" })).not.toBeInTheDocument(); // opens on demand
     expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Bundled mock data");
-    expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Station · select for details");
+    expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Station · select");
     expect(screen.getByText("Step 2 of 5 · Plan", visible)).toBeInTheDocument();
   });
 
@@ -104,7 +104,7 @@ describe("Mission flow", () => {
 
   it("lets the planner drag the habitat before approval, and shows the planner's answer", async () => {
     render(<PlanningView initialPhase="plan" />);
-    expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Habitat · drag to move");
+    expect(screen.getByRole("group", { name: "Map legend" })).toHaveTextContent("Habitat · drag");
     await userEvent.click(screen.getByRole("button", { name: "Drag habitat" }));
     expect(await screen.findByText(/Habitat not moved: Moving the habitat needs the planner API/, visible)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Approve plan" }));

@@ -522,3 +522,11 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
 .mission-skeleton-rule { min-height: 2.625rem; }
 @media (prefers-reduced-motion: reduce) { .mission-skeleton { animation: none; } }
 .mission-dock[data-pending] .mission-dock-cell strong { color: var(--color-label-secondary); }
+.mission-ice-why { display: inline-grid; place-items: center; width: .875rem; height: .875rem; margin-left: .25rem; border-radius: 50%; border: 1px solid currentColor; font-size: .5625rem; font-style: italic; vertical-align: .05rem; cursor: help; pointer-events: auto; }
+/* Narrow screens (the panel is 360 px): the dock keeps PET, walkback, bingo, alerts and the toggle. */
+@media (max-width: 1100px) {
+  .mission-dock-bar, .mission-dock-long, .mission-dock-cell[data-k=walkback] small { display: none; }
+  .mission-dock-cell { padding: 0 .5rem; }
+  .mission-dock-line { padding-left: .875rem; }
+  .mission-dock-toggle { margin-left: auto; }
+}

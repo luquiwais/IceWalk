@@ -219,7 +219,8 @@ export function SiteScene({
   const helpId = useId();
   const habitat = useMemo(() => habitatOf(plan), [plan]);
   // Dragging the habitat: where the pointer started and is (screen px) and the grid point under it.
-  const [habDrag, setHabDrag] = useState<{ ox: number; oy: number; sx: number; sy: number; wx: number; wy: number; released?: string } | null>(null);
+  type HabDrag = { ox: number; oy: number; sx: number; sy: number; wx: number; wy: number; released?: string; area?: { x: number; y: number; w: number; h: number }; outside: boolean };
+  const [habDrag, setHabDrag] = useState<HabDrag | null>(null);
   // The ghost shows while dragging, and after release until this plan is replaced (or the move is refused).
   const ghost = habDrag && (!habDrag.released || (stale && habDrag.released === plan.plan_id)) ? habDrag : null;
   const localPoint = (e: { clientX: number; clientY: number }): [number, number] => {
@@ -230,7 +231,16 @@ export function SiteScene({
     const cam = camera.current;
     if (!cam) return;
     const [wx, wy] = screenToWorld(cam, size.current, sx, sy);
-    setHabDrag({ ox, oy, sx, sy, wx: Math.round(wx), wy: Math.round(wy) });
+    const a = plan.habitat_area_m;
+    // The allowed area in screen px (the camera does not move while dragging), and whether the point is out.
+    let area: HabDrag["area"];
+    if (a) {
+      const [x0, y0] = worldToScreen(cam, size.current, a.xmin, a.ymax);
+      const [x1, y1] = worldToScreen(cam, size.current, a.xmax, a.ymin);
+      area = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+    }
+    const outside = !!a && (wx < a.xmin || wx > a.xmax || wy < a.ymin || wy > a.ymax);
+    setHabDrag({ ox, oy, sx, sy, wx: Math.round(wx), wy: Math.round(wy), area, outside });
   };
   const crewRef = useRef(crew);
   useEffect(() => { crewRef.current = crew; }, [crew]);
@@ -1053,8 +1063,11 @@ export function SiteScene({
         ) : null}
         {ghost ? (
           <div className="site-hab-drag" aria-hidden>
-            <svg width="100%" height="100%"><line x1={ghost.ox} y1={ghost.oy} x2={ghost.sx} y2={ghost.sy} /></svg>
-            <div className="site-hab-ghost" style={{ left: ghost.sx, top: ghost.sy }}>HAB<span>x {signed(ghost.wx)} m · y {signed(ghost.wy)} m</span></div>
+            <svg width="100%" height="100%">
+              {ghost.area && !ghost.released ? <rect className="site-hab-area" x={ghost.area.x} y={ghost.area.y} width={ghost.area.w} height={ghost.area.h} /> : null}
+              <line x1={ghost.ox} y1={ghost.oy} x2={ghost.sx} y2={ghost.sy} />
+            </svg>
+            <div className="site-hab-ghost" data-outside={ghost.outside ? "" : undefined} style={{ left: ghost.sx, top: ghost.sy }}>HAB<span>{ghost.outside ? "Outside the planning area" : `x ${signed(ghost.wx)} m · y ${signed(ghost.wy)} m`}</span></div>
           </div>
         ) : null}
         <div ref={anchorRef("@habitat")} className="site-anchor">

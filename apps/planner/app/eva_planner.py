@@ -74,6 +74,11 @@ def eva_config(path: Path = CONFIG) -> EvaConfig:
     )
 
 
+def _area_dict(a: tuple[float, float, float, float] | None) -> dict | None:
+    """El área donde se acepta mover el hábitat, para que la web la dibuje."""
+    return None if a is None else {"xmin": a[0], "xmax": a[1], "ymin": a[2], "ymax": a[3]}
+
+
 def _area(v: dict | None) -> tuple[float, float, float, float] | None:
     if not v:
         return None
@@ -714,6 +719,7 @@ def build(
         "plan_id": f"plan-{uuid.uuid4().hex[:8]}",
         "replanned_from": replanned_from,
         "habitat_xy": [round(float(v), 1) for v in planner.habitat_xy],
+        "habitat_area_m": _area_dict(planner.cfg.habitat_area_m),
         "stations": stations,
         "route": {
             "type": "FeatureCollection",
