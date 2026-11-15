@@ -27,7 +27,7 @@ vi.mock("@/components/site3d/site-3d-stage", () => ({ Site3DStage: ({ jump, mode
     {reviewing ? <><button onClick={onAccept}>Copy, continue</button><button onClick={onReturn}>Copy, terminate</button></> : null}
   </div>;
 } }));
-import { demoPlan, demoReplan, orderedStations, measuringTool } from "@/lib/plan";
+import { demoConfirm, demoPlan, demoReplan, orderedStations, measuringTool } from "@/lib/plan";
 import { PlanningView } from "./planning-view";
 const first = orderedStations(demoPlan)[0];
 const second = orderedStations(demoPlan)[1];
@@ -67,6 +67,17 @@ describe("Mission flow", () => {
     expect(screen.getByRole("group", { name: "Plan timeline" })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "EVA status" })).toHaveTextContent("Bundled mock data");
     expect(screen.getByText("Step 2 of 5 · Plan", visible)).toBeInTheDocument();
+  });
+
+  it("lets the crew choose the EVA goal and says why each station is there", async () => {
+    render(<PlanningView initialPhase="plan" />);
+    const panel = screen.getByRole("region", { name: "EVA plan" });
+    expect(within(panel).getByText(first.reason!.split(":")[0], visible)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("tab", { name: "Confirm ice" }));
+    const c1 = orderedStations(demoConfirm)[0];
+    expect(await screen.findByRole("button", { name: new RegExp(`Station 1, ${c1.id}`) })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: `Map ${c1.id}` }));
+    expect(screen.getByRole("region", { name: "Why this station" })).toHaveTextContent(c1.reason!);
   });
 
   it("answers whether the EVA can be walked, and where the dust opacity comes from", async () => {

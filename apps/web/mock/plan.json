@@ -39,6 +39,7 @@
       "kind": "survey",
       "depth_median_m": 2.36,
       "depth_shallow_m": 1.37,
+      "reason": "First station on terrain unit 1 of 3 (lower thermal inertia, 395-475): tests whether ice follows the terrain.",
       "terrain_unit": 1,
       "comm_los": true,
       "soil_ti": 430
@@ -79,6 +80,7 @@
       "kind": "survey",
       "depth_median_m": 2.36,
       "depth_shallow_m": 1.37,
+      "reason": "First station on terrain unit 2 of 3 (middle thermal inertia, 475-508): tests whether ice follows the terrain.",
       "terrain_unit": 2,
       "comm_los": true,
       "soil_ti": 479
@@ -125,6 +127,7 @@
       "kind": "survey",
       "depth_median_m": 2.36,
       "depth_shallow_m": 1.37,
+      "reason": "Most uncertainty removed per minute of walking among reachable points (P(ice) 67%).",
       "terrain_unit": 2,
       "comm_los": true,
       "soil_ti": 501
@@ -165,6 +168,7 @@
       "kind": "survey",
       "depth_median_m": 2.26,
       "depth_shallow_m": 1.31,
+      "reason": "Most uncertainty removed per minute of walking among reachable points (P(ice) 70%).",
       "terrain_unit": 2,
       "comm_los": true,
       "soil_ti": 492
@@ -205,6 +209,7 @@
       "kind": "survey",
       "depth_median_m": 2.36,
       "depth_shallow_m": 1.37,
+      "reason": "Most uncertainty removed per minute of walking among reachable points (P(ice) 67%).",
       "terrain_unit": 2,
       "comm_los": true,
       "soil_ti": 492
@@ -245,6 +250,7 @@
       "kind": "survey",
       "depth_median_m": 2.36,
       "depth_shallow_m": 1.37,
+      "reason": "First station on terrain unit 3 of 3 (higher thermal inertia, 508-652): tests whether ice follows the terrain.",
       "terrain_unit": 3,
       "comm_los": true,
       "soil_ti": 508
@@ -667,6 +673,7 @@
       },
       "is_assumption": true
     },
+    "strategy": "learn",
     "terrain_units": [
       {
         "unit": 1,

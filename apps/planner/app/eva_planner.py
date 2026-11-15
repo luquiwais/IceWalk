@@ -40,6 +40,10 @@ CONFIG = Path(__file__).resolve().parents[1] / "config" / "eva.yaml"
 BASE_DOSE_MSV_PER_DAY = 0.67  # RAD/Curiosity, promedio GCR en superficie (Hassler et al. 2014)
 ICE_VARIABLES = {"ice_presence", "ice_depth"}
 SURVEY_COVERAGE = {"all_terrain_units", "highest_value"}
+# Estrategia de la EVA, la elige la tripulación: "learn" baja la incertidumbre del mapa (valor de
+# medir por minuto, cubre las unidades de terreno); "confirm" va donde es más probable
+# encontrar hielo (P(hielo) por minuto), para confirmar un recurso usable.
+STRATEGIES = ("learn", "confirm")
 
 
 @dataclass(frozen=True)
@@ -150,6 +154,7 @@ class Stop:
     kind: str  # "survey" (hielo, elegida por el GP) o "target" (posición fija de la STM)
     objectives: list[int] = field(default_factory=list)
     tools: list[str] = field(default_factory=list)
+    reason: str = ""  # por qué está acá, en palabras (se muestra en la web)
 
     def add(self, rank: int, tools: list[str]) -> None:
         if rank not in self.objectives:
@@ -199,7 +204,11 @@ class EvaPlanner:
         completed: list[dict] | None = None,
         config: EvaConfig | None = None,
         catalog: dict[str, dict] | None = None,
+        strategy: str = "learn",
     ) -> None:
+        if strategy not in STRATEGIES:
+            raise ValueError(f"strategy must be one of {STRATEGIES}")
+        self.strategy = strategy
         self.stm = stm
         self.tmap = tmap
         self.model = model
@@ -359,11 +368,24 @@ class EvaPlanner:
         # cuesta sumar la estación (caminata desde la anterior + herramientas). Sin esto, con
         # puntajes parecidos se elige una estación lejana por una diferencia mínima y la caminata
         # se come la EVA.
-        score = model.evaluate(self.cx[idx], self.cy[idx])["score"]
+        ev = model.evaluate(self.cx[idx], self.cy[idx])
+        score = ev["p_ice"] if self.strategy == "confirm" else ev["score"]
         rate = score / np.maximum(leg[idx] + dur, 1.0)
-        best = idx[np.lexsort((leg[idx], -rate))[0]]  # mejor valor por minuto; empate: más cerca
+        k = int(np.lexsort((leg[idx], -rate))[0])  # mejor por minuto; empate: más cerca
+        best = idx[k]
         stop = Stop(float(self.cx[best]), float(self.cy[best]), int(self.ccell[best]), "survey")
         stop.add(req.rank, req.tools)
+        p = float(ev["p_ice"][k])
+        if unit is not None and self.units:
+            u = self.units[unit - 1]
+            stop.reason = (f"First station on terrain unit {unit} of 3 ({u['label'].lower()}, "
+                           f"{u['ti_min']}-{u['ti_max']}): tests whether ice follows the terrain.")
+        elif self.strategy == "confirm":
+            stop.reason = (f"Highest chance of ice per minute of walking among reachable points: "
+                           f"P(ice) {p:.0%} within {req.depth_m:g} m.")
+        else:
+            stop.reason = ("Most uncertainty removed per minute of walking among reachable "
+                           f"points (P(ice) {p:.0%}).")
         return stop
 
     def _insert_target(self, stops: list[Stop], req: Requirement, xy) -> bool:
@@ -379,6 +401,7 @@ class EvaPlanner:
                 return False
         stop = Stop(x, y, cell, "target")
         stop.add(req.rank, req.tools)
+        stop.reason = f"Fixed target of objective {req.rank} in the science plan (STM)."
         best, best_end = None, math.inf
         for i in range(len(stops) + 1):
             trial = [*stops[:i], stop, *stops[i:]]
@@ -432,7 +455,8 @@ class EvaPlanner:
             done = sum(1 for st in self.completed if req.rank in st.get("objective_ranks", []))
             need = max(req.min_stations - done, 0)
             got = 0
-            if req.coverage == "all_terrain_units" and self.cunit is not None:
+            if (req.coverage == "all_terrain_units" and self.cunit is not None
+                    and self.strategy == "learn"):
                 # Primero una estación por unidad que todavía no tenga medición.
                 covered = {self.unit_at(self.tmap.snap(*st["position"])) for st in self.completed
                            if req.rank in st.get("objective_ranks", [])}
@@ -448,7 +472,8 @@ class EvaPlanner:
             if got < need:
                 self.alerts.append(_alert("caution", f"Objective {req.rank}: {done + got} of "
                                           f"{req.min_stations} required stations fit the EVA."))
-            if req.coverage == "all_terrain_units" and self.cunit is None:
+            no_units = self.cunit is None and self.strategy == "learn"
+            if req.coverage == "all_terrain_units" and no_units:
                 self.alerts.append(_alert("advisory", f"Objective {req.rank}: terrain units not "
                                           "available (no thermal inertia layer); stations "
                                           "chosen by ice potential."))
@@ -540,10 +565,11 @@ def build(
     replanned_from: str | None = None,
     decisions: bool = True,
     config: EvaConfig | None = None,
+    strategy: str = "learn",
 ) -> dict:
     """Plan completo en el formato de `plan.schema.json`."""
     planner = EvaPlanner(stm, tmap, model, start_xy=start_xy, elapsed_min=elapsed_min,
-                         completed=completed, config=config)
+                         completed=completed, config=config, strategy=strategy)
     stops = planner.plan_stops()
     sched = planner.schedule(stops)
     planned_model = planner.planned_model
@@ -590,6 +616,8 @@ def build(
             "depth_median_m": round(float(ev["depth_median_m"][i]), 2),
             "depth_shallow_m": round(float(ev["depth_shallow_m"][i]), 2),
         })
+        if s.reason:
+            stations[-1]["reason"] = s.reason
         unit = planner.unit_at(s.cell)
         if unit is not None:
             stations[-1]["terrain_unit"] = unit
@@ -700,6 +728,7 @@ def build(
             "ice_threshold_m": model.threshold_m,
             "craters_in_model": model.craters,
             "feasibility": feas,
+            "strategy": planner.strategy,
             **({"terrain_units": planner.units} if planner.units else {}),
         },
         "alerts": alerts,
@@ -770,7 +799,8 @@ def _decision_points(stm, tmap, model, planner, stations, sched: Schedule, confi
             obs = from_measurement(meas, tool)
             sub_model = model.with_observations([obs] if obs else [])
             sub = EvaPlanner(stm, tmap, sub_model, start_xy=(x, y), elapsed_min=visit.end_min,
-                             completed=stations[: i + 1], config=config)
+                             completed=stations[: i + 1], config=config,
+                             strategy=planner.strategy)
             stops = sub.plan_stops()
             ids = [station_id(s.x, s.y) for s in stops]
             extra = []

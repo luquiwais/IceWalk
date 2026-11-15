@@ -32,6 +32,12 @@ export function StationDetail({
 
   return (
     <>
+      {station.reason ? (
+        <section className="mission-why" aria-label="Why this station">
+          <span className="mission-kicker">Why here</span>
+          <span>{station.reason}</span>
+        </section>
+      ) : null}
       {station.planetary_protection === "sensitive" ? (
         <StatusBadge level="advisory">
           Planetary protection: sampling protocol applies

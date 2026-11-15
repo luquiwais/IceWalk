@@ -17,7 +17,7 @@ import { Body } from "@icewalk/ui/text";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
 import { useIceMap } from "@/lib/use-ice-map";
 import { ICE_RADIUS_M, ICE_VIEW_MODES, renderIceView, type IceViewMode } from "@/lib/ice-view";
-import { bearing, demoPlan, demoReplan, measuringTool, nextStation, orderedStations, stationBlock, stationById, type Measurement, type Plan, type Station } from "@/lib/plan";
+import { bearing, demoConfirm, demoPlan, demoReplan, measuringTool, nextStation, orderedStations, stationBlock, stationById, type Measurement, type Plan, type Station } from "@/lib/plan";
 import { formatOdds } from "@/lib/format";
 import { HABITAT_XY } from "@/components/site/site-data";
 import { MissionStatus } from "./mission-status";
@@ -79,7 +79,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const sceneRef = useRef<SiteSceneHandle>(null);
   const panelOrigin = useRef<HTMLElement | null>(null);
   const reopenRef = useRef<HTMLButtonElement | null>(null);
-  const session = usePlanSession({ fallback: { plan: demoPlan, replan: demoReplan } });
+  const session = usePlanSession({ fallback: { plan: demoPlan, replan: demoReplan, confirm: demoConfirm } });
   const plan: Plan = session.plan;
   const iceMap = useIceMap(plan.plan_id, session.source);
   const raster: SiteRaster | undefined = useMemo(() => {
@@ -170,7 +170,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView = "ev" }: {
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
     : phase === "plan" ? station
       ? <section className="mission-stack" aria-label="Station detail"><Footnote>{formatOdds(station.p_ice)} chance of ice at the STM threshold</Footnote><StationDetail plan={plan} station={station} /></section>
-      : <PlanPanel plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} planSource={session.source} onSelect={selectStation} onHover={hoverStation} onNext={() => goTo("rehearse")} />
+      : <PlanPanel plan={plan} measurements={session.measurements} hoveredId={hoveredId} source={describeSource(session)} planSource={session.source} pending={pending} onStrategy={(s) => { setStationId(null); void session.setStrategy(s); }} onSelect={selectStation} onHover={hoverStation} onNext={() => goTo("rehearse")} />
       : phase === "rehearse" ? <RehearsePanel plan={plan} onJump={setJump} onNext={() => goTo("execute")} />
         : phase === "execute" ? <section className="mission-stack" aria-label="EVA">
           <SegmentedControl label="EVA view" value={evaView} options={[{ value: "ev", label: "EV1 helmet" }, { value: "iv", label: "IV console" }]} onValueChange={(v) => setEvaView(v as "ev" | "iv")} />

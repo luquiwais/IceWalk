@@ -14,6 +14,7 @@ import threading
 from contextlib import asynccontextmanager
 from datetime import timedelta
 from functools import lru_cache
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -53,6 +54,8 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)  # el mapa: ~250 kB, compr
 class PlanRequest(BaseModel):
     stm: dict | None = None
     measurements: list[dict] = []
+    # "learn": bajar la incertidumbre; "confirm": ir donde es más probable el hielo.
+    strategy: Literal["learn", "confirm"] = "learn"
 
 
 class ReplanRequest(BaseModel):
@@ -60,6 +63,7 @@ class ReplanRequest(BaseModel):
     measurement: dict
     elapsed_min: float
     stm: dict | None = None
+    strategy: Literal["learn", "confirm"] | None = None  # None: la del plan anterior
 
 
 def _traverse_map(stm: dict) -> TraverseMap | None:
@@ -112,10 +116,12 @@ def _map(stm: dict, entry: dict | None = None) -> dict:
     return entry["map"]
 
 
-def _store(plan: dict, stm: dict, measurements: list[dict], completed: list[dict]) -> dict:
+def _store(plan: dict, stm: dict, measurements: list[dict], completed: list[dict],
+           strategy: str = "learn") -> dict:
     plan["site_assessment"] = site_card(stm)  # plan y re-plan, real o mock
+    plan["summary"].setdefault("strategy", strategy)
     _PLANS[plan["plan_id"]] = {"plan": plan, "stm": stm, "measurements": measurements,
-                               "completed": completed}
+                               "completed": completed, "strategy": strategy}
     return plan
 
 
@@ -162,9 +168,9 @@ def plan(req: PlanRequest) -> dict:
     stm = req.stm or DEFAULT_STM
     tmap = _traverse_map(stm)
     if tmap is None:
-        return _store(mock_planner.build_plan(stm), stm, list(req.measurements), [])
-    p = eva_planner.build(stm, tmap, _ice_model(stm, req.measurements))
-    return _store(p, stm, list(req.measurements), [])
+        return _store(mock_planner.build_plan(stm), stm, list(req.measurements), [], req.strategy)
+    p = eva_planner.build(stm, tmap, _ice_model(stm, req.measurements), strategy=req.strategy)
+    return _store(p, stm, list(req.measurements), [], req.strategy)
 
 
 @app.post("/replan")
@@ -173,13 +179,14 @@ def replan(req: ReplanRequest) -> dict:
     if entry is None:
         raise HTTPException(404, "Unknown plan_id")
     stm = req.stm or entry["stm"]
+    strategy = req.strategy or entry.get("strategy", "learn")
     current, meas = entry["plan"], req.measurement
     measurements = [*entry["measurements"], meas]
     tmap = _traverse_map(stm)
     if tmap is None or current["summary"].get("is_mock"):
         p = mock_planner.replan(stm, current, meas, req.elapsed_min)
         p["replan"] = replan_check.assess(current, p, meas, stm)
-        return _store(p, stm, measurements, entry["completed"])
+        return _store(p, stm, measurements, entry["completed"], strategy)
 
     # Hechas: las estaciones del plan hasta la medida, inclusive (o el punto medido).
     done = [s for s in current["stations"] if s["id"] == meas["station_id"]]
@@ -191,14 +198,14 @@ def replan(req: ReplanRequest) -> dict:
     p = eva_planner.build(
         stm, tmap, _ice_model(stm, measurements),
         start_xy=tuple(meas["position"]), elapsed_min=req.elapsed_min,
-        completed=completed, replanned_from=current["plan_id"],
+        completed=completed, replanned_from=current["plan_id"], strategy=strategy,
     )
     result = {"ice": "Ice", "no_ice": "No ice", "inconclusive": "Inconclusive result"}
     p["alerts"].insert(0, {"level": "advisory", "source": "planner",
                            "message": f"{result[meas['result']]} at {meas['station_id']}. "
                                       "EVA replanned."})
     p["replan"] = replan_check.assess(current, p, meas, stm)
-    return _store(p, stm, measurements, completed)
+    return _store(p, stm, measurements, completed, strategy)
 
 
 @app.get("/plan/{plan_id}")

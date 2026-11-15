@@ -86,4 +86,7 @@ out.mkdir(parents=True, exist_ok=True)
 (out / "measurement.json").write_text(json.dumps(meas, indent=2))
 (out / "map.json").write_text(json.dumps(ice_map))  # ~250 kB: sin sangría
 (out / "campaign.json").write_text(json.dumps(client.get("/campaign").json(), indent=2))
+confirm = client.post("/plan", json={"strategy": "confirm"}).json()
+confirm["plan_id"] = "plan-demo0003"
+(out / "plan-confirm.json").write_text(json.dumps(confirm, indent=2))
 print("ok:", [p.name for p in out.iterdir()], "| planner:", client.get("/health").json())

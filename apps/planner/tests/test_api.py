@@ -66,3 +66,12 @@ def test_get_plan_and_campaign():
 
 def test_spaceweather_demo():
     assert client.get("/spaceweather").json()["alert"]["level"] == "warning"
+
+
+def test_strategy_changes_the_plan_and_every_station_says_why():
+    learn = client.post("/plan", json={"strategy": "learn"}).json()
+    confirm = client.post("/plan", json={"strategy": "confirm"}).json()
+    jsonschema.validate(confirm, PLAN_SCHEMA)
+    assert learn["summary"]["strategy"] == "learn" and confirm["summary"]["strategy"] == "confirm"
+    assert all(s.get("reason") for s in learn["stations"] + confirm["stations"])
+    assert client.post("/plan", json={"strategy": "guess"}).status_code == 422

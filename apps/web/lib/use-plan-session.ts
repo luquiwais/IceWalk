@@ -43,7 +43,7 @@ export type PlanSessionOptions = {
   /** Defaults to NEXT_PUBLIC_PLANNER_API_URL; null forces mock mode. */
   baseUrl?: string | null;
   /** Bundled plans used without an API. `replan` is what a negative result loads. */
-  fallback?: { plan: Plan; replan: Plan };
+  fallback?: { plan: Plan; replan: Plan; confirm?: Plan };
   stm?: Record<string, unknown>;
   fetch?: typeof fetch;
   timeoutMs?: number;
@@ -55,8 +55,12 @@ export type PlanSession = {
   start: () => Promise<void>;
   logMeasurement: (measurement: Measurement, elapsedMin: number) => Promise<LogOutcome>;
   reset: () => void;
+  /** Re-plans from the habitat with another strategy: learn (reduce uncertainty) or confirm (go where ice is likeliest). */
+  setStrategy: (strategy: Strategy) => Promise<void>;
   dispose: () => void;
 };
+
+export type Strategy = "learn" | "confirm";
 
 export function createPlanSession(options: PlanSessionOptions = {}): PlanSession {
   const fallback = options.fallback ?? { plan: demoPlan, replan: demoReplan };
@@ -67,6 +71,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
 
   /** The nominal plan from POST /plan; reset returns to it (the server keeps it by plan_id). */
   let nominal: Plan | null = null;
+  let strategy: Strategy = "learn";
   let generation = 0;
   let controller: AbortController | null = null;
   let state: PlanSessionState = {
@@ -98,7 +103,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     set({ status: "loading" });
     const [health, plan] = await Promise.allSettled([
       getHealth({ ...api, signal, timeoutMs: Math.min(api.timeoutMs ?? 5_000, 5_000) }),
-      postPlan({ ...stm, measurements: [] }, { ...api, signal }),
+      postPlan({ ...stm, measurements: [], strategy }, { ...api, signal }),
     ]);
     if (id !== generation) return;
     if (plan.status === "fulfilled") {
@@ -167,7 +172,17 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
       return;
     }
     begin();
-    set({ ...mockState(fallback.plan), status: "ready" });
+    set({ ...mockState(strategy === "confirm" && fallback.confirm ? fallback.confirm : fallback.plan), status: "ready" });
+  }
+
+  async function setStrategy(next: Strategy) {
+    strategy = next;
+    if (!baseUrl) {
+      begin();
+      set({ ...mockState(next === "confirm" && fallback.confirm ? fallback.confirm : fallback.plan), status: "ready" });
+      return;
+    }
+    await start();
   }
 
   return {
@@ -179,6 +194,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     start,
     logMeasurement,
     reset,
+    setStrategy,
     dispose() {
       generation += 1;
       controller?.abort();
@@ -195,7 +211,7 @@ export function usePlanSession(options: PlanSessionOptions = {}) {
     void session.start();
     return () => session.dispose();
   }, [session]);
-  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset };
+  return { ...state, logMeasurement: session.logMeasurement, reset: session.reset, setStrategy: session.setStrategy };
 }
 
 /** One discreet line for the UI about where the plan comes from. */

@@ -1,6 +1,7 @@
 import { Button } from "@icewalk/ui/button";
 import { ListRow, ListSection } from "@icewalk/ui/list";
 import { Metric, MetricList } from "@icewalk/ui/metric";
+import { SegmentedControl } from "@icewalk/ui/segmented-control";
 import { Footnote, Title3 } from "@icewalk/ui/text";
 import { formatDuration, formatNumber, formatPercent } from "@/lib/format";
 import { evaLimitMin, measurementSummary, measuringTool, missionObjective, nextBingo, nextStation, orderedStations, toolName, totalEquipmentMass, type Measurement, type Plan } from "@/lib/plan";
@@ -14,8 +15,9 @@ import { NextStep } from "./phases";
 const MOBILITY = { walk: "Walkable", cart: "Hand cart advised", rover: "Rover advised" } as const;
 
 /** Phase 2: the plan in numbers, three go/no-go checks, the stations, and the next step. */
-export function PlanPanel({ plan, measurements, hoveredId, source, planSource, onSelect, onHover, onNext }: {
-  plan: Plan; measurements: Measurement[]; hoveredId: string | null; source: string; planSource: PlanSource;
+export function PlanPanel({ plan, measurements, hoveredId, source, planSource, pending, onStrategy, onSelect, onHover, onNext }: {
+  plan: Plan; measurements: Measurement[]; hoveredId: string | null; source: string; planSource: PlanSource; pending?: boolean;
+  onStrategy?: (strategy: "learn" | "confirm") => void;
   onSelect: (id: string) => void; onHover: (id: string | null) => void; onNext: () => void;
 }) {
   const limit = evaLimitMin(plan);
@@ -27,6 +29,14 @@ export function PlanPanel({ plan, measurements, hoveredId, source, planSource, o
   return (
     <section aria-label="EVA plan" className="mission-stack">
       <Footnote tone="secondary">{missionObjective(plan) ?? "Mission objective unavailable"}</Footnote>
+      {onStrategy ? (
+        <section className="mission-stack" aria-label="EVA goal">
+          <SegmentedControl label="EVA goal" value={plan.summary.strategy ?? "learn"} options={[{ value: "learn", label: "Reduce uncertainty" }, { value: "confirm", label: "Confirm ice" }]} onValueChange={(v) => onStrategy(v as "learn" | "confirm")} />
+          <Footnote tone="secondary">{pending ? "Replanning..." : (plan.summary.strategy ?? "learn") === "confirm"
+            ? "Stations go where ice is likeliest, to confirm a usable resource."
+            : "Stations go where a measurement teaches the most, one per terrain type first."}</Footnote>
+        </section>
+      ) : null}
       <MetricList aria-label="Plan numbers" className="mission-metrics">
         <Metric label={limit ? `Duration · limit ${formatDuration(limit)}` : "Duration"} value={formatDuration(plan.summary.duration_min)} />
         <Metric label="Traverse" value={formatNumber(plan.summary.distance_km, 2)} unit="km" />
@@ -66,7 +76,7 @@ export function StationList({ plan, measurements, hoveredId, onSelect, onHover }
         return <Button key={s.id} variant="plain" shape="rounded" className="mission-station-row" data-hovered={hoveredId === s.id}
           aria-label={`Station ${s.order}, ${s.id}, ${formatPercent(s.p_ice)}, ${s.duration_min} min, ${toolName(measuringTool(s))}`}
           onClick={() => onSelect(s.id)} onPointerEnter={() => onHover(s.id)} onPointerLeave={() => onHover(null)} onFocus={() => onHover(s.id)} onBlur={() => onHover(null)}>
-          <span className="mission-order">{s.order}</span><span className="mission-station-copy"><strong>{s.id}</strong><span>{measured ? `Measured · ${measurementSummary(measured)}` : `${s.duration_min} min · ${toolName(measuringTool(s))}`}</span></span><span className="mission-station-probability"><strong>{formatPercent(s.p_ice)}</strong><span>{measured ? "Measured" : next?.id === s.id ? "Next" : "Remaining"}</span></span>
+          <span className="mission-order">{s.order}</span><span className="mission-station-copy"><strong>{s.id}</strong><span>{measured ? `Measured · ${measurementSummary(measured)}` : `${s.duration_min} min · ${toolName(measuringTool(s))}`}</span>{s.reason && !measured ? <span className="mission-station-why">{s.reason.split(":")[0]}</span> : null}</span><span className="mission-station-probability"><strong>{formatPercent(s.p_ice)}</strong><span>{measured ? "Measured" : next?.id === s.id ? "Next" : "Remaining"}</span></span>
         </Button>;
       })}
     </section>

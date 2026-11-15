@@ -48,7 +48,7 @@ export type CatalogTool = { id: string; name?: string; [key: string]: unknown };
 /** GET /eva-window (eva_window.schema.json); the UI reads it through lib/eva-window. */
 export type EvaWindowPayload = Record<string, unknown> & { best?: unknown; sols?: unknown };
 
-export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[] };
+export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[]; strategy?: "learn" | "confirm" };
 export type ReplanRequest = {
   plan_id: string;
   measurement: Measurement;
