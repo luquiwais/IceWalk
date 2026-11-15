@@ -50,6 +50,21 @@
       "height_px": 3600,
       "valid_fraction": 1.0,
       "bytes": 1304650
+    },
+    "context": {
+      "file": "/site/s1094b-context.webp",
+      "product": "THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018",
+      "box_m": {
+        "xmin": -9700.0,
+        "ymin": -12200.0,
+        "xmax": 10300.0,
+        "ymax": 7800.0
+      },
+      "m_per_px": 25.0,
+      "width_px": 800,
+      "height_px": 800,
+      "credit": "THEMIS Day IR controlled mosaic, 100 m (NASA/JPL-Caltech/ASU, via NASA Mars Trek)",
+      "bytes": 55468
     }
   },
   "registration": {
