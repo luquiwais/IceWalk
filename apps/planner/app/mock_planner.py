@@ -227,6 +227,7 @@ def build_plan(
         "mission_id": stm["mission_id"],
         "plan_id": f"plan-{uuid.uuid4().hex[:8]}",
         "replanned_from": replanned_from,
+        "habitat_xy": [HABITAT_XY[0], HABITAT_XY[1]],
         "stations": kept,
         "route": {
             "type": "FeatureCollection",

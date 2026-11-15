@@ -1,6 +1,7 @@
 import json
 
 import jsonschema
+import pytest
 from fastapi.testclient import TestClient
 
 from app.contracts import CONTRACTS
@@ -78,6 +79,16 @@ def test_strategy_changes_the_plan_and_every_station_says_why():
     assert client.post("/plan", json={"strategy": "guess"}).status_code == 422
 
 
+REAL = client.get("/health").json()["planner"] == "real"  # CI has no terrain layers: mock planner
+needs_terrain = pytest.mark.skipif(not REAL, reason="needs data/processed terrain layers")
+
+
+def test_every_plan_reports_its_habitat():
+    plan = client.post("/plan", json={}).json()
+    assert len(plan["habitat_xy"]) == 2 and all(isinstance(v, float) for v in plan["habitat_xy"])
+
+
+@needs_terrain
 def test_plan_reports_its_habitat_and_the_operator_can_move_it():
     base = client.post("/plan", json={}).json()
     assert base["habitat_xy"] == [300.0, -2200.0]
@@ -94,6 +105,7 @@ def test_plan_reports_its_habitat_and_the_operator_can_move_it():
     assert re["habitat_xy"] == moved["habitat_xy"]
 
 
+@needs_terrain
 def test_habitat_outside_the_planning_area_is_rejected_with_a_reason():
     r = client.post("/plan", json={"habitat_xy": [3000, 4000]})
     assert r.status_code == 422
