@@ -141,3 +141,79 @@ def test_walkback_is_the_fastest_route_to_the_habitat():
     straight = ((fx - hx) ** 2 + (fy - hy) ** 2) ** 0.5
     assert body["distance_m"] >= straight * 0.95 and body["minutes"] > 0
     assert _walkback(plan["plan_id"], 99999, 0).status_code == 422
+
+
+def _edits(plan, **moves):
+    """The plan's stations in order, as /evaluate takes them, with some moved by (dx, dy)."""
+    out = []
+    for s in sorted(plan["stations"], key=lambda s: s["order"]):
+        dx, dy = moves.get(s["id"], (0, 0))
+        out.append({"id": s["id"], "position": [s["position"][0] + dx, s["position"][1] + dy]})
+    return out
+
+
+def test_evaluate_validates_its_input():
+    assert client.post("/evaluate", json={"plan_id": "plan-nope", "stations": [
+        {"position": [0, 0]}]}).status_code == 404
+    pid = client.post("/plan", json={}).json()["plan_id"]
+    assert client.post("/evaluate", json={"plan_id": pid, "stations": []}).status_code == 422
+    assert client.post("/plan", json={"tools": ["laser_sword"]}).status_code == 422
+
+
+@needs_terrain
+def test_evaluate_keeps_untouched_stations_and_scores_a_move():
+    base = client.post("/plan", json={}).json()
+    same = client.post("/evaluate", json={"plan_id": base["plan_id"], "stations": _edits(base),
+                                          "decisions": True})
+    assert same.status_code == 200
+    same = same.json()
+    jsonschema.validate(same, PLAN_SCHEMA)
+    order = sorted(base["stations"], key=lambda s: s["order"])
+    assert [s["id"] for s in same["stations"]] == [s["id"] for s in order]
+    assert abs(same["summary"]["duration_min"] - base["summary"]["duration_min"]) < 1
+    assert same["replanned_from"] == base["plan_id"]
+    assert same["decision_points"]  # committed edit: bingo and options, as a planned EVA
+    # Move the first station 150 m east: it gets a new id, the operator's reason, new numbers.
+    first = sorted(base["stations"], key=lambda s: s["order"])[0]
+    moved = client.post("/evaluate", json={"plan_id": base["plan_id"],
+                                           "stations": _edits(base, **{first["id"]: (150, 0)})})
+    moved = moved.json()
+    jsonschema.validate(moved, PLAN_SCHEMA)
+    new_first = sorted(moved["stations"], key=lambda s: s["order"])[0]
+    assert new_first["reason"] == "Placed by the operator."
+    assert new_first["id"] != first["id"]
+    assert moved["summary"]["distance_km"] != base["summary"]["distance_km"]
+
+
+@needs_terrain
+def test_evaluate_says_why_a_move_is_not_viable():
+    base = client.post("/plan", json={}).json()
+    pid = base["plan_id"]
+    # Out of the terrain model: refused with a reason.
+    far = [{"position": [9000, 9000]}]
+    r = client.post("/evaluate", json={"plan_id": pid, "stations": far})
+    assert r.status_code == 422 and "terrain model" in r.json()["detail"]
+    # Far but on the grid: the plan comes back with a negative margin and a warning.
+    edits = _edits(base)
+    edits.append({"position": [1700, -800]})
+    edits.append({"position": [-1100, -3600]})
+    plan = client.post("/evaluate", json={"plan_id": pid, "stations": edits}).json()
+    jsonschema.validate(plan, PLAN_SCHEMA)
+    assert plan["summary"]["min_walkback_margin_min"] < 0
+    assert any(a["level"] == "warning" and "Not viable" in a["message"] for a in plan["alerts"])
+
+
+@needs_terrain
+def test_plan_with_the_tools_the_crew_carries():
+    all_tools = client.post("/plan", json={}).json()
+    no_radar = client.post("/plan", json={"tools": ["core_drill", "sample_kit"]}).json()
+    jsonschema.validate(no_radar, PLAN_SCHEMA)
+    carried = {e["tool"] for e in no_radar["equipment"]}
+    assert carried <= {"core_drill", "sample_kit"}
+    assert {e["tool"] for e in all_tools["equipment"]} != carried
+    # The replan keeps the crew's tools.
+    first = sorted(no_radar["stations"], key=lambda s: s["order"])[0]
+    meas = {**MEAS, "station_id": first["id"], "position": first["position"], "result": "no_ice"}
+    re = client.post("/replan", json={"plan_id": no_radar["plan_id"], "measurement": meas,
+                                      "elapsed_min": 60}).json()
+    assert {e["tool"] for e in re["equipment"]} <= {"core_drill", "sample_kit"}

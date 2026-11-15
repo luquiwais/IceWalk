@@ -302,6 +302,9 @@ describe("describeSource", () => {
     error: null,
     apiConfigured: false,
     habitatError: null,
+    editBase: null,
+    editError: null,
+    tools: null,
   };
 
   it("never presents bundled data as planner output", () => {

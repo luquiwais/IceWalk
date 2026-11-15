@@ -292,3 +292,9 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 
 - Las ventanas EV1 e IV se sincronizan con `BroadcastChannel` (`apps/web/lib/use-eva-link.ts`), sin servidor ni líder: cada cambio local sale como foto (plan, mediciones, re-plan en revisión, TERMINATE, walkback, aprobación) y las otras ventanas la adoptan; la que se abre tarde pide el estado. La pose del EV va aparte, a 10 Hz. Motivo: el video en pantalla dividida, sin agregar estado en la API.
 - Con un IV conectado, el casco muestra "Awaiting IV call", el IV da la orden ("Concur" o "Call EVA terminate", que puede cambiar) y el EV la copia ("Copy, continue" / "Copy, terminate"). Sin IV conectado, el EV decide como antes y la decisión del IV en la misma ventana se aplica directo. Motivo: xEVA Con Ops 4.3.2 y 8.1 sin trabar la demo de una sola ventana.
+
+## 2026-11-15 · Editar el plan y elegir herramientas
+
+- Edición en Plan antes de aprobar: arrastrar una estación en el mapa (como el hábitat) o quitarla desde su detalle. Mientras se arrastra, el fantasma muestra el veredicto del planificador para ese punto (`POST /evaluate` sin puntos de decisión, cada 90 ms); al soltar, el plan editado reemplaza al otro y el panel muestra "Viable / Viable, tight / Not viable", antes y después (duración y margen) y "Undo". Motivo: Luqui pidió respuesta instantánea de si la reubicación es viable; nada lo decide la web, todo sale del planificador.
+- Herramientas: interruptores en el detalle de "Carry per EV" (lo que puede llevar la tripulación); apagar una re-planifica desde el hábitat sin ella (`POST /plan` con `tools`). Motivo: que se vea el costo de dejar el radar, la decisión central del proyecto.
+- Sin "agregar estación" ni reordenar a mano por ahora: falta tiempo antes de la entrega; el endpoint ya los acepta (estación sin `id`, orden de la lista).

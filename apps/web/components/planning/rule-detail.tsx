@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { habitatOf } from "@/components/site/site-data";
 import type { FlightRule } from "@/lib/flight-rules";
 import { formatNumber, formatPercent } from "@/lib/format";
-import { decisionPointFor, missionConstraints, orderedStations, stationBlock, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
+import { catalogTools, decisionPointFor, missionConstraints, orderedStations, stationBlock, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
 import type { EvaWindow } from "@/lib/use-eva-window";
 import { EvaWindowCard } from "./eva-window-card";
 import { clock } from "./parts";
@@ -21,7 +21,11 @@ function Fact({ label, value, note }: { label: string; value: string; note?: str
  * The detail of one flight rule: what supports that number, from the plan, the planner's feasibility, the
  * STM and the EVA window. Each rule shows its own evidence; nothing repeats the tile's headline.
  */
-export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRule; plan: Plan; window: EvaWindow; onTimeline: () => void }) {
+export function RuleDetail({ rule, plan, window, onTimeline, tools }: {
+  rule: FlightRule; plan: Plan; window: EvaWindow; onTimeline: () => void;
+  /** Tools the crew may take (null: all): a switch per tool re-plans with that set. */
+  tools?: { carried: readonly string[] | null; onChange: (tools: string[]) => void; disabled?: boolean };
+}) {
   const f = plan.summary.feasibility;
   const stations = orderedStations(plan);
   const head = <h3 className="mission-detail-title">{rule.name} <span className="mission-detail-value">{rule.value} · {rule.limit.replace("*", "")}</span></h3>;
@@ -112,15 +116,45 @@ export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRul
     const perEv = f?.carry.per_crew_kg;
     return <section className="mission-detail" aria-label="Gear list">{head}
       <p className="mission-detail-lead">{formatNumber(mass.known_kg, 1)} kg known across {equipment.length} items, split evenly{crew != null ? ` between ${crew} EVs` : ""}{mass.unknown ? `; ${mass.unknown} item${mass.unknown === 1 ? " has" : "s have"} no mass yet` : ""}.</p>
-      <table className="mission-table mission-table-fixed">
+      {tools ? <ToolSwitches plan={plan} tools={tools} /> : <table className="mission-table mission-table-fixed">
         <colgroup><col /><col style={{ width: "4.5rem" }} /><col style={{ width: "6.5rem" }} /></colgroup>
         <thead><tr><th>Tool</th><th>Mass</th><th>Used</th></tr></thead>
         <tbody>{equipment.map((item) => <tr key={item.tool}><td className="mission-wrap">{item.count > 1 ? `${item.count} × ` : ""}{toolName(item.tool)}</td><td>{item.mass_kg == null ? "Unknown" : `${formatNumber(item.mass_kg, 1)} kg`}</td><td>{/while walking/i.test(item.justification ?? "") ? "While walking" : "At stations"}</td></tr>)}</tbody>
-      </table>
+      </table>}
       <Footnote tone="secondary">{heaviest && perEv != null && heaviest.mass_kg > perEv ? `The even split is an average: the ${toolName(heaviest.tool).toLowerCase()} alone weighs more, so one EV carries it. ` : ""}Allowance: 50 lbm of tools and samples per crewmember (NASA ICES-2026-127).</Footnote>
     </section>;
   }
 
   // EVA window
   return <section className="mission-detail" aria-label="Window detail">{head}<EvaWindowCard data={window} /></section>;
+}
+
+/**
+ * The catalog with a switch per tool: what the crew may take. The plan says what it uses of them; turning
+ * one off re-plans from the habitat without it (POST /plan with the list), so the radar-first choice and
+ * its cost in mass and time are visible.
+ */
+const SHORT_TOOL: Record<string, string> = { neutron_spectrometer: "Neutron spectrometer", gpr: "Ground radar", core_drill: "Core drill", camera_spectrometer: "Camera / spectrometer", sample_kit: "Sample containers" };
+
+function ToolSwitches({ plan, tools }: { plan: Plan; tools: { carried: readonly string[] | null; onChange: (tools: string[]) => void; disabled?: boolean } }) {
+  const all = catalogTools();
+  const allowed = new Set(tools.carried ?? all.map((t) => t.id));
+  const used = new Map((plan.equipment ?? []).map((e) => [e.tool, /while walking/i.test(e.justification ?? "") ? "While walking" : "At stations"]));
+  const toggle = (id: string, on: boolean) => {
+    const next = all.map((t) => t.id).filter((t) => (t === id ? on : allowed.has(t)));
+    if (next.length) tools.onChange(next);
+  };
+  return (
+    <ul className="mission-tools" aria-label="Tools the crew may take">
+      {all.map((t) => (
+        <li key={t.id}>
+          <label title={t.depth_m ? `Reaches ${t.depth_m} m` : undefined}>
+            <input type="checkbox" checked={allowed.has(t.id)} disabled={tools.disabled || (allowed.has(t.id) && allowed.size === 1)} onChange={(e) => toggle(t.id, e.target.checked)} />
+            <span>{SHORT_TOOL[t.id] ?? toolName(t.id)}{t.depth_m ? ` · ${t.depth_m} m` : ""}</span>
+          </label>
+          <small>{t.mass_kg == null ? "mass unknown" : `${formatNumber(t.mass_kg, 1)} kg`} · {allowed.has(t.id) ? used.get(t.id) ?? "Not used" : "Left behind"}</small>
+        </li>
+      ))}
+    </ul>
+  );
 }

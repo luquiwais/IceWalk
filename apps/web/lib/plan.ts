@@ -252,6 +252,11 @@ export function diffPlans(before: Plan, after: Plan): PlanDiff {
 type CatalogTool = { id: string; name: string; mass_kg?: number | null; depth_m?: number; measures?: string[] };
 const TOOLS = new Map((toolsCatalog as CatalogTool[]).map((t) => [t.id, t]));
 
+/** Every tool in the certified catalog, in catalog order (the crew may take any of them). */
+export function catalogTools(): readonly { id: string; name: string; mass_kg?: number | null; depth_m?: number; mode?: string }[] {
+  return toolsCatalog as (CatalogTool & { mode?: string })[];
+}
+
 /** Tool name from the certified catalog (contracts/examples/tools.catalog.json). */
 export function toolName(id: string): string {
   return TOOLS.get(id)?.name ?? id.replaceAll("_", " ");
