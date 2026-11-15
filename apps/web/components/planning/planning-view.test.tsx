@@ -61,7 +61,8 @@ describe("Mission flow", () => {
   it("answers at the EVA level with the flight rules, and keeps the timeline and provenance", async () => {
     render(<PlanningView initialPhase="plan" />);
     const panel = screen.getByRole("region", { name: "EVA plan" });
-    expect(panel).toHaveTextContent(/^(GO|NO-GO)\./);
+    expect(panel).toHaveTextContent(/^(GO|NO-GO) ·/);
+    expect(within(within(panel).getByRole("navigation", { name: "Review stations" })).getAllByRole("button")).toHaveLength(orderedStations(demoPlan).length);
     const rules = within(panel).getByRole("list", { name: "Flight rules" });
     expect(within(rules).getAllByRole("listitem")).toHaveLength(8);
     for (const name of ["Duration", "Walkback margin", "Distance out", "Route slope", "Comms gap", "Metabolic rate", "Carry per EV", "EVA window"]) expect(rules).toHaveTextContent(name);

@@ -1,31 +1,28 @@
 import { Button } from "@icewalk/ui/button";
-import { ListRow, ListSection } from "@icewalk/ui/list";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
 import { Footnote } from "@icewalk/ui/text";
-import { Check, ChevronLeft } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { flightRules, worstLevel, type FlightRule, type RuleDetail } from "@/lib/flight-rules";
 import { formatDuration, formatNumber } from "@/lib/format";
-import { missionObjective, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
+import { missionObjective, orderedStations, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
 import { useEvaWindow } from "@/lib/use-eva-window";
 import type { PlanSource } from "@/lib/use-plan-session";
 import { EvaWindowCard } from "./eva-window-card";
 import { FeasibilityCard } from "./feasibility-card";
 import { FlightRuleTiles } from "./flight-rules";
-import { RowLabel, Value } from "./parts";
 
-type Detail = RuleDetail;
+type Detail = Exclude<RuleDetail, "timeline">;
 const DETAIL_TITLE: Record<Detail, string> = { walk: "Can we walk it?", window: "EVA window & space weather", gear: "Gear" };
 
 /** The panel's one-line answer: GO or NO-GO, the size of the EVA and which rules need attention. */
 function answer(plan: Plan, rules: readonly FlightRule[]) {
   const worst = worstLevel(rules);
   const flagged = rules.filter((r) => r.level !== "go");
-  const size = `${plan.stations.length} stations in ${formatDuration(plan.summary.duration_min)}`;
+  const size = `${plan.stations.length} stations · ${formatDuration(plan.summary.duration_min)}`;
   const go = rules.length - flagged.length;
-  if (worst === "warning") return { verdict: "NO-GO", text: `${size}. Over the limit: ${flagged.filter((r) => r.level === "warning").map((r) => r.name).join(", ")}.` };
-  if (!flagged.length) return { verdict: "GO", text: `${size}. All ${rules.length} flight rules within limits.` };
-  return { verdict: "GO", text: `${size}. ${go} of ${rules.length} flight rules clear; check ${flagged.map((r) => r.name).join(", ")}.` };
+  if (worst === "warning") return { verdict: "NO-GO", text: `${size} · over the limit: ${flagged.filter((r) => r.level === "warning").map((r) => r.name).join(", ")}` };
+  return { verdict: "GO", text: `${size} · ${go} of ${rules.length} rules clear` };
 }
 
 /**
@@ -34,10 +31,14 @@ function answer(plan: Plan, rules: readonly FlightRule[]) {
  * rules, value against limit; each rule opens what supports it. Stations live on the map and in the dock;
  * selecting one opens its composition (station-detail.tsx). After approval it folds to a card.
  */
-export function PlanPanel({ plan, source, planSource, pending, approved, onApprove, onEdit, onStrategy, onNext }: {
+export function PlanPanel({ plan, source, planSource, pending, approved, onApprove, onEdit, onStrategy, onNext, onSelect, onTimeline }: {
   plan: Plan; source: string; planSource: PlanSource; pending?: boolean;
   approved: boolean; onApprove: () => void; onEdit: () => void;
   onStrategy?: (strategy: "learn" | "confirm") => void; onNext: () => void;
+  /** Open a station's composition (and zoom the map to it). */
+  onSelect: (id: string) => void;
+  /** Open the dock's timeline: where duration and the walkback margin are drawn. */
+  onTimeline: () => void;
 }) {
   const [detail, setDetail] = useState<Detail | null>(null);
   const evaWindow = useEvaWindow(plan.plan_id, planSource);
@@ -52,7 +53,7 @@ export function PlanPanel({ plan, source, planSource, pending, approved, onAppro
     return (
       <section aria-label="Approved plan" className="mission-stack mission-plan-approved">
         <p className="mission-approved-line"><Check aria-hidden />Plan approved · {strategy === "confirm" ? "goal: confirm ice" : "goal: reduce uncertainty"}</p>
-        <p className="mission-answer"><strong>{verdict}.</strong> {text}</p>
+        <p className="mission-answer"><strong>{verdict}</strong> · {text}</p>
         <Footnote tone="secondary">Flight rules {go} of {rules.length} GO · select a station on the map or in the timeline for its details.</Footnote>
         <div className="mission-next"><Button variant="prominent" onClick={onNext}>Brief the EVA</Button><Button variant="plain" onClick={onEdit}>Edit plan</Button></div>
       </section>
@@ -66,24 +67,32 @@ export function PlanPanel({ plan, source, planSource, pending, approved, onAppro
         <h3 className="mission-detail-title">{DETAIL_TITLE[detail]}</h3>
         {detail === "walk" ? <FeasibilityCard plan={plan} /> : null}
         {detail === "window" ? <EvaWindowCard planId={plan.plan_id} source={planSource} /> : null}
-        {detail === "gear" ? <>
-          <ListSection footer={`${formatNumber(mass.known_kg, 1)} kg known${mass.unknown ? ` · ${mass.unknown} items without mass` : ""}`}>{equipment.map((item) => <ListRow key={item.tool} trailing={<Value>{item.count} × {item.mass_kg == null ? "Unknown mass" : `${item.mass_kg} kg`}</Value>}><RowLabel title={toolName(item.tool)} detail={item.justification} /></ListRow>)}</ListSection>
-          <Footnote tone="secondary">Model & assumptions: {plan.summary.craters_in_model !== undefined ? `${plan.summary.craters_in_model} craters in the model. ` : ""}Probabilities are model estimates, not confirmed ice. Habitat position and instrument performance include assumptions; see the project sources. {plan.plan_id} · {source}</Footnote>
-        </> : null}
+        {detail === "gear" ? <section className="mission-detail" aria-label="Gear list">
+          <table className="mission-table">
+            <thead><tr><th>Tool</th><th>Count</th><th>Mass</th><th>For</th></tr></thead>
+            <tbody>{equipment.map((item) => <tr key={item.tool}><td>{toolName(item.tool)}</td><td>{item.count}</td><td>{item.mass_kg == null ? "Unknown" : `${item.mass_kg} kg`}</td><td>{(item.justification ?? "").replace("Objectives", "Obj.").replace("Objective", "Obj.")}</td></tr>)}</tbody>
+          </table>
+          <Footnote tone="secondary">{formatNumber(mass.known_kg, 1)} kg known{mass.unknown ? `, ${mass.unknown} item${mass.unknown === 1 ? "" : "s"} without a mass yet` : ""}. Probabilities are model estimates{plan.summary.craters_in_model !== undefined ? ` from ${plan.summary.craters_in_model} craters` : ""}, not confirmed ice; habitat position and instrument performance include assumptions. {plan.plan_id} · {source}</Footnote>
+        </section> : null}
       </section>
     );
   }
 
   return (
     <section aria-label="EVA plan" className="mission-plan-eva">
-      <p className="mission-answer"><strong>{verdict}.</strong> {text}</p>
+      <p className="mission-answer"><strong>{verdict}</strong> · {text}</p>
       {onStrategy ? (
         <section className="mission-goal" aria-label="EVA goal">
           <div title={`${missionObjective(plan) ?? "EVA goal"}. ${strategy === "confirm" ? "Stations go where ice is likeliest, to confirm a usable resource." : "Stations go where a measurement teaches the most, one per terrain type first."}`}><SegmentedControl label="EVA goal" value={strategy} options={[{ value: "learn", label: "Reduce uncertainty" }, { value: "confirm", label: "Confirm ice" }]} onValueChange={(v) => onStrategy(v as "learn" | "confirm")} /></div>
           {pending ? <Footnote tone="secondary" role="status">Replanning...</Footnote> : null}
         </section>
       ) : null}
-      <FlightRuleTiles rules={rules} onOpen={setDetail} />
+      <FlightRuleTiles rules={rules} onOpen={(d) => (d === "timeline" ? onTimeline() : setDetail(d))} />
+      <nav className="mission-station-strip" aria-label="Review stations">
+        <span>Review stations</span>
+        <span className="mission-station-chips">{orderedStations(plan).map((st) => <button type="button" key={st.id} aria-label={`Review station ${st.order}, ${st.id}`} title={`${st.id} · P(ice) ${Math.round(st.p_ice * 100)}%`} onClick={() => onSelect(st.id)}>{st.order}</button>)}</span>
+        <ChevronRight aria-hidden />
+      </nav>
       <div className="mission-plan-footer">
         <Button variant="prominent" onClick={onApprove} disabled={pending}>Approve plan</Button>
       </div>

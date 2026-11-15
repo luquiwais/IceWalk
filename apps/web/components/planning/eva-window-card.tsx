@@ -1,11 +1,9 @@
 "use client";
 
-import { ListRow, ListSection } from "@icewalk/ui/list";
-import { Body, Footnote } from "@icewalk/ui/text";
+import { Footnote } from "@icewalk/ui/text";
 import { formatNumber } from "@/lib/format";
 import type { PlanSource } from "@/lib/use-plan-session";
 import { useEvaWindow, type EvaWindow, type WindowLevel } from "@/lib/use-eva-window";
-import { RowLabel, Value } from "./parts";
 
 type Level = WindowLevel;
 
@@ -27,24 +25,15 @@ export function EvaWindowCard({ planId, source }: { planId: string; source: Plan
   const rec = data.recommended;
   const sw = data.space_weather;
   return (
-    <section aria-label="EVA window and weather" className="mission-stack">
-      <Body>
-        {rec ? <>Recommended: sol {rec.sol}, {rec.start_ltst}–{rec.end_ltst} local solar time · <span className="mission-verdict" data-verdict={rec.go ? "GO" : "NO_GO"}>{rec.go ? "GO" : "Hold"}</span></> : "No safe window in the next sols."}
-      </Body>
-      <ListSection footer={data.climate_source ? `Climate: ${data.climate_source.split(",")[0]} (analogue at 48°N).` : undefined}>
-        <ListRow trailing={<Value>{sw ? `${sw.events.length} events` : "—"}</Value>}>
-          <RowLabel title="Space weather · NASA DONKI" detail={sw ? `${sw.events.map((e) => e.kind.toUpperCase()).join(", ") || "Quiet"}${data.mode === "demo" ? " · demo period Aug 2023" : " · live"}` : "Unavailable"} />
-        </ListRow>
-        <ListRow trailing={<Value>τ {data.dust ? formatNumber(data.dust.tau, 1) : "—"}</Value>}>
-          <RowLabel title="Dust opacity" detail={dustDetail(data.dust)} />
-        </ListRow>
-        {(data.stations ?? []).slice(0, 6).map((s) => (
-          <ListRow key={s.station_id} trailing={<Value>{LEVEL_LABEL[s.level]}</Value>}>
-            <RowLabel title={`${s.station_id} · ${s.arrival_ltst}`} detail={`Sun ${formatNumber(s.sun_elevation_deg, 0)}° · ${formatNumber(s.temperature_k - 273.15, 0)} °C · wind p95 ${formatNumber(s.wind_p95_mps, 0)} m/s`} />
-          </ListRow>
-        ))}
-      </ListSection>
-      {data.notes ? <Footnote tone="secondary">{data.notes}</Footnote> : null}
+    <section aria-label="EVA window and weather" className="mission-detail">
+      <p className="mission-detail-lead"><strong>NASA DONKI:</strong> {sw ? (sw.events.map((e) => e.kind === "sep" ? "SEP" : e.kind.replace(/_/g, " ").replace(/^cme/i, "CME")).join(", ") || "quiet") : "unavailable"}{sw && data.mode === "demo" ? " (demo period)" : ""} · <strong>Dust</strong> τ {data.dust ? formatNumber(data.dust.tau, 1) : "—"}, <span title={dustDetail(data.dust)}>{data.dust?.source === "hope_emirs" ? "Hope EMIRS (UAE)" : data.dust?.reported ? "crew report" : "assumed"}</span></p>
+      <table className="mission-table">
+        <thead><tr><th>Station</th><th>LTST</th><th>Sun</th><th>Temp.</th><th>Wind p95</th><th>Level</th></tr></thead>
+        <tbody>{(data.stations ?? []).slice(0, 8).map((st) => (
+          <tr key={st.station_id} data-level={st.level}><td>{st.station_id}</td><td>{st.arrival_ltst}</td><td>{formatNumber(st.sun_elevation_deg, 0)}°</td><td>{formatNumber(st.temperature_k - 273.15, 0)} °C</td><td>{formatNumber(st.wind_p95_mps, 0)} m/s</td><td>{LEVEL_LABEL[st.level]}</td></tr>
+        ))}</tbody>
+      </table>
+      <Footnote tone="secondary">Stations at planned arrival{rec ? ` on sol ${rec.sol}` : ""}. Viking 2 climate (48°N analogue); thresholds are assumptions.</Footnote>
     </section>
   );
 }
