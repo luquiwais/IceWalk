@@ -14,7 +14,7 @@
   .mission-app .mission-status-values > :last-child { grid-column: 1 / -1; }
   .mission-app .mission-status-source { flex-wrap: wrap; }
 
-  .mission-app .mission-panel-presence { top: var(--mission-panel-top, 200px); right: var(--mission-edge); bottom: calc(var(--mission-timeline-y, 9rem) + .75rem); width: var(--dc-col); }
+  .mission-app .mission-panel-presence { top: var(--dc-header); right: var(--mission-edge); bottom: calc(var(--mission-timeline-y, 0px) + var(--mission-edge)); width: var(--dc-col); }
   .mission-app .mission-show-panel { top: calc(var(--dc-header) + 1rem); right: calc(var(--dc-col) + 2 * var(--mission-edge)); }
 
   .mission-app .mission-camera { top: calc(var(--dc-header) + 1rem); }

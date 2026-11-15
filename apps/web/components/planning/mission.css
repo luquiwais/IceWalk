@@ -1,6 +1,6 @@
 /* Composition in the existing visionOS point scale. Glass is owned by @icewalk/ui.
    No transform, opacity, filter or stacking context on ancestors of its materials. */
-.mission-app { --mission-edge: 1.5rem; position: relative; height: 100dvh; min-height: 36rem; overflow: hidden; background: #141311; font-variant-numeric: tabular-nums; }
+.mission-app { --mission-edge: 1.5rem; position: relative; height: 100dvh; overflow: hidden; background: #141311; font-variant-numeric: tabular-nums; }
 .mission-heading { position: absolute; top: var(--mission-edge); left: var(--mission-edge); display: flex; flex-direction: column; gap: .25rem; pointer-events: none; text-shadow: 0 1px 5px #000; }
 .mission-heading > [data-text-style] { color: #fff; }
 .mission-heading [data-text-style=footnote] { font-size: .8125rem; }
@@ -319,3 +319,13 @@
 .mission-why { display: flex; flex-direction: column; gap: .25rem; padding: .625rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); font-size: .875rem; line-height: 1.4; }
 .mission-kicker { font-size: .6875rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-label-secondary); }
 .mission-station-why { display: block; font-size: .75rem; color: var(--color-label-tertiary, var(--color-label-secondary)); white-space: normal; }
+
+/* EVA status as a strip at the top of the phase window (was a separate, squeezed window). */
+.mission-panel-window .mission-status { padding: .5rem 1.25rem .75rem; border-bottom: 1px solid var(--color-separator); gap: .375rem; }
+.mission-panel-window .mission-status-values { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.mission-panel-window .mission-status-values span { font-size: .6875rem; color: var(--color-label-secondary); }
+.mission-panel-window .mission-status-values strong { font-size: .9375rem; white-space: normal; }
+.mission-panel-window .mission-status-source [data-slot=status-badge] { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+.mission-panel-window .mission-provenance { font-size: .625rem; color: var(--color-label-tertiary, var(--color-label-secondary)); }
+.mission-app .mission-panel-window .mission-status-values { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.mission-app .mission-panel-window .mission-status-values > :last-child { grid-column: auto; }

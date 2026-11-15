@@ -58,13 +58,13 @@ describe("Mission flow", () => {
     expect(screen.getByRole("heading", { name: "Where do we go, and is it safe?" })).toBeInTheDocument();
   });
 
-  it("shows the plan numbers, go/no-go checks, stations, timeline and provenance", () => {
+  it("shows the plan numbers, go/no-go checks, stations, timeline and provenance", async () => {
     render(<PlanningView initialPhase="plan" />);
     const panel = screen.getByRole("region", { name: "EVA plan" });
     expect(within(panel).getByLabelText("Plan numbers")).toBeInTheDocument();
     for (const s of orderedStations(demoPlan)) expect(within(panel).getByRole("button", { name: new RegExp(`Station ${s.order}, ${s.id}`) })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Go / no-go checks" })).toHaveTextContent("Comms with the habitat");
-    expect(screen.getByRole("group", { name: "Plan timeline" })).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Plan timeline" })).not.toBeInTheDocument(); // opens on demand
     expect(screen.getByRole("region", { name: "EVA status" })).toHaveTextContent("Bundled mock data");
     expect(screen.getByText("Step 2 of 5 · Plan", visible)).toBeInTheDocument();
   });
@@ -106,6 +106,7 @@ describe("Mission flow", () => {
 
   it("shares selection and hover between map, list and timeline, and returns to the plan", async () => {
     render(<PlanningView initialPhase="plan" />);
+    await userEvent.click(screen.getByRole("button", { name: "Timeline" }));
     const timeline = screen.getByRole("group", { name: "Plan timeline" });
     const block = within(timeline).getByRole("button", { name: new RegExp(first.id) });
     await userEvent.hover(block);
@@ -119,6 +120,7 @@ describe("Mission flow", () => {
 
   it("navigates timeline station blocks with arrows and Enter", async () => {
     render(<PlanningView initialPhase="plan" />);
+    await userEvent.click(screen.getByRole("button", { name: "Timeline" }));
     const timeline = screen.getByRole("group", { name: "Plan timeline" });
     within(timeline).getByRole("button", { name: new RegExp(first.id) }).focus();
     await userEvent.keyboard("{ArrowRight}");
