@@ -16,6 +16,10 @@ export type MapProps = {
   showChange?: boolean;
   focus?: string;
   labelScale?: number;
+  /** Stations shown (in plan order); default all. */
+  stationReveal?: number;
+  /** Fraction of the route drawn, 0..1; default 1. */
+  routeReveal?: number;
 };
 
 const FULL = D.view_box_m as Box;
@@ -43,6 +47,7 @@ export const stationsView = (aspect: number, marginM = 220): Box => {
 
 export const IceMap: React.FC<MapProps> = ({
   state, layer, view, width, height, layerOpacity = 0.72, showRoute = true, showChange = false, focus, labelScale = 1,
+  stationReveal = Infinity, routeReveal = 1,
 }) => {
   const v = view ?? stationsView(width / height);
   const sx = width / (v.xmax - v.xmin);
@@ -67,9 +72,16 @@ export const IceMap: React.FC<MapProps> = ({
         <Img src={staticFile("data/change.png")} style={{ position: "absolute", left: fl, top: ft, width: fw, height: fh, imageRendering: "pixelated" }} />
       )}
       <svg width={width} height={height} style={{ position: "absolute", inset: 0 }}>
-        {showRoute && route.map((line, i) => (
-          <polyline key={i} points={line.map(([x, y]) => px(x, y).join(",")).join(" ")} fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth={2.2 * labelScale} strokeDasharray={`${8 * labelScale} ${6 * labelScale}`} />
-        ))}
+        {showRoute && route.map((line, i) => {
+          const pts = line.map(([x, y]) => px(x, y));
+          const len = pts.slice(1).reduce((a, p, k) => a + Math.hypot(p[0] - pts[k][0], p[1] - pts[k][1]), 0);
+          return (
+            <g key={i}>
+              <defs><mask id={`route-${i}`}><polyline points={pts.map((p) => p.join(",")).join(" ")} fill="none" stroke="#fff" strokeWidth={8 * labelScale} strokeDasharray={`${len * routeReveal} ${len}`} /></mask></defs>
+              <polyline points={pts.map((p) => p.join(",")).join(" ")} mask={`url(#route-${i})`} fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth={2.2 * labelScale} strokeDasharray={`${8 * labelScale} ${6 * labelScale}`} />
+            </g>
+          );
+        })}
         {showChange && state === "after" && cb && (() => {
           const [x0, y0] = px(cb.xmin, cb.ymax);
           const [x1, y1] = px(cb.xmax, cb.ymin);
@@ -85,14 +97,14 @@ export const IceMap: React.FC<MapProps> = ({
             </g>
           );
         })()}
-        {stations.map((s) => {
+        {stations.filter((s) => s.order <= stationReveal).map((s) => {
           const [x, y] = px(s.xy[0], s.xy[1]);
           const isFocus = s.id === focus;
           return (
             <g key={s.id}>
               <circle cx={x} cy={y} r={isFocus ? r * 1.25 : r} fill={isFocus ? "#fff" : "rgba(9,12,16,0.85)"} stroke="#fff" strokeWidth={2 * labelScale} />
               <text x={x} y={y + 5.5 * labelScale} textAnchor="middle" fill={isFocus ? "#000" : "#fff"} fontFamily={T.mono} fontSize={15 * labelScale} fontWeight={600}>{s.order}</text>
-              <text x={x + r + 7} y={y + r + 16 * labelScale} fill="#fff" fontFamily={T.mono} fontSize={15 * labelScale} style={{ paintOrder: "stroke", stroke: "rgba(0,0,0,0.7)", strokeWidth: 4 }}>{s.id}</text>
+              <text x={s.id.startsWith("E02") ? x - r - 7 : x + r + 7} y={y + 5 * labelScale} textAnchor={s.id.startsWith("E02") ? "end" : "start"} fill="#fff" fontFamily={T.mono} fontSize={15 * labelScale} style={{ paintOrder: "stroke", stroke: "rgba(0,0,0,0.7)", strokeWidth: 4 }}>{s.id}</text>
             </g>
           );
         })}

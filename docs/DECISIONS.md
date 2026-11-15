@@ -232,3 +232,19 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 - Referencia Apollo = film de IBM sobre apoyo en tierra, no video de lanzamiento. Solo ideas de estructura; ningún plano, música o audio de IBM. Investigación consolidada en [submission/video/references.md](submission/video/references.md).
 - Último pedido de Eitan: pull, documentación vigente y materiales ordenados en el repo. Código en `tools/video`, fuera del descubrimiento moon y workspaces Bun; mantiene lock y dependencias independientes. Binarios y referencias ajenas locales ignorados; manifiesto público sin correos, raw de Discord ni IDs de generación personales. No se publica un Release.
 - Pendiente de Eitan: filmar IV, mantener S02 rotulado como IA y usar contexto de análogos NASA. Reorganizar no resuelve esas decisiones ni autoriza producción final.
+
+### Producción iniciada y correcciones de Eitan (14/11 noche, Codex)
+
+- No se filma al equipo. No se usa ningún clip ni placa de Higgsfield: el usuario los considera malos. Se resuelven las escenas con 3D y archivo existente. Esto supera las fuentes A/E del plan v4.
+- Sí a clips de análogos NASA en el local, rotulados como contexto terrestre.
+- El 3D debe usar modelos realistas, texturas y shaders; no bastan formas básicas ni zoom sobre imágenes. Animar esqueletos, objetos y cámaras. Las pruebas actuales no se consideran material final aprobado.
+- Voces naturales, sin sonido robótico. Se descartó la guía de macOS; primeras tomas Microsoft Neural (inglés y español argentino), sin compresión temporal. La interpretación todavía requiere escucha y ajuste.
+
+### Global v2 (15/11, Claude)
+
+- Global primero, a calidad final y subido hoy; el Local después, reusando set, rigs y sonido. Voces Microsoft Neural se mantienen por ahora (Eitan: "después hacemos con ElevenLabs u otra cosa").
+- Movimiento de personas con mocap CMU retargeteado sobre el Z2, sin servicios con login (Mixamo descartado por pedido de Eitan de no intervenir). Manos al taladro con IK sobre el mocap.
+- Formato 2,39:1 dentro de 1920×1080; subtítulos en la barra inferior, rótulos de misión en la superior.
+- Cycles (GPU Metal) para los planos de superficie; EEVEE para órbita, consola y corte del subsuelo, por tiempo de render.
+- La interfaz de los monitores se compone en Remotion con corner pin exportado por cuadro desde Blender, para que el texto quede legible y editable sin re-render.
+- El corte del subsuelo se rotula como estimación del modelo, no como imagen del subsuelo. Sin telemetría de traje inventada en el HUD: solo valores de IceWalk.

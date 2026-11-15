@@ -9,6 +9,7 @@
         "@react-three/fiber": "^9.8.2",
         "@remotion/cli": "4.0.543",
         "@remotion/google-fonts": "4.0.543",
+        "@remotion/media": "4.0.543",
         "@remotion/three": "4.0.543",
         "react": "19.3.1",
         "react-dom": "19.3.1",

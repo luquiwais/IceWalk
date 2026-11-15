@@ -266,3 +266,27 @@ créditos y términos por recurso antes del corte final. El episodio usa las och
 fuentes de `tools/video/fixtures/` (commit `2a633fb`), con sus hashes originales.
 PIA25582.wav y PIA25583.jpg se movieron a `tools/video/assets/nasa/mars/`; correos
 y copias raw de canales permanecen fuera del repo.
+
+
+### Fuentes de las pruebas de producción
+
+- NASA / DigitalSpace Corporation: [Pistol Grip Tool](https://science.nasa.gov/3d-resources/pistol-grip-tool/) y [Astronaut Glove](https://science.nasa.gov/3d-resources/astronaut-glove/), GLB descargados para estudio. El adaptador de taladro es ilustrativo, no hardware certificado.
+- NASA/LaRC/Advanced Concepts Lab: [Z2 Spacesuit](https://science.nasa.gov/3d-resources/z2-spacesuit/), geometría y texturas del traje; rig agregado por IceWalk para la prueba.
+- Poly Haven: [Red Laterite Soil Stones](https://polyhaven.com/a/red_laterite_soil_stones), materiales de terreno; microdetalle visual, no geología medida del sitio. Relieve macro procede de HiRISE.
+- NASA JSC: [CHAPEA reel](https://images.nasa.gov/details/jsc2023m000115_CHAPEA_Resource%20Reel_230501-4K-YT), 160–166 s. NASA GSFC: [Desert RATS](https://images.nasa.gov/details/GSFC_20100909_Desert_m10641_RATS), 112–117 s. Insertos mudos de contexto terrestre; créditos originales conservados localmente.
+- Voces sintéticas Microsoft Neural de catálogo, accedidas con [edge-tts](https://github.com/rany2/edge-tts): Andrew/Guy (inglés), Tomás/Elena (Argentina). No se clonó una persona. Declarar en entrega junto al uso de asistentes; revisar términos antes de distribución final.
+
+### Fuentes del Global v2 (15/11, Claude)
+
+- Carnegie Mellon University Graphics Lab, [CMU Motion Capture Database](http://mocap.cs.cmu.edu/), conversión BVH de B. Hahne ([espejo en GitHub](https://github.com/una-dinosauria/cmu-mocap)). Clips 17_08, 07_04, 40_10 y 15_06 (y otros descargados para pruebas) retargeteados sobre el traje Z2. CMU y el conversor permiten cualquier uso; no se redistribuye la base.
+- NASA/JPL-Caltech/LANL/CNES/IRAP, [Perseverance SuperCam records wind on Mars](https://science.nasa.gov/resource/perseverance-rovers-supercam-records-wind-on-mars), archivo `45827_SCAM_MIC_SOL004_RUN001.wav` (sol 4). Viento real en la mezcla de superficie, filtrado y en bucle.
+- Solar System Scope, [textura 8k de Marte](https://www.solarsystemscope.com/textures/) (CC BY 4.0, basada en datos de NASA). Solo el globo del plano orbital. Requiere atribución en la entrega.
+- NASA/JPL-Caltech: [Mars Reconnaissance Orbiter](https://science.nasa.gov/3d-resources/mars-reconnaissance-orbiter-mro/), modelo 3D del plano de apertura. NASA: [Habitat Demonstration Unit](https://science.nasa.gov/3d-resources/), hábitat ilustrativo en el horizonte.
+- HiRISE DTM `DTEEC_073578_2155_073077_2155_A01` y detecciones de bloques de IceWalk (ya listadas): relieve y posición de los 364 bloques del set de superficie.
+- Poly Haven (CC0): Red Sand, Rocky Terrain 02, Boulder 01, Moon Rock 01/03/05. Microdetalle del regolito y rocas, regraduados a albedo marciano; no es geología medida.
+- Música, efectos de taladro, radio (tonos Quindar de 2525/2475 Hz, convención Apollo), respiración, pasos e interfaz: síntesis propia en `tools/video/scripts/sound_global.py`.
+
+### Revisión audiovisual del 15/11 (Codex)
+
+- Astronauta articulado: [Animated Astronaut Character in Space Suit Loop](https://sketchfab.com/3d-models/animated-astronaut-character-in-space-suit-loop-8fe5c8d3365e4d87bb7bc253d53a64e1), de [LasquetiSpice](https://sketchfab.com/LasquetiSpice), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Skin y rig originales preservados; materiales, poses y animación adaptados. Descarga, licencia y límites en [el registro del activo](research/astronaut-assets-2026-11-15.md).
+- Voces de catálogo Orus y Charon, mediante [Gemini speech generation](https://ai.google.dev/gemini-api/docs/speech-generation). Diálogo dirigido con Gemini 3.8 Flash TTS por Interactions; reemplaza las voces Microsoft anteriores en GlobalFilm y LocalFilm. No se clonó una persona. Audio y manifiestos quedan locales; el texto coincide con los guiones y datos congelados.

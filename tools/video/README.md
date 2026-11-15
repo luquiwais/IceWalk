@@ -1,9 +1,10 @@
 # IceWalk — video
 
 Proyecto Remotion y Blender. Fuente editorial: [docs/submission/video](../../docs/submission/video/README.md).
-Estado: animatic global de 708 frames a 24 fps, pantallas, pruebas de composición
-y escena 3D incompleta. Sin voces finales, película final ni composición local.
-La producción está pausada por pedido de Eitan.
+Estado: maquetas Global (708 frames) y Local (4320), tres pruebas de animación
+Blender de 72 frames, pantallas con datos congelados y voces Microsoft Neural.
+Sin filmación ni material Higgsfield. Todavía no hay acabado ni export final.
+Preview en `http://localhost:3100/Global`, `/Local` y `/WalkRigProof`.
 
 ## Comandos
 
@@ -56,10 +57,70 @@ mapas y márgenes. No se ejecutó durante la reorganización. Blender usa rutas
 relativas al proyecto; el `.blend` puede conservar rutas absolutas antiguas.
 `~/Developer/icewalk-video` enlaza a este proyecto: una sola copia activa.
 
+## Producción y QA
+
+```sh
+python3 scripts/test_delivery.py
+uv run --with edge-tts scripts/prepare_neural_audio.py
+python3 scripts/prepare_audio.py
+blender -b --python blender/cinematic.py -- console --motion
+blender -b --python blender/cinematic.py -- drill --motion
+blender -b --python blender/cinematic.py -- walk --preview
+```
+
+`prepare_neural_audio.py` requiere red para sintetizar las voces de catálogo;
+`prepare_audio.py` mezcla esas tomas sin comprimirlas. Los archivos quedan locales.
+Los PNG de animación están en `assets/renders/`; se codificaron a MP4 con ffmpeg
+(24 fps, libx264) en `public/cinema/`. Los `.blend` originales no se sobrescriben.
+El mapa y las capas siguen congelados; la migración a Node evita un fallo de
+`stream.unref` de Studio bajo Bun.
+
 ## Límites pendientes
 
-El animatic conserva placas IA y placeholders anteriores: no implementa todavía
-la puesta de producción vigente. El 3D tenía costuras, problemas de bruma, cámara
-dentro del traje y sol fuera de cuadro, sin cierre verificado. Quitar logos sigue
-pendiente. Cada recurso NASA requiere revisar créditos antes del uso final.
-Las referencias ajenas son solo para análisis. No publicar `assets/` completo.
+Son pruebas, no un video terminado. Los clips 3D duran 3 s y se mantienen en el
+último frame si el bloque dura más; hay que extenderlos para el local. El rig
+necesita pulido de apoyo, deslizamiento y pose; los modelos, iluminación y
+materiales todavía requieren revisión de realismo. La órbita es una maqueta de
+zoom, sin la transición 3D final. Las voces son sintéticas naturales de catálogo,
+no actuación humana grabada; falta escucha y dirección final.
+
+## Revisión del 15/11: astronauta, voces y cobertura
+
+Studio sigue en `http://localhost:3100/GlobalFilm`. La prueba del nuevo rig está
+en `http://localhost:3100/AstronautProof`: modelo de LasquetiSpice con sus 91
+articulaciones y skin originales, CMU retargeteado y materiales adaptados.
+Licencia, procedencia y crédito completo en
+[el registro del activo](../../docs/research/astronaut-assets-2026-11-15.md).
+
+Las mezclas actuales usan Orus (narración/IV) y Charon (EV), voces masculinas
+dirigidas por diálogo completo. No volver a ejecutar el generador anterior de
+Microsoft para GlobalFilm/LocalFilm. `scripts/generate_directed_dialogue.py`
+genera las tomas mediante Gemini Interactions; `align_dialogue.py` las alinea
+con Whisper y `sound_global.py` / `sound_local.py` producen las mezclas. La clave
+se lee del entorno o del `.env` ignorado; no forma parte del código.
+
+```sh
+blender -b --python-exit-code 1 --python blender/v2/validate_scene.py
+blender -b --python-exit-code 1 --python blender/v3/render_shots.py -- drill
+RENDER_REVISION=v3 zsh scripts/encode_shots.sh drill
+python3 scripts/produce_v3.py
+```
+
+La validación comprueba contacto de ambas palmas durante 60 cuadros, avance y
+giro visibles del taladro y movimiento del observador. Después de cambiar el
+rig, volver a validar para regenerar `assets/scenes/drill-v3.blend`, que usa el
+renderizador como escena base. La marcha se apoya contra el DTM; las texturas
+de microrelieve siguen siendo ilustrativas.
+
+`produce_v3.py` renderiza y codifica las tomas de `shot-manifest.json`, con
+pantallas integradas en la geometría. Mantiene el montaje existente hasta que
+estén completos todos los clips del nuevo montaje de cada película. Luego
+instala las plantillas de `blender/v3/edit-templates`, verifica tipos, exporta y
+ejecuta los tests de entrega. No sube archivos. Estado y logs:
+`out/v3-production/status.json`. Si se modifica código de producción mientras
+corre, se detiene para no mezclar esa modificación con la revisión en curso.
+
+Los nuevos montajes eliminan los `hold` de personas y los intervalos de video
+reutilizados dentro de cada película. Hasta que se activen, el test nuevo de
+repetición/congelado señala deliberadamente los problemas del montaje anterior.
+Las exportaciones requieren revisión visual y escucha antes de la entrega.

@@ -12,3 +12,4 @@ public/site/*
 blender/*.blend*
 blender/renders/
 .DS_Store
+__pycache__/

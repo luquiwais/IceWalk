@@ -1,282 +1,85 @@
 import React from "react";
 import { D, T, fmtH, pct, round1 } from "./theme";
-import { Big, Label, Row, Screen, Tag, TopBar } from "./chrome";
+import { IceWalkMark, Screen, TopBar } from "./chrome";
 import { IceMap, Legend } from "./map";
 
-const W = 1920;
-const H = 1080;
-const clock = D.clock;
-const meas = D.measurement;
-const rp = D.replan;
+const W = 1920, H = 1080;
+const clock = D.clock, meas = D.measurement, rp = D.replan;
+const muted: React.CSSProperties = { color: T.dim, fontSize: 24, lineHeight: 1.5 };
+const eyebrow: React.CSSProperties = { fontFamily: T.mono, fontSize: 19, letterSpacing: 2, color: T.dim, textTransform: "uppercase" };
+const panel: React.CSSProperties = { background: "linear-gradient(150deg,#1a1f25,#12161c)", borderRadius: 24, boxShadow: "inset 0 1px 0 #ffffff12, 0 12px 30px #00000020" };
+const Metric: React.FC<{ label: string; value: React.ReactNode; note?: string; large?: boolean }> = ({ label, value, note, large }) => (
+  <div><div style={eyebrow}>{label}</div><div style={{ fontSize: large ? 94 : 62, fontWeight: 500, letterSpacing: -2, lineHeight: 1.16, marginTop: 14, fontVariantNumeric: "tabular-nums" }}>{value}</div>{note && <div style={{ ...muted, marginTop: 12 }}>{note}</div>}</div>
+);
+const Foot: React.FC<{ left: string; right?: string }> = ({ left, right }) => <div style={{ position: "absolute", left: 56, right: 56, bottom: 30, display: "flex", justifyContent: "space-between", ...eyebrow, fontSize: 15, letterSpacing: .8 }}><span>{left}</span><span>{right ?? "IceWalk / mission planning"}</span></div>;
+const Check: React.FC<{ children: React.ReactNode }> = ({ children }) => <div style={{ display: "flex", gap: 18, alignItems: "center", fontSize: 26, padding: "18px 0", borderBottom: `1px solid ${T.line}` }}><svg width={24} height={24} viewBox="0 0 24 24"><path d="m4 12 5 5L20 6" fill="none" stroke="currentColor" strokeWidth={2} /></svg>{children}</div>;
 
-/** Monitor principal del IV: mapa del sitio con capa y barra lateral. */
+/** Deliberately edited for a film monitor: one decision, large hierarchy, readable data. */
 export const ConsoleMap: React.FC<{ state: "before" | "after"; layer?: "probability" | "uncertainty" }> = ({ state, layer = "probability" }) => {
-  const side = 520;
-  const stations = state === "before" ? D.stations_before : D.stations_after;
-  return (
-    <Screen w={W} h={H}>
-      <TopBar title={state === "before" ? "Site model · before EVA" : "Site model · updated with E03S24"} right={`SITE ${D.site.id.toUpperCase()} · ${state === "before" ? "plan-demo0001" : rp.plan_id}`} />
-      <div style={{ display: "flex", height: H - 64 }}>
-        <IceMap state={state} layer={layer} width={W - side} height={H - 64} showChange={state === "after"} focus={state === "after" ? D.next.id : undefined} />
-        <div style={{ width: side, padding: 32, borderLeft: `1px solid ${T.line}`, background: T.panel, display: "flex", flexDirection: "column", gap: 26 }}>
-          <Legend layer={layer} width={side - 64} />
-          <div>
-            <Label>Model</Label>
-            <Row k="Fresh impacts in model" v={D.site.craters_in_model} />
-            <Row k="Cell size" v={`${D.site.cell_size_m} m`} />
-            <Row k="Measurements in model" v={state === "before" ? 0 : 1} />
-            {state === "after" && <Row k="Cells updated" v={`${D.map.change.cells} · max Δ ${D.map.change.max_abs.toFixed(2)}`} strong />}
-          </div>
-          <div>
-            <Label>{state === "before" ? "Planned stations" : "Remaining stations"}</Label>
-            {stations.map((s) => (
-              <Row key={s.id} k={`${s.order}  ${s.id}`} v={s.p_ice == null ? "—" : `P ${s.p_ice.toFixed(2)}`} />
-            ))}
-          </div>
-          <div style={{ marginTop: "auto", fontSize: 14, color: T.faint, fontFamily: T.mono }}>{D.site.credit}</div>
-        </div>
+  const after = state === "after";
+  const stations = after ? D.stations_after : D.stations_before;
+  return <Screen w={W} h={H}>
+    <TopBar title="Surface operations" right={`S1094b / ${after ? "model updated" : "EVA 01"}`} />
+    <div style={{ position: "absolute", inset: "102px 24px 24px", display: "grid", gridTemplateColumns: "1fr 510px", gap: 20 }}>
+      <div style={{ position: "relative", borderRadius: 22, overflow: "hidden", background: "#21282d" }}>
+        <IceMap state={state} layer={layer} width={1338} height={954} layerOpacity={.45} showChange={after} focus={after ? D.next.id : undefined} labelScale={1.25} />
+        <div style={{ position: "absolute", inset: "0 0 auto", padding: "40px 44px 85px", background: "linear-gradient(#080d12dd,transparent)" }}><div style={eyebrow}>SITE MODEL / {layer === "probability" ? "ICE PROBABILITY" : "UNCERTAINTY"}</div><div style={{ fontSize: 52, fontWeight: 500, letterSpacing: -1.5, marginTop: 10 }}>{after ? "One measurement. A clearer picture." : "Choose what to learn next."}</div></div>
+        <div style={{ position: "absolute", bottom: 36, left: 36, padding: "22px 28px", width: 420, borderRadius: 16, background: "#0b111ae8", boxShadow: "inset 0 1px 0 #ffffff15" }}><Legend layer={layer} width={364} /></div>
+        <div style={{ position: "absolute", right: 32, bottom: 35, fontFamily: T.mono, fontSize: 17, color: "#dbe2ea" }}>HiRISE / NASA · JPL-Caltech · UArizona</div>
       </div>
-    </Screen>
-  );
+      <div style={{ ...panel, padding: "38px 34px", display: "flex", flexDirection: "column" }}>
+        <div style={eyebrow}>{after ? "NEXT STATION" : "FIRST STATION"}</div>
+        <div style={{ fontSize: 66, fontWeight: 500, letterSpacing: -2, marginTop: 10 }}>{after ? D.next.id : meas.station_id}</div>
+        <div style={{ ...muted, marginTop: 4 }}>{after ? `${D.next.distance_m} m ahead · core drill` : "Core drill · simulated EVA"}</div>
+        <div style={{ marginTop: 30, padding: "22px 24px", borderRadius: 16, background: "#ffffff07" }}><div style={eyebrow}>{after ? "MEASUREMENT RECEIVED" : "MODEL HORIZON"}</div><div style={{ fontSize: 36, marginTop: 10 }}>{after ? `No ice to ${round1(meas.depth_m)} m` : `Ice within ${D.site.threshold_m} metres`}</div><div style={{ ...muted, fontSize: 21, marginTop: 10 }}>{after ? "Small, local update. The route is retained." : "Probability is not a confirmed deposit."}</div></div>
+        <div style={{ ...eyebrow, marginTop: 34, marginBottom: 12 }}>TRAVERSE / {stations.length} STATIONS</div>
+        {stations.map((s, i) => <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 20, padding: "16px 0", borderBottom: `1px solid ${T.line}` }}><span style={{ width: 36, height: 36, borderRadius: 18, background: i === 0 ? "#edf1f5" : "#ffffff09", color: i === 0 ? "#13171d" : T.dim, textAlign: "center", lineHeight: "36px", fontSize: 18 }}>{s.order}</span><span style={{ fontSize: 25, flex: 1 }}>{s.id}</span><span style={{ ...eyebrow, fontSize: 19 }}>{s.p_ice == null ? "—" : pct(s.p_ice)}</span></div>)}
+        <div style={{ marginTop: "auto", paddingTop: 28, ...muted, fontSize: 20 }}>{D.site.craters_in_model} fresh impacts<br />{D.site.cell_size_m} m model cells · {after ? "1 measurement" : "regional prior"}</div>
+      </div>
+    </div>
+  </Screen>;
 };
 
-/** Tarjeta de revisión del plan que confirma el IV. */
-export const ReviewCard: React.FC<{ confirmed?: boolean }> = ({ confirmed = false }) => (
-  <Screen w={W} h={H}>
-    <TopBar title="Plan review · IV" />
-    <div style={{ zoom: 1.22, paddingTop: 24 }}>
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 28, padding: 40 }}>
-      <div style={{ background: T.panel, padding: 32, borderRadius: 10, border: `1px solid ${T.line}` }}>
-        <Label>Trigger</Label>
-        <Big>{meas.station_id}</Big>
-        <div style={{ fontFamily: T.mono, fontSize: 30, marginTop: 14 }}>NO ICE ≤ {round1(meas.depth_m)} m</div>
-        <div style={{ marginTop: 24 }}>
-          <Row k="Tool" v="Core drill" />
-          <Row k="Logged by" v={meas.crew_member} />
-          <Row k="Expected outcome" v={pct(D.decision.p_no_ice_branch)} strong />
-          <Row k="Est. ice depth (median)" v={`${round1(D.stations_before[0].depth_median_m!)} m`} />
-        </div>
-      </div>
-      <div style={{ background: T.panel, padding: 32, borderRadius: 10, border: `1px solid ${T.line}` }}>
-        <Label>Stations</Label>
-        <Big>{rp.stations_kept.length} kept</Big>
-        <div style={{ marginTop: 24 }}>
-          <Row k="Added" v={rp.stations_added.length} />
-          <Row k="Dropped" v={rp.stations_dropped.length} />
-          <Row k="Next" v={`${D.next.id} · ${D.next.distance_m} m`} strong />
-          <Row k="Next station time" v={`${D.next.duration_min} min`} />
-        </div>
-      </div>
-      <div style={{ background: T.panel, padding: 32, borderRadius: 10, border: `1px solid ${T.line}` }}>
-        <Label>Return</Label>
-        <Big>{fmtH(clock.station_end.h, clock.station_end.m)}</Big>
-        <div style={{ fontFamily: T.sans, fontSize: 19, color: T.dim, marginTop: 8 }}>to required departure</div>
-        <div style={{ marginTop: 18 }}>
-          <Row k="PET" v={`${Math.round(clock.station_end.pet_min)} min`} />
-          <Row k="Lowest walkback margin ahead" v={`${rp.margin_before_min} → ${rp.margin_after_min} min`} strong />
-        </div>
-      </div>
+export const ReviewCard: React.FC<{ confirmed?: boolean }> = ({ confirmed = false }) => <Screen w={W} h={H}>
+  <TopBar title="Plan review" right="IV / decision support" />
+  <div style={{ padding: "48px 64px 0" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 40 }}><div><div style={eyebrow}>{meas.station_id} / MEASUREMENT RECEIVED</div><div style={{ fontSize: 74, fontWeight: 500, letterSpacing: -2, marginTop: 12 }}>The plan can continue.</div></div><div style={{ ...eyebrow, paddingBottom: 14 }}>REVIEW {confirmed ? "CONFIRMED" : "REQUIRED"}</div></div>
+    <div style={{ display: "grid", gridTemplateColumns: "1.05fr 1fr 1.05fr", gap: 24 }}>
+      <div style={{ ...panel, padding: 36, minHeight: 350 }}><Metric label="Core drill result" value="No ice" note={`Measured to ${round1(meas.depth_m)} m · reported by ${meas.crew_member}`} /><div style={{ marginTop: 36, paddingTop: 26, borderTop: `1px solid ${T.line}`, ...muted }}>Estimated median ice depth<br /><strong style={{ color: T.text, fontWeight: 500 }}>{round1(D.stations_before[0].depth_median_m!)} m</strong></div></div>
+      <div style={{ ...panel, padding: 36 }}><Metric label="Traverse retained" value={<>{rp.stations_kept.length}<span style={{ fontSize: 30, marginLeft: 12, letterSpacing: 0 }}>stations</span></>} note="No stations added or dropped" /><div style={{ marginTop: 30 }}><Check>Next: {D.next.id}</Check><Check>{D.next.distance_m} m to the next station</Check></div></div>
+      <div style={{ ...panel, padding: 36 }}><Metric label="Until required departure" value={<>{clock.station_end.h}<span style={{ fontSize: 32 }}>h </span>{clock.station_end.m}<span style={{ fontSize: 32 }}>m</span></>} note={`At station end · PET ${Math.round(clock.station_end.pet_min)} min`} /><div style={{ marginTop: 36, paddingTop: 26, borderTop: `1px solid ${T.line}`, ...muted }}>Lowest future walkback margin<br /><strong style={{ color: T.text, fontWeight: 500 }}>{rp.margin_before_min} → {rp.margin_after_min} min</strong></div></div>
     </div>
-    <div style={{ margin: "0 40px", padding: 32, background: T.panel2, borderRadius: 10, border: `1px solid ${T.lineStrong}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <div>
-        <Label>Recommendation</Label>
-        <div style={{ fontFamily: T.mono, fontSize: 46, fontWeight: 600 }}>{rp.recommendation.toUpperCase()}</div>
-        <div style={{ fontSize: 21, color: T.dim, marginTop: 8 }}>{rp.reasons[0]}</div>
-      </div>
-      <div style={{ fontFamily: T.mono, fontSize: 30, fontWeight: 600, padding: "22px 40px", borderRadius: 8, border: "2px solid #fff", background: confirmed ? "#fff" : "transparent", color: confirmed ? "#000" : "#fff" }}>
-        {confirmed ? `GO ${D.next.id} · SENT` : `CONFIRM · GO ${D.next.id}`}
-      </div>
-    </div>
-    </div>
-  </Screen>
-);
+    <div style={{ ...panel, marginTop: 28, padding: "32px 38px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 30 }}><div><div style={eyebrow}>RECOMMENDATION / CONTINUE</div><div style={{ fontSize: 26, maxWidth: 1010, lineHeight: 1.45, marginTop: 12, color: T.dim }}>The shallow negative was expected. Keep the five remaining stations and learn at the next point.</div></div><div style={{ width: 440, height: 100, borderRadius: 18, background: confirmed ? "#d9e2e7" : "#f1f3f5", color: "#11161d", display: "flex", alignItems: "center", justifyContent: "center", gap: 18, fontSize: 31, fontWeight: 600 }}><span>{confirmed ? `GO ${D.next.id} · sent` : "Confirm & send GO"}</span><span>↗</span></div></div>
+  </div><Foot left="Planner output · simulated measurement" right={`${pct(D.decision.p_no_ice_branch)} predicted no-ice branch`} />
+</Screen>;
 
-/** Pantalla del antebrazo del EV (registro y reloj). */
 export const Wrist: React.FC<{ mode: "result" | "clock-arrival" | "clock-end" }> = ({ mode }) => {
   const c = mode === "clock-arrival" ? clock.arrival : clock.station_end;
-  return (
-    <div style={{ width: 1000, height: 640, background: "#06080b", color: T.text, fontFamily: T.sans, padding: 44, boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: T.mono, fontSize: 30, color: T.dim }}>
-        <span>{meas.crew_member} · {meas.station_id}</span><span>PET {Math.round(c.pet_min)}</span>
-      </div>
-      {mode === "result" ? (
-        <div>
-          <div style={{ fontFamily: T.mono, fontSize: 30, color: T.dim }}>CORE DRILL</div>
-          <div style={{ fontFamily: T.mono, fontSize: 92, fontWeight: 600, lineHeight: 1.05 }}>NO ICE</div>
-          <div style={{ fontFamily: T.mono, fontSize: 58 }}>down to {round1(meas.depth_m)} m</div>
-        </div>
-      ) : (
-        <div>
-          <div style={{ fontFamily: T.mono, fontSize: 30, color: T.dim }}>TO REQUIRED DEPARTURE</div>
-          <div style={{ fontFamily: T.mono, fontSize: 104, fontWeight: 600, lineHeight: 1.05 }}>{fmtH(c.h, c.m)}</div>
-        </div>
-      )}
-      <div style={{ fontFamily: T.mono, fontSize: 28, color: T.dim }}>{mode === "result" ? "LOGGED · SENT TO IV" : `NEXT ${D.next.id} · ${D.next.distance_m} m`}</div>
-    </div>
-  );
+  return <div style={{ width: 1000, height: 640, background: "linear-gradient(135deg,#1d252c,#080d12)", color: T.text, padding: "38px 48px", boxSizing: "border-box", fontFamily: T.sans, borderRadius: 38, boxShadow: "inset 0 1px 0 #ffffff30" }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", ...eyebrow }}><span>{meas.crew_member} / {meas.station_id}</span><IceWalkMark size={34} /><span>PET {Math.round(c.pet_min)} min</span></div><div style={{ marginTop: 74, ...eyebrow }}>{mode === "result" ? "CORE DRILL / RESULT" : "UNTIL REQUIRED DEPARTURE"}</div><div style={{ fontSize: mode === "result" ? 112 : 104, fontWeight: 500, letterSpacing: -4, lineHeight: 1.2, marginTop: 16 }}>{mode === "result" ? "No ice" : fmtH(c.h, c.m)}</div><div style={{ ...muted, fontSize: 36, marginTop: 12 }}>{mode === "result" ? `Measured to ${round1(meas.depth_m)} m` : `Next: ${D.next.id} · ${D.next.distance_m} m`}</div><div style={{ borderTop: `1px solid ${T.lineStrong}`, marginTop: 62, paddingTop: 24, fontSize: 24, color: T.dim }}>{mode === "result" ? "Measurement logged · sent to IV" : "Return and ingress included in the plan"}</div></div>;
 };
 
-/** Elementos del visor AR sobre fondo transparente. */
-export const ArHud: React.FC<{ clockKey?: "station_end" | "arrival"; minusMin?: number }> = ({ clockKey = "station_end", minusMin = 1 }) => {
-  const c = clock[clockKey];
-  const total = c.h * 60 + c.m - minusMin;
-  return (
-    <div style={{ width: W, height: H, position: "relative", fontFamily: T.mono, color: "#f2f6fa", textShadow: "0 0 12px rgba(150,190,255,0.35)" }}>
-      <div style={{ position: "absolute", left: 120, top: 110 }}>
-        <div style={{ fontSize: 26, opacity: 0.8 }}>NEXT STATION</div>
-        <div style={{ fontSize: 64, fontWeight: 600 }}>{D.next.id}</div>
-        <div style={{ fontSize: 34 }}>{D.next.distance_m} m · core drill</div>
-        <div style={{ fontSize: 24, opacity: 0.75, marginTop: 10 }}>PLAN REVIEWED · GO</div>
-      </div>
-      <div style={{ position: "absolute", right: 120, top: 110, textAlign: "right" }}>
-        <div style={{ fontSize: 26, opacity: 0.8 }}>TO REQUIRED DEPARTURE</div>
-        <div style={{ fontSize: 64, fontWeight: 600 }}>{fmtH(Math.floor(total / 60), total % 60)}</div>
-      </div>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 196, textAlign: "center", fontSize: 20, opacity: 0.6, fontFamily: T.sans, letterSpacing: 2 }}>AR INTERFACE CONCEPT</div>
-    </div>
-  );
+export const ArHud: React.FC<{ clockKey?: "station_end" | "arrival"; minusMin?: number; showClock?: boolean }> = ({ clockKey = "station_end", minusMin = 0, showClock = false }) => {
+  const c = clock[clockKey], total = c.h * 60 + c.m - minusMin;
+  return <div style={{ width: W, height: H, position: "relative", fontFamily: T.sans, color: "#f4f7fa", textShadow: "0 2px 16px #000b" }}><div style={{ position: "absolute", left: 120, top: 160, borderLeft: "2px solid #ffffff80", paddingLeft: 26 }}><div style={{ ...eyebrow, color: "#dee7ee" }}>PLAN REVIEWED / GO</div><div style={{ fontSize: 62, fontWeight: 500, margin: "12px 0" }}>{D.next.id}</div><div style={{ fontSize: 30 }}>{D.next.distance_m} m · core drill</div></div><div style={{ position: "absolute", right: 120, top: 160, textAlign: "right" }}><div style={{ ...eyebrow, color: "#dee7ee" }}>UNTIL REQUIRED DEPARTURE</div><div style={{ fontSize: showClock ? 62 : 26, marginTop: 14 }}>{showClock ? fmtH(Math.floor(total / 60), total % 60) : "Review from current position"}</div></div><div style={{ position: "absolute", left: 0, right: 0, bottom: 170, textAlign: "center", ...eyebrow, fontSize: 17, color: "#d0d8e1" }}>AR interface concept</div></div>;
 };
 
-/** Columna del subsuelo bajo el agujero, para el visor (fondo transparente). */
 export const DepthColumn: React.FC<{ progress?: number }> = ({ progress = 1 }) => {
-  const s = D.stations_before[0];
-  const pxPerM = 230;
-  const top = 120;
-  const drilled = meas.depth_m * pxPerM * Math.min(1, progress * 1.6);
-  const median = s.depth_median_m! * pxPerM;
-  const shallow = s.depth_shallow_m! * pxPerM;
-  return (
-    <div style={{ width: W, height: H, position: "relative", fontFamily: T.mono, color: "#f2f6fa" }}>
-      <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
-        <defs>
-          <radialGradient id="cloud" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#86b6ef" stopOpacity="0.55" />
-            <stop offset="100%" stopColor="#86b6ef" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <ellipse cx={W / 2} cy={top + median} rx={210} ry={(median - shallow) * 1.15} fill="url(#cloud)" opacity={Math.max(0, progress * 1.4 - 0.4)} />
-        <line x1={W / 2} y1={top} x2={W / 2} y2={top + 3.0 * pxPerM} stroke="rgba(255,255,255,0.25)" strokeWidth={2} strokeDasharray="6 8" />
-        <rect x={W / 2 - 14} y={top} width={28} height={drilled} fill="rgba(255,255,255,0.9)" />
-        {[0, 1, 2, 3].map((m) => (
-          <g key={m}>
-            <line x1={W / 2 + 40} y1={top + m * pxPerM} x2={W / 2 + 70} y2={top + m * pxPerM} stroke="rgba(255,255,255,0.6)" strokeWidth={2} />
-            <text x={W / 2 + 82} y={top + m * pxPerM + 9} fill="rgba(255,255,255,0.75)" fontSize={26}>{m} m</text>
-          </g>
-        ))}
-      </svg>
-      <div style={{ position: "absolute", left: W / 2 - 560, top: top + drilled - 40, width: 500, textAlign: "right", fontSize: 30, opacity: Math.min(1, progress * 2) }}>
-        MEASURED 0–{round1(meas.depth_m)} m<br /><span style={{ fontWeight: 600 }}>NO ICE</span>
-      </div>
-      <div style={{ position: "absolute", left: W / 2 - 560, top: top + median - 30, width: 500, textAlign: "right", fontSize: 30, opacity: Math.max(0, progress * 1.4 - 0.4) }}>
-        ESTIMATED ICE DEPTH<br /><span style={{ fontWeight: 600 }}>median {round1(s.depth_median_m!)} m</span>
-      </div>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 196, textAlign: "center", fontSize: 20, opacity: 0.6, fontFamily: T.sans, letterSpacing: 2 }}>AR INTERFACE CONCEPT · MODEL ESTIMATE, NOT A SUBSURFACE IMAGE</div>
-    </div>
-  );
+  const s = D.stations_before[0], top = 180, ppm = 200;
+  return <div style={{ width: W, height: H, color: T.text, fontFamily: T.sans, position: "relative" }}><svg width={W} height={H}><defs><linearGradient id="depth-band"><stop stopColor="#86b6ef" stopOpacity={0} /><stop offset="50%" stopColor="#86b6ef" stopOpacity={.35} /><stop offset="100%" stopColor="#86b6ef" stopOpacity={0} /></linearGradient></defs><rect x={620} y={top + s.depth_shallow_m! * ppm} width={700} height={(3 - s.depth_shallow_m!) * ppm} fill="url(#depth-band)" opacity={progress} /><line x1={960} y1={top} x2={960} y2={top + 600} stroke="#ffffff30" strokeDasharray="4 10" /><rect x={952} y={top} width={16} height={meas.depth_m * ppm * progress} rx={8} fill="#eef2f5" />{[0,1,2,3].map(m => <g key={m}><line x1={1000} x2={1024} y1={top+m*ppm} y2={top+m*ppm} stroke="#ffffff90" /><text x={1042} y={top+m*ppm+9} fill="#d8e0e9" fontSize={27} fontFamily={T.mono}>{m} m</text></g>)}</svg><div style={{ position: "absolute", top: 350, left: 240, textAlign: "right", width: 620 }}><div style={eyebrow}>MEASURED</div><div style={{ fontSize: 48, marginTop: 12 }}>No ice to {round1(meas.depth_m)} m</div></div><div style={{ position: "absolute", top: top+s.depth_median_m!*ppm-24, left: 240, width: 620, textAlign: "right" }}><div style={{ ...eyebrow, color: "#b9cee6" }}>MODEL ESTIMATE / MEDIAN</div><div style={{ fontSize: 40, marginTop: 12 }}>Possible ice at {round1(s.depth_median_m!)} m</div></div><div style={{ position: "absolute", bottom: 170, width: "100%", textAlign: "center", ...eyebrow }}>Estimate · not a subsurface image</div></div>;
 };
 
-/** Pantalla secundaria: comparación de campaña simulada. */
 export const Campaign: React.FC = () => {
-  const c = D.campaign;
-  const blind = c.series.find((s) => s.strategy === "blind_drill")!;
-  const radar = c.series.find((s) => s.strategy === "radar_first_50")!;
-  const max = blind.evas_to_confirm;
-  const bar = (label: string, v: number, strong: boolean) => (
-    <div style={{ marginBottom: 46 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 30, marginBottom: 14 }}>
-        <span style={{ color: strong ? T.text : T.dim }}>{label}</span>
-        <span style={{ fontFamily: T.mono, fontWeight: 600 }}>{v.toFixed(2)} EVAs</span>
-      </div>
-      <div style={{ height: 46, background: T.panel2, borderRadius: 4 }}>
-        <div style={{ width: `${(v / max) * 100}%`, height: "100%", background: strong ? "#3987e5" : "#5b6672", borderRadius: 4 }} />
-      </div>
-    </div>
-  );
-  return (
-    <Screen w={W} h={H}>
-      <TopBar title="Campaign strategy · simulation" />
-      <div style={{ padding: "90px 90px", zoom: 1.45 }}>
-        <Label scale={1.4}>Expected EVAs to confirm ice</Label>
-        <div style={{ height: 30 }} />
-        {bar(blind.label, blind.evas_to_confirm, false)}
-        {bar(radar.label, radar.evas_to_confirm, true)}
-        <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
-          <Tag tone="advisory" scale={1.3}>SIMULATION</Tag>
-          <span style={{ fontSize: 22, color: T.dim }}>Monte Carlo · drill {round1(c.drill_m)} m · {c.stations_per_eva} stations per EVA · EVAs assumed independent</span>
-        </div>
-      </div>
-    </Screen>
-  );
+  const c=D.campaign, blind=c.series.find(s=>s.strategy==="blind_drill")!, radar=c.series.find(s=>s.strategy==="radar_first_50")!;
+  return <Screen w={W} h={H}><TopBar title="Campaign strategy" right="Monte Carlo / simulation" /><div style={{ padding: "60px 80px" }}><div style={eyebrow}>EXPECTED EVAs TO CONFIRM ICE</div><div style={{ fontSize: 74, fontWeight: 500, letterSpacing: -2, marginTop: 14 }}>Measure first. Drill with purpose.</div><div style={{ marginTop: 60, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>{[[blind,"Without radar"],[radar,"Radar first"]].map(([strategy,label],i)=>{const s=strategy as typeof blind;return <div key={i} style={{ ...panel,padding:48 }}><div style={eyebrow}>{label as string}</div><div style={{ fontSize: 136,letterSpacing:-5,marginTop:26,lineHeight:1 }}>{s.evas_to_confirm.toFixed(2)}<span style={{ fontSize:32,letterSpacing:0,marginLeft:18,color:T.dim }}>EVAs</span></div><div style={{ height:12,background:"#ffffff0b",borderRadius:6,marginTop:44 }}><div style={{ width:`${s.evas_to_confirm/blind.evas_to_confirm*100}%`,height:"100%",background:i?"#b4cde7":"#68737d",borderRadius:6 }} /></div><div style={{ ...muted,marginTop:30 }}>{s.label}</div></div>;})}</div><div style={{ ...muted,marginTop:38 }}>{c.stations_per_eva} stations per EVA · {round1(c.drill_m)} m drill · EVAs assumed independent</div></div><Foot left="Simulation, not a demonstrated human result" /></Screen>;
 };
 
-/** Ventana ambiental (módulo de ejemplo, otra fecha). */
 export const EvaWindow: React.FC = () => {
-  const w = D.eva_window;
-  const hours = w.hours.slice(0, 72);
-  const col = (lvl: string) => (lvl === "warning" ? T.warning : lvl === "caution" ? T.caution : lvl === "advisory" ? T.advisory : "#2a323c");
-  const rec = w.recommended as { sol: number; start_ltst: string; end_ltst: string };
-  return (
-    <Screen w={W} h={H}>
-      <TopBar title="EVA window · environment" right={`EXAMPLE MODULE · ${w.requested_utc.slice(0, 10)}`} />
-      <div style={{ padding: "50px 60px", zoom: 1.3 }}>
-        <Label scale={1.3}>Hourly conditions · 3 sols</Label>
-        <div style={{ display: "flex", gap: 4, marginTop: 20 }}>
-          {hours.map((h, i) => {
-            const inRec = h.sol === rec.sol && h.ltst >= rec.start_ltst && h.ltst < rec.end_ltst;
-            return <div key={i} style={{ flex: 1, height: 140, background: col(h.level), outline: inRec ? "3px solid #fff" : "none", outlineOffset: -3, borderRadius: 2 }} />;
-          })}
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: T.mono, fontSize: 20, color: T.dim, marginTop: 10 }}>
-          <span>SOL 0</span><span>SOL 1</span><span>SOL 2</span><span>SOL 3</span>
-        </div>
-        <div style={{ display: "flex", gap: 40, marginTop: 50 }}>
-          <div style={{ flex: 1, background: T.panel, padding: 30, borderRadius: 10, border: `1px solid ${T.lineStrong}` }}>
-            <Label>Recommended window</Label>
-            <Big>SOL {rec.sol} · {rec.start_ltst}–{rec.end_ltst}</Big>
-            <div style={{ fontSize: 20, color: T.dim, marginTop: 10 }}>Local true solar time</div>
-          </div>
-          <div style={{ flex: 1.4, background: T.panel, padding: 30, borderRadius: 10, border: `1px solid ${T.line}` }}>
-            <Label>Earliest hour · why not</Label>
-            {hours[0].reasons.map((r) => (
-              <div key={r} style={{ fontSize: 22, marginBottom: 8, color: T.text }}>· {r}</div>
-            ))}
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 14, marginTop: 34, alignItems: "center" }}>
-          <Tag tone="warning">WARNING</Tag><Tag tone="caution">CAUTION</Tag><Tag tone="advisory">ADVISORY</Tag>
-          <span style={{ fontSize: 19, color: T.dim, marginLeft: 16 }}>Climatology: Viking Lander 2 analogue · Space weather: NASA DONKI (historical, demo)</span>
-        </div>
-      </div>
-    </Screen>
-  );
+  const w=D.eva_window, hours=w.hours.slice(0,72), rec=w.recommended as {sol:number;start_ltst:string;end_ltst:string};
+  const color=(level:string)=>level==="warning"?"#cf5a56":level==="caution"?"#c19a56":level==="advisory"?"#8195a8":"#303a42";
+  return <Screen w={W} h={H}><TopBar title="EVA window" right={`Environmental example / ${w.requested_utc.slice(0,10)}`} /><div style={{ padding:"52px 64px" }}><div style={eyebrow}>DEPARTURE PLANNING / 3 SOLS</div><div style={{ display:"flex",justifyContent:"space-between",alignItems:"end",marginTop:14 }}><div style={{ fontSize:76,fontWeight:500,letterSpacing:-2 }}>Choose the window.</div><div style={{ ...muted,textAlign:"right" }}>Local true solar time<br />Labeled conditions from a separate date</div></div><div style={{ ...panel,padding:40,marginTop:42 }}><div style={{ display:"flex",justifyContent:"space-between",...eyebrow }}><span>HOURLY CONDITIONS</span><span>RECOMMENDED HOURS OUTLINED</span></div><div style={{ display:"flex",gap:5,marginTop:32 }}>{hours.map((h,i)=>{const yes=h.sol===rec.sol&&h.ltst>=rec.start_ltst&&h.ltst<rec.end_ltst;return <div key={i} style={{ flex:1,height:160,background:color(h.level),borderRadius:5,boxShadow:yes?"inset 0 0 0 3px #f4f6f8":"none" }} />;})}</div><div style={{ display:"flex",justifyContent:"space-between",...eyebrow,marginTop:20 }}><span>Sol 0</span><span>Sol 1</span><span>Sol 2</span><span>Sol 3</span></div></div><div style={{ display:"grid",gridTemplateColumns:"1fr 1.2fr",gap:24,marginTop:26 }}><div style={{ ...panel,padding:34 }}><Metric label="Recommended window" value={`Sol ${rec.sol}`} note={`${rec.start_ltst}–${rec.end_ltst} LTST`} /></div><div style={{ ...panel,padding:34 }}><div style={eyebrow}>LIGHT / TEMPERATURE / DUST / SPACE WEATHER</div><div style={{ ...muted,marginTop:24 }}>{hours[0].reasons.slice(0,2).join(" · ")}</div><div style={{ display:"flex",gap:28,marginTop:28,...eyebrow,fontSize:17 }}>{["warning","caution","advisory"].map(s=><span key={s} style={{ color:color(s) }}>● {s}</span>)}</div></div></div></div><Foot left="Viking Lander 2 analogue · NASA DONKI historical demo" /></Screen>;
 };
 
-/** Fichas de herramientas para la pantalla de pared del brief. */
 export const Tools: React.FC = () => {
-  const t = D.site_tools as Record<string, { depth_m: number; p_ice: number; verdict: string; precursor?: boolean }>;
-  const eq = Object.fromEntries(D.equipment.map((e) => [e.tool, e.mass_kg]));
-  const cards = [
-    { key: "gpr", name: "Ground-penetrating radar", role: "Find where to look" },
-    { key: "core_drill", name: "Core drill", role: "Confirm in place" },
-  ];
-  return (
-    <Screen w={W} h={H}>
-      <TopBar title="Tools · reach vs. estimated ice depth" />
-      <div style={{ zoom: 1.3, paddingTop: 20 }}>
-      <div style={{ display: "flex", gap: 40, padding: 50 }}>
-        {cards.map((c) => (
-          <div key={c.key} style={{ flex: 1, background: T.panel, padding: 40, borderRadius: 12, border: `1px solid ${T.line}` }}>
-            <div style={{ fontSize: 22, color: T.dim }}>{c.role}</div>
-            <div style={{ fontSize: 44, fontWeight: 600, margin: "6px 0 26px" }}>{c.name}</div>
-            <Row k="Reach" v={`${round1(t[c.key].depth_m)} m`} scale={1.3} strong />
-            <Row k="Mass" v={eq[c.key] == null ? "—" : `${round1(eq[c.key] as number)} kg`} scale={1.3} />
-            <Row k="P(ice within reach), site" v={t[c.key].p_ice.toFixed(2)} scale={1.3} />
-            <div style={{ marginTop: 26 }}><Tag scale={1.4}>{t[c.key].verdict.replace("_", "-")}</Tag></div>
-          </div>
-        ))}
-      </div>
-      <div style={{ padding: "0 50px", fontSize: 22, color: T.dim }}>Strategy: radar first, drill to confirm · regional estimate per tool</div>
-      </div>
-    </Screen>
-  );
+  const tools=D.site_tools as Record<string,{depth_m:number;p_ice:number;verdict:string}>,eq=Object.fromEntries(D.equipment.map(e=>[e.tool,e.mass_kg]));
+  return <Screen w={W} h={H}><TopBar title="Tool strategy" right="S1094b / regional estimate" /><div style={{ padding:"50px 64px" }}><div style={eyebrow}>REACH / ESTIMATED ICE DEPTH</div><div style={{ fontSize:76,fontWeight:500,letterSpacing:-2,marginTop:14 }}>Radar to find. A core to confirm.</div><div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:28,marginTop:44 }}>{[{key:"gpr",title:"Ground-penetrating radar",action:"01 / LOCATE",sub:"Survey along the traverse"},{key:"core_drill",title:"Core drill",action:"02 / CONFIRM",sub:"Measure at the station"}].map(c=><div key={c.key} style={{ ...panel,padding:40 }}><div style={eyebrow}>{c.action}</div><div style={{ fontSize:40,fontWeight:500,letterSpacing:-1,marginTop:16 }}>{c.title}</div><div style={{ ...muted,marginTop:8 }}>{c.sub}</div><div style={{ display:"flex",gap:50,marginTop:42 }}><Metric label="Reach" value={<>{round1(tools[c.key].depth_m)}<span style={{ fontSize:30 }}> m</span></>} /><Metric label="P(ice within reach)" value={pct(tools[c.key].p_ice)} /></div><div style={{ borderTop:`1px solid ${T.line}`,marginTop:36,paddingTop:26,display:"flex",justifyContent:"space-between",fontSize:25 }}><span>{eq[c.key]==null?"Mass not specified":`${round1(eq[c.key] as number)} kg`}</span><span style={{ fontFamily:T.mono }}>{tools[c.key].verdict.replace("_","-")}</span></div></div>)}</div></div><Foot left="Illustrative hardware · reach is tool-specific" /></Screen>;
 };

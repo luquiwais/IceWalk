@@ -1,8 +1,9 @@
 # IceWalk — videos de entrega
 
-Una versión de trabajo: guion base v3 con producción v4 (filmación real, terreno
-3D y motion graphics). Consolidado el 14/11/2026 ART. Producción pausada por Eitan;
-organizar los archivos no aprueba las tomas pendientes.
+Producción iniciada. Eitan descartó filmación y material Higgsfield; pide 3D
+realista y animado, y voces naturales. Estado detallado en [production.md](production.md).
+Preview: [Global](http://localhost:3100/Global) y [Local](http://localhost:3100/Local).
+Son maquetas en elaboración, sin calidad final aprobada.
 
 | Documento | Contenido |
 | --- | --- |
@@ -29,7 +30,6 @@ Los ocho documentos superados se retiraron después de respaldarlos en
 `~/Developer/IceWalk-workfiles/2026-11-14-video/`. Historia en [el log](../../log/2026-11-14.md);
 ese registro no sustituye el plan actual.
 
-Siguiente paso creativo: resolver filmación del IV, uso del clip S02 y contexto
-NASA de análogos antes de retomar producción. Requisitos y fuentes de entrega:
-[relevamiento](../../research/submission-brief-2026-11-14.md), con fecha de consulta.
-Drive y plazo local siguen pendientes de confirmación.
+Siguiente paso: terminar pruebas de rigs, materiales y cámaras antes de integrar las
+tomas animadas; revisar voces y los dos montajes. Decisiones #89–91 resueltas;
+Drive y plazo local siguen en #92. [Relevamiento de entrega](../../research/submission-brief-2026-11-14.md).

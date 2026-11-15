@@ -815,3 +815,91 @@ Se mide la diferencia con un bootstrap pareado y estratificado (2000 remuestreos
 - Siguen sin verificar: defectos visuales 3D heredados, logos, actuación y voces,
   lectura cronometrada, composición local y puesta final. El animatic conserva
   placeholders; build/lint no prueban que esté listo para entrega.
+
+
+## 2026-11-14 — Primeras pruebas de producción (Codex)
+
+- Remotion Studio bajo Bun falló por `stream.unref` en el file picker nativo de
+  macOS. Ejecutar el CLI con Node funciona; preview en :3100, app de producto intacta.
+- Retiradas todas las referencias Higgsfield del grafo de composiciones registradas;
+  el test falló primero por ProofConsole y pasa después de reemplazar las placas.
+- Consola física, taladro conceptual y terreno probados con Cycles. Primitivas y
+  stills no se aceptan como acabado final. La primera superficie era demasiado
+  lisa/brillante; se corrigieron coordenadas de textura a metros, mapas PBR,
+  specular y roughness. Todavía requiere revisión visual.
+- Rig Z2: el heat weighting falló, pese a crear grupos vacíos. Reemplazado por
+  pesos anatómicos explícitos. Validación de malla evaluada entre frames 1/13:
+  13 huesos y deformación local máxima 0,1134 m por actor. Eso prueba skinning,
+  no una caminata profesional: siguen en revisión pose, pies y deslizamiento.
+- Renderizadas tres pruebas nativas de 72 frames a 24 fps: consola y taladro a
+  1920×1080, caminata a 960×540. Cámara 3D, proyección de monitores por frame,
+  rig y giro/parada de eje. No son exportaciones de los videos finales.
+- Guías de macOS descartadas por pedido de voces naturales. Generadas 36 tomas
+  Microsoft Neural (Andrew/Guy; Tomás/Elena), mezcla de 29,5/180 s sin `atempo`.
+  Se recortaron frases/pausas y ventanas para no comprimirlas. Test de ventanas pasa.
+- Archivo NASA: CHAPEA 160–166 s y Desert RATS 112–117 s, mudo y rotulado como
+  contexto terrestre en Local. Smithsonian dio página temporalmente no disponible
+  y API 403; no se descargó el escaneo Armstrong. PGT y guante sí desde NASA;
+  PGT no se presenta como taladro de hielo certificado.
+
+## 2026-11-15 — Global v2: set, rigs y render (Claude)
+
+- Retarget CMU → Z2 por dirección de hueso con giro del origen: funciona con la malla en pose de brazos adelante. Falló primero porque el BVH importado estaba oculto en viewport y no se evaluaba (pose constante); corregido.
+- El clip 03_01 (terreno irregular) sube y baja la pelvis: no sirve para suelo plano. 40_10 camina y gira: se buscó por script la ventana más quieta (cuadro 151, 2 cm de deriva) y se fijó la raíz. Caminata: ventanas rectas de 17_08 (cuadro 61) y 07_04.
+- El casco giraba con la cabeza; en el Z2 va fijo al torso superior: pesos del casco al pecho.
+- La textura Rocky Terrain tenía tinte verde (musgo): se usa solo su luminancia con color de regolito marciano. Las rocas escaneadas salían blancas: basalto oscuro con polvo en caras superiores.
+- EEVEE rompe con la subdivisión adaptativa del terreno (desborde de enteros): en modo layout se baja a nivel 1.
+- Tiempo por cuadro en Cycles 1920×804, 48 muestras: ~65–75 s en M4 Pro (con otras tareas en GPU). El primer render incluye la compilación de kernels Metal (~170 s).
+- Volumen de mundo en EEVEE dentro del hábitat produjo un patrón de mosaico: se quitó.
+- Luces de área frente a los monitores aparecían reflejadas en el vidrio: la luz miraba hacia la pantalla; se invirtió.
+- El plano de resultado usaba cuadros posteriores al final del render del taladro: lo detectó el test nuevo de cobertura; ahora congela el último cuadro.
+
+## 2026-11-15 — Continuación de renders y memoria (Codex, tarde)
+
+- Cinco secuencias finales completas: órbita 72, taladro 60, consola amplia 64,
+  revisión 80 y subsuelo 72 cuadros. Se codificaron en `public/v2/`; los MP4 de
+  consolas, órbita y subsuelo que había al entrar eran anteriores al render final.
+  Caminata heredada: 24/72; POV sin secuencia final. No había export final.
+- El codificador aceptaba secuencias incompletas y podía terminar con código 0.
+  Test reproducido en una carpeta temporal; ahora exige cuadros contiguos,
+  permite elegir planos y sustituye el MP4 solo al completar la codificación.
+  También se corrigió la expansión del listado predeterminado en zsh. Nueve tests
+  de entrega pasan; eslint y TypeScript pasan.
+- Reanudar walk en 25:72 consumió unos 49,7 GB de huella física, medidos con
+  `sample`; el proceso estaba preparando `LightManager::device_update_tree`.
+  Se terminó ese intento, conservando los 24 cuadros originales. Hipótesis:
+  el shader emisivo usado para perspectiva aérea hacía tratar el terreno
+  desplazado y los bloques como fuentes de luz para muestreo directo.
+- Ajuste en `mars.haze`: `mat.cycles.emission_sampling = 'NONE'`, manteniendo
+  geometría, texturas, 1920×804, 48 muestras y el shader de perspectiva aérea.
+  Verificado en Blender 5.3. El cuadro 24 se renderizó aparte en 47,54 s;
+  comparación visual con el original sin cambios importantes de encuadre o tono.
+  Diferencia absoluta media RGB: 0,00420 en escala 0–1 (incluye ruido de muestreo).
+  Referencia: [Blender, Emission Sampling](https://docs.blender.org/manual/en/5.0/render/cycles/material_settings.html).
+  Secuencia 25:72 reanudada con el ajuste; rendimiento sostenido pendiente.
+- Audio medido con ffmpeg loudnorm, sin modificar las mezclas: Global 29,50 s,
+  −16,44 LUFS, pico −1,00 dBTP; Local 180 s, −16,32 LUFS, pico −0,99 dBTP.
+  Esto no valida interpretación, claridad de voces ni mezcla por escucha.
+# Revisión del astronauta y motion blur — 2026-11-15
+
+Se conservó el rig original (91 articulaciones) del astronauta de LasquetiSpice,
+CC BY 4.0, con retarget CMU para locomoción. El clip lunar del activo tiene una
+fase aérea demasiado larga para la puesta en escena elegida. Se conserva para
+comparación, sin usarlo como marcha final.
+
+`blender/v2/validate_scene.py`, ejecutado con el actor nuevo: 60 cuadros; máximo
+error geométrico palma/manillar **5,98 × 10⁻⁶ m**; avance del taladro **0,22 m**;
+giro **46,50 rad**; observador con variación de pose. Resultado local:
+`tools/video/assets/scenes/drill-v3-checks.json`. Esto no mide la naturalidad
+percibida de las manos, que también se inspeccionó en acercamientos.
+
+El primer render EEVEE de la piel segmentada presentó doble contorno con motion
+blur, incluso en reposo. Comparación del cuadro 30 con el mismo set, materiales,
+cámara y 96 muestras, cambiando solo `use_motion_blur=False`: contornos limpios.
+Lote original preservado en `assets/renders/v3/drill-motion-blur-check`; nuevo
+lote en `assets/renders/v3/drill`. El taladro conserva hélice continua, siete
+vueltas y avance visibles sin depender del desenfoque para comunicar giro.
+
+Fuente, licencia y adaptación de shaders:
+[`research/astronaut-assets-2026-11-15.md`](research/astronaut-assets-2026-11-15.md).
+Los clips siguen en producción; falta revisión continua de las películas.

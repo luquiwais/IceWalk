@@ -3,14 +3,14 @@ import { D, T } from "./theme";
 
 /** Barra superior común a las pantallas de consola. */
 export const TopBar: React.FC<{ title: string; right?: string; scale?: number }> = ({ title, right, scale = 1 }) => (
-  <div style={{ height: 64 * scale, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `0 ${32 * scale}px`, borderBottom: `1px solid ${T.line}`, fontFamily: T.sans, color: T.text, background: T.panel }}>
+  <div style={{ height: 96 * scale, display: "flex", alignItems: "center", justifyContent: "space-between", padding: `0 ${48 * scale}px`, borderBottom: `1px solid ${T.line}`, fontFamily: T.sans, color: T.text, background: "#10151b" }}>
     <div style={{ display: "flex", alignItems: "center", gap: 18 * scale }}>
-      <IceWalkMark size={26 * scale} />
-      <span style={{ fontSize: 20 * scale, fontWeight: 600, letterSpacing: 0.4 }}>IceWalk</span>
+      <IceWalkMark size={34 * scale} />
+      <span style={{ fontSize: 28 * scale, fontWeight: 600, letterSpacing: -0.5 }}>IceWalk</span>
       <span style={{ width: 1, height: 24 * scale, background: T.line }} />
-      <span style={{ fontSize: 19 * scale, color: T.dim }}>{title}</span>
+      <span style={{ fontSize: 24 * scale, color: T.dim }}>{title}</span>
     </div>
-    <div style={{ fontFamily: T.mono, fontSize: 18 * scale, color: T.dim }}>{right ?? `SITE ${D.site.id.toUpperCase()} · ${D.replan.plan_id}`}</div>
+    <div style={{ fontFamily: T.mono, fontSize: 19 * scale, color: T.dim }}>{right ?? `SITE ${D.site.id.toUpperCase()} · ${D.replan.plan_id}`}</div>
   </div>
 );
 
@@ -43,5 +43,5 @@ export const Tag: React.FC<{ children: React.ReactNode; tone?: "neutral" | "advi
 };
 
 export const Screen: React.FC<{ w: number; h: number; children: React.ReactNode }> = ({ w, h, children }) => (
-  <div style={{ width: w, height: h, background: T.bg, color: T.text, fontFamily: T.sans, overflow: "hidden", position: "relative" }}>{children}</div>
+  <div style={{ width: w, height: h, background: "radial-gradient(ellipse at 30% 0%,#1b232c,#0b1016 75%)", color: T.text, fontFamily: T.sans, fontVariantNumeric: "tabular-nums", WebkitFontSmoothing: "antialiased", overflow: "hidden", position: "relative" }}>{children}</div>
 );

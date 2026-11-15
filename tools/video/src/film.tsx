@@ -57,8 +57,8 @@ export const Fade: React.FC<{ dur: number; inF?: number; outF?: number; children
 
 /** Subtítulo de voz o radio. */
 export const Sub: React.FC<{ text: string; who?: string }> = ({ text, who }) => (
-  <div style={{ position: "absolute", left: 0, right: 0, bottom: 84, textAlign: "center" }}>
-    <span style={{ fontFamily: T.sans, fontSize: 44, fontWeight: 500, color: "#fff", background: "rgba(0,0,0,0.5)", padding: "6px 18px", borderRadius: 4, textShadow: "0 2px 6px rgba(0,0,0,0.6)" }}>
+  <div style={{ position: "absolute", left: 0, right: 0, bottom: 72, textAlign: "center", padding: "0 100px" }}>
+    <span style={{ fontFamily: T.sans, display: "inline-block", maxWidth: 1680, fontSize: 42, lineHeight: 1.25, fontWeight: 500, color: "#fff", background: "rgba(0,0,0,0.5)", padding: "6px 18px", borderRadius: 4, textShadow: "0 2px 6px rgba(0,0,0,0.6)" }}>
       {who ? <span style={{ fontFamily: T.mono, fontSize: 30, color: "#c9d3dd", marginRight: 14 }}>{who}</span> : null}
       {text}
     </span>

@@ -53,9 +53,6 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 
 | 87 | Hábitat del 3D con un modelo de NASA 3D Resources: la búsqueda no encontró un hábitat de superficie en el catálogo oficial (solo naves e instalaciones; los hábitats que aparecen son de terceros, pagos o "editorial only"). ¿Se busca a mano en science.nasa.gov/3d-resources o queda el cilindro rotulado? | Buscar a mano; mientras, el cilindro | Luqui + Frontend | 14/11 |
 
-| 89 | ¿Quién filma el IV y con qué celular? Producción de video propuesta, todavía sin tomas finales | Ver `submission/video/production.md` §5 y §9 | Eitan + equipo | 14/11 |
-| 90 | ¿Se mantiene el clip S02 del taladro, con marca de IA? No se generan clips nuevos | Pendiente de Eitan; hay una versión local de 720p | Eitan | 14/11 |
-| 91 | ¿Se usa contexto NASA de análogos en el video local? | Poco, rotulado y con revisión de créditos por recurso; pendiente de Eitan | Eitan | 14/11 |
 
 ## A averiguar
 

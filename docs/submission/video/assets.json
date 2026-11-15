@@ -11,7 +11,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/assets/frames/F01_drill_overhead.png",
@@ -20,7 +20,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/assets/nasa/3d/Astronaut.glb",
@@ -964,7 +964,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/assets/refs/R2_EV2.png",
@@ -973,7 +973,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/assets/refs/R3_IV.png",
@@ -982,7 +982,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/assets/refs/R4_HAB.png",
@@ -991,7 +991,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/assets/refs/R5_SITE.png",
@@ -1000,7 +1000,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/assets/renders/W1_preview/0001.png",
@@ -1099,7 +1099,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/public/data/change.png",
@@ -1215,7 +1215,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/public/plates/R1_EV1.png",
@@ -1224,7 +1224,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/public/plates/R2_EV2.png",
@@ -1233,7 +1233,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/public/plates/R3_IV.png",
@@ -1242,7 +1242,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/public/plates/R4_HAB.png",
@@ -1251,7 +1251,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/public/plates/R5_SITE.png",
@@ -1260,7 +1260,7 @@
       "git": "local_ignored",
       "origin": "Higgsfield generation; existing material only",
       "license": "AI-generated; account terms and disclosure apply",
-      "review": "pending_final_use"
+      "review": "rejected_by_user_do_not_use"
     },
     {
       "path": "tools/video/public/site/s1094b-3d.json",
@@ -1547,5 +1547,379 @@
       "license": "Project work; review before final distribution",
       "review": "pending"
     }
-  ]
+  ],
+  "production_files": [
+    {
+      "path": "tools/video/public/cinema/cast-proof.png",
+      "bytes": 716422,
+      "sha256": "85834881eabaaad0cc7f35b07d239d8067ba7fabf5ebe5f6040cd57728f8908a",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/console-motion.mp4",
+      "bytes": 1584234,
+      "sha256": "674d5ba492a63dba0d3eb42085653dafc552132a2ea4a390dd1c33c146767173",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/console-proof.png",
+      "bytes": 738027,
+      "sha256": "a5f403f3515315ad1eabd72f9c56e128abd26c6edb3355630493f9a3258db5ea",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/console.png",
+      "bytes": 2658845,
+      "sha256": "4ef301ad2f7d817bcfcb583e4fabce8be0c861f916abab81a413c2749bf65792",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/drill-motion.mp4",
+      "bytes": 2120579,
+      "sha256": "d0f23078de3f83bea515d8d4ed1f3b306492045a87a04c2427810a2f2bdcf567",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/drill-proof.png",
+      "bytes": 885822,
+      "sha256": "b44ecb416272f5ff61e85a21bac5bb1d1d6c6240a2616fae2bc37f9fadf7cf2a",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/drill.png",
+      "bytes": 3515084,
+      "sha256": "909da492c0106bf7e130e9dad0e4beec1896330eedc39b95278c611e2d6549b1",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/hole.png",
+      "bytes": 3098916,
+      "sha256": "245d9a653f2e07af51882d503305086cadfa9f94894942c63d4dace514b7e99f",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/walk-proof.mp4",
+      "bytes": 372824,
+      "sha256": "908e658d2d11d728452ef704c3ddf188e5cf5383b45e9d0a15ad28f5ce6a8282",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/wide-proof.png",
+      "bytes": 558490,
+      "sha256": "c9632ac11bdb932b59511b6f7d775c98b7c38460ed2fd66071b97437dc56fabf",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/cinema/wide.png",
+      "bytes": 2535146,
+      "sha256": "47d38210ceb946511b118c9f0262f34b5a11f9b86be47015d8d4f4ce68b70757",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/audio/global-guide.wav",
+      "bytes": 1416044,
+      "sha256": "63ce90603707c291a6abdf09ac7240eeede86f2c856fecabafdd46520688e4c8",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/audio/global-voice.wav",
+      "bytes": 1416044,
+      "sha256": "0d564acccae14243d9b478d7a5c822695878cc61486265c811c3a07ac19fb460",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/audio/local-guide.wav",
+      "bytes": 8640044,
+      "sha256": "5b9f413b00880cf933f395cc5dad4e42b2d078ac6c7dee46d16f1d274ad66853",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/audio/local-voice.wav",
+      "bytes": 8640044,
+      "sha256": "3b1876484aeaefb21b1601446d81a39de6f0e2b9d71b2808c942a03eb5622dd3",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/nasa/chapea-context.mp4",
+      "bytes": 7389433,
+      "sha256": "2d1fd43f2a5507afeccf2ba3af774dcdf4079d50263824e15098d012ce57ce31",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/nasa/desert-rats-context.mp4",
+      "bytes": 6160294,
+      "sha256": "9baf3d7de952b40cfe5360d537f641e884d57cef4e0f3e0e1c9ddb80f77b921d",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/global-00.mp3",
+      "bytes": 15552,
+      "sha256": "e256b81f4298a07a1bb15fc7b979c81b1b4b580dbde98195d5640509c64f6382",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/global-01.mp3",
+      "bytes": 21744,
+      "sha256": "a4b105f9ce8ea8a042fa3636f3607dfda2d5182e7acc6434cb039efb6f1885ba",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/global-02.mp3",
+      "bytes": 17280,
+      "sha256": "11071081d7b208cf29a5bf8c39feac523065b3aef9e79c52ec3808c6383097f6",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/global-03.mp3",
+      "bytes": 19728,
+      "sha256": "4abf5e7115f5690b98c7c6017766a7446e17d924208a61e43b60c83482d69a74",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/global-04.mp3",
+      "bytes": 11232,
+      "sha256": "97cf5302aefebd9e27585b91c78bbe0de9da802b1fec2b0313f3bf2fc06e1d21",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/global-05.mp3",
+      "bytes": 20016,
+      "sha256": "1f09b612c393288d4a41f93fdfcc097726605d9c3e8f93774c057eb5f0a2482f",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/global-06.mp3",
+      "bytes": 11232,
+      "sha256": "3a26aa64b707e9013a8afaf337a078f9873df008a0c071158b4033c03b6161c0",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-00.mp3",
+      "bytes": 29232,
+      "sha256": "78ca467db11d8bcefca98975d8a5cf107a1225aad960bcc4a61cce2854f513d7",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-01.mp3",
+      "bytes": 20016,
+      "sha256": "ff7f8b163c174c0b4ce582870eb0b463477be1202ad2d2302daa93eca2694c47",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-02.mp3",
+      "bytes": 26352,
+      "sha256": "9bd967930e98af9431796b0497baaacec2ca6cb8fe5f6b64b0328ec0e6d81af2",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-03.mp3",
+      "bytes": 35712,
+      "sha256": "c489b1703c81d5b338ef2e8b1e60b75a3105f3e0b0a532b78b1a5196275ebd40",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-04.mp3",
+      "bytes": 28800,
+      "sha256": "b92c55507f4c16196a8a0d292942419283bddc5caf84f2ab12b8fdfeba657932",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-05.mp3",
+      "bytes": 22608,
+      "sha256": "8e4264e4a582a407c6fe70ec451950594314274bfa74a9f914424c0e3460f01a",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-06.mp3",
+      "bytes": 36432,
+      "sha256": "7180aa304746be1b73ed7fc6a22d6ada7085efa81bb658e5903f73fcd90ce608",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-07.mp3",
+      "bytes": 26208,
+      "sha256": "79bd9c4197c6d6756a046d83c3e2e181d4ddd9ff969d2dc79f78ba894bba29bc",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-08.mp3",
+      "bytes": 24912,
+      "sha256": "dbd3f354aed1a915ea9f75c42564e66b20cc952e6fcea20be18efd58615767a1",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-09.mp3",
+      "bytes": 33696,
+      "sha256": "623441f04917e8f583873fc222ad1f04f9eb667a9d5859501e4d50c1eed508a8",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-10.mp3",
+      "bytes": 30816,
+      "sha256": "00c57229d237f75caf8342a98d5da08724d46cbbe52cc5b9de9f387816081602",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-11.mp3",
+      "bytes": 35280,
+      "sha256": "73374bae3b6bb4cd79810df8cc19bd37cc1ccadfa7bc83ff93e5e6675c5e7fa4",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-12.mp3",
+      "bytes": 26640,
+      "sha256": "62b7a53424009b7ffa1d0661829af5a6ec498f441ec1e37d1574d06e069526ce",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-13.mp3",
+      "bytes": 40176,
+      "sha256": "b1a435aa2b7550a54ec47c1d86b4542c4edd693b3d9eb2706ac8c357a6def8e4",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-14.mp3",
+      "bytes": 27072,
+      "sha256": "34cd0c3d37d739a2949d6a58618abfb718060b644f079fcc94b072c6a22a20e0",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-15.mp3",
+      "bytes": 36864,
+      "sha256": "d6f57a6c4ac1097960744a0c321f11f424f844495c6aa237dc19f438cde7bde3",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-16.mp3",
+      "bytes": 28368,
+      "sha256": "e845e458fd6c7e4f885ac1036ecfa48368ea1c84f81537200fcbb9cb22ebd07a",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-17.mp3",
+      "bytes": 11232,
+      "sha256": "c930fea6194e4892ce485d127f0c31b9663231e537ce8d39636c038474d7c1ee",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-18.mp3",
+      "bytes": 45792,
+      "sha256": "b1d082a45356ce16c8d497442496826ff65032da41978bdf68387ffe420fcca5",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-19.mp3",
+      "bytes": 30384,
+      "sha256": "5c6778b2dd9f2617fc3541fcfa33897b2bf0c1d066c65e1368ffb0c07f7ee065",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-20.mp3",
+      "bytes": 39600,
+      "sha256": "a23e36f2aedb184dec309975fc62d431c8a30a6d6c5491d1af40433a7568de1d",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-21.mp3",
+      "bytes": 32832,
+      "sha256": "2a1c3d60b3700440c7c79ca2fa18bbafda5d2e98397d55b52e4e6cefe8e3a47a",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-22.mp3",
+      "bytes": 45648,
+      "sha256": "1b1b462629e56d806de4a64d57f0e4541131a44e7eafd1d01c1245d9d70ab4db",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-23.mp3",
+      "bytes": 30096,
+      "sha256": "377cc18ab37560d9311a2334bc322de0476d37156df013c0e5456c92982603f3",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-24.mp3",
+      "bytes": 21744,
+      "sha256": "c9fc87e3391a8ae2754206521be2ae13a8e5071639fd4e39512880f2fe560a26",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-25.mp3",
+      "bytes": 35712,
+      "sha256": "ce30ec3ff4ba5d53bd5093f3415c2fad402f75144af251f57f3428ececf54004",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-26.mp3",
+      "bytes": 48528,
+      "sha256": "995243ebd78681c82362496ec5318d6bcfcba50495c14bb63b172bc2336ba435",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-27.mp3",
+      "bytes": 21600,
+      "sha256": "84f025df1a7639848d476f5f6d5ac5b6419ed658a151fe86cc0989a8071a53eb",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/assets/neural-voice/local-28.mp3",
+      "bytes": 38880,
+      "sha256": "75031fa63ccd11b3037635482cac9db403d6f973d56537bec93ee672da672f33",
+      "git": "local_ignored",
+      "stage": "work_in_progress_not_final"
+    }
+  ],
+  "production_note": "Current proof media. Neural voices synthesized with Microsoft stock voices through edge-tts; no impersonation or voice cloning. Rendered geometry, rigs and camera proofs are not final quality approval."
 }
