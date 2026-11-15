@@ -507,3 +507,5 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
 .mission-detail-title .mission-detail-value { font-size: .8125rem; font-weight: 500; color: var(--color-label-secondary); margin-left: .25rem; }
 .mission-detail .mission-text-link { display: inline-flex; align-items: center; gap: .125rem; }
 .mission-detail .mission-text-link svg { width: .875rem; height: .875rem; }
+.mission-table-fixed { table-layout: fixed; }
+.mission-table td.mission-wrap { white-space: normal; line-height: 1.25; }
