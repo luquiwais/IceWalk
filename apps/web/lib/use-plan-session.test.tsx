@@ -352,6 +352,15 @@ describe("moving the habitat", () => {
     expect(session.getSnapshot()).toMatchObject({ plan: apiPlan, status: "ready", habitatError: "Habitat outside the planning area covered by the HiRISE terrain model" });
   });
 
+  it("says the planner was too slow instead of refusing the habitat when the request times out", async () => {
+    let first = true;
+    const slow = deferred();
+    const fetch = routes({ ...healthy, "/plan": (init) => { if (first) { first = false; return json(apiPlan); } return slow.route(init); } });
+    const session = await started(fetch, 10);
+    await session.setHabitat([800, -1200]);
+    expect(session.getSnapshot()).toMatchObject({ plan: apiPlan, status: "ready", habitatError: "The planner took too long to answer. Try again." });
+  });
+
   it("says the planner API is needed when there is none", async () => {
     const session = createPlanSession({ baseUrl: null, fallback });
     await session.setHabitat([800, -1200]);
