@@ -938,3 +938,10 @@ explicación específica del fin de estación, no se trata como telemetría en r
 - **Viaje animado entre estaciones** (descartado, 1.3 s con arco): Luqui prefirió el salto instantáneo.
 - **Modelo HDU de NASA**: el GLB exige `KHR_draco_mesh_compression` (sin el decodificador cae al cilindro) y su material con transmisión se ve negro sin mapa de entorno; con DRACOLoader y material mate se ve bien.
 - Medido: panel del Brief sin scroll a 1280 × 551 en el sobrevuelo, el hábitat, las 6 estaciones y la confirmación. A 1024 × 768 no se pudo medir (la ventana del navegador de prueba no se achicó).
+
+## 2026-11-15 · Video: capturas reales de la app y voces
+
+- **Capturar `/app` con agent-browser a 2x** (funciona): Site, Plan, Brief, consola IV y casco EV1 a 3840 × 2160, con el botón de Next oculto por CSS. Colapsar el panel del plan reencuadra el mapa, así que para la versión limpia se ocultaron los paneles por CSS.
+- **Registrar una medición automatizada** (falló): la pregunta "What did you find?" aparece solo a ≤ 5 m de la estación; los `keydown` sintéticos de página no mueven al EV1, `agent-browser keydown` sí, pero el HUD va atrasado, se pasó 121 m y la pestaña volvió a Plan perdiendo el estado.
+- **Gemini TTS en paralelo**: 2 de 6 pedidos devolvieron 429; no hizo falta reintentar.
+- **Niebla volumétrica de mundo en EEVEE 5.3** (falló): la dispersión volumétrica del mundo deja el cuadro negro con densidad 0,0025 y 0,0006. Se mantiene la bruma de los materiales y se suma bruma en composición (Remotion).

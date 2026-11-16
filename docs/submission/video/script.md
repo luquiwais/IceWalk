@@ -7,49 +7,54 @@ No son una aprobación del ritmo, actuación o acabado visual final.
 
 ## Global — 29,5 segundos, inglés
 
+Reestructura del 15/11 noche (producto primero, UI real de la app).
+
 | Tiempo | Voz | Texto |
 | --- | --- | --- |
-| 0.17–3.83 s | IV / narración | We can map Mars. Not one metre down. |
-| 4.00–5.92 s | EV1 | One metre. No ice. |
-| 10.21–13.42 s | IV / narración | Each measurement updates the map and the plan. |
-| 15.08–18.50 s | IV | Plan reviewed. You are GO for station twenty-five. |
-| 18.67–19.17 s | EV1 | Copy. |
-| 21.71–25.08 s | IV / narración | We don't promise ice. Fewer EVAs. |
-| 28.08–28.92 s | IV / narración | IceWalk. |
+| 0.17–3.38 s | Narración | Every EVA on Mars is limited. Where should the crew measure? |
+| 4.25–8.67 s | Narración | IceWalk maps where ice is likely, and how sure we are. Then it plans the stations. |
+| 9.67–11.38 s | EV1 | One metre. No ice. |
+| 12.75–15.88 s | Narración | Each measurement updates the map and the plan. |
+| 17.75–20.38 s | IV | Plan reviewed. EV1, you are GO for the next station. |
+| 20.58–21.00 s | EV1 | Copy. |
+| 21.33–25.71 s | Narración | In our simulation, radar first cuts the expected EVAs from three point three to one point two. |
+| 27.83–28.46 s | Narración | IceWalk. |
 
 ## Local — 180 segundos, castellano
 
+Reestructura del 15/11 noche (UI real como protagonista, guía de pitch de los organizadores; sin CHAPEA/Desert RATS).
+
 | Tiempo | Voz | Texto |
 | --- | --- | --- |
-| 0.21–3.42 s | IV / narración | Desde la órbita vemos mucho. No lo que hay a un metro. |
-| 5.50–7.29 s | EV1 | Un metro. Sin hielo. |
-| 8.29–12.12 s | IV / narración | Buscar hielo en Marte cuesta salidas y tiempo de la tripulación. |
-| 14.79–20.17 s | IV / narración | No prometemos hielo: ayudamos a decidir dónde medir, con qué herramienta y cuándo volver. |
-| 22.42–26.08 s | IV / narración | Juntamos datos orbitales de NASA para estimar hielo hasta tres metros. |
-| 28.58–31.67 s | IV / narración | Y mostramos por separado lo que todavía no sabemos. |
-| 35.50–40.96 s | IV / narración | El radar indica dónde conviene buscar. El taladro confirma hasta un metro. |
-| 43.29–46.75 s | IV / narración | Las operaciones se apoyan en prácticas documentadas por NASA. |
-| 48.50–52.42 s | IV / narración | El sistema arma estaciones según lo que pueden enseñarnos. |
-| 55.00–61.17 s | IV / narración | Y una ruta sobre el terreno, con obstáculos vistos desde la órbita y tiempo para volver. |
-| 61.50–68.38 s | IV / narración | Elegimos cuándo salir: luz, temperatura, polvo y clima espacial. |
-| 68.54–73.79 s | IV / narración | Cada aviso conserva su fuente. Este es un ejemplo ambiental de otra fecha. |
-| 73.96–77.96 s | IV / narración | En la Tierra, NASA ensaya cómo vivir y trabajar lejos. |
-| 80.00–86.29 s | IV / narración | Afuera, uno mide y el otro asiste. Adentro, el operador revisa cada cambio. |
-| 86.50–90.88 s | IV / narración | Este reloj muestra cuánto pueden trabajar antes de emprender la vuelta. |
-| 92.50–96.42 s | IV / narración | Ya cuenta el trayecto y la entrada al hábitat. La reserva no se vuelve a descontar. |
-| 99.50–102.25 s | EV1 | Sin hielo hasta un metro. Registro enviado. |
-| 103.50–104.25 s | IV | Recibido. |
-| 105.00–110.88 s | IV / narración | Un negativo también informa. El modelo esperaba hielo más abajo y el plan ya tenía preparado este camino. |
-| 113.50–117.33 s | IV / narración | La medición actualiza la estimación cerca del punto y también su incertidumbre. |
-| 120.00–125.38 s | IV / narración | El cambio es pequeño y local. Sin hielo en el primer metro permite hielo más profundo. |
-| 127.42–131.38 s | IV | PET noventa y uno. Cuatro horas dieciséis para iniciar el regreso. |
-| 134.00–139.71 s | IV | Plan revisado: cinco estaciones, seguimos. EV1, GO para la estación veinticinco. |
-| 142.50–146.38 s | IV / narración | Siguen con una decisión revisada: qué aprendieron y qué falta conocer. |
-| 148.21–150.67 s | IV / narración | Y qué margen tienen que cuidar en el siguiente paso. |
-| 154.50–160.25 s | IV / narración | En nuestra simulación, radar primero y taladro para confirmar baja las salidas esperadas. |
-| 161.50–169.00 s | IV / narración | De tres coma treinta y dos a uno coma dieciséis. No prometemos hielo: buscamos aprender más con menos EVAs. |
-| 171.00–173.58 s | IV / narración | Todos los números de este video salieron de IceWalk. |
-| 174.50–179.00 s | IV / narración | IceWalk. Entender la incertidumbre. Planificar el siguiente paso. |
+| 0.25–3.46 s | Narración | Desde la órbita vemos mucho. No lo que hay a un metro. |
+| 5.83–7.62 s | EV1 | Un metro. Sin hielo. |
+| 8.17–12.00 s | Narración | Buscar hielo en Marte cuesta salidas y tiempo de la tripulación. |
+| 12.42–17.79 s | Narración | No prometemos hielo: ayudamos a decidir dónde medir, con qué herramienta y cuándo volver. |
+| 18.33–28.33 s | Narración | Lo que importa es hasta dónde llega cada herramienta. Con un taladro de un metro, seis por ciento. Con un radar de suelo, que ve hasta diez metros, noventa y siete. |
+| 32.71–36.38 s | Narración | Juntamos datos orbitales de NASA para estimar hielo hasta tres metros. |
+| 36.88–43.62 s | Narración | La probabilidad y la incertidumbre son cosas distintas. Un lugar puede parecer prometedor y seguir casi sin medir. |
+| 44.12–48.04 s | Narración | El sistema arma estaciones según lo que pueden enseñarnos. |
+| 48.54–54.71 s | Narración | Y una ruta sobre el terreno, con obstáculos vistos desde la órbita y tiempo para volver. |
+| 55.21–61.71 s | Narración | Cada número del plan tiene su regla: duración, pendiente, carga y margen para volver caminando. |
+| 62.83–69.62 s | Narración | Antes de salir, la tripulación recorre la EVA en tres dimensiones y ve qué espera encontrar en cada estación. |
+| 70.17–76.46 s | Narración | Afuera, uno mide y el otro asiste. Adentro, el operador revisa cada cambio. |
+| 82.50–85.25 s | EV1 | Sin hielo hasta un metro. Registro enviado. |
+| 85.42–86.17 s | IV | Recibido. |
+| 86.50–93.62 s | Narración | Un negativo también informa. El modelo esperaba el hielo cerca de los tres metros, más abajo de lo que alcanza el taladro. |
+| 97.50–101.33 s | Narración | La medición actualiza la estimación cerca del punto y también su incertidumbre. |
+| 101.83–107.21 s | Narración | El cambio es pequeño y local. Sin hielo en el primer metro permite hielo más profundo. |
+| 107.83–112.42 s | IV | Revisé el cambio. Mantenemos el plan. EV1, GO para la siguiente estación. |
+| 112.67–114.29 s | EV1 | Copiado. Seguimos. |
+| 114.67–118.46 s | Narración | Revisar no siempre cambia el plan: a veces confirma que conviene seguir. |
+| 119.00–125.79 s | Narración | Durante la EVA, el margen para volver caminando y la hora límite de regreso están siempre a la vista. |
+| 126.25–133.12 s | Narración | Elegimos cuándo salir: luz, temperatura, polvo y clima espacial. |
+| 133.62–137.08 s | Narración | Las operaciones se apoyan en prácticas documentadas por NASA. |
+| 137.92–143.67 s | Narración | En nuestra simulación, radar primero y taladro para confirmar baja las salidas esperadas. |
+| 144.17–151.67 s | Narración | De tres coma treinta y dos a uno coma dieciséis. No prometemos hielo: buscamos aprender más con menos EVAs. |
+| 152.17–159.92 s | Narración | La simulación repite muchas campañas: seis estaciones por EVA y un taladro de un metro, que a ciegas acierta seis veces de cada cien. |
+| 160.42–168.08 s | Narración | Con radar, se perfora solo donde marca hielo cerca. Supone cincuenta sondeos por EVA: es una simulación, no un resultado de campo. |
+| 168.67–174.67 s | Narración | Al terminar, el informe reúne lo que se aprendió y lo que falta medir. De ahí sale el plan de la próxima EVA. |
+| 175.25–179.75 s | Narración | IceWalk. Entender la incertidumbre. Planificar el siguiente paso. |
 
 ## Puesta y montaje
 

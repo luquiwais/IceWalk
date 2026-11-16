@@ -125,3 +125,7 @@ No se verificó de oído toda la mezcla ni se aprobó el acabado visual.
 
 La preview de trabajo está en [Global](http://localhost:3100/Global) y
 [Local](http://localhost:3100/Local). Todavía no hay exportaciones finales.
+
+## 15/11 noche — reestructura con UI real
+
+Global reexportado con la dirección producto primero y la UI real de la app; el anterior queda local como `out/IceWalk-GlobalFilm-pre-lucas.mp4`. Local reestructurado en paralelo con UI real. Validación técnica: tipos, lint, `test_delivery.py`, Whisper y loudness. La aprobación humana de Eitan y Lucas sigue pendiente. Detalle en `docs/log/2026-11-15.md`.

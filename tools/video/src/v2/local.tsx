@@ -104,3 +104,48 @@ export const ReviewInsert: React.FC<{ dur: number; confirmAt?: number }> = ({ du
   const f = useCurrentFrame();
   return <UiInsert dur={dur} zoom={[1.0, 1.1]} origin="60% 70%"><ReviewCard confirmed={f >= confirmAt} /></UiInsert>;
 };
+
+/** Real app screen recording (1920x1080) shown inside the picture area. */
+export const UIVideo: React.FC<{ src: string; trimBefore?: number; top?: number }> = ({ src, trimBefore, top = -120 }) => (
+  <AbsoluteFill style={{ top: PIC.top, height: PIC.h, overflow: "hidden", background: "#000" }}>
+    <div style={{ position: "absolute", left: 0, top, width: 1920, height: 1080 }}>
+      <OffthreadVideo src={staticFile(src)} trimBefore={trimBefore} muted style={{ width: 1920, height: 1080 }} />
+    </div>
+  </AbsoluteFill>
+);
+
+/** How the campaign simulation works (values from docs/EXPERIMENTS.md, 14/11: Monte Carlo, S1094b prior). */
+export const SimExplainer: React.FC<{ dur: number }> = ({ dur }) => {
+  const f = useCurrentFrame();
+  const c = D.campaign;
+  const inn = (d: number) => interpolate(f, [d, d + 14], [0, 1], { ...clamp, easing: ease });
+  const dots = (n: number, hits: number, d: number, color: string) => (
+    <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+      {Array.from({ length: n }).map((_, i) => (
+        <div key={i} style={{ width: 40, height: 40, borderRadius: 20, border: "2px solid #5b6672", background: i < hits ? color : "transparent", opacity: inn(d + i * 3) }} />
+      ))}
+    </div>
+  );
+  const row = (title: string, sub: string, val: string, d: number, strong: boolean, hits: number) => (
+    <div style={{ marginBottom: 54, opacity: inn(d) }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <span style={{ fontSize: 30, color: strong ? "#eef2f5" : "#9aa7b4" }}>{title}</span>
+        <span style={{ fontFamily: T.mono, fontSize: 40, fontWeight: 600, color: strong ? "#fff" : "#9aa7b4" }}>{val}</span>
+      </div>
+      <div style={{ fontFamily: T.mono, fontSize: 16, letterSpacing: 1.4, color: "#8b97a4", marginTop: 8 }}>{sub}</div>
+      {dots(c.stations_per_eva, hits, d + 10, strong ? "#86b6ef" : "#5b6672")}
+    </div>
+  );
+  return (
+    <AbsoluteFill style={{ top: PIC.top, height: PIC.h, background: "#05080b", color: "#eef2f5", fontFamily: T.sans }}>
+      <div style={{ position: "absolute", left: 240, right: 240, top: 96 }}>
+        <div style={{ fontFamily: T.mono, fontSize: 17, letterSpacing: 2.6, color: "#8b97a4", marginBottom: 44 }}>CÓMO FUNCIONA LA SIMULACIÓN · UNA EVA = {c.stations_per_eva} ESTACIONES · TALADRO DE {c.drill_m.toFixed(0)} m</div>
+        {row("Taladro a ciegas", "P(HIELO) POR PERFORACIÓN ≈ 0,06 · PRIOR DE S1094b", "≈ 6 / 100", 8, false, 0)}
+        {row("Radar primero: perforar donde marca hielo ≤ 1 m", "50 SONDEOS DE RADAR POR EVA · P(HIELO) POR PERFORACIÓN ≈ 0,50", "≈ 50 / 100", Math.round(dur * 0.48), true, 3)}
+        <div style={{ fontFamily: T.mono, fontSize: 15, letterSpacing: 1.4, color: "#8b97a4", opacity: inn(Math.round(dur * 0.7)), lineHeight: 1.6 }}>
+          MONTE CARLO · SONDEOS Y EVAs INDEPENDIENTES (SUPUESTO) · ESTACIONES ILUSTRATIVAS · NO ES UN RESULTADO DE CAMPO
+        </div>
+      </div>
+    </AbsoluteFill>
+  );
+};

@@ -99,7 +99,7 @@ export const ScreenInsert: React.FC<{ dur: number }> = ({ dur }) => {
 };
 
 /** Orbit → site: real HiRISE imagery, zooming to station E03S24. */
-export const Descent: React.FC<{ dur: number; reverse?: boolean }> = ({ dur, reverse = false }) => {
+export const Descent: React.FC<{ dur: number; reverse?: boolean; label?: string }> = ({ dur, reverse = false, label = D.measurement.station_id }) => {
   const f0 = useCurrentFrame();
   const f = reverse ? dur - f0 : f0;
   const t = interpolate(f, [0, dur], [0, 1], { ...clamp, easing: ease });
@@ -122,7 +122,7 @@ export const Descent: React.FC<{ dur: number; reverse?: boolean }> = ({ dur, rev
         <line x1={cx + 46} y1={cy} x2={cx + 110} y2={cy} stroke="rgba(255,255,255,.7)" />
       </svg>
       <div style={{ position: "absolute", left: cx + 84, top: cy - 58, fontFamily: T.mono, color: "#fff", fontSize: 20, letterSpacing: 1.5, textShadow: "0 1px 6px #000" }}>
-        {D.measurement.station_id}<br /><span style={{ color: "#d4d9dd", fontSize: 16 }}>FIELD {Math.round(t < .55 ? 1920 / (2000 * sOv) * 3000 : field)} m</span>
+        {label}<br /><span style={{ color: "#d4d9dd", fontSize: 16 }}>FIELD {Math.round(t < .55 ? 1920 / (2000 * sOv) * 3000 : field)} m</span>
       </div>
     </AbsoluteFill>
   );

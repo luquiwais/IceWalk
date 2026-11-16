@@ -5,14 +5,14 @@ from faster_whisper import WhisperModel
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 def normal(s):return re.sub(r'[^a-z0-9]','',unicodedata.normalize('NFKD',s.lower().replace('metre','meter')).encode('ascii','ignore').decode())
-ap=argparse.ArgumentParser();ap.add_argument('kind',choices=['local','global']);a=ap.parse_args()
+ap=argparse.ArgumentParser();ap.add_argument('kind');a=ap.parse_args()
 source=ROOT/'assets/gemini-dialogue'/f'{a.kind}.wav'
 cache=source.with_suffix('.words.json')
 if cache.exists(): heard=json.loads(cache.read_text())
 else:
  model=WhisperModel('small',device='cpu',compute_type='int8',cpu_threads=6)
  raw=subprocess.run(['ffmpeg','-v','error','-i',str(source),'-ac','1','-ar','16000','-f','f32le','-'],capture_output=True,check=True).stdout
- segments,info=model.transcribe(np.frombuffer(raw,np.float32),language='es' if a.kind=='local' else 'en',word_timestamps=True,beam_size=5,vad_filter=True)
+ segments,info=model.transcribe(np.frombuffer(raw,np.float32),language='es' if a.kind.startswith('local') else 'en',word_timestamps=True,beam_size=5,vad_filter=True)
  heard=[{'word':w.word.strip(),'start':w.start,'end':w.end} for s in segments for w in s.words]
  cache.write_text(json.dumps(heard,ensure_ascii=False,indent=2))
 merged=[]
@@ -24,7 +24,7 @@ heard=merged
 expected=json.loads((source.with_suffix('.json')).read_text())['lines']
 tokens=[];ranges=[]
 for line in expected:
- text=line['text'].replace('tres coma treinta y dos','3 ,32').replace('uno coma dieciséis','1 ,16').replace('twenty-five','25').replace('veinticinco','25')
+ text=line['text'].replace('three point three','3 ,3').replace('one point two','1 ,2').replace('tres coma treinta y dos','3 ,32').replace('uno coma dieciséis','1 ,16').replace('twenty-five','25').replace('veinticinco','25')
  start=len(tokens);tokens.extend(normal(w) for w in text.split());ranges.append((start,len(tokens)))
 observed=[normal(w['word']) for w in heard]
 mapping={}

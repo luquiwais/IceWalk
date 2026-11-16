@@ -3,7 +3,12 @@
 uv run --with numpy --with scipy --with soundfile scripts/sound_global.py
 Sources: neural voice takes (assets/neural-voice), NASA Perseverance SuperCam Mars wind
 (sol 4, NASA/JPL-Caltech/LANL/CNES/IRAP, public domain). Everything else synthesized here.
-Timeline in frames at 24 fps, matching src/GlobalFilm.tsx.
+Voice takes: assets/directed-voice/global-NN.wav (scripts/assemble_global_cut.py), cues from src/narration.json "global".
+Timeline in frames at 24 fps, matching the 15/11 EDL of src/v2/GlobalFilm.tsx (708 frames):
+  orbit 0-60 | descent 60-96 | uiPlan 96-216 (full-screen UI) | drill 216-276 | result 276-300 |
+  uiUpdate 300-420 (full-screen UI) | review 420-504 (UI card, confirm click at 452, then crew walks) |
+  campaign 504-648 | end 648-708 (logo).
+Mars wind only under the Mars shots (drill/result, the walk); ducked out of the UI sections.
 """
 import json
 import subprocess
@@ -87,16 +92,18 @@ def quindar(freq):
 
 def voices(cues):
     bus = np.zeros(N)
+    last_radio_end = -99
     for i, c in enumerate(cues):
-        x = load(ROOT / f'assets/directed-voice/global-{i:02d}.wav')
-        # Trim leading/trailing silence of the synthetic take.
-        idx = np.nonzero(np.abs(x) > .01)[0]
-        x = x[max(0, idx[0] - 400): idx[-1] + 2400]
+        x = load(ROOT / f'assets/directed-voice/global-{i:02d}.wav')  # already trimmed by assemble_global_cut.py
         x /= np.max(np.abs(x)) + 1e-9
         if c['role'] in ('EV1', 'IV'):
-            place(bus, quindar(2525), c['from'] - 7)
+            # Squelch: opening pip (skipped when the previous transmission's closing pip is still ringing:
+            # back-to-back exchange IV -> EV1), voice, closing pip.
+            if c['from'] - 7 >= last_radio_end:
+                place(bus, quindar(2525), c['from'] - 7)
             y = radio(x) * .78
             place(bus, y, c['from'])
+            last_radio_end = c['from'] + len(y) / SR * FPS + 2 + 6
             place(bus, quindar(2475), c['from'] + len(y) / SR * FPS + 2)
         else:
             y = hp(x, 70)
@@ -126,32 +133,34 @@ def score():
     bus = np.zeros(N)
     # (start_frame, end_frame, midi notes, gain, brightness)
     plan = [
-        (0, 96, [45, 52, 57, 60], .10, .2),        # Am: orbit, wonder
-        (88, 176, [41, 48, 57, 60], .12, .3),      # F: descent into drill
-        (170, 250, [41, 48, 53, 57, 60], .10, .35),  # F add: what a negative means
-        (245, 362, [36, 43, 52, 55, 60], .13, .45),  # C: the map updates
-        (356, 440, [43, 50, 55, 59, 62], .18, .7),   # G: GO, swell
-        (434, 525, [45, 52, 57, 60, 64], .15, .55),  # Am: next step
-        (518, 610, [41, 48, 57, 60, 65], .17, .7),   # F: campaign
-        (600, 664, [36, 43, 52, 55, 60, 64], .13, .5),  # C: return
+        (0, 100, [45, 52, 57, 60], .10, .2),          # Am: orbit, wonder
+        (90, 224, [41, 48, 57, 60], .11, .3),         # F: descent, the map and the stations (uiPlan)
+        (216, 304, [41, 48, 53, 57, 60], .10, .35),   # F add: drill, a negative result
+        (296, 428, [36, 43, 52, 55, 60], .13, .45),   # C: the map updates (uiUpdate)
+        (420, 516, [43, 50, 55, 59, 62], .16, .65),   # G: review, GO, walking on: swell
+        (506, 580, [41, 48, 57, 60, 65], .17, .75),   # F: campaign, chart builds
+        (572, 650, [45, 52, 57, 60, 64, 67], .20, .9),  # Am9: swell into the result
     ]
     for a, b, notes, g, br in plan:
         n = at(b) - at(a)
         x = chord(notes, n, br) * env(n, .9, 1.2, 1.5) * g
         place(bus, x, a)
-    # Sub pedal under the build.
-    n = at(440) - at(240)
-    place(bus, np.sin(2 * np.pi * 32.7 * t(n)) * env(n, 3, 1.5) * .12, 240)
-    # Clock: soft woody tick every 1.25 s (the EVA budget is time), stops at the GO.
+    # Sub pedal under the build to the review/GO.
+    n = at(452) - at(300)
+    place(bus, np.sin(2 * np.pi * 32.7 * t(n)) * env(n, 3, 1.5) * .12, 300)
+    # Rising pad under the campaign chart, peaking at the logo cut.
+    n = at(650) - at(520)
+    place(bus, np.sin(2 * np.pi * 55 * t(n)) * env(n, 4, .3, 2) * .12, 520)
+    # Clock: soft woody tick every 1.25 s (the EVA budget is time), stops at the GO click.
     tick_n = int(.035 * SR)
     tick = bp(rng.standard_normal(tick_n), 1800, 5200) * env(tick_n, .001, .03, 2) * .22
-    f = 96
-    while f < 432:
-        place(bus, tick, f, .55 + .45 * (f - 96) / 336)
+    f = 100
+    while f < 450:
+        place(bus, tick, f, .45 + .35 * (f - 100) / 350)
         f += 30
-    # Final chord after the black beat: IceWalk.
-    n = at(708) - at(674)
-    place(bus, chord([33, 45, 52, 57, 64, 69], n, .8) * env(n, .05, .8) * .2, 674)
+    # Resolve on the logo (648): open A-minor-add9 / A pedal, tail rings through IceWalk and to the end.
+    n = at(708) - at(648)
+    place(bus, chord([33, 45, 52, 57, 64, 69], n, .8) * env(n, .12, 1.4) * .26, 648)
     return hp(reverb(bus, 3.5, .35, 3500), 38)
 
 
@@ -234,40 +243,51 @@ def sfx():
     bus = np.zeros(N)
     w = wind()
     # Orbit: low space drone, MRO pass.
-    n = at(96)
+    n = at(100)
     place(bus, lp(rng.standard_normal(n), 90) * env(n, 1.5, .5) * .35, 0)
-    place(bus, whoosh(at(50) - at(8), True, 80, 900) * .28, 8)
-    # Descent: rising whoosh into the surface cut.
-    place(bus, whoosh(at(92) - at(56), True, 150, 4500) * .45, 56)
-    place(bus, boom(int(1.5 * SR), 38) * .5, 92)
-    # Surface beds: Mars wind (real), suit breathing.
-    for a, b, g in ((92, 245, .30), (434, 521, .26)):
+    place(bus, whoosh(at(54) - at(6), True, 80, 900) * .28, 6)
+    # Descent: rising whoosh into the HiRISE site, soft thud as the full-screen UI takes over (96).
+    place(bus, whoosh(at(96) - at(58), True, 150, 4500) * .42, 58)
+    place(bus, boom(int(1.2 * SR), 40) * .30, 96)
+    # Mars wind (real SuperCam recording) ONLY under the Mars shots: drill/result and the walk.
+    # Nothing under uiPlan (96-216), uiUpdate (300-420) or the review card (420-~456).
+    for a, b, g in ((214, 308, .30), (456, 510, .26)):
         n = at(b) - at(a)
-        place(bus, w[at(a):at(b)] * env(n, .08, .25), a, g)
-    place(bus, breath(at(245) - at(92)) * .6, 92)
-    place(bus, breath(at(521) - at(434), 3.1) * 1.0, 434)
-    # Drill: spin-up, grind, stop.
-    n = at(152) - at(90)
-    place(bus, drill_sound(n) * .55, 90)
-    place(bus, boom(int(2.6 * SR), 36) * .55, 150)
-    # Cross-section: low sweep.
-    place(bus, whoosh(at(245) - at(176), False, 120, 1600) * .25, 176)
-    # Habitat interior: room tone, UI.
-    n = at(434) - at(245)
-    place(bus, room_tone(n) * env(n, .05, .1), 245)
-    for f in (258, 268, 278, 300, 318, 340, 372, 386, 400):
-        place(bus, ui_tick(2000 + (f % 5) * 120), f)
-    place(bus, chime(), 412)  # IV clicks CONFIRM: review cut (360) + clickAt (52)
-    # POV + walk: footsteps (EV1 close, inside suit; EV2 distant).
-    f = 436
-    while f < 520:
-        place(bus, footstep(), f, .55 if f < 480 else .25)
+        place(bus, w[at(a):at(b)] * env(n, .35, .3), a, g)
+    # Suit breathing: EV1 drilling, EV1 walking.
+    place(bus, breath(at(300) - at(224)) * .6, 224)
+    place(bus, breath(at(508) - at(458), 3.1) * 1.0, 458)
+    # UI bed: quiet room tone under the full-screen UI, so the silence of the wind is not a hole.
+    for a, b in ((96, 218), (298, 456)):
+        n = at(b) - at(a)
+        place(bus, room_tone(n) * env(n, .2, .3) * .55, a)
+    # uiPlan: stations appear on the map.
+    for f, g in ((110, .8), (128, .6), (146, .6), (164, .6), (182, .6), (200, .6)):
+        place(bus, ui_tick(2000 + (f % 5) * 120), f, g)
+    # Cut to the drill: short low sweep, then the core drill (spin-up, grind, stop).
+    place(bus, whoosh(at(220) - at(198), True, 100, 1200) * .22, 198)
+    n = at(266) - at(216)
+    place(bus, drill_sound(n) * .50, 216)
+    place(bus, boom(int(1.6 * SR), 36) * .35, 266)
+    # Result (276): core out, short low confirmation.
+    place(bus, boom(int(1.0 * SR), 52) * .22, 278)
+    # uiUpdate: soft tick at the map update (~330), small follow-ups as the plan re-flows.
+    place(bus, ui_tick(2400), 330, 1.0)
+    place(bus, ui_tick(2000), 340, .5)
+    place(bus, ui_tick(2200), 356, .4)
+    # Review card: IV clicks CONFIRM at review cut (420) + clickAt (32) = 452.
+    place(bus, chime(), 452)
+    # Walk to the next station: footsteps (EV1 close, inside the suit).
+    f = 458
+    while f < 508:
+        place(bus, footstep(), f, .5)
         f += 13
-    # Campaign: counter ticks.
-    for f in range(540, 586, 3):
-        place(bus, ui_tick(2600), f, .6)
-    # Return to orbit.
-    place(bus, whoosh(at(640) - at(600), False, 300, 5000) * .35, 600)
+    # Campaign: counter ticks while the chart counts 3.32 -> 1.16.
+    for f in range(526, 600, 4):
+        place(bus, ui_tick(2600), f, .45)
+    place(bus, chime(), 602, .6)
+    # Logo.
+    place(bus, whoosh(at(648) - at(630), True, 300, 5000) * .22, 630)
     return bus
 
 
@@ -275,22 +295,28 @@ def main():
     cues = json.loads((ROOT / 'src/narration.json').read_text())['global']
     v, m, s = voices(cues), score(), sfx()
     # Duck music and effects under the voice.
-    ve = np.abs(signal.hilbert(lp(np.abs(v), 20))) if False else lp(np.abs(v), 6)
+    ve = lp(np.abs(v), 6)
     duck = 1 - .45 * np.clip(ve / (np.max(ve) + 1e-9) * 3, 0, 1)
-    # Black beat: silence before IceWalk (frames 664-674) except the voice.
+    # Brief score dip just before the logo hit (frames 640-648) so the resolve lands.
     gate = np.ones(N)
-    gate[at(662):at(674)] = 0
+    gate[at(641):at(648)] = .35
     gate = lp(gate, 30)
     mix = v * 1.0 + (m * .9 + s * .8) * duck * gate
     peak = np.max(np.abs(mix))
     mix = mix / peak * .89
     out = ROOT / 'public/audio'
-    sf.write(out / 'global-film-mix.wav', mix.astype(np.float32), SR, subtype='PCM_24')
     for name, x in (('voice', v), ('score', m), ('sfx', s)):
         sf.write(ROOT / f'assets/sfx/global-stem-{name}.wav', (x / (np.max(np.abs(x)) + 1e-9) * .9).astype(np.float32), SR)
-    # Broadcast/online loudness: -15 LUFS integrated, -1 dBTP.
+    # Online loudness: -14 LUFS integrated, -1 dBTP (two-pass loudnorm for accuracy on a 30 s file).
     tmp = out / 'global-film-mix.wav'
-    subprocess.run(['ffmpeg', '-v', 'quiet', '-y', '-i', str(tmp), '-af', 'loudnorm=I=-15:TP=-1.0:LRA=11', '-ar', str(SR),
+    sf.write(tmp, mix.astype(np.float32), SR, subtype='PCM_24')
+    target = 'I=-14:TP=-1.0:LRA=11'
+    r = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-y', '-i', str(tmp), '-af', f'loudnorm={target}:print_format=json', '-f', 'null', '-'],
+                       capture_output=True, text=True, check=True).stderr
+    m_ = json.loads(r[r.rindex('{'):r.rindex('}') + 1])
+    flt = (f"loudnorm={target}:measured_I={m_['input_i']}:measured_TP={m_['input_tp']}:measured_LRA={m_['input_lra']}"
+           f":measured_thresh={m_['input_thresh']}:offset={m_['target_offset']}:linear=true")
+    subprocess.run(['ffmpeg', '-v', 'quiet', '-y', '-i', str(tmp), '-af', flt, '-ar', str(SR),
                     '-c:a', 'pcm_s24le', str(out / 'global-film-mix-norm.wav')], check=True)
     (out / 'global-film-mix-norm.wav').replace(tmp)
     print('MIX', tmp, round(len(mix) / SR, 2), 's peak', round(float(peak), 3))
