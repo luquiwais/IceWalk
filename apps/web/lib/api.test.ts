@@ -139,6 +139,21 @@ describe("planner API client", () => {
     expect(init.signal?.aborted).toBe(true);
   });
 
+  it("keeps the long plan timeout when the caller passes timeoutMs: undefined", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetch = hangingFetch();
+      const pending = failure(postPlan({ measurements: [] }, { baseUrl: BASE, fetch, timeoutMs: undefined }));
+      await vi.advanceTimersByTimeAsync(30_000);
+      const init = fetch.mock.calls[0][1] as RequestInit;
+      expect(init.signal?.aborted).toBe(false);
+      await vi.advanceTimersByTimeAsync(31_000);
+      expect((await pending).kind).toBe("timeout");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("tells a caller abort apart from a timeout", async () => {
     const controller = new AbortController();
     const pending = postPlan(
