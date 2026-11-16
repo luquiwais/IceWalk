@@ -76,6 +76,8 @@ ice_map = client.get("/maps", params={"plan_id": replan["plan_id"]}).json()
 plan["plan_id"], replan["plan_id"] = "plan-demo0001", "plan-demo0002"
 ice_map["plan_id"] = "plan-demo0002"
 replan["replanned_from"] = "plan-demo0001"
+if "replan" in replan:
+    replan["replan"]["from_plan_id"] = "plan-demo0001"
 
 out = ROOT / "apps" / "web" / "mock"
 out.mkdir(parents=True, exist_ok=True)
@@ -83,4 +85,8 @@ out.mkdir(parents=True, exist_ok=True)
 (out / "replan.json").write_text(json.dumps(replan, indent=2))
 (out / "measurement.json").write_text(json.dumps(meas, indent=2))
 (out / "map.json").write_text(json.dumps(ice_map))  # ~250 kB: sin sangría
+(out / "campaign.json").write_text(json.dumps(client.get("/campaign").json(), indent=2))
+confirm = client.post("/plan", json={"strategy": "confirm"}).json()
+confirm["plan_id"] = "plan-demo0003"
+(out / "plan-confirm.json").write_text(json.dumps(confirm, indent=2))
 print("ok:", [p.name for p in out.iterdir()], "| planner:", client.get("/health").json())

@@ -12,6 +12,8 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Mapas de consistencia de hielo SWIM (Ci 0-1 m y 1-5 m, GeoTIFF del 2025-08-04; licencia no declarada, cuestión 56) | https://swim.psi.edu/SWIM4MIMProducts.php | Morgan et al. (2021) Nature Astronomy; SWIM (PSI/JPL) |
 | Mosaico global CTX | https://murray-lab.caltech.edu/CTX/ | Dickson et al. (2024) Earth and Space Science; NASA/JPL/MSSS/The Murray Lab |
 | Inercia térmica THEMIS | https://astrogeology.usgs.gov | Fergason et al. (2006) JGR; USGS / ASU |
+| Inercia térmica THEMIS, mosaico global cuantitativo de 100 m (teselas 00N y 30N, de 2.5 GB cada una, leídas por ventanas con `/vsicurl`, ~25 MB en total; no se bajaron). TI en cada impacto de Daubar 2022 (`gp/thermal_inertia_check.py`) | https://asc-astropedia.s3.us-west-2.amazonaws.com/Mars/Odyssey/THEMIS-Global-Thermal-Inertia-Mosaic/Quantitative-32-Bit/ | USGS Astrogeology, página del producto (ej. https://astrogeology.usgs.gov/search/map/themis_thermal_inertia_mosaic_quantitative_30s060e_100mpp: TI de imágenes nocturnas de THEMIS, exactitud ~20 %, sin datos al norte de 60°); método de Fergason et al. (2006) JGR 111, E12004; ASU |
+| Inercia térmica TES, mapas globales nocturno y diurno de 2007 con máscaras de interpolación (20 px/°, PDS MGS-M-TES-5-TIMAP-V1.0, volumen MGST_9001; 155.5 MB en `data/raw/tes_putzig2007/`: 2 mapas de 51.8 MB y 2 máscaras de 25.9 MB) | https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/ | Putzig y Mellon (2007) Icarus 191, 68-94, doi:10.1016/j.icarus.2007.05.013; NASA PDS Geosciences Node |
 | MOLA-HRSC 200 m | https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m | Fergason, Hare & Laura (2018) USGS |
 | Catálogo de cráteres nuevos (tabla S1, CC BY 4.0; los encabezados de latitud y longitud están cruzados en el original) | https://zenodo.org/record/6604912 | Daubar et al. (2022) JGR Planets |
 | Exposiciones de hielo | https://doi.org/10.5066/P9Y8FR1R | Dundas et al. (2021) USGS |
@@ -40,6 +42,7 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Índice de una ley de potencias por máxima verosimilitud (comparación de tamaños de bloques con Tusberti et al., que citan el mismo método) | Clauset, Shalizi & Newman (2009) SIAM Review 51(4), 661-703, doi:10.1137/070710111 |
 | BoulderNet: detección de bloques con Mask R-CNN (datos y pesos CC BY 4.0) | Prieur et al. (2023) JGR Planets; https://zenodo.org/records/8171052 |
 | Mask R-CNN ResNet-50 FPN v2 con pesos COCO (punto de partida del detector de `vision/maskrcnn.py`) | torchvision (BSD-3); Li et al. (2021) "Benchmarking Detection Transfer Learning with Vision Transformers", arXiv:2111.11429 |
+| BoulderNet: detección de bloques con Mask R-CNN (datos y pesos CC BY 4.0). Usados: recortes de Marte y `model_0055999.pth`, para medir; no entra en el producto (`EXPERIMENTS.md`, 2026-11-14) | Prieur et al. (2023) JGR Planets; https://zenodo.org/records/8171052 |
 | Prioridades científicas para humanos en Marte | National Academies (2025), A Science Strategy for the Human Exploration of Mars |
 | Hielo limpio a < 1 m en latitudes medias | Dundas et al. (2021) JGR Planets |
 | STM y planificación de EVA (BASALT) | https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6442241/ |
@@ -230,3 +233,67 @@ agrega pointer capture, snap/inercia y edición directa. No usa un select nativo
 | Umbral de saltación en Marte: 25-30 m/s a la altura de los sensores del Viking | Ryan, Sharman y Lucich (1981), Local Mars dust storm generation mechanism, GRL 8(8), 899-901, doi:10.1029/GL008i008p00899 |
 | DONKI: eventos SEP y simulaciones WSA-Enlil con llegada a Marte | NASA CCMC, https://ccmc.gsfc.nasa.gov/DONKI-API/get/SEP y /WSAEnlilSimulations |
 | Mars Climate Database: uso de la web "moderado"; la versión completa no se puede pasar a terceros | https://www-mars.lmd.jussieu.fr/mars/access.html |
+| Eficiencia del músculo en trabajo positivo al subir caminando (~25 %) y en trabajo negativo | Margaria, R. (1968), Positive and negative work performances and their efficiencies in human locomotion, Int. Z. angew. Physiol. 25, 339-351 |
+| El aterrizaje del Apollo 12 arenó la Surveyor 3 a ~160 m (alcance de la eyecta del motor; base del radio de exclusión del hábitat, que es supuesto) | Immer, C., Metzger, P., Hintze, P. E., Nick, A., Horan, R. (2011), Apollo 12 Lunar Module exhaust plume impingement on Lunar Surveyor III, Icarus 211(2), 1089-1102 |
+| Lista de puño (cuff checklist) de las EVAs | NASA, Apollo y Shuttle EVA cuff checklists (Flight Data File) |
+| Color del cielo de Marte de día: marrón amarillento, más rojo lejos del Sol y hacia el horizonte (sin valor citable; el cielo del 3D es ilustrativo) | Maki et al. (1999), JGR 104(E4); Thomas et al. (1999), JGR 104(E4) (Mars Pathfinder) |
+| Orto IRB de HiRISE registrado sobre el DTM del sitio (probado para color; descartado) | NASA/JPL-Caltech/UArizona, https://hirise.lpl.arizona.edu/PDS/DTM/ESP/ORB_073500_073599/ESP_073578_2155_ESP_073077_2155/ |
+| EVA TERMINATE frente a EVA ABORT; separación probabilidad / incertidumbre / cambio en mapas de hielo | Ver `docs/research/flujo-ui-nasa-2026-11-14.md` (xEVA Con Ops; Courville et al. 2026) |
+
+## Entrega, landing y videos: fuentes revalidadas por Codex el 14/11
+
+Inventario y explicación completos en [`research/submission-brief-2026-11-14.md`](research/submission-brief-2026-11-14.md). Las copias de correos y canales están fuera del repo; aquí se enlazan fuentes y hallazgos relevantes.
+
+| Uso | Fuente primaria |
+| --- | --- |
+| Campos, inglés, demo de 30 s / 7 slides, cierre 15/11 23:59 local, permisos, SI y envío | [Project Submission Guide, 13/11/2026](https://www.spaceappschallenge.org/resources/project-submission-guide/) |
+| Cinco criterios en todos los niveles y calendario global | [Judging & Awards Guide, 13/11/2026](https://www.spaceappschallenge.org/resources/judging-awards-guide/) |
+| Enunciado y lista oficial de recursos | [Martian Map](https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/) |
+| Video local de 3 min castellano y Drive de organización; diferencias con global | [Santi, Discord 14/11 09:50](https://discord.com/channels/940389167035207760/998222622468882472/1571145271931306176) |
+| Solo video local, sin vivo, más tiempo y anuncio pendiente | [Santi, Discord 14/11 18:02](https://discord.com/channels/940389167035207760/998222622468882472/1571269148414320652) |
+| Recurso de la lista del desafío requerido para premios globales | [GO Team, discusión #1827](https://github.com/nasa/spaceapps/discussions/1827#discussioncomment-19421469) |
+| Cronograma publicado de sede; contrastar con instrucciones posteriores de Discord | [Buenos Aires en Space Apps](https://www.spaceappschallenge.org/2026/local-events/buenos-aires/), [UP](https://www.palermo.edu/ingenieria/2026/noviembre/nasa-space-apps-challenge.html) |
+| Marca oficial y descargas de logos | [Space Apps Brand Guidelines](https://www.spaceappschallenge.org/brand/) |
+| Sonificación sísmica de impacto del 24/12/2021, acelerada ×100; crédito NASA/JPL-Caltech/CNES/Imperial College London | [PIA25582](https://science.nasa.gov/photojournal/nasas-insight-records-the-sound-of-a-martian-impact/) |
+| Imagen real de hielo alrededor del cráter; crédito NASA/JPL-Caltech/University of Arizona | [PIA25583](https://science.nasa.gov/photojournal/hirise-views-a-mars-impact-crater-surrounded-by-water-ice/) |
+| Referencia de tono y estructura para los videos (sin reutilizar material; derechos de IBM) | IBM, «Apollo 11: The Untold Story Of the IBM Team Behind the Moon Landing», YouTube, 12/07/2019, https://www.youtube.com/watch?v=XPgtfOwuUGY. Análisis en `submission/video/references.md` |
+
+### Inventario de producción de video (reubicado el 14/11 noche)
+
+[Manifiesto](submission/video/assets.json): rutas, tamaños y hashes de los medios
+locales. Fuentes por recurso registradas desde el material recuperado; esta
+reorganización no vuelve a validar derechos ni publica medios. NASA 3D Resources,
+reels CHAPEA/xEMU/Desert RATS y Poly Haven quedaron locales e ignorados. Revisar
+créditos y términos por recurso antes del corte final. El episodio usa las ocho
+fuentes de `tools/video/fixtures/` (commit `2a633fb`), con sus hashes originales.
+PIA25582.wav y PIA25583.jpg se movieron a `tools/video/assets/nasa/mars/`; correos
+y copias raw de canales permanecen fuera del repo.
+
+
+### Fuentes de las pruebas de producción
+
+- NASA / DigitalSpace Corporation: [Pistol Grip Tool](https://science.nasa.gov/3d-resources/pistol-grip-tool/) y [Astronaut Glove](https://science.nasa.gov/3d-resources/astronaut-glove/), GLB descargados para estudio. El adaptador de taladro es ilustrativo, no hardware certificado.
+- NASA/LaRC/Advanced Concepts Lab: [Z2 Spacesuit](https://science.nasa.gov/3d-resources/z2-spacesuit/), geometría y texturas del traje; rig agregado por IceWalk para la prueba.
+- Poly Haven: [Red Laterite Soil Stones](https://polyhaven.com/a/red_laterite_soil_stones), materiales de terreno; microdetalle visual, no geología medida del sitio. Relieve macro procede de HiRISE.
+- NASA JSC: [CHAPEA reel](https://images.nasa.gov/details/jsc2023m000115_CHAPEA_Resource%20Reel_230501-4K-YT), 160–166 s. NASA GSFC: [Desert RATS](https://images.nasa.gov/details/GSFC_20100909_Desert_m10641_RATS), 112–117 s. Insertos mudos de contexto terrestre; créditos originales conservados localmente.
+- Voces sintéticas Microsoft Neural de catálogo, accedidas con [edge-tts](https://github.com/rany2/edge-tts): Andrew/Guy (inglés), Tomás/Elena (Argentina). No se clonó una persona. Declarar en entrega junto al uso de asistentes; revisar términos antes de distribución final.
+
+### Fuentes del Global v2 (15/11, Claude)
+
+- Carnegie Mellon University Graphics Lab, [CMU Motion Capture Database](http://mocap.cs.cmu.edu/), conversión BVH de B. Hahne ([espejo en GitHub](https://github.com/una-dinosauria/cmu-mocap)). Clips 17_08, 07_04, 40_10 y 15_06 (y otros descargados para pruebas) retargeteados sobre el traje Z2. CMU y el conversor permiten cualquier uso; no se redistribuye la base.
+- NASA/JPL-Caltech/LANL/CNES/IRAP, [Perseverance SuperCam records wind on Mars](https://science.nasa.gov/resource/perseverance-rovers-supercam-records-wind-on-mars), archivo `45827_SCAM_MIC_SOL004_RUN001.wav` (sol 4). Viento real en la mezcla de superficie, filtrado y en bucle.
+- Solar System Scope, [textura 8k de Marte](https://www.solarsystemscope.com/textures/) (CC BY 4.0, basada en datos de NASA). Solo el globo del plano orbital. Requiere atribución en la entrega.
+- NASA/JPL-Caltech: [Mars Reconnaissance Orbiter](https://science.nasa.gov/3d-resources/mars-reconnaissance-orbiter-mro/), modelo 3D del plano de apertura. NASA: [Habitat Demonstration Unit](https://science.nasa.gov/3d-resources/), hábitat ilustrativo en el horizonte.
+- HiRISE DTM `DTEEC_073578_2155_073077_2155_A01` y detecciones de bloques de IceWalk (ya listadas): relieve y posición de los 364 bloques del set de superficie.
+- Poly Haven (CC0): Red Sand, Rocky Terrain 02, Boulder 01, Moon Rock 01/03/05. Microdetalle del regolito y rocas, regraduados a albedo marciano; no es geología medida.
+- Música, efectos de taladro, radio (tonos Quindar de 2525/2475 Hz, convención Apollo), respiración, pasos e interfaz: síntesis propia en `tools/video/scripts/sound_global.py`.
+
+### Revisión audiovisual del 15/11 (Codex)
+
+- Astronauta articulado: [Animated Astronaut Character in Space Suit Loop](https://sketchfab.com/3d-models/animated-astronaut-character-in-space-suit-loop-8fe5c8d3365e4d87bb7bc253d53a64e1), de [LasquetiSpice](https://sketchfab.com/LasquetiSpice), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Skin y rig originales preservados; materiales, poses y animación adaptados. Descarga, licencia y límites en [el registro del activo](research/astronaut-assets-2026-11-15.md).
+- Voces de catálogo Orus y Charon, mediante [Gemini speech generation](https://ai.google.dev/gemini-api/docs/speech-generation). Diálogo dirigido con Gemini 3.8 Flash TTS por Interactions; reemplaza las voces Microsoft anteriores en GlobalFilm y LocalFilm. No se clonó una persona. Audio y manifiestos quedan locales; el texto coincide con los guiones y datos congelados.
+
+### Brief (15/11)
+
+- Hábitat del 3D: [Habitat Demonstration Unit (part 1)](https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Habitat%20Demonstration%20Unit), repositorio oficial NASA 3D Resources. GLB de 516 748 bytes, SHA-256 `3106557bea24c9ba012556ddbecf3740c39276dc369cf359b77225de97458cfe`. Uso según las [NASA Media Usage Guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/); se usa solo la geometría: la textura trae la insignia de NASA y la bandera, que las reglas de Space Apps no permiten usar, y se reemplaza por un material liso. Escala 12 m de ancho a pie y 48 m desde arriba (`assumption`: ancho aproximado del HDU con la esclusa; desde arriba agrandado como el resto de los marcadores).
+- Decodificador Draco: `three/examples/jsm/libs/draco/gltf` (three 0.170.0, MIT), copiado a `apps/web/public/draco/`.

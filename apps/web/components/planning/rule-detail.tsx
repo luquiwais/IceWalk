@@ -1,0 +1,160 @@
+import { Footnote } from "@icewalk/ui/text";
+import { ChevronRight } from "lucide-react";
+import { habitatOf } from "@/components/site/site-data";
+import type { FlightRule } from "@/lib/flight-rules";
+import { formatNumber, formatPercent } from "@/lib/format";
+import { catalogTools, decisionPointFor, missionConstraints, orderedStations, stationBlock, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
+import type { EvaWindow } from "@/lib/use-eva-window";
+import { EvaWindowCard } from "./eva-window-card";
+import { clock } from "./parts";
+
+const SOIL_LABEL = { firm: "Firm", loose: "Loose", dust: "Dust", unknown: "Unknown" } as const;
+const MODE_LABEL = { walk: "Walkable", cart: "Hand cart advised", rover: "Rover advised" } as const;
+const dash = "—";
+
+/** One fact: label, value and an optional note under it. */
+function Fact({ label, value, note }: { label: string; value: string; note?: string }) {
+  return <div><dt>{label}</dt><dd>{value}{note ? <small>{note}</small> : null}</dd></div>;
+}
+
+/**
+ * The detail of one flight rule: what supports that number, from the plan, the planner's feasibility, the
+ * STM and the EVA window. Each rule shows its own evidence; nothing repeats the tile's headline.
+ */
+export function RuleDetail({ rule, plan, window, onTimeline, tools }: {
+  rule: FlightRule; plan: Plan; window: EvaWindow; onTimeline: () => void;
+  /** Tools the crew may take (null: all): a switch per tool re-plans with that set. */
+  tools?: { carried: readonly string[] | null; onChange: (tools: string[]) => void; disabled?: boolean };
+}) {
+  const f = plan.summary.feasibility;
+  const stations = orderedStations(plan);
+  const head = <h3 className="mission-detail-title">{rule.name} <span className="mission-detail-value">{rule.value} · {rule.limit.replace("*", "")}</span></h3>;
+
+  if (rule.id === "duration") {
+    const c = missionConstraints(plan);
+    const sum = (kind: string) => plan.timeline.filter((t) => t.kind === kind).reduce((a, t) => a + (t.t_end_min - t.t_start_min), 0);
+    const budget = c ? c.eva_max_h * 60 * (1 - c.reserve) : undefined;
+    return <section className="mission-detail" aria-label="Duration detail">{head}
+      <dl className="mission-facts">
+        <Fact label="Egress" value={clock(sum("egress"))} />
+        <Fact label="Walking" value={clock(sum("traverse"))} note={`${formatNumber(plan.summary.distance_km, 2)} km`} />
+        <Fact label="At stations" value={clock(sum("station"))} note={`${stations.length} stations`} />
+        <Fact label="Ingress" value={clock(sum("ingress"))} />
+        <Fact label="Reserve" value={c ? clock(c.eva_max_h * 60 * c.reserve) : dash} note={c ? `${Math.round(c.reserve * 100)} % of ${c.eva_max_h} h` : "STM unknown"} />
+        <Fact label="Left in budget" value={budget ? clock(Math.max(0, budget - plan.summary.duration_min)) : dash} />
+      </dl>
+      <button type="button" className="mission-text-link" onClick={onTimeline}>Show on the timeline<ChevronRight aria-hidden /></button>
+    </section>;
+  }
+
+  if (rule.id === "walkback") {
+    return <section className="mission-detail" aria-label="Walkback detail">{head}
+      <table className="mission-table">
+        <thead><tr><th>#</th><th>Station</th><th>At</th><th>Margin</th><th>Bingo</th></tr></thead>
+        <tbody>{stations.map((s) => { const b = stationBlock(plan, s.id); const p = decisionPointFor(plan, s.id); return <tr key={s.id}><td>{s.order}</td><td>{s.id}</td><td>{b ? clock(b.t_start_min) : dash}</td><td>{b?.walkback_margin_min != null ? `${formatNumber(b.walkback_margin_min, 0)} min` : dash}</td><td>{p ? clock(p.decide_by_min) : dash}</td></tr>; })}</tbody>
+      </table>
+      <Footnote tone="secondary">Minutes to spare if the crew turned back at each station. {plan.summary.walkback_caution_min != null ? `Caution below ${formatNumber(plan.summary.walkback_caution_min, 0)} min is an assumption of the STM.` : "No caution threshold in the STM."}</Footnote>
+      <button type="button" className="mission-text-link" onClick={onTimeline}>Show on the timeline<ChevronRight aria-hidden /></button>
+    </section>;
+  }
+
+  if (rule.id === "distance") {
+    const [hx, hy] = habitatOf(plan);
+    const far = Math.max(...stations.map((s) => Math.hypot(s.position[0] - hx, s.position[1] - hy)));
+    return <section className="mission-detail" aria-label="Distance detail">{head}
+      <table className="mission-table">
+        <thead><tr><th>#</th><th>Station</th><th>From habitat</th><th></th></tr></thead>
+        <tbody>{stations.map((s) => { const d = Math.hypot(s.position[0] - hx, s.position[1] - hy); return <tr key={s.id}><td>{s.order}</td><td>{s.id}</td><td>{formatNumber(d / 1000, 2)} km</td><td>{d === far ? "farthest" : ""}</td></tr>; })}</tbody>
+      </table>
+      <Footnote tone="secondary">{f ? `${MODE_LABEL[f.mobility.mode]}: ${f.mobility.reasons.join("; ").toLowerCase()}. ` : ""}Straight-line distance. The walkback limit is 30 min at 3.5 km/h if a suit or rover fails (NASA ICES-2026-127).</Footnote>
+    </section>;
+  }
+
+  if (rule.id === "slope") {
+    const c = missionConstraints(plan);
+    return <section className="mission-detail" aria-label="Slope detail">{head}
+      <dl className="mission-facts">
+        <Fact label="Climb" value={f?.effort.climb_m != null ? `${formatNumber(f.effort.climb_m, 0)} m` : dash} note="whole traverse" />
+        <Fact label="Soil firmness" value={f ? SOIL_LABEL[f.soil.class] : dash} note={f?.soil.thermal_inertia_median != null ? `TI ${formatNumber(f.soil.thermal_inertia_median, 0)} · THEMIS` : undefined} />
+        <Fact label="Terrain factor" value={f?.soil.terrain_coefficient != null ? `×${formatNumber(f.soil.terrain_coefficient, 1)}` : dash} note="slows the pace" />
+        <Fact label="Walking speed" value={c?.walking_speed_kmh != null ? `${formatNumber(c.walking_speed_kmh, 1)} km/h` : dash} note="STM, flat ground" />
+      </dl>
+      <Footnote tone="secondary">The route is the fastest path on the HiRISE terrain model (DTM): slope only slows the pace and legs over the STM limit are excluded.</Footnote>
+    </section>;
+  }
+
+  if (rule.id === "comms") {
+    return <section className="mission-detail" aria-label="Comms detail">{head}
+      <table className="mission-table">
+        <thead><tr><th>#</th><th>Station</th><th>Line of sight to habitat</th></tr></thead>
+        <tbody>{stations.map((s) => <tr key={s.id}><td>{s.order}</td><td>{s.id}</td><td>{s.comm_los == null ? "Unknown" : s.comm_los ? "In view" : "Blocked · relay via EV2"}</td></tr>)}</tbody>
+      </table>
+      <Footnote tone="secondary">{f?.comms.route_los_fraction != null ? `${formatPercent(f.comms.route_los_fraction)} of the route in view. ` : ""}Habitat antenna over the HiRISE terrain model; the antenna height and the gap limit are assumptions.</Footnote>
+    </section>;
+  }
+
+  if (rule.id === "effort") {
+    const e = f?.effort;
+    return <section className="mission-detail" aria-label="Effort detail">{head}
+      <dl className="mission-facts">
+        <Fact label="Peak" value={e ? `${formatNumber(e.peak_btu_h, 0)}` : dash} note={e?.peak_limit_btu_h != null ? `of ${formatNumber(e.peak_limit_btu_h, 0)} BTU/h` : "BTU/h"} />
+        <Fact label="VO2max" value={e?.vo2max_fraction != null ? formatPercent(e.vo2max_fraction) : dash} note={e?.vo2max_fraction_limit != null ? `limit ${formatPercent(e.vo2max_fraction_limit)}` : undefined} />
+        <Fact label="Oxygen per EV" value={e?.o2_kg_per_crew != null ? `${formatNumber(e.o2_kg_per_crew, 2)} kg` : dash} note="metabolic estimate" />
+        <Fact label="Moved mass" value={e?.moved_mass_kg != null ? `${formatNumber(e.moved_mass_kg, 0)} kg` : dash} note="crew, suit and load" />
+        <Fact label="Climb" value={e?.climb_m != null ? `${formatNumber(e.climb_m, 0)} m` : dash} />
+        <Fact label="Soil" value={f ? SOIL_LABEL[f.soil.class] : dash} />
+      </dl>
+      <Footnote tone="secondary">Rates scaled from NASA&apos;s suited walkback (ICES-2026-127) by leg speed and soil.</Footnote>
+    </section>;
+  }
+
+  if (rule.id === "carry") {
+    const equipment = plan.equipment ?? [];
+    const mass = totalEquipmentMass(equipment);
+    const crew = plan.summary.crew;
+    const heaviest = f?.carry.heaviest;
+    const perEv = f?.carry.per_crew_kg;
+    return <section className="mission-detail" aria-label="Gear list">{head}
+      <p className="mission-detail-lead">{formatNumber(mass.known_kg, 1)} kg known across {equipment.length} items, split evenly{crew != null ? ` between ${crew} EVs` : ""}{mass.unknown ? `; ${mass.unknown} item${mass.unknown === 1 ? " has" : "s have"} no mass yet` : ""}.</p>
+      {tools ? <ToolSwitches plan={plan} tools={tools} /> : <table className="mission-table mission-table-fixed">
+        <colgroup><col /><col style={{ width: "4.5rem" }} /><col style={{ width: "6.5rem" }} /></colgroup>
+        <thead><tr><th>Tool</th><th>Mass</th><th>Used</th></tr></thead>
+        <tbody>{equipment.map((item) => <tr key={item.tool}><td className="mission-wrap">{item.count > 1 ? `${item.count} × ` : ""}{toolName(item.tool)}</td><td>{item.mass_kg == null ? "Unknown" : `${formatNumber(item.mass_kg, 1)} kg`}</td><td>{/while walking/i.test(item.justification ?? "") ? "While walking" : "At stations"}</td></tr>)}</tbody>
+      </table>}
+      <Footnote tone="secondary">{heaviest && perEv != null && heaviest.mass_kg > perEv ? `The even split is an average: the ${toolName(heaviest.tool).toLowerCase()} alone weighs more, so one EV carries it. ` : ""}Allowance: 50 lbm of tools and samples per crewmember (NASA ICES-2026-127).</Footnote>
+    </section>;
+  }
+
+  // EVA window
+  return <section className="mission-detail" aria-label="Window detail">{head}<EvaWindowCard data={window} /></section>;
+}
+
+/**
+ * The catalog with a switch per tool: what the crew may take. The plan says what it uses of them; turning
+ * one off re-plans from the habitat without it (POST /plan with the list), so the radar-first choice and
+ * its cost in mass and time are visible.
+ */
+const SHORT_TOOL: Record<string, string> = { neutron_spectrometer: "Neutron spectrometer", gpr: "Ground radar", core_drill: "Core drill", camera_spectrometer: "Camera / spectrometer", sample_kit: "Sample containers" };
+
+function ToolSwitches({ plan, tools }: { plan: Plan; tools: { carried: readonly string[] | null; onChange: (tools: string[]) => void; disabled?: boolean } }) {
+  const all = catalogTools();
+  const allowed = new Set(tools.carried ?? all.map((t) => t.id));
+  const used = new Map((plan.equipment ?? []).map((e) => [e.tool, /while walking/i.test(e.justification ?? "") ? "While walking" : "At stations"]));
+  const toggle = (id: string, on: boolean) => {
+    const next = all.map((t) => t.id).filter((t) => (t === id ? on : allowed.has(t)));
+    if (next.length) tools.onChange(next);
+  };
+  return (
+    <ul className="mission-tools" aria-label="Tools the crew may take">
+      {all.map((t) => (
+        <li key={t.id}>
+          <label title={t.depth_m ? `Reaches ${t.depth_m} m` : undefined}>
+            <input type="checkbox" checked={allowed.has(t.id)} disabled={tools.disabled || (allowed.has(t.id) && allowed.size === 1)} onChange={(e) => toggle(t.id, e.target.checked)} />
+            <span>{SHORT_TOOL[t.id] ?? toolName(t.id)}{t.depth_m ? ` · ${t.depth_m} m` : ""}</span>
+          </label>
+          <small>{t.mass_kg == null ? "mass unknown" : `${formatNumber(t.mass_kg, 1)} kg`} · {allowed.has(t.id) ? used.get(t.id) ?? "Not used" : "Left behind"}</small>
+        </li>
+      ))}
+    </ul>
+  );
+}

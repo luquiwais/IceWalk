@@ -24,13 +24,16 @@ export class PlannerApiError extends Error {
   readonly kind: PlannerErrorKind;
   readonly status?: number;
   readonly url?: string;
+  /** The planner's own reason (FastAPI `detail`), safe to show the operator. */
+  readonly detail?: string;
 
-  constructor(kind: PlannerErrorKind, message: string, options: { status?: number; url?: string; cause?: unknown } = {}) {
+  constructor(kind: PlannerErrorKind, message: string, options: { status?: number; url?: string; cause?: unknown; detail?: string } = {}) {
     super(message, { cause: options.cause });
     this.name = "PlannerApiError";
     this.kind = kind;
     this.status = options.status;
     this.url = options.url;
+    this.detail = options.detail;
   }
 }
 
@@ -48,7 +51,9 @@ export type CatalogTool = { id: string; name?: string; [key: string]: unknown };
 /** GET /eva-window (eva_window.schema.json); the UI reads it through lib/eva-window. */
 export type EvaWindowPayload = Record<string, unknown> & { best?: unknown; sols?: unknown };
 
-export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[] };
+export type PlanRequest = { stm?: Record<string, unknown>; measurements: Measurement[]; strategy?: "learn" | "confirm"; habitat_xy?: [number, number]; tools?: string[] };
+/** A station as the operator left it: an existing id keeps its tools and objectives; no id, a new station. */
+export type EditedStation = { id?: string; position: [number, number]; tools?: string[] };
 export type ReplanRequest = {
   plan_id: string;
   measurement: Measurement;
@@ -93,8 +98,44 @@ export function postPlan(body: PlanRequest, options?: ApiOptions): Promise<Plan>
   return request("/plan", post(body), isPlan, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
 }
 
+/** POST /evaluate: the plan with the operator's stations, in that order, without re-choosing any. */
+export function postEvaluate(body: { plan_id: string; stations: EditedStation[]; decisions?: boolean }, options?: ApiOptions): Promise<Plan> {
+  return request("/evaluate", post(body), isPlan, options);
+}
+
 export function postReplan(body: ReplanRequest, options?: ApiOptions): Promise<Plan> {
   return request("/replan", post(body), isPlan, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
+}
+
+/** GET /plan/{id}: a plan already built in this server session (the cuff checklist reads it). */
+export function getPlan(planId: string, options?: ApiOptions): Promise<Plan> {
+  return request(`/plan/${encodeURIComponent(planId)}`, { method: "GET" }, isPlan, options);
+}
+
+/** GET /walkback: the fastest route from a point back to the plan's habitat over the DTM (EVA TERMINATE). */
+export type Walkback = { from: [number, number]; to: [number, number]; xy: [number, number][]; distance_m: number; minutes: number; max_slope_deg: number };
+
+/** EVA TERMINATE route from (x, y). With the habitat, the planner answers even if it no longer has the plan. */
+export function getWalkback(planId: string, x: number, y: number, habitat?: readonly [number, number], options?: ApiOptions): Promise<Walkback> {
+  const q = new URLSearchParams({ plan_id: planId, x: x.toFixed(1), y: y.toFixed(1) });
+  if (habitat) { q.set("hx", habitat[0].toFixed(1)); q.set("hy", habitat[1].toFixed(1)); }
+  return request(`/walkback?${q}`, { method: "GET" }, isWalkback, options);
+}
+
+function isWalkback(body: unknown): body is Walkback {
+  return isObject(body) && Array.isArray(body.xy) && body.xy.length > 1 && typeof body.distance_m === "number" && typeof body.minutes === "number";
+}
+
+/** GET /campaign: P(ice confirmed) after 1..N EVAs, drilling blind against radar first. */
+export type CampaignSeries = { strategy: string; label: string; p_eva: number; evas_to_confirm: number; p_confirmed: number[] };
+export type Campaign = { site: string; drill_m: number; stations_per_eva: number; evas: number[]; series: CampaignSeries[]; speedup: number; is_assumption?: boolean; source?: string };
+
+export function getCampaign(options?: ApiOptions): Promise<Campaign> {
+  return request("/campaign", { method: "GET" }, isCampaign, options);
+}
+
+function isCampaign(body: unknown): body is Campaign {
+  return isObject(body) && Array.isArray(body.evas) && Array.isArray(body.series) && typeof body.speedup === "number";
 }
 
 function post(body: unknown): RequestInit {
@@ -142,6 +183,7 @@ async function request<T>(
       throw new PlannerApiError("http", `${path} returned HTTP ${response.status}${detail ? `: ${detail}` : ""}`, {
         status: response.status,
         url,
+        detail: detail || undefined,
       });
     }
 

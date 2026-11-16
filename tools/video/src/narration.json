@@ -1,0 +1,222 @@
+{
+  "global": [
+    {
+      "duration": 88,
+      "text": "We can map Mars. Not one metre down.",
+      "role": "",
+      "from": 4
+    },
+    {
+      "duration": 46,
+      "text": "One metre. No ice.",
+      "role": "EV1",
+      "from": 96
+    },
+    {
+      "duration": 77,
+      "text": "Each measurement updates the map and the plan.",
+      "role": "",
+      "from": 245
+    },
+    {
+      "duration": 82,
+      "text": "Plan reviewed. You are GO for station twenty-five.",
+      "role": "IV",
+      "from": 362
+    },
+    {
+      "duration": 12,
+      "text": "Copy.",
+      "role": "EV1",
+      "from": 448
+    },
+    {
+      "duration": 81,
+      "text": "We don't promise ice. Fewer EVAs.",
+      "role": "",
+      "from": 521
+    },
+    {
+      "duration": 20,
+      "text": "IceWalk.",
+      "role": "",
+      "from": 674
+    }
+  ],
+  "local": [
+    {
+      "duration": 77,
+      "text": "Desde la órbita vemos mucho. No lo que hay a un metro.",
+      "role": "",
+      "from": 5
+    },
+    {
+      "duration": 43,
+      "text": "Un metro. Sin hielo.",
+      "role": "EV1",
+      "from": 132
+    },
+    {
+      "duration": 92,
+      "text": "Buscar hielo en Marte cuesta salidas y tiempo de la tripulación.",
+      "role": "",
+      "from": 199
+    },
+    {
+      "duration": 129,
+      "text": "No prometemos hielo: ayudamos a decidir dónde medir, con qué herramienta y cuándo volver.",
+      "role": "",
+      "from": 355
+    },
+    {
+      "duration": 88,
+      "text": "Juntamos datos orbitales de NASA para estimar hielo hasta tres metros.",
+      "role": "",
+      "from": 538
+    },
+    {
+      "duration": 74,
+      "text": "Y mostramos por separado lo que todavía no sabemos.",
+      "role": "",
+      "from": 686
+    },
+    {
+      "duration": 131,
+      "text": "El radar indica dónde conviene buscar. El taladro confirma hasta un metro.",
+      "role": "",
+      "from": 852
+    },
+    {
+      "duration": 83,
+      "text": "Las operaciones se apoyan en prácticas documentadas por NASA.",
+      "role": "",
+      "from": 1039
+    },
+    {
+      "duration": 94,
+      "text": "El sistema arma estaciones según lo que pueden enseñarnos.",
+      "role": "",
+      "from": 1164
+    },
+    {
+      "duration": 148,
+      "text": "Y una ruta sobre el terreno, con obstáculos vistos desde la órbita y tiempo para volver.",
+      "role": "",
+      "from": 1320
+    },
+    {
+      "duration": 165,
+      "text": "Elegimos cuándo salir: luz, temperatura, polvo y clima espacial.",
+      "role": "",
+      "from": 1476
+    },
+    {
+      "duration": 126,
+      "text": "Cada aviso conserva su fuente. Este es un ejemplo ambiental de otra fecha.",
+      "role": "",
+      "from": 1645
+    },
+    {
+      "duration": 96,
+      "text": "En la Tierra, NASA ensaya cómo vivir y trabajar lejos.",
+      "role": "",
+      "from": 1775
+    },
+    {
+      "duration": 151,
+      "text": "Afuera, uno mide y el otro asiste. Adentro, el operador revisa cada cambio.",
+      "role": "",
+      "from": 1920
+    },
+    {
+      "duration": 105,
+      "text": "Este reloj muestra cuánto pueden trabajar antes de emprender la vuelta.",
+      "role": "",
+      "from": 2076
+    },
+    {
+      "duration": 94,
+      "text": "Ya cuenta el trayecto y la entrada al hábitat. La reserva no se vuelve a descontar.",
+      "role": "",
+      "from": 2220
+    },
+    {
+      "duration": 66,
+      "text": "Sin hielo hasta un metro. Registro enviado.",
+      "role": "EV1",
+      "from": 2388
+    },
+    {
+      "duration": 18,
+      "text": "Recibido.",
+      "role": "IV",
+      "from": 2484
+    },
+    {
+      "duration": 141,
+      "text": "Un negativo también informa. El modelo esperaba hielo más abajo y el plan ya tenía preparado este camino.",
+      "role": "",
+      "from": 2520
+    },
+    {
+      "duration": 92,
+      "text": "La medición actualiza la estimación cerca del punto y también su incertidumbre.",
+      "role": "",
+      "from": 2724
+    },
+    {
+      "duration": 129,
+      "text": "El cambio es pequeño y local. Sin hielo en el primer metro permite hielo más profundo.",
+      "role": "",
+      "from": 2880
+    },
+    {
+      "duration": 95,
+      "text": "PET noventa y uno. Cuatro horas dieciséis para iniciar el regreso.",
+      "role": "IV",
+      "from": 3058
+    },
+    {
+      "duration": 137,
+      "text": "Plan revisado: cinco estaciones, seguimos. EV1, GO para la estación veinticinco.",
+      "role": "IV",
+      "from": 3216
+    },
+    {
+      "duration": 93,
+      "text": "Siguen con una decisión revisada: qué aprendieron y qué falta conocer.",
+      "role": "",
+      "from": 3420
+    },
+    {
+      "duration": 59,
+      "text": "Y qué margen tienen que cuidar en el siguiente paso.",
+      "role": "",
+      "from": 3557
+    },
+    {
+      "duration": 138,
+      "text": "En nuestra simulación, radar primero y taladro para confirmar baja las salidas esperadas.",
+      "role": "",
+      "from": 3708
+    },
+    {
+      "duration": 180,
+      "text": "De tres coma treinta y dos a uno coma dieciséis. No prometemos hielo: buscamos aprender más con menos EVAs.",
+      "role": "",
+      "from": 3876
+    },
+    {
+      "duration": 62,
+      "text": "Todos los números de este video salieron de IceWalk.",
+      "role": "",
+      "from": 4104
+    },
+    {
+      "duration": 108,
+      "text": "IceWalk. Entender la incertidumbre. Planificar el siguiente paso.",
+      "role": "",
+      "from": 4188
+    }
+  ]
+}

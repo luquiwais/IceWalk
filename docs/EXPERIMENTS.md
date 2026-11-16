@@ -741,3 +741,247 @@ Km² de Tusberti (`--zone tusberti`, `python -m vision.evaluate sfd ... --radius
 | Índice sobre 1.8 m | −4.68 ± 0.15 | −1.86 ± 0.08 | −2.76 ± 0.17 |
 
 La forma mejora (la cola de grandes ya no sobra, el índice se acerca), pero **el conteo cae a la mitad del de sombras** y al 13 % del de Tusberti. En BoulderNet el modelo le gana a las sombras en las 8 comparaciones; en S1094b, sin etiquetas propias, la única vara externa dice que pierde muchos bloques. Probable cambio de dominio: incidencia de 63-68° (el entrenamiento de Marte va de 38° a 58°) y eyecta rugosa.
+### BoulderNet (Mask R-CNN publicado) sobre el dataset y sobre S1094b (2026-11-14)
+
+`python -m vision.bouldernet_infer` con los pesos `model_0055999.pth` de Prieur et al. (2023) (Zenodo 8171052, CC BY 4.0), sin reentrenar. Recortes de 500 px a 0.5 m/px como en su entrenamiento, umbral de score 0.30 elegido en `validation` (el mejor para ≥ 2 m) y medido **una sola vez** en `test`. La partición de Marte es chica: 6 recortes de validación y 4 de test (uno por imagen HiRISE). Corrió en la RTX 3060 del PC de Simon (1.4 s los 4 recortes; 8 min la zona de la EVA, dos fechas); los mismos números en CPU.
+
+| Recortes de Marte del dataset | BoulderNet F1 ≥ 2 m | ≥ 3 m | Sombras F1 ≥ 2 m | ≥ 3 m |
+| --- | --- | --- | --- | --- |
+| `validation` (800 bloques ≥ 2 m) | 0.72 | 0.75 | 0.37 | 0.52 |
+| `test` (274 bloques ≥ 2 m) | **0.70** | **0.73** | 0.29 | 0.44 |
+| `test`, con el estiramiento de niveles que necesita S1094b | 0.67 | 0.70 | | |
+
+**En su propio dominio gana con holgura. En S1094b no sirve:**
+
+1. **Niveles.** Los ortos de S1094b vienen estirados muy distinto que los recortes (abril: mediana 219 y desvío 8; febrero: 202 y 13; recortes: 115-157 y 9-59). Sin corregirlo, BoulderNet encuentra 25 bloques en abril y 524 en febrero en 9 km². Se agregó un estiramiento lineal de los percentiles 1 y 99 de cada imagen a los del `train` (48 y 210); en el dataset casi no cambia el F1 (fila 3).
+2. **Con los niveles corregidos detecta pozos y cráteres chicos, no bloques.** 18 270 objetos en la zona de la EVA (11 861 en las dos fechas). Contra la vara de Tusberti (febrero de 2022, 1 km² centrado en el cráter): 1276 por km² de 3 m o más (Tusberti ~220, sombras 247), 1094 de 4 m o más (~50, sombras 139), índice −0.92 (−4.68; sombras −1.86). A ojo, en tres recortes de 80 m (eyecta, hábitat, sur de la EVA) los círculos caen sobre depresiones redondas de 4-8 m: medialuna oscura en la pared que da al sol y borde iluminado enfrente, la misma firma que un bloque con su sombra a 64-68° de incidencia (en su entrenamiento, hasta 58°). Los bloques chicos y brillantes de la eyecta no los marca.
+
+**Decisión: queda el detector de sombras** (regla de `plans/vision-bouldernet.md`; `DECISIONS.md`). El catálogo de BoulderNet queda solo local (`data/processed/s1094b-bouldernet*/`, no se publica). Lo que falló, para no repetirlo:
+
+- Los pesos publicados no cargan con `weights_only=True`: guardan el estado del entrenamiento con un `getattr` (`CyclicLR.scale_fn`). `clean_weights()` lee solo los tensores con un unpickler restringido y deja un `.model_only.pth` que sí carga en modo seguro.
+- detectron2 sin compilar alcanza para Mask R-CNN (ROIAlign y NMS vienen de torchvision); `DefaultPredictor` no, porque importa el evaluador COCO. Con un predictor propio anda en Windows sin MSVC ni toolkit de CUDA.
+- Las corridas en segundo plano en dev-cachy morían al cerrarse la sesión de Claude Code: usar `systemd-run --user`.
+
+Para que BoulderNet sirva acá haría falta **reentrenarlo con bloques de S1094b** (o de imágenes con sol tan bajo) y con cráteres chicos como negativos: depende de las etiquetas a mano (cuestión 74).
+
+## 2026-11-14: pendiente en el esfuerzo, exclusión del hábitat y regla de volver
+
+- **Plan nominal de S1094b** con la exclusión de 150 m: la estación 1 pasa de 0 m (encima del hábitat) a 200 m; 6 estaciones entre 200 y 510 m, 1.14 km, margen mínimo 20.6 min. Sube 19 m en total: media 1050 BTU/h, pico 1617 (tope 2000), VO2 30 % del máximo (límite 43 %): sigue siendo a pie.
+- **Rampa sintética de 30 m** (`test_feasibility.py`): el pico sube más de 300 BTU/h respecto del llano; en bajada queda igual que en el llano (bajar no descuenta).
+- **Regla de volver** (re-plan tras la estación 2, sin hielo): a los 150 min, `continue` (margen 46.8 min, 3 estaciones); a los 300 min, `return_to_habitat` (margen 0.4 min, bajo los 15 de caution); a los 330 min, `return_to_habitat` (no queda estación alcanzable).
+- **Lo que no cambia:** con las estaciones repartidas por tercios de inercia térmica, una medición casi no mueve las estaciones siguientes (la medición de la demo da 0 % de cambio). La regla del 50 % se activa por tiempo y margen, no por el resultado. Es coherente con lo medido el 08/11: el mapa a escala de sitio casi no cambia con una medición.
+- **Campaña** (`GET /campaign`, taladro de 1 m, 6 estaciones por EVA): a ciegas, P(confirmar) por EVA 0.30 y 3.3 EVAs esperadas; radar primero con 50 sondeos, 0.86 y 1.16 (×2.9); con 20 sondeos, 0.63 y 1.58. Tras 2 EVAs: 51 % contra 98 %.
+
+## 2026-11-14: por qué el mapa de hielo "no se entendía", y color real para el terreno
+
+- **Distribución del mapa nominal** (`apps/web/mock/map.json`, 300 × 300 celdas de 10 m): P(hielo ≤ 3 m) vale 0.669 (el prior) en el 75 % de las celdas; la incertidumbre restante es 1.0 en más del 75 %. Solo 474 celdas (0.5 %) se apartan del prior en 0.1 o más, en manchas de decenas de metros alrededor de cráteres. Con una rampa continua (y la misma paleta para probabilidad e incertidumbre) se veía un azul parejo.
+- **Bloques de 100 m con la media**: ningún bloque baja de U = 0.8 (la evidencia se diluye). **Con la mejor celda del bloque**: 25 de 716 bloques del círculo de 1.5 km tienen evidencia local (3.5 %), 12 con P ≥ prior + 0.1 y 4 con P ≤ prior − 0.1. Es lo que dibuja la grilla de puntos.
+- **Color del terreno con el orto IRB** (`ESP_073578_2155_IRB_C_01_ORTHO.JP2`, 1 m, bajado de hirise.lpl.arizona.edu): las tres bandas de 8 bits vienen estiradas por separado (en una ventana de 400 × 400 px, medianas NIR 182, RED 157, BG 14). Cualquier compuesto RED/BG sale rojo saturado: no es color natural. Para color real hace falta el COLOR RDR calibrado (I/F) registrado sobre el DTM. **Descartado**: el terreno queda en gris (HiRISE RED, como se adquirió). El IRB queda en `data/raw/hirise_irb/` (fuera de Git).
+
+## 2026-11-14: ¿la inercia térmica predice el hielo?
+
+Pregunta: ¿la inercia térmica (TI) en la posición de cada impacto fresco predice si expuso hielo **mejor que la latitud sola**? Si sí, entraría como covariable del prior y daría variación real entre cráteres. Solo se midió: el prior y el planificador no cambian.
+
+Código: `packages/model/gp/thermal_inertia_check.py` (`python -m gp.thermal_inertia_check`), con tests en `tests/test_thermal_inertia_check.py`. Resultados en `data/processed/daubar2022/thermal_inertia_check.json` y la TI de THEMIS por impacto en `thermal_inertia_themis.csv`, fuera de Git.
+
+**Datos.** Los 383 impactos del prior regional (Daubar et al. 2022, norte de 20°N, 37 con hielo).
+- **THEMIS 100 m** (opción a): mosaico global cuantitativo de USGS, leído por ventanas con `/vsicurl` (bloques de 128 × 128, ~25 MB en total, 2.5 min) sin bajar las teselas de 2.5 GB. **Falló como prueba principal:** cubre solo hasta 60°N y sus huecos crecen con la latitud. Al norte de 40°N tienen dato 29 de 63 impactos; en total, 317 impactos y **solo 11 de los 37 con hielo**.
+- **TES, Putzig y Mellon (2007)** (opción b), PDS, ~3 km, global hasta 87°: mapas nocturno y diurno con máscara de interpolación (155 MB en `data/raw/tes_putzig2007/`). Quedó como **prueba principal**: TES nocturno en el píxel del impacto, sin píxeles interpolados (337 impactos, 35 con hielo). La elección se hizo después de ver la cobertura de THEMIS y antes de mirar cualquier métrica.
+- Orientación de TES verificada con regiones conocidas: Arabia 57, Amazonis 51, Tharsis 79, Acidalia 301; con el mapa invertido no cuadra.
+
+**Método.** Validación cruzada estratificada 5 × 5, con las mismas particiones para todos los modelos. La TI se estandariza dentro de cada pliegue y nada se elige mirando el test. Se comparan dos pares de modelos:
+- probit censurado (la familia del prior: `log(r·D)` de offset, latitud) contra el mismo con `log TI`;
+- logística en latitud y `log D`, con L2 fija de 1, contra la misma con `log TI`.
+
+Se mide la diferencia con un bootstrap pareado y estratificado (2000 remuestreos) y se hacen 300 permutaciones de la TI **dentro de franjas de 5° de latitud**. Así se conserva la relación TI-latitud y solo se rompe lo que la TI agrega.
+
+**Prueba principal (TES nocturno, ≥ 20°N, n = 337, 35 con hielo; correlación entre latitud y log TI: 0.55)**
+
+| Modelo | AUC | Brier | Log-loss | Δ log-loss contra solo latitud (90 % bootstrap) | Permutación |
+| --- | --- | --- | --- | --- | --- |
+| Tasa constante | 0.500 | 0.0931 | 0.3335 | - | - |
+| Probit, latitud (prior) | 0.981 | 0.0329 | 0.1058 | - | - |
+| Probit, latitud + TI | 0.982 | 0.0326 | 0.1062 | +0.0004 (−0.0070 a +0.0075) | p = 0.28 |
+| Logística, latitud + log D | 0.982 | 0.0327 | 0.1070 | - | - |
+| Logística, + TI | 0.982 | 0.0323 | 0.1046 | −0.0024 (−0.0078 a +0.0031) | p = 0.28 |
+
+**Variantes declaradas de antemano** (Δ log-loss con TI menos sin TI; negativo = la TI ayuda)
+
+| Variante | n (hielo) | Probit: Δ (90 %), p | Logística: Δ (90 %), p |
+| --- | --- | --- | --- |
+| TES nocturno, solo ≥ 35°N | 106 (35) | −0.0046 (−0.037 a +0.020), p = 0.073 | −0.0140 (−0.034 a +0.006), **p = 0.030** |
+| TES diurno | 346 (32) | +0.0014 (−0.001 a +0.005), p = 0.37 | +0.0002 (−0.003 a +0.004), p = 0.49 |
+| TES nocturno, mediana 3 × 3 (~9 km) | 377 (37) | −0.0001 (−0.006 a +0.005) | −0.0024 (−0.007 a +0.003) |
+| Cociente diurno / nocturno (capas, exploratoria) | 309 (30) | −0.0002 (−0.007 a +0.008), p = 0.15 | +0.0006 (−0.000 a +0.002), p = 0.40 |
+| THEMIS, mediana 5 × 5 (500 m) | 317 (11) | +0.0034 (−0.005 a +0.009), p = 0.27 | +0.0002 (−0.003 a +0.003), p = 0.33 |
+| THEMIS, píxel central / 11 × 11 | 317-318 (11) | +0.0030 / +0.0096 | +0.0002 / +0.0007 |
+
+**Lo que sí aparece.** Con todos los datos, el probit da a la TI nocturna de TES un coeficiente negativo: −0.33 en `log d` por desvío de `log TI`, con intervalo bootstrap del 90 % de −0.60 a −0.09. Es decir, a más TI, hielo más somero, como esperaría la física. Pero es un ajuste dentro de muestra, y **fuera de muestra no mejora la predicción**: la latitud ya explica casi todo (AUC 0.981).
+
+**Arcadia y S1094b.**
+- La TI explica una parte chica del exceso de Arcadia (40-60°N, 165-190°E, con TES válido): 4 impactos con hielo por 1.6 esperados con latitud (z = 2.6) y por 1.9 con latitud + TI (z = 2.1).
+- Alrededor de S1094b (±10°, ±30°): 7 por 3.3 (z = 2.8) contra 7 por 3.5 (z = 2.6). El aviso de `nearby_impacts` sigue haciendo falta.
+- En el sitio, **las dos fuentes de TI dicen lo contrario**. TES da 78 (polvo, a 3 km); THEMIS da 488 (suelo firme, a 100 m; coincide con `build_soil.py`).
+  - Con TES: mediana 4.4 m y P(≤ 3 m) 0.28, contra 3.3 m y 0.45 con solo latitud sobre la misma muestra.
+  - Con THEMIS: 2.9 m y 0.51, contra 4.9 m y 0.23. Además, 488 está a 2 desvíos de los impactos (mediana 140): es una extrapolación.
+  - El signo del cambio en el sitio depende de qué producto se use.
+
+**Lo que falló o queda débil.**
+- THEMIS como fuente principal (cobertura; ver arriba).
+- La única p < 0.05 (logística, ≥ 35°N, p = 0.030) es una de 12 pruebas de permutación; con Bonferroni el umbral es 0.004. Además, su intervalo bootstrap cruza el cero y el probit en la misma muestra no llega (p = 0.073). Es una pista, no un resultado.
+- El cociente diurno / nocturno (la firma de capas de Putzig y Mellon 2007) no aporta nada.
+- Límites:
+  - la TI diurna y nocturna mide centímetros, y el hielo en latitudes medias está a decímetros o metros;
+  - el píxel de TES (3 km) mezcla terrenos;
+  - quedan 26 a 35 impactos con hielo por variante;
+  - "sin hielo" puede ser hielo no visible.
+
+**Conclusión: no.** La TI no predice el hielo de los impactos frescos mejor que la latitud sola, ni con TES (3 km) ni con THEMIS (100 m): la diferencia de log-loss es de ±0.003 sobre 0.106, con p = 0.28. Hay una señal física débil (a más TI, hielo más somero) que no se traduce en predicción. **No entra como covariable del prior.** Donde podría aportar es al norte de 35°N; se revisaría con más impactos con hielo (catálogos posteriores a 2022) o con TI estacional, que llega más hondo.
+
+
+## 2026-11-14 — Migración del proyecto de video (Codex)
+
+- Recuperado el pedido que Claude no inició por cuota: pull y organización, sin
+  nueva producción. `git fetch origin` y fast-forward de `2a633fb` a `ad2eaba`
+  (17 commits). Dos conflictos documentales integrados: se preservaron las filas
+  remotas nuevas y las decisiones locales; #68 continuó resuelta según investigación.
+  Primer pull abortó porque faltaba preparar el log anidado; no cambió HEAD.
+  Segundo pull exitoso; los cuatro docs locales se restauraron integrados.
+- Proyecto Remotion/Blender trasladado de `~/Developer/icewalk-video` a `tools/video`.
+  Hash de cada archivo original calculado antes del traslado; 163 archivos del
+  inventario coinciden después. Historial `.git` independiente respaldado fuera;
+  ningún repositorio anidado ni binario entre los candidatos de Git. Ruta anterior
+  enlaza al nuevo proyecto para compatibilidad con rutas de los `.blend`.
+- `bun run lint` inicial falló por dos props `from={0}` redundantes de Remotion.
+  Eliminadas sin cambiar el montaje; lint y TypeScript pasan después.
+- `bun run build` pasa desde la nueva ruta (Rspack, salida `out/bundle` ignorada).
+  Es compilación, no render ni validación visual. No se generaron planos ni voces.
+- Ocho fixtures originales coinciden con los hashes de `public/data/data.json`.
+  No regenerados con los mocks nuevos de main. Enlaces de documentación vigente
+  comprobados. Código de aplicación y workspaces/lock raíz sin cambios propios.
+- Siguen sin verificar: defectos visuales 3D heredados, logos, actuación y voces,
+  lectura cronometrada, composición local y puesta final. El animatic conserva
+  placeholders; build/lint no prueban que esté listo para entrega.
+
+
+## 2026-11-14 — Primeras pruebas de producción (Codex)
+
+- Remotion Studio bajo Bun falló por `stream.unref` en el file picker nativo de
+  macOS. Ejecutar el CLI con Node funciona; preview en :3100, app de producto intacta.
+- Retiradas todas las referencias Higgsfield del grafo de composiciones registradas;
+  el test falló primero por ProofConsole y pasa después de reemplazar las placas.
+- Consola física, taladro conceptual y terreno probados con Cycles. Primitivas y
+  stills no se aceptan como acabado final. La primera superficie era demasiado
+  lisa/brillante; se corrigieron coordenadas de textura a metros, mapas PBR,
+  specular y roughness. Todavía requiere revisión visual.
+- Rig Z2: el heat weighting falló, pese a crear grupos vacíos. Reemplazado por
+  pesos anatómicos explícitos. Validación de malla evaluada entre frames 1/13:
+  13 huesos y deformación local máxima 0,1134 m por actor. Eso prueba skinning,
+  no una caminata profesional: siguen en revisión pose, pies y deslizamiento.
+- Renderizadas tres pruebas nativas de 72 frames a 24 fps: consola y taladro a
+  1920×1080, caminata a 960×540. Cámara 3D, proyección de monitores por frame,
+  rig y giro/parada de eje. No son exportaciones de los videos finales.
+- Guías de macOS descartadas por pedido de voces naturales. Generadas 36 tomas
+  Microsoft Neural (Andrew/Guy; Tomás/Elena), mezcla de 29,5/180 s sin `atempo`.
+  Se recortaron frases/pausas y ventanas para no comprimirlas. Test de ventanas pasa.
+- Archivo NASA: CHAPEA 160–166 s y Desert RATS 112–117 s, mudo y rotulado como
+  contexto terrestre en Local. Smithsonian dio página temporalmente no disponible
+  y API 403; no se descargó el escaneo Armstrong. PGT y guante sí desde NASA;
+  PGT no se presenta como taladro de hielo certificado.
+
+## 2026-11-15 — Global v2: set, rigs y render (Claude)
+
+- Retarget CMU → Z2 por dirección de hueso con giro del origen: funciona con la malla en pose de brazos adelante. Falló primero porque el BVH importado estaba oculto en viewport y no se evaluaba (pose constante); corregido.
+- El clip 03_01 (terreno irregular) sube y baja la pelvis: no sirve para suelo plano. 40_10 camina y gira: se buscó por script la ventana más quieta (cuadro 151, 2 cm de deriva) y se fijó la raíz. Caminata: ventanas rectas de 17_08 (cuadro 61) y 07_04.
+- El casco giraba con la cabeza; en el Z2 va fijo al torso superior: pesos del casco al pecho.
+- La textura Rocky Terrain tenía tinte verde (musgo): se usa solo su luminancia con color de regolito marciano. Las rocas escaneadas salían blancas: basalto oscuro con polvo en caras superiores.
+- EEVEE rompe con la subdivisión adaptativa del terreno (desborde de enteros): en modo layout se baja a nivel 1.
+- Tiempo por cuadro en Cycles 1920×804, 48 muestras: ~65–75 s en M4 Pro (con otras tareas en GPU). El primer render incluye la compilación de kernels Metal (~170 s).
+- Volumen de mundo en EEVEE dentro del hábitat produjo un patrón de mosaico: se quitó.
+- Luces de área frente a los monitores aparecían reflejadas en el vidrio: la luz miraba hacia la pantalla; se invirtió.
+- El plano de resultado usaba cuadros posteriores al final del render del taladro: lo detectó el test nuevo de cobertura; ahora congela el último cuadro.
+
+## 2026-11-15 — Continuación de renders y memoria (Codex, tarde)
+
+- Cinco secuencias finales completas: órbita 72, taladro 60, consola amplia 64,
+  revisión 80 y subsuelo 72 cuadros. Se codificaron en `public/v2/`; los MP4 de
+  consolas, órbita y subsuelo que había al entrar eran anteriores al render final.
+  Caminata heredada: 24/72; POV sin secuencia final. No había export final.
+- El codificador aceptaba secuencias incompletas y podía terminar con código 0.
+  Test reproducido en una carpeta temporal; ahora exige cuadros contiguos,
+  permite elegir planos y sustituye el MP4 solo al completar la codificación.
+  También se corrigió la expansión del listado predeterminado en zsh. Nueve tests
+  de entrega pasan; eslint y TypeScript pasan.
+- Reanudar walk en 25:72 consumió unos 49,7 GB de huella física, medidos con
+  `sample`; el proceso estaba preparando `LightManager::device_update_tree`.
+  Se terminó ese intento, conservando los 24 cuadros originales. Hipótesis:
+  el shader emisivo usado para perspectiva aérea hacía tratar el terreno
+  desplazado y los bloques como fuentes de luz para muestreo directo.
+- Ajuste en `mars.haze`: `mat.cycles.emission_sampling = 'NONE'`, manteniendo
+  geometría, texturas, 1920×804, 48 muestras y el shader de perspectiva aérea.
+  Verificado en Blender 5.3. El cuadro 24 se renderizó aparte en 47,54 s;
+  comparación visual con el original sin cambios importantes de encuadre o tono.
+  Diferencia absoluta media RGB: 0,00420 en escala 0–1 (incluye ruido de muestreo).
+  Referencia: [Blender, Emission Sampling](https://docs.blender.org/manual/en/5.0/render/cycles/material_settings.html).
+  Secuencia 25:72 reanudada con el ajuste; rendimiento sostenido pendiente.
+- Audio medido con ffmpeg loudnorm, sin modificar las mezclas: Global 29,50 s,
+  −16,44 LUFS, pico −1,00 dBTP; Local 180 s, −16,32 LUFS, pico −0,99 dBTP.
+  Esto no valida interpretación, claridad de voces ni mezcla por escucha.
+# Revisión del astronauta y motion blur — 2026-11-15
+
+Se conservó el rig original (91 articulaciones) del astronauta de LasquetiSpice,
+CC BY 4.0, con retarget CMU para locomoción. El clip lunar del activo tiene una
+fase aérea demasiado larga para la puesta en escena elegida. Se conserva para
+comparación, sin usarlo como marcha final.
+
+`blender/v2/validate_scene.py`, ejecutado con el actor nuevo: 60 cuadros; máximo
+error geométrico palma/manillar **5,98 × 10⁻⁶ m**; avance del taladro **0,22 m**;
+giro **46,50 rad**; observador con variación de pose. Resultado local:
+`tools/video/assets/scenes/drill-v3-checks.json`. Esto no mide la naturalidad
+percibida de las manos, que también se inspeccionó en acercamientos.
+
+El primer render EEVEE de la piel segmentada presentó doble contorno con motion
+blur, incluso en reposo. Comparación del cuadro 30 con el mismo set, materiales,
+cámara y 96 muestras, cambiando solo `use_motion_blur=False`: contornos limpios.
+Lote original preservado en `assets/renders/v3/drill-motion-blur-check`; nuevo
+lote en `assets/renders/v3/drill`. El taladro conserva hélice continua, siete
+vueltas y avance visibles sin depender del desenfoque para comunicar giro.
+
+Fuente, licencia y adaptación de shaders:
+[`research/astronaut-assets-2026-11-15.md`](research/astronaut-assets-2026-11-15.md).
+Los clips siguen en producción; falta revisión continua de las películas.
+
+# 2026-11-15 — Recuperación de render y archivo NASA sin congelado
+
+El estado de la cola decía `rendering`, pero no existían procesos Blender ni
+`produce_v3`: el log POV terminaba en el cuadro32 a las17:08ART. Se cargó el
+`.blend` guardado y se renderizaron33–60 con el mismo encuadre y ajustes, sin
+repetir los primeros32. Completado; continúa la cola para los planos restantes.
+
+La plantilla Local usaba cinco segundos (120cuadros) de Desert RATS en un corte
+de seis (144). `Archive` congelaba el último cuadro. Test nuevo confirma el fallo
+120<144. Se amplió el recorte del original local NASA a112–118s (antes112–117),
+sin audio y a24fps; ahora hay144cuadros. Se elimina el congelado y se limita el
+video con `trimAfter`. Test específico, eslint y TypeScript pasan. El montaje
+v3 completo se activa cuando termine su cobertura; estos checks no implican
+aprobación estética ni escucha humana del video terminado.
+
+## HUD de tránsito: reloj y números sin respaldo (21:10 ART)
+
+La prueba histórica solo cubría `ui/screens.tsx`; no detectaba que `v2/Hud`
+mostraba el reloj de fin de estación mientras la cámara caminaba, además de un
+rumbo180° fijo y una distancia interpolada100→97m sin trayectoria validada.
+Comprobación real en Remotion, Global cuadro450: falla al exigir ausencia de
+`TO REQUIRED DEPARTURE`. Se elimina el reloj de tránsito y el rumbo numérico;
+la distancia queda fija, rotulada desde E03S24. El HUD pide revisar la partida
+en estación. Comprobación de DOM verde, eslint/TypeScript limpios y Global
+reexportado; cuadro450 del MP4 inspeccionado. El reloj4h16m permanece en la
+explicación específica del fin de estación, no se trata como telemetría en ruta.
+
+## 2026-11-15 · Brief: bordes del 3D, camino y saltos
+
+- **Faldón de anillos alrededor del DTM** (descartado): anillos desplazados desde el borde con esquinas en abanico. Se veía como un aro facetado con muchos polígonos. Reemplazado por una grilla pareja de 240 × 240 que sigue el relieve del borde y se aplana, sin celdas dentro de la caja del DTM (la primera versión pasaba por debajo del terreno y asomaba en los pozos con su textura más borrosa).
+- **Camino con borde oscuro y tubo grueso** (descartado): a pie parecía una ruta en 3D. Queda la línea original, apenas más ancha.
+- **Viaje animado entre estaciones** (descartado, 1.3 s con arco): Luqui prefirió el salto instantáneo.
+- **Modelo HDU de NASA**: el GLB exige `KHR_draco_mesh_compression` (sin el decodificador cae al cilindro) y su material con transmisión se ve negro sin mapa de entorno; con DRACOLoader y material mate se ve bien.
+- Medido: panel del Brief sin scroll a 1280 × 551 en el sobrevuelo, el hábitat, las 6 estaciones y la confirmación. A 1024 × 768 no se pudo medir (la ventana del navegador de prueba no se achicó).

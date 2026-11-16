@@ -12,7 +12,8 @@
   --site-brightness: 0.5;
   --site-contrast: 1.15;
   --site-tint: rgb(168 132 112);
-  --site-tint-opacity: 0.55;
+  /* No invented color: HiRISE RED is a grayscale band and is shown as acquired. */
+  --site-tint-opacity: 0;
   --site-vignette: rgb(0 0 0 / 0.45);
   --site-void: oklch(0.14 0.006 50);
 
@@ -133,7 +134,6 @@
 .site-imagery {
   position: absolute;
   inset: 0;
-  filter: brightness(var(--site-brightness)) contrast(var(--site-contrast));
   opacity: 0;
   transition: opacity 500ms var(--ease-settle, ease-out);
 }
@@ -620,3 +620,62 @@
     transition: none;
   }
 }
+
+/* The HiRISE overview fades into the background at its edges: no hard rectangle. */
+.site-image[data-kind="overview"] {
+  mask-image:
+    linear-gradient(to right, transparent, #000 7%, #000 93%, transparent),
+    linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
+  mask-composite: intersect;
+}
+
+/* Only the photo is dimmed for legibility; the ice layer keeps its own colors. */
+.site-image:not([data-kind="raster"]) { filter: brightness(var(--site-brightness)) contrast(var(--site-contrast)); }
+
+/* The EV during the EVA, for the IV console: heading arrow and callsign. */
+.site-crew { position: absolute; left: -11px; top: -11px; display: flex; align-items: center; gap: 4px; pointer-events: none; }
+.site-crew svg { width: 22px; height: 22px; fill: #9fe8ff; stroke: #0b1a24; stroke-width: 1.2; filter: drop-shadow(0 0 3px rgb(0 0 0 / .8)); }
+.site-crew span { font: 700 11px/1 ui-monospace, monospace; color: #dff7ff; text-shadow: 0 0 3px #000, 0 1px 4px #000; }
+
+/* THEMIS context under HiRISE: a little softer so the HiRISE detail reads as the focus. */
+.site-image[data-kind="context"] { opacity: .45; }
+
+/* Wide HiRISE strip: same photo, feathered so the THEMIS edge never shows a seam. */
+.site-image[data-kind="wide"] {
+  mask-image:
+    linear-gradient(to right, transparent, #000 4%, #000 96%, transparent),
+    linear-gradient(to bottom, transparent, #000 3%, #000 97%, transparent);
+  mask-composite: intersect;
+}
+
+/* Dragging the habitat (Plan, before approval): grab cursor, a ghost that follows the pointer with its
+   grid coordinates, and a dashed line from where it was. */
+.site-hab[data-draggable] { pointer-events: auto; cursor: grab; touch-action: none; box-shadow: inset 0 0 0 1.5px #fff; }
+.site-hab[data-draggable]:hover { background: rgb(10 132 255 / .55); }
+.site-hab[data-dragging] { cursor: grabbing; opacity: .45; }
+.site-hab-drag { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.site-hab-drag svg { position: absolute; inset: 0; overflow: visible; }
+.site-hab-drag line { stroke: #fff; stroke-width: 1.5; stroke-dasharray: 5 4; }
+.site-hab-ghost { position: absolute; transform: translate(-50%, -50%); display: grid; place-items: center; width: var(--site-hab, 1.75rem); height: var(--site-hab, 1.75rem); border-radius: .4375rem; background: #0a84ff; box-shadow: 0 0 0 2px #fff; font-size: .5625rem; font-weight: 600; letter-spacing: .06em; color: #fff; }
+.site-hab-ghost span { position: absolute; top: calc(100% + .375rem); white-space: nowrap; padding: .125rem .4rem; border-radius: .375rem; background: rgb(20 20 24 / .85); font-size: .6875rem; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+
+/* A new plan is being built: hide the old route and stations rather than show them frozen. */
+.site-scene :is(.site-route, .site-route-halo, .site-route-previous, .site-chevrons, .site-station, .site-dropped, .site-leader) { transition: opacity .15s ease; }
+.site-scene[data-stale] :is(.site-route, .site-route-halo, .site-route-previous, .site-chevrons, .site-station, .site-dropped, .site-range, .site-range-label, .site-leader) { opacity: 0; pointer-events: none; }
+.site-hab-area { fill: rgb(10 132 255 / .06); stroke: rgb(255 255 255 / .7); stroke-width: 1.5; stroke-dasharray: 6 5; }
+.site-hab-ghost[data-outside] { background: var(--color-warning, #ff453a); }
+.site-hab-ghost[data-outside] span { color: var(--color-warning, #ff453a); }
+
+/* EVA TERMINATE: the fastest route back to the habitat (caution). Only drawn during the EVA. */
+.site-route-walkback { fill: none; stroke: var(--color-caution, #f0bf4f); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Dragging a station (Plan, before approval): its ghost says at once whether the new point works. */
+.site-station[data-draggable] { cursor: grab; touch-action: none; }
+.site-station[data-dragging] { opacity: .35; }
+.site-station-ghost { position: absolute; transform: translate(-50%, -50%); display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: rgb(20 20 24 / .9); box-shadow: 0 0 0 2px #fff; font-size: .875rem; font-weight: 700; color: #fff; }
+.site-station-ghost span { position: absolute; top: calc(100% + .375rem); white-space: nowrap; padding: .2rem .5rem; border-radius: .375rem; background: rgb(20 20 24 / .9); font-size: .75rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.site-station-ghost[data-level=caution] { box-shadow: 0 0 0 2px var(--color-caution, #ffd60a); }
+.site-station-ghost[data-level=caution] span { color: var(--color-caution, #ffd60a); }
+.site-station-ghost[data-level=warning] { box-shadow: 0 0 0 2px var(--color-warning, #ff453a); }
+.site-station-ghost[data-level=warning] span { color: var(--color-warning, #ff453a); }
+.site-station-ghost[data-level=pending] span { color: rgb(255 255 255 / .75); }

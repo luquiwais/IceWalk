@@ -7,14 +7,16 @@ pasillo entre bloques, regreso al hábitat). Esto agrega lo que el planificador 
 - Suelo: inercia térmica de THEMIS (`scripts/build_soil.py`). Polvo (< 100) puede no soportar
   peso y sube el costo de caminar (coeficiente de terreno de Pandolf).
 - Esfuerzo: BTU/h por tramo, escalado desde el regreso a pie medido por NASA (ICES-2026-127) con
-  la velocidad del tramo y el coeficiente del suelo; media de la EVA, pico, VO2 y oxígeno.
+  la velocidad del tramo y el coeficiente del suelo, más el trabajo de subir: desnivel positivo del
+  DTM por la masa de tripulante, traje y carga en la gravedad de Marte, sobre la eficiencia del
+  músculo en trabajo positivo (Margaria 1968). Media de la EVA, pico, VO2 y oxígeno.
 - Carga: masa de herramientas por tripulante contra la que asume NASA.
 - Comunicaciones: línea de vista entre la antena del hábitat y el traje sobre el DTM, en cada
   estación y a lo largo de la ruta (Artemis planifica con un tiempo máximo sin línea de vista).
 - Movilidad: caminar, carrito (como el MET del Apollo 14) o rover (LRV, Apollo 15-17).
 
-La pendiente no suma esfuerzo aparte: entra solo por la velocidad (más lento en pendiente), una
-simplificación que subestima el costo de subir.
+Bajar no descuenta esfuerzo (criterio conservador): el trabajo negativo cuesta poco pero no es
+gratis, y frenar con el traje no está medido.
 """
 
 from __future__ import annotations
@@ -32,6 +34,8 @@ from .traverse.terrain import OUT_DIR
 CONFIG = Path(__file__).resolve().parents[1] / "config" / "feasibility.yaml"
 SOIL = OUT_DIR / "soil_thermal_inertia.tif"
 MARS_RADIUS_M = 3389500.0
+MARS_G = 3.71  # m/s²
+W_TO_BTU_H = 3.412
 O2_G_PER_L = 1.429
 
 
@@ -137,12 +141,15 @@ def assess(*, legs: list[dict], segments: list[dict], stations: list[dict],
     alerts: list[dict] = []
 
     # Suelo y comunicaciones a lo largo de la ruta.
-    leg_eta, ti_route, los_runs = [], [], []
+    leg_eta, leg_climb, ti_route, los_runs = [], [], [], []
     run, longest = 0.0, 0.0
     for leg in legs:
         pts = densify(leg["xy"], step) if len(leg["xy"]) > 1 else np.asarray(leg["xy"], float)
         ti = _sample(soil, grid, pts) if soil is not None else np.full(len(pts), np.nan)
         ti_route.append(ti)
+        z = _sample(elevation, grid, pts)
+        dz = np.diff(z[np.isfinite(z)])
+        leg_climb.append(float(dz[dz > 0].sum()) if dz.size else 0.0)
         leg_eta.append(soil_class(float(np.nanmedian(ti)) if np.isfinite(ti).any() else np.nan,
                                   cfg)[1])
         los = line_of_sight(elevation, grid, habitat_xy, co["habitat_antenna_m"], pts,
@@ -173,16 +180,27 @@ def assess(*, legs: list[dict], segments: list[dict], stations: list[dict],
             }
     no_los = [sid for sid, v in per_station.items() if v["comm_los"] is False]
 
-    # Esfuerzo: tareas a ritmo de estación; caminata escalada por velocidad y suelo.
+    # Carga.
+    known = [e for e in equipment if e.get("mass_kg") is not None]
+    total = sum(e["mass_kg"] * e.get("count", 1) for e in known)
+    heaviest = max(known, key=lambda e: e["mass_kg"], default=None)
+    per_crew = total / max(crew, 1)
+
+    # Esfuerzo: tareas a ritmo de estación; caminata escalada por velocidad y suelo, más subir.
     task, walk, v_ref = ef["task_btu_h"], ef["walk_btu_h_ref"], ef["walk_speed_ref_kmh"]
+    moved_kg = ef["crew_mass_kg"] + ef["suit_mass_kg"] + per_crew
+    climb_total = 0.0
     btu = sum(s["minutes"] for s in segments) * task / 60
     minutes = sum(s["minutes"] for s in segments)
     peak = task if segments else 0.0
-    for leg, eta_leg in zip(legs, leg_eta, strict=True):
+    for leg, eta_leg, climb in zip(legs, leg_eta, leg_climb, strict=True):
         if leg["minutes"] <= 0:
             continue
         v = leg["distance_m"] / 1000 / (leg["minutes"] / 60)
         rate = task + (walk - task) * (v / v_ref) * eta_leg
+        climb_total += climb
+        lift_w = moved_kg * MARS_G * climb / (leg["minutes"] * 60) / ef["positive_work_efficiency"]
+        rate += lift_w * W_TO_BTU_H
         btu += rate * leg["minutes"] / 60
         minutes += leg["minutes"]
         peak = max(peak, rate)
@@ -190,12 +208,6 @@ def assess(*, legs: list[dict], segments: list[dict], stations: list[dict],
     per_kg = (0.961 + 0.275 * ef["rer"]) * ef["crew_mass_kg"]  # BTU/h por ml/(kg·min)
     vo2_avg = avg / per_kg
     o2_kg = btu / per_kg * 60 * ef["crew_mass_kg"] / 1000 * O2_G_PER_L / 1000  # por tripulante
-
-    # Carga.
-    known = [e for e in equipment if e.get("mass_kg") is not None]
-    total = sum(e["mass_kg"] * e.get("count", 1) for e in known)
-    heaviest = max(known, key=lambda e: e["mass_kg"], default=None)
-    per_crew = total / max(crew, 1)
 
     # Movilidad.
     rover, cart = [], []
@@ -240,6 +252,8 @@ def assess(*, legs: list[dict], segments: list[dict], stations: list[dict],
             "vo2max_fraction": round(vo2_avg / ef["vo2max_ml_kg_min"], 2),
             "vo2max_fraction_limit": ef["vo2_fraction_limit"],
             "o2_kg_per_crew": round(o2_kg, 2),
+            "climb_m": round(climb_total),
+            "moved_mass_kg": round(moved_kg),
         },
         "carry": {
             "per_crew_kg": round(per_crew, 1),

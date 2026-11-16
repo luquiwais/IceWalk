@@ -3,63 +3,259 @@
   "$id": "icewalk/plan.schema.json",
   "title": "Plan de EVA (respuesta de POST /plan y POST /replan)",
   "type": "object",
-  "required": ["mission_id", "plan_id", "stations", "route", "timeline", "summary"],
+  "required": [
+    "mission_id",
+    "plan_id",
+    "stations",
+    "route",
+    "timeline",
+    "summary"
+  ],
   "properties": {
-    "mission_id": { "type": "string" },
-    "plan_id": { "type": "string" },
-    "replanned_from": { "type": ["string", "null"] },
+    "mission_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "replanned_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "habitat_xy": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "Habitat position in grid meters (x, y) the plan starts and ends at. The operator can move it (POST /plan habitat_xy); absent in older plans, which used config/eva.yaml"
+    },
+    "habitat_area_m": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "xmin": {
+          "type": "number"
+        },
+        "xmax": {
+          "type": "number"
+        },
+        "ymin": {
+          "type": "number"
+        },
+        "ymax": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "xmin",
+        "xmax",
+        "ymin",
+        "ymax"
+      ],
+      "description": "Box in grid meters where the operator may move the habitat (config/eva.yaml habitat_area_m). Absent or null: the habitat cannot be moved"
+    },
     "stations": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "order", "position", "priority", "objective_ranks", "tools", "tasks", "duration_min", "hypothesis", "p_ice", "uncertainty", "value"],
+        "required": [
+          "id",
+          "order",
+          "position",
+          "priority",
+          "objective_ranks",
+          "tools",
+          "tasks",
+          "duration_min",
+          "hypothesis",
+          "p_ice",
+          "uncertainty",
+          "value"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "order": { "type": "integer", "minimum": 1 },
-          "position": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
-          "lonlat": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
-          "priority": { "enum": ["high", "medium", "low"] },
-          "objective_ranks": { "type": "array", "items": { "type": "integer" } },
-          "tools": { "type": "array", "items": { "type": "string" } },
+          "id": {
+            "type": "string"
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "position": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "lonlat": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "priority": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "objective_ranks": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "tasks": {
             "type": "object",
             "properties": {
-              "EV1": { "type": "array", "items": { "type": "string" } },
-              "EV2": { "type": "array", "items": { "type": "string" } }
+              "EV1": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "EV2": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           },
-          "duration_min": { "type": "number", "minimum": 0 },
-          "hypothesis": { "type": "string" },
-          "p_ice": { "type": "number", "minimum": 0, "maximum": 1, "description": "P(profundidad del hielo ≤ umbral de la STM), del GP" },
-          "uncertainty": { "type": "number", "minimum": 0, "maximum": 1, "description": "Entropía en bits de P(hielo ≤ umbral): 0 = se sabe, 1 = máxima ambigüedad" },
-          "value": { "type": "number", "minimum": 0, "maximum": 1, "description": "Valor de medir de gp.planning.rank_candidates; ordena igual que 'potencial + incertidumbre'" },
-          "planetary_protection": { "enum": ["none", "sensitive"] },
-          "terrain_unit": { "type": "integer" },
-          "kind": { "enum": ["survey", "target"], "description": "survey: elegida por el mapa de hielo; target: posición fija de la STM" },
-          "depth_median_m": { "type": "number", "minimum": 0, "description": "Mediana de la profundidad del hielo según el GP" },
-          "depth_shallow_m": { "type": "number", "minimum": 0, "description": "Profundidad optimista: un desvío más somera que la media de log d" },
-          "comm_los": { "type": ["boolean", "null"], "description": "Línea de vista entre la antena del hábitat y la del traje sobre el DTM; null sin DTM (app/feasibility.py)" },
-          "soil_ti": { "type": ["number", "null"], "description": "Inercia térmica de THEMIS en la estación (J m-2 K-1 s-1/2); < 100 es polvo" }
+          "duration_min": {
+            "type": "number",
+            "minimum": 0
+          },
+          "hypothesis": {
+            "type": "string"
+          },
+          "p_ice": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "P(profundidad del hielo ≤ umbral de la STM), del GP"
+          },
+          "uncertainty": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Entropía en bits de P(hielo ≤ umbral): 0 = se sabe, 1 = máxima ambigüedad"
+          },
+          "value": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Valor de medir de gp.planning.rank_candidates; ordena igual que 'potencial + incertidumbre'"
+          },
+          "planetary_protection": {
+            "enum": [
+              "none",
+              "sensitive"
+            ]
+          },
+          "terrain_unit": {
+            "type": "integer"
+          },
+          "kind": {
+            "enum": [
+              "survey",
+              "target"
+            ],
+            "description": "survey: elegida por el mapa de hielo; target: posición fija de la STM"
+          },
+          "depth_median_m": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Mediana de la profundidad del hielo según el GP"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Por que la estacion esta aca, en palabras (unidad de terreno, valor por minuto, chance de hielo o objetivo fijo)"
+          },
+          "depth_shallow_m": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Profundidad optimista: un desvío más somera que la media de log d"
+          },
+          "comm_los": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Línea de vista entre la antena del hábitat y la del traje sobre el DTM; null sin DTM (app/feasibility.py)"
+          },
+          "soil_ti": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Inercia térmica de THEMIS en la estación (J m-2 K-1 s-1/2); < 100 es polvo"
+          }
         }
       }
     },
     "route": {
       "type": "object",
       "description": "GeoJSON FeatureCollection; coordenadas en lon/lat este",
-      "required": ["type", "features"]
+      "required": [
+        "type",
+        "features"
+      ]
     },
     "timeline": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["t_start_min", "t_end_min", "kind", "label"],
+        "required": [
+          "t_start_min",
+          "t_end_min",
+          "kind",
+          "label"
+        ],
         "properties": {
-          "t_start_min": { "type": "number" },
-          "t_end_min": { "type": "number" },
-          "kind": { "enum": ["egress", "traverse", "station", "ingress", "reserve"] },
-          "label": { "type": "string" },
-          "station_id": { "type": ["string", "null"] },
-          "walkback_margin_min": { "type": "number" }
+          "t_start_min": {
+            "type": "number"
+          },
+          "t_end_min": {
+            "type": "number"
+          },
+          "kind": {
+            "enum": [
+              "egress",
+              "traverse",
+              "station",
+              "ingress",
+              "reserve"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "station_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "walkback_margin_min": {
+            "type": "number"
+          }
         }
       }
     },
@@ -68,41 +264,113 @@
       "description": "Qué hacer tras medir en las primeras estaciones de hielo (cuestión 23, opción C). Recomendación con justificación: decide la tripulación",
       "items": {
         "type": "object",
-        "required": ["station_id", "decide_by_min", "default_option", "options"],
+        "required": [
+          "station_id",
+          "decide_by_min",
+          "default_option",
+          "options"
+        ],
         "additionalProperties": false,
         "properties": {
-          "station_id": { "type": "string" },
-          "decide_by_min": { "type": "number", "minimum": 0, "description": "Bingo time: hora más tarde (min desde el inicio de la EVA) para dejar la estación con margen de regreso ≥ 0" },
-          "hard_stop": { "type": "string", "description": "Condiciones que cortan la EVA sin importar el resultado" },
-          "default_option": { "type": "integer", "minimum": 1, "description": "Rango de la opción a seguir si no hay decisión a tiempo" },
+          "station_id": {
+            "type": "string"
+          },
+          "decide_by_min": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Bingo time: hora más tarde (min desde el inicio de la EVA) para dejar la estación con margen de regreso ≥ 0"
+          },
+          "hard_stop": {
+            "type": "string",
+            "description": "Condiciones que cortan la EVA sin importar el resultado"
+          },
+          "default_option": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Rango de la opción a seguir si no hay decisión a tiempo"
+          },
           "options": {
             "type": "array",
             "minItems": 1,
             "maxItems": 3,
             "items": {
               "type": "object",
-              "required": ["rank", "if_result", "next_station_ids", "rationale"],
+              "required": [
+                "rank",
+                "if_result",
+                "next_station_ids",
+                "rationale"
+              ],
               "additionalProperties": false,
               "properties": {
-                "rank": { "type": "integer", "minimum": 1 },
-                "if_result": { "enum": ["ice", "no_ice", "inconclusive", "any"], "description": "any: el resultado no cambia las estaciones siguientes" },
-                "probability": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "Chance del resultado según el GP; null si no se estima" },
-                "next_station_ids": { "type": "array", "items": { "type": "string" } },
+                "rank": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "if_result": {
+                  "enum": [
+                    "ice",
+                    "no_ice",
+                    "inconclusive",
+                    "any"
+                  ],
+                  "description": "any: el resultado no cambia las estaciones siguientes"
+                },
+                "probability": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Chance del resultado según el GP; null si no se estima"
+                },
+                "next_station_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
                 "next_stations": {
                   "type": "array",
                   "description": "Estaciones de esta opción que no están en el plan nominal",
                   "items": {
                     "type": "object",
-                    "required": ["id", "position"],
+                    "required": [
+                      "id",
+                      "position"
+                    ],
                     "properties": {
-                      "id": { "type": "string" },
-                      "position": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
-                      "lonlat": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
-                      "p_ice": { "type": "number", "minimum": 0, "maximum": 1 }
+                      "id": {
+                        "type": "string"
+                      },
+                      "position": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "lonlat": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "p_ice": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
                     }
                   }
                 },
-                "rationale": { "type": "string" }
+                "rationale": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -113,135 +381,561 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["tool", "count"],
+        "required": [
+          "tool",
+          "count"
+        ],
         "properties": {
-          "tool": { "type": "string" },
-          "count": { "type": "integer" },
-          "mass_kg": { "type": ["number", "null"] },
-          "justification": { "type": "string" }
+          "tool": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "mass_kg": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "justification": {
+            "type": "string"
+          }
         }
       }
     },
     "summary": {
       "type": "object",
-      "required": ["duration_min", "distance_km", "expected_uncertainty_reduction"],
+      "required": [
+        "duration_min",
+        "distance_km",
+        "expected_uncertainty_reduction"
+      ],
       "properties": {
-        "duration_min": { "type": "number" },
-        "distance_km": { "type": "number" },
-        "max_distance_from_habitat_km": { "type": "number" },
-        "min_walkback_margin_min": { "type": "number" },
-        "dose_estimate_msv": { "type": "number" },
-        "expected_uncertainty_reduction": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fracción de la incertidumbre espacial de la zona alcanzable (la capa uncertainty de map.schema.json, sumada sobre las candidatas) que el plan espera sacar, con cada estación supuesta medida en su valor esperado. Chica por construcción: una estación informa ~100 m alrededor" },
-        "walkback_caution_min": { "type": "number", "minimum": 0, "description": "Umbral de caution del margen de regreso, copiado de la STM; la web lo dibuja en la curva de walkback margin" },
-        "ice_threshold_m": { "type": "number", "exclusiveMinimum": 0, "description": "Umbral de profundidad de la STM para P(hielo)" },
-        "craters_in_model": { "type": "integer", "minimum": 0, "description": "Cráteres del catálogo en el GP; 0 = solo el prior" },
+        "duration_min": {
+          "type": "number"
+        },
+        "distance_km": {
+          "type": "number"
+        },
+        "max_distance_from_habitat_km": {
+          "type": "number"
+        },
+        "min_walkback_margin_min": {
+          "type": "number"
+        },
+        "dose_estimate_msv": {
+          "type": "number"
+        },
+        "expected_uncertainty_reduction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fracción de la incertidumbre espacial de la zona alcanzable (la capa uncertainty de map.schema.json, sumada sobre las candidatas) que el plan espera sacar, con cada estación supuesta medida en su valor esperado. Chica por construcción: una estación informa ~100 m alrededor"
+        },
+        "walkback_caution_min": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Umbral de caution del margen de regreso, copiado de la STM; la web lo dibuja en la curva de walkback margin"
+        },
+        "ice_threshold_m": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Umbral de profundidad de la STM para P(hielo)"
+        },
+        "craters_in_model": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Cráteres del catálogo en el GP; 0 = solo el prior"
+        },
         "terrain_units": {
           "type": "array",
           "description": "Unidades de terreno del objetivo con coverage all_terrain_units: tercios de inercia térmica de THEMIS en la zona alcanzable (stations[].terrain_unit)",
-          "items": { "type": "object", "required": ["unit", "label"], "properties": { "unit": { "type": "integer" }, "label": { "type": "string" }, "ti_min": { "type": "number" }, "ti_max": { "type": "number" } } }
+          "items": {
+            "type": "object",
+            "required": [
+              "unit",
+              "label"
+            ],
+            "properties": {
+              "unit": {
+                "type": "integer"
+              },
+              "label": {
+                "type": "string"
+              },
+              "ti_min": {
+                "type": "number"
+              },
+              "ti_max": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "strategy": {
+          "enum": [
+            "learn",
+            "confirm"
+          ],
+          "description": "learn: bajar la incertidumbre del mapa; confirm: ir donde es mas probable encontrar hielo"
         },
         "feasibility": {
           "type": "object",
           "description": "¿Se puede hacer caminando? Esfuerzo, carga, suelo, comunicaciones y movilidad (app/feasibility.py, config/feasibility.yaml; supuestos)",
-          "required": ["mobility", "effort", "carry", "soil", "comms"],
+          "required": [
+            "mobility",
+            "effort",
+            "carry",
+            "soil",
+            "comms"
+          ],
           "properties": {
             "mobility": {
-              "type": "object", "required": ["mode", "reasons"],
+              "type": "object",
+              "required": [
+                "mode",
+                "reasons"
+              ],
               "properties": {
-                "mode": { "enum": ["walk", "cart", "rover"] },
-                "reasons": { "type": "array", "items": { "type": "string" }, "description": "En inglés, para la interfaz" }
+                "mode": {
+                  "enum": [
+                    "walk",
+                    "cart",
+                    "rover"
+                  ]
+                },
+                "reasons": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "En inglés, para la interfaz"
+                }
               }
             },
             "effort": {
-              "type": "object", "required": ["average_btu_h", "peak_btu_h"],
+              "type": "object",
+              "required": [
+                "average_btu_h",
+                "peak_btu_h"
+              ],
               "properties": {
-                "average_btu_h": { "type": "number", "minimum": 0 },
-                "peak_btu_h": { "type": "number", "minimum": 0 },
-                "average_limit_btu_h": { "type": "number" },
-                "peak_limit_btu_h": { "type": "number" },
-                "vo2max_fraction": { "type": "number", "minimum": 0, "description": "VO2 medio de la EVA sobre el VO2max mínimo de regla de vuelo" },
-                "vo2max_fraction_limit": { "type": "number" },
-                "o2_kg_per_crew": { "type": "number", "minimum": 0 }
+                "average_btu_h": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "peak_btu_h": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "average_limit_btu_h": {
+                  "type": "number"
+                },
+                "peak_limit_btu_h": {
+                  "type": "number"
+                },
+                "vo2max_fraction": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "VO2 medio de la EVA sobre el VO2max mínimo de regla de vuelo"
+                },
+                "vo2max_fraction_limit": {
+                  "type": "number"
+                },
+                "o2_kg_per_crew": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "climb_m": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Desnivel positivo de la ruta sobre el DTM; suma el trabajo de subir al esfuerzo"
+                },
+                "moved_mass_kg": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Tripulante + traje + carga por tripulante"
+                }
               }
             },
             "carry": {
-              "type": "object", "required": ["per_crew_kg"],
+              "type": "object",
+              "required": [
+                "per_crew_kg"
+              ],
               "properties": {
-                "per_crew_kg": { "type": "number", "minimum": 0 },
-                "allowance_kg": { "type": "number" },
-                "heaviest": { "type": ["object", "null"], "properties": { "tool": { "type": "string" }, "mass_kg": { "type": "number" } } },
-                "unknown_mass": { "type": "array", "items": { "type": "string" } }
+                "per_crew_kg": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "allowance_kg": {
+                  "type": "number"
+                },
+                "heaviest": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "tool": {
+                      "type": "string"
+                    },
+                    "mass_kg": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "unknown_mass": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
             },
             "soil": {
-              "type": "object", "required": ["class"],
+              "type": "object",
+              "required": [
+                "class"
+              ],
               "properties": {
-                "class": { "enum": ["dust", "loose", "firm", "unknown"] },
-                "thermal_inertia_median": { "type": ["number", "null"] },
-                "terrain_coefficient": { "type": "number", "description": "Coeficiente de terreno de Pandolf (Soule y Goldman 1972)" },
-                "dust_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
-                "source": { "type": ["string", "null"] }
+                "class": {
+                  "enum": [
+                    "dust",
+                    "loose",
+                    "firm",
+                    "unknown"
+                  ]
+                },
+                "thermal_inertia_median": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "terrain_coefficient": {
+                  "type": "number",
+                  "description": "Coeficiente de terreno de Pandolf (Soule y Goldman 1972)"
+                },
+                "dust_fraction": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "source": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
               }
             },
             "comms": {
-              "type": "object", "required": ["max_min_without_los"],
+              "type": "object",
+              "required": [
+                "max_min_without_los"
+              ],
               "properties": {
-                "route_los_fraction": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
-                "max_min_without_los": { "type": "number", "minimum": 0 },
-                "limit_min": { "type": "number" },
-                "stations_without_los": { "type": "array", "items": { "type": "string" } }
+                "route_los_fraction": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "max_min_without_los": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "limit_min": {
+                  "type": "number"
+                },
+                "stations_without_los": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
             },
-            "is_assumption": { "type": "boolean" }
+            "is_assumption": {
+              "type": "boolean"
+            }
           }
         },
-        "crew": { "type": "integer" },
-        "is_mock": { "type": "boolean" }
+        "crew": {
+          "type": "integer"
+        },
+        "is_mock": {
+          "type": "boolean"
+        }
       }
     },
     "alerts": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["level", "message"],
+        "required": [
+          "level",
+          "message"
+        ],
         "properties": {
-          "level": { "enum": ["advisory", "caution", "warning"] },
-          "message": { "type": "string" },
-          "source": { "type": "string" }
+          "level": {
+            "enum": [
+              "advisory",
+              "caution",
+              "warning"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "replan": {
+      "type": "object",
+      "description": "Solo en planes de /replan: que cambio respecto del plan anterior y si conviene seguir o volver al habitat (app/replan_check.py). La decision final es de la tripulacion",
+      "required": [
+        "recommendation",
+        "reasons",
+        "stations_kept",
+        "stations_added",
+        "stations_dropped"
+      ],
+      "properties": {
+        "from_plan_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "trigger": {
+          "type": "object",
+          "properties": {
+            "station_id": {
+              "type": "string"
+            },
+            "result": {
+              "enum": [
+                "ice",
+                "no_ice",
+                "inconclusive"
+              ]
+            }
+          }
+        },
+        "stations_kept": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stations_added": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stations_dropped": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "changed_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "changed_fraction_limit": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "margin_before_min": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "margin_after_min": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "objective_met": {
+          "type": "boolean"
+        },
+        "iv_decision": {
+          "type": "boolean",
+          "description": "Replan grande (mas de la fraccion configurada de estaciones cambia): decide el IV; no es motivo para volver"
+        },
+        "recommendation": {
+          "enum": [
+            "continue",
+            "return_to_habitat"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_assumption": {
+          "type": "boolean"
         }
       }
     },
     "site_assessment": {
       "type": "object",
       "description": "Tarjeta de sitio, nivel región: P(hielo al alcance) por herramienta antes de ir, con el prior regional por latitud (gp.regional.site_assessment, Daubar 2022). No usa los cráteres del sitio ni las mediciones. Veredicto solo si la STM declara constraints.site_min_p: GO si todo el intervalo del 90 % la supera, NO_GO si queda todo debajo, CONDITIONAL si la cruza; el sitio toma el de la mejor herramienta. Sin datos regionales, INSUFFICIENT_DATA",
-      "required": ["lat_deg", "status", "warnings", "tools"],
+      "required": [
+        "lat_deg",
+        "status",
+        "warnings",
+        "tools"
+      ],
       "additionalProperties": false,
       "properties": {
-        "lat_deg": { "type": "number" },
-        "status": { "enum": ["ok", "extrapolated", "no_data"] },
-        "median_depth_m": { "type": "number", "exclusiveMinimum": 0, "description": "Mediana regional de la profundidad a la tabla de hielo" },
-        "median_depth_90_m": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
-        "sd_log_total": { "type": "number", "minimum": 0 },
-        "warnings": { "type": "array", "items": { "type": "string" } },
+        "lat_deg": {
+          "type": "number"
+        },
+        "status": {
+          "enum": [
+            "ok",
+            "extrapolated",
+            "no_data"
+          ]
+        },
+        "median_depth_m": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Mediana regional de la profundidad a la tabla de hielo"
+        },
+        "median_depth_90_m": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "sd_log_total": {
+          "type": "number",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "tools": {
           "type": "object",
           "description": "Por id de herramienta del catálogo (las que miden bajo la superficie)",
           "additionalProperties": {
             "type": "object",
-            "required": ["depth_m", "p_ice", "p_ice_90"],
+            "required": [
+              "depth_m",
+              "p_ice",
+              "p_ice_90"
+            ],
             "additionalProperties": false,
             "properties": {
-              "depth_m": { "type": "number", "exclusiveMinimum": 0 },
-              "p_ice": { "type": "number", "minimum": 0, "maximum": 1 },
-              "p_ice_90": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 1 }, "minItems": 2, "maxItems": 2 },
-              "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO"] },
-              "precursor": { "type": "boolean", "description": "Herramienta precursora (radar aéreo de SkyFall), no de la EVA" }
+              "depth_m": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "p_ice": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "p_ice_90": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "verdict": {
+                "enum": [
+                  "GO",
+                  "CONDITIONAL",
+                  "NO_GO"
+                ]
+              },
+              "precursor": {
+                "type": "boolean",
+                "description": "Herramienta precursora (radar aéreo de SkyFall), no de la EVA"
+              }
             }
           }
         },
-        "verdict": { "enum": ["GO", "CONDITIONAL", "NO_GO", "INSUFFICIENT_DATA"] },
-        "min_p": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
-        "nearby_impacts": {"type": "object", "description": "Control local: impactos nuevos de Daubar 2022 a ±10° de latitud y ±30° de longitud, con hielo observado contra esperado por el prior de latitud (dentro de la muestra). Si sobran (z >= 2), warnings avisa que el hielo probablemente está más somero", "required": ["window_deg", "n", "ice", "expected_ice", "z"], "additionalProperties": false, "properties": {"window_deg": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}, "n": {"type": "integer", "minimum": 0}, "ice": {"type": "integer", "minimum": 0}, "expected_ice": {"type": "number", "minimum": 0}, "z": {"type": ["number", "null"]}}}
+        "verdict": {
+          "enum": [
+            "GO",
+            "CONDITIONAL",
+            "NO_GO",
+            "INSUFFICIENT_DATA"
+          ]
+        },
+        "min_p": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "nearby_impacts": {
+          "type": "object",
+          "description": "Control local: impactos nuevos de Daubar 2022 a ±10° de latitud y ±30° de longitud, con hielo observado contra esperado por el prior de latitud (dentro de la muestra). Si sobran (z >= 2), warnings avisa que el hielo probablemente está más somero",
+          "required": [
+            "window_deg",
+            "n",
+            "ice",
+            "expected_ice",
+            "z"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "window_deg": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "n": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "ice": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "expected_ice": {
+              "type": "number",
+              "minimum": 0
+            },
+            "z": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        }
       }
     }
   }

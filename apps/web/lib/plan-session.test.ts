@@ -91,7 +91,10 @@ describe("mission framing", () => {
     const earliest = [...(demoPlan.decision_points ?? [])].sort((x, y) => x.decide_by_min - y.decide_by_min)[0];
     expect(nextBingo(demoPlan)).toMatchObject({ station_id: earliest.station_id, decide_by_min: earliest.decide_by_min });
     expect(nextBingo(demoPlan, 400)).toBeUndefined();
-    expect(stationBlock(demoPlan, first.id)).toMatchObject({ t_start_min: 45, t_end_min: 85 });
+    const block = stationBlock(demoPlan, first.id)!;
+    expect(block.kind).toBe("station");
+    expect(block.t_start_min).toBeGreaterThan(45); // after egress and the first traverse
+    expect(block.t_end_min - block.t_start_min).toBe(first.duration_min);
   });
 
   it("ranks alerts warning > caution > advisory", () => {

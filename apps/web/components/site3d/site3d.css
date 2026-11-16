@@ -145,3 +145,88 @@
   display: flex;
   gap: 8px;
 }
+
+/* Inline rehearsal view (site-3d-stage.tsx), inside the mission layout. */
+.site3d-stage { position: absolute; inset: 0; background: #1a120c; color: #fff; touch-action: none; }
+.site3d-stage .site3d-toolbar { top: calc(var(--dc-header, 5rem) + .75rem); left: var(--mission-edge, 1rem); right: auto; }
+.site3d-stage .site3d-hud { left: var(--mission-edge, 1rem); right: auto; }
+.site3d-stage .site3d-credit { left: var(--mission-edge, 1rem); right: calc(var(--dc-col, 0px) + 2 * var(--mission-edge, 1rem)); }
+.site3d-stage .site3d-toolbar { padding: 6px; border-radius: 14px; background: rgb(10 10 12 / 0.45); backdrop-filter: blur(8px); z-index: 2; }
+.site3d-stage .site3d-credit { padding: 4px 8px; border-radius: 8px; background: rgb(10 10 12 / 0.4); }
+
+/* Plan update in the helmet (site-3d-stage.tsx): the replan as the EV sees it. */
+.site3d-update {
+  position: absolute; top: calc(var(--dc-header, 5rem) + 4rem); left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 6px; min-width: 300px; max-width: min(420px, calc(100% - 32px));
+  padding: 14px 16px; border-radius: 14px; border: 1px solid rgb(180 220 255 / 0.7);
+  background: rgb(8 20 34 / 0.62); color: #e6f4ff; backdrop-filter: blur(6px);
+  font: 500 13px/1.45 ui-monospace, "SF Mono", Menlo, monospace; z-index: 3;
+}
+.site3d-update[data-alert="caution"] { border-color: var(--color-caution, #f0bf4f); }
+.site3d-update-call { font-size: 16px; letter-spacing: .04em; }
+.site3d-update[data-alert="caution"] .site3d-update-call { color: var(--color-caution, #f0bf4f); }
+.site3d-update-line { opacity: .9; }
+.site3d-label[data-kind="station-active"] { border: 1px solid #9fe8ff; color: #dff7ff; }
+
+/* Full-screen helmet (EVA phase, EV1): top bar, arrival question, race-style track map. */
+.site3d-stage[data-mode="helmet"] .site3d-toolbar { top: 64px; }
+.eva-topbar { position: absolute; top: 12px; left: 16px; right: 16px; display: flex; justify-content: space-between; align-items: center; z-index: 3;
+  font: 600 13px/1 ui-monospace, monospace; letter-spacing: .06em; color: #e6f4ff; text-shadow: 0 1px 4px #000; }
+.eva-topbar b { color: var(--color-caution, #f0bf4f); }
+.eva-arrival { top: auto; bottom: 24px; border-color: #9fe8ff; }
+.eva-minimap { position: absolute; right: 16px; bottom: 16px; width: 220px; padding: 10px; border-radius: 14px; z-index: 2;
+  border: 1px solid rgb(180 220 255 / .45); background: rgb(8 20 34 / .6); backdrop-filter: blur(6px); color: #d8eeff; }
+.eva-minimap svg { width: 100%; height: auto; display: block; }
+.eva-minimap-route { fill: none; stroke: rgb(255 255 255 / .35); stroke-width: 2.5; stroke-linejoin: round; }
+.eva-minimap-walked { fill: none; stroke: #9fe8ff; stroke-width: 3; stroke-linejoin: round; }
+.eva-minimap-hab { fill: #eef1f5; }
+.eva-minimap-station { fill: rgb(255 255 255 / .2); stroke: #fff; stroke-width: 1.5; }
+[data-state="next"] > .eva-minimap-station { fill: #9fe8ff; stroke: #fff; }
+[data-state="done"] > .eva-minimap-station { fill: rgb(255 255 255 / .55); stroke: rgb(255 255 255 / .55); }
+.eva-minimap-ev { fill: #f0bf4f; stroke: #111; stroke-width: 1; }
+.eva-minimap-label { fill: #d8eeff; font: 600 9px ui-monospace, monospace; }
+.eva-progress { margin-top: 6px; }
+.eva-progress-bar { height: 4px; border-radius: 2px; background: rgb(255 255 255 / .15); overflow: hidden; }
+.eva-progress-bar > i { display: block; height: 100%; background: #9fe8ff; }
+.eva-progress dl { margin: 6px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font: 500 11px/1.3 ui-monospace, monospace; }
+.eva-progress dt { opacity: .7; }
+.eva-progress dd { margin: 0; font-weight: 700; }
+/* Same tracker inside the IV console panel. */
+.mission-tracker .eva-minimap { position: static; width: 100%; max-width: 320px; }
+.eva-minimap-north { fill: #f06a5a; }
+
+/* EVA views (15/11): web type instead of monospace, navigation-only HUD, one-line credits, the status
+   dock along the bottom and the track map above its right end. */
+.site3d-stage[data-mode="helmet"] .site3d-hud, .site3d-stage[data-mode="helmet"] .site3d-update {
+  font: 500 13px/1.45 var(--font-sans, system-ui, sans-serif); text-shadow: none; }
+.site3d-stage[data-mode="helmet"] .site3d-hud { min-width: 220px; top: calc(50% - 40px); }
+.site3d-stage[data-mode="helmet"] .site3d-hud-key { font-size: 11px; font-weight: 600; }
+.site3d-stage[data-mode="helmet"] .site3d-hud-value { font-weight: 600; }
+.eva-topbar { font: 600 14px/1 var(--font-sans, system-ui, sans-serif); letter-spacing: 0; }
+.eva-topbar > span { display: inline-flex; align-items: center; gap: .5rem; }
+.site3d-credit[data-compact] { left: auto; right: var(--mission-edge, 1rem); bottom: auto; top: 56px; max-width: min(520px, 50%);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10px; opacity: .7; }
+/* Above the dock as measured (--mission-timeline-y: its top from the bottom), so an open timeline never
+   covers the arrival question or the track map. */
+.site3d-stage[data-mode="helmet"] .eva-minimap, .site3d-stage[data-mode="watch"] .eva-minimap { bottom: calc(var(--mission-timeline-y, 80px) + 8px); }
+.site3d-stage[data-mode="helmet"] .eva-arrival { bottom: calc(var(--mission-timeline-y, 80px) + 12px); z-index: 5; }
+.eva-minimap { font-family: var(--font-sans, system-ui, sans-serif); }
+.eva-minimap-label { font-family: var(--font-sans, system-ui, sans-serif); font-size: 10px; }
+.eva-progress dl { font-family: var(--font-sans, system-ui, sans-serif); }
+.eva-minimap-previous { fill: none; stroke: rgb(255 255 255 / .35); stroke-width: 1.5; stroke-dasharray: 4 4; }
+/* IV window: map and numbers side by side, so the whole track map fits without scrolling. */
+.eva-minimap[data-layout="panel"] { display: grid; grid-template-columns: 7.5rem 1fr; gap: .75rem; align-items: center; }
+.eva-minimap[data-layout="panel"] .eva-progress { margin: 0; }
+.eva-minimap[data-layout="panel"] .eva-progress dl { grid-template-columns: 1fr; gap: 6px; }
+.eva-minimap[data-layout="panel"] .eva-progress dl > div { display: flex; justify-content: space-between; gap: .5rem; }
+.mission-tracker .eva-minimap[data-layout="panel"] { max-width: none; }
+.site3d-credit[data-compact="watch"] { top: auto; bottom: calc(var(--mission-dock-h, 64px) + 24px); left: var(--mission-edge, 1rem); right: auto; }
+.site3d-watch-chip { display: inline-flex; align-items: center; gap: .5rem; padding: 0 .5rem; font: 600 13px/1 var(--font-sans, system-ui, sans-serif); color: #e6f4ff; white-space: nowrap; }
+.eva-minimap-route[data-faded] { stroke: rgb(255 255 255 / .18); }
+.eva-minimap-walkback { fill: none; stroke: var(--color-caution, #f0bf4f); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+
+/* Helmet, plan update with an IV on the loop: the EV waits for the IV's call, then copies it. */
+.site3d-await { display: inline-flex; align-items: center; gap: .5rem; font-size: .8125rem; font-weight: 600; color: var(--color-label-secondary, rgb(255 255 255 / .7)); }
+.site3d-await::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; animation: site3d-await 1.2s ease-in-out infinite; }
+@keyframes site3d-await { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .site3d-await::before { animation: none; } }

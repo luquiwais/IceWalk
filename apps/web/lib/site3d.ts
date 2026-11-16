@@ -3,7 +3,7 @@
  * path along the planned route and what the helmet HUD shows at each point.
  * Data comes from apps/web/scripts/build-site-3d.py (public/site/s1094b-3d.json).
  */
-import { HABITAT_XY, routeLines } from "@/components/site/site-data";
+import { habitatOf, routeLines } from "@/components/site/site-data";
 import { bearing, measuringTool, orderedStations, toolName, type Measurement, type Plan, type Station } from "./plan";
 
 export type Box = { xmin: number; ymin: number; xmax: number; ymax: number };
@@ -49,7 +49,11 @@ export type PathPoint = { x: number; y: number; s: number };
 
 /** The plan route as one polyline in grid meters, resampled every `step` meters. */
 export function walkPath(plan: Plan, step = 2): PathPoint[] {
-  const raw = routeLines(plan).flat();
+  return polylinePath(routeLines(plan).flat(), step);
+}
+
+/** Any polyline in grid meters (the walkback route), resampled every `step` meters. */
+export function polylinePath(raw: readonly (readonly number[])[], step = 2): PathPoint[] {
   const out: PathPoint[] = [];
   let s = 0;
   for (let i = 0; i < raw.length; i++) {
@@ -146,7 +150,7 @@ export function hudFrom(plan: Plan, measurements: readonly Measurement[], x: num
   const st = orderedStations(plan).find((s) => !measured.has(s.id));
   const base = { elapsedMin: 0, remainingKm: 0 };
   if (!st) {
-    const back = bearing([x, y], HABITAT_XY);
+    const back = bearing([x, y], habitatOf(plan));
     return { ...base, returning: true, remainingKm: back.distanceM / 1000 };
   }
   const dir = bearing([x, y], st.position);

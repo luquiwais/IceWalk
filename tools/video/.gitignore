@@ -1,0 +1,15 @@
+assets/
+out/
+node_modules/
+# Medios y resultados locales: el manifiesto vive en docs/submission/video/.
+public/*
+!public/data/
+public/data/*
+!public/data/data.json
+!public/site/
+public/site/*
+!public/site/*.json
+blender/*.blend*
+blender/renders/
+.DS_Store
+__pycache__/

@@ -93,3 +93,16 @@ def test_long_stretch_behind_a_ridge_raises_caution():
     assert summary["comms"]["stations_without_los"] == ["S1"]
     assert summary["comms"]["max_min_without_los"] > summary["comms"]["limit_min"]
     assert any(a["level"] == "caution" and "line of sight" in a["message"] for a in alerts)
+
+
+def test_climbing_costs_effort_and_descending_is_free():
+    ramp = np.tile(np.linspace(0.0, 30.0, GRID.width), (GRID.height, 1))  # sube 30 m hacia el este
+    flat, _, _ = run()
+    up, _, _ = run(elevation=ramp)
+    assert up["effort"]["climb_m"] > 25 and flat["effort"]["climb_m"] == 0
+    assert up["effort"]["peak_btu_h"] > flat["effort"]["peak_btu_h"] + 300
+    assert up["effort"]["moved_mass_kg"] == round(82 + 104 + (13.6 + 3.455) / 2)
+    downhill = np.fliplr(ramp)
+    back, _, _ = run(elevation=downhill)
+    assert back["effort"]["climb_m"] == 0
+    assert back["effort"]["peak_btu_h"] == flat["effort"]["peak_btu_h"]  # bajar no descuenta

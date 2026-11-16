@@ -18,6 +18,21 @@ export const SITE_IMAGERY = {
     width: imagery.images.overview.width_px,
     height: imagery.images.overview.height_px,
   },
+  /** THEMIS Day IR around the site (build-site-context.py): real terrain beyond HiRISE, never black. */
+  context: {
+    src: imagery.images.context.file,
+    box: imagery.images.context.box_m as Box,
+    width: imagery.images.context.width_px,
+    height: imagery.images.context.height_px,
+    credit: imagery.images.context.credit,
+  },
+  /** The whole HiRISE strip at 2.5 m (build-site-wide.py): sharp terrain when zooming out. */
+  wide: {
+    src: imagery.images.wide.file,
+    box: imagery.images.wide.box_m as Box,
+    width: imagery.images.wide.width_px,
+    height: imagery.images.wide.height_px,
+  },
   detail: {
     src: imagery.images.detail.file,
     box: imagery.images.detail.box_m as Box,
@@ -26,14 +41,21 @@ export const SITE_IMAGERY = {
   },
 } as const;
 
-/** The camera never leaves the overview image. */
-export const SCENE_BOUNDS: Box = SITE_IMAGERY.overview.box;
+/** The camera never leaves the context image. */
+// The map never shows past the wide HiRISE strip (2.5 m): THEMIS beyond it is dark and soft at this scale.
+export const SCENE_BOUNDS: Box = SITE_IMAGERY.wide.box;
 
 /**
  * Habitat in grid meters. apps/planner/config/eva.yaml `habitat_xy` (assumption: true,
  * decision of 2026-11-08). Not in the plan contract yet; read it from the STM when it is.
  */
 export const HABITAT_XY: [number, number] = [300, -2200];
+
+/** The habitat a plan starts and ends at: the operator can move it; older plans used the default. */
+export function habitatOf(plan: { habitat_xy?: readonly number[] | null }): [number, number] {
+  const h = plan.habitat_xy;
+  return h && h.length === 2 ? [h[0], h[1]] : HABITAT_XY;
+}
 
 /**
  * Spatial range of the fitted GP prior: half spatial with a 100 m range, half
@@ -93,10 +115,10 @@ export function sceneStations(plan: Plan, previous?: Plan) {
 export function framePoints(plan: Plan, ids?: readonly string[]): [number, number][] {
   const chosen = ids?.length ? plan.stations.filter((s) => ids.includes(s.id)) : plan.stations;
   const points = chosen.map((s) => [s.position[0], s.position[1]] as [number, number]);
-  return ids?.length ? points : [...points, HABITAT_XY];
+  return ids?.length ? points : [...points, habitatOf(plan)];
 }
 
 /** Whether the habitat sits on a station, so its mark is offset with a leader line. */
-export function habitatOnStation(stations: readonly Station[]): boolean {
-  return stations.some((s) => Math.hypot(s.position[0] - HABITAT_XY[0], s.position[1] - HABITAT_XY[1]) < 1);
+export function habitatOnStation(stations: readonly Station[], habitat: readonly [number, number] = HABITAT_XY): boolean {
+  return stations.some((s) => Math.hypot(s.position[0] - habitat[0], s.position[1] - habitat[1]) < 1);
 }

@@ -1,6 +1,6 @@
 /* Composition in the existing visionOS point scale. Glass is owned by @icewalk/ui.
    No transform, opacity, filter or stacking context on ancestors of its materials. */
-.mission-app { --mission-edge: 1.5rem; position: relative; height: 100dvh; min-height: 36rem; overflow: hidden; background: #141311; font-variant-numeric: tabular-nums; }
+.mission-app { --mission-edge: 1.5rem; position: relative; height: 100dvh; overflow: hidden; background: #141311; font-variant-numeric: tabular-nums; }
 .mission-heading { position: absolute; top: var(--mission-edge); left: var(--mission-edge); display: flex; flex-direction: column; gap: .25rem; pointer-events: none; text-shadow: 0 1px 5px #000; }
 .mission-heading > [data-text-style] { color: #fff; }
 .mission-heading [data-text-style=footnote] { font-size: .8125rem; }
@@ -259,3 +259,432 @@
 
 /* First-person analogue photo: full width of the window, rounded like the kit's media. */
 .mission-analog-image { width: 100%; height: auto; border-radius: 12px; }
+
+/* Brief (rehearse-panel.tsx): stand-at strip, the station card, the cuff checklist and the confirmed go. */
+.mission-brief { gap: .5rem; }
+.mission-brief-station { gap: .5rem; }
+.mission-brief-hint { margin: 0; }
+.mission-brief .mission-station-strip { padding: .3125rem .5rem; gap: .375rem; }
+.mission-brief .mission-station-chips { justify-content: space-between; gap: .1875rem; }
+.mission-brief .mission-station-chips button { width: 1.5rem; height: 1.5rem; padding: 0; display: inline-grid; place-items: center; line-height: 1; font-variant-numeric: tabular-nums; }
+.mission-brief .mission-station-chips .mission-chip-hab { width: auto; padding: 0 .4375rem; border-radius: 999px; font-size: .625rem; letter-spacing: .04em; }
+.mission-brief .mission-station-chips button[aria-pressed=true] { background: #0a84ff; border-color: #0a84ff; }
+.mission-brief-card { display: flex; flex-direction: column; gap: .4rem; padding: .5rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .1); }
+.mission-brief-card > header { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.mission-brief-card > header strong { font-size: .9375rem; font-weight: 600; white-space: nowrap; }
+.mission-brief-card > header span { font-size: .75rem; color: var(--color-label-secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mission-brief-crew { margin: 0; padding: 0; display: flex; flex-wrap: wrap; column-gap: .75rem; row-gap: .125rem; font-size: .8125rem; line-height: 1.35; color: var(--color-label-secondary); }
+.mission-brief-crew b { font-weight: 600; color: var(--color-label); margin-right: .375rem; }
+.mission-brief-card .mission-after { margin: 0; padding-top: 0; border-top: 0; }
+.mission-brief .mission-next { padding-top: 0; margin-top: 0; border-top: 0; }
+.mission-cuff { align-self: start; display: inline-flex; align-items: center; gap: .375rem; padding: .375rem .75rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / .18); background: rgb(255 255 255 / .06); color: var(--color-label); font-size: .8125rem; font-weight: 600; text-decoration: none; }
+.mission-cuff:hover { background: rgb(255 255 255 / .14); }
+.mission-cuff:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.mission-cuff svg { width: 1rem; height: 1rem; }
+.mission-brief-go { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: .5rem; align-items: center; }
+.mission-brief-go > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-brief-go > button { width: 100%; }
+.mission-brief-go .mission-cuff { align-self: stretch; }
+.mission-confirm { display: grid; grid-template-columns: 1fr 2fr; gap: .5rem; }
+.mission-confirm > button { width: 100%; }
+
+/* Phase flow (phases.tsx): the panel title is the phase question, the footer the next step. */
+.mission-panel-title { display: flex; flex-direction: column; gap: .125rem; min-width: 0; flex: 1; }
+.mission-panel-title [data-text-style=title-2] { font-size: 1.125rem; line-height: 1.25; }
+.mission-next { display: flex; flex-direction: column; gap: .5rem; padding-top: .75rem; margin-top: .25rem; border-top: 1px solid var(--color-separator); }
+.mission-next > button { width: 100%; }
+.mission-text-link { align-self: start; font-size: .8125rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 0; cursor: pointer; }
+.mission-text-link:hover { color: var(--color-label); }
+.mission-check { display: flex; justify-content: space-between; gap: .75rem; width: 100%; }
+.mission-check > strong { font-weight: 600; color: var(--color-label-secondary); font-size: .875rem; white-space: nowrap; }
+.mission-jumps { display: flex; flex-wrap: wrap; gap: .375rem; }
+.mission-reasons { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .25rem; font-size: .875rem; color: var(--color-label-secondary); list-style: square; }
+.mission-sim { align-self: center; font: 700 .6875rem/1 ui-monospace, monospace; letter-spacing: .12em; padding: .25rem .4rem; border-radius: 4px; border: 1px solid var(--color-caution, #f0bf4f); color: var(--color-caution, #f0bf4f); text-shadow: none; }
+
+/* Ice map legend (ice-view-legend.tsx): marks drawn like the map's own. */
+.mission-ice-legend { display: flex; flex-direction: column; gap: .25rem; }
+.mission-ice-title { font-weight: 600; color: var(--color-label); }
+.mission-ice-keys { display: flex; flex-wrap: wrap; gap: .25rem .75rem; align-items: center; }
+.mission-ice-keys > span { display: inline-flex; align-items: center; gap: .375rem; }
+.mission-ice-known { color: var(--color-label-secondary); }
+.mission-key-dot { width: .75rem; height: .75rem; border-radius: 50%; border: 1px solid rgb(255 255 255 / .5); display: inline-block; }
+.mission-key-dot[data-filled] { background: #4f9cf0; border: 1.5px solid #fff; }
+.mission-key-zone { width: .9rem; height: .9rem; border-radius: 50%; border: 2px dashed #fff; display: inline-block; }
+.mission-key-fog { width: .9rem; height: .9rem; border-radius: 3px; background: rgb(232 235 240 / .6); display: inline-block; }
+.mission-key-clear { width: .9rem; height: .9rem; border-radius: 3px; border: 1px solid rgb(255 255 255 / .5); display: inline-block; }
+
+/* Campaign chart (campaign-chart.tsx). */
+.mission-campaign { display: flex; flex-direction: column; gap: .5rem; margin: 0; }
+.mission-campaign-hero { font-size: .9375rem; color: var(--color-label-secondary); }
+.mission-campaign-hero > strong { font-size: 1.5rem; color: var(--color-label); margin-right: .25rem; font-variant-numeric: tabular-nums; }
+.mission-campaign > svg { width: 100%; height: auto; overflow: visible; }
+.mission-campaign-legend svg { flex: none; }
+.mission-campaign-grid { stroke: rgb(255 255 255 / .12); stroke-width: 1; }
+.mission-campaign-axis { fill: var(--color-label-secondary); font-size: 10px; font-variant-numeric: tabular-nums; }
+.mission-campaign-cross { stroke: rgb(255 255 255 / .4); stroke-width: 1; }
+.mission-campaign-tip { font-size: .75rem; color: var(--color-label-secondary); min-height: 2.2em; }
+.mission-campaign-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .25rem; font-size: .8125rem; color: var(--color-label-secondary); }
+.mission-campaign-legend li { display: flex; align-items: center; gap: .5rem; }
+
+/* The globe and the 3D terrain fill the scene like the map does. */
+.mission-scene > .mission-globe, .mission-scene > .site3d-stage { position: absolute; inset: 0; }
+
+/* EV1 helmet: the 3D view takes the whole screen; only the sr-only announcements stay. */
+.mission-app[data-helmet="true"] > :not(.mission-scene):not(.sr-only) { display: none !important; }
+
+/* Combined ice map legend (ice-view-legend.tsx): 4 probability columns x 2 certainty rows. */
+.mission-ice-matrix { display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto auto; column-gap: .5rem; row-gap: .125rem; align-items: center; }
+.mission-ice-matrix > .mission-ice-axis:first-child { grid-column: 1; grid-row: 1; }
+.mission-ice-grid { grid-column: 2; grid-row: 1 / span 2; display: grid; grid-template-columns: repeat(4, 1.5rem); grid-template-rows: repeat(2, .75rem); gap: 2px; border-radius: 4px; overflow: hidden; }
+.mission-ice-grid > i { display: block; }
+.mission-ice-matrix > .mission-ice-axis:nth-child(3) { grid-column: 1; grid-row: 2; }
+.mission-ice-axis { font-size: .6875rem; color: var(--color-label-secondary); text-align: right; }
+.mission-ice-scale-labels { grid-column: 2; grid-row: 3; display: flex; justify-content: space-between; font-size: .6875rem; color: var(--color-label-secondary); }
+
+/* Why the planner chose a station (station-detail.tsx, plan-panel.tsx). */
+.mission-why { display: flex; flex-direction: column; gap: .25rem; padding: .625rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); font-size: .875rem; line-height: 1.4; }
+.mission-kicker { font-size: .6875rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-label-secondary); }
+.mission-station-why { display: block; font-size: .75rem; color: var(--color-label-tertiary, var(--color-label-secondary)); white-space: normal; }
+
+/* EVA status as a strip at the top of the phase window (was a separate, squeezed window). */
+.mission-panel-window .mission-status { padding: .5rem 1.25rem .75rem; border-bottom: 1px solid var(--color-separator); gap: .375rem; }
+.mission-panel-window .mission-status-values { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.mission-panel-window .mission-status-values span { font-size: .6875rem; color: var(--color-label-secondary); }
+.mission-panel-window .mission-status-values strong { font-size: .9375rem; white-space: normal; }
+.mission-panel-window .mission-status-source [data-slot=status-badge] { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+.mission-panel-window .mission-provenance { font-size: .625rem; color: var(--color-label-tertiary, var(--color-label-secondary)); }
+.mission-app .mission-panel-window .mission-status-values { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.mission-app .mission-panel-window .mission-status-values > :last-child { grid-column: auto; }
+
+/* A soft shade under the header and the right column, so the panels read on any terrain. */
+.mission-scene::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background:
+    linear-gradient(to bottom, rgb(0 0 0 / .45), transparent 7rem),
+    linear-gradient(to left, rgb(0 0 0 / .45), transparent 32rem); }
+.mission-app[data-helmet="true"] .mission-scene::after, .mission-app[data-phase="site"] .mission-scene::after { display: none; }
+
+/* Map card (bottom left): layers on top, the legend under them, one glass window, nothing floating. */
+.mission-app .mission-map-tools { left: calc(var(--mission-edge) + 4rem); bottom: calc(var(--mission-timeline-y, 0px) + var(--mission-edge)); max-width: min(30rem, calc(100% - var(--dc-col, 400px) - 7rem)); }
+.mission-map-card { display: flex; flex-direction: column; gap: .5rem; padding: .5rem .625rem .625rem; border-radius: 1.25rem; }
+.mission-map-card .mission-layer-window { display: flex; flex-wrap: wrap; gap: .125rem; padding: 0; background: none; box-shadow: none; }
+.mission-map-card .mission-legend { pointer-events: auto; text-shadow: none; padding-inline: .25rem; flex-direction: column; align-items: start; gap: .375rem; color: var(--color-label); }
+.mission-legend-keys { display: flex; flex-wrap: wrap; gap: .25rem .875rem; }
+.mission-legend-keys > span { display: inline-flex; align-items: center; gap: .375rem; }
+.mission-legend-source { font-size: .625rem; color: var(--color-label-secondary); }
+.mission-map-card .mission-ice-legend { gap: .3rem; }
+.mission-map-card .mission-ice-known { font-size: .6875rem; color: var(--color-label-secondary); white-space: normal; }
+
+/* Plan panel: chips for the checks, compact numbers, a sticky approve bar. */
+.mission-objective-line { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mission-metrics-compact { gap: .5rem 1rem; }
+.mission-metrics-compact [data-slot=metric-value], .mission-metrics-compact dd { font-size: 1.25rem; }
+.mission-chips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .375rem; }
+.mission-chips > li { display: flex; flex-direction: column; gap: .125rem; padding: .375rem .5rem; border-radius: 10px; background: rgb(255 255 255 / .06); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .08); min-width: 0; }
+.mission-chips > li > span { font-size: .625rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-label-secondary); }
+.mission-chips > li > strong { font-size: .8125rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+.mission-chips > li[data-level=advisory] { box-shadow: inset 0 0 0 1px var(--color-advisory, #9fe0f2); }
+.mission-chips > li[data-level=caution] { box-shadow: inset 0 0 0 1px var(--color-caution, #f0bf4f); }
+.mission-chips > li[data-level=warning] { box-shadow: inset 0 0 0 1px var(--color-warning, #f06a5a); }
+.mission-plan-footer { position: sticky; bottom: -1px; margin-top: .25rem; padding: .75rem 0 .25rem; display: flex; flex-direction: column; gap: .375rem; background: linear-gradient(to top, var(--mission-panel-bg, rgb(30 30 34 / .96)) 70%, transparent); }
+.mission-plan-footer > button { width: 100%; }
+/* After approval (and in the brief) the panel shrinks so the map and the timeline lead. */
+@media (min-width: 760px) { .mission-app[data-panel="compact"] { --dc-col: 330px; } }
+
+/* Legend in its own card above the layer buttons: border and solid ground so it always reads. */
+.mission-legend-card .mission-legend { pointer-events: auto; text-shadow: none; padding-inline: 0; flex-direction: column; align-items: start; gap: .375rem; color: var(--color-label); }
+.mission-legend-card .mission-ice-known { font-size: .6875rem; color: var(--color-label-secondary); white-space: normal; }
+
+/* Dock and map tools (15/11, docs/research/auditoria-ux-2026-11-15.md). The status line replaces the
+   floating timeline and the scattered numbers: one dock at the bottom of the map, the same in every map
+   phase ([V2 10005]). Layers and legend move to a column at the top left, the camera to the bottom right
+   of the map, so nothing stacks above the dock. The legend uses the same glass as every other window. */
+.mission-dock-position { position: absolute; left: var(--mission-edge); right: var(--mission-edge); bottom: var(--mission-edge); z-index: 2; }
+.mission-dock-window { width: 100%; border-radius: 1.5rem; }
+.mission-dock { width: 100%; display: flex; flex-direction: column; }
+.mission-dock-line { display: flex; align-items: center; gap: 0; min-height: 3rem; padding: .375rem .5rem .375rem 1.125rem; overflow-x: auto; scrollbar-width: none; }
+.mission-dock-mode { font-size: .75rem; font-weight: 500; color: var(--color-label-secondary); }
+.mission-dock-mode[data-sim] { font-size: .625rem; font-weight: 700; letter-spacing: .1em; padding: .1rem .3rem; border-radius: 4px; border: 1px solid var(--color-caution); color: var(--color-caution); }
+.mission-dock-cell { display: flex; align-items: baseline; gap: .375rem; padding: 0 .625rem; border-left: 1px solid var(--color-separator); white-space: nowrap; flex-shrink: 0; }
+.mission-dock-cell:first-child { border-left: 0; padding-left: 0; }
+.mission-dock-cell > span:first-child { font-size: .625rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--color-label-secondary); }
+.mission-dock-cell strong { font-size: .9375rem; font-weight: 600; }
+.mission-dock-cell small { font-size: .75rem; font-weight: 500; color: var(--color-label-secondary); }
+.mission-dock-cell[data-alert=caution] strong { color: var(--color-caution); }
+/* The alert gives way first: the badge truncates its message (full text in the tooltip) so the toggle always fits. */
+.mission-dock-alert { flex: 1 1 auto; min-width: 9.5rem; overflow: hidden; }
+.mission-dock-badge { display: block; min-width: 0; max-width: 24rem; }
+.mission-dock-badge > [role] { display: flex; max-width: 100%; min-height: 1.75rem; padding-block: .25rem; }
+.mission-dock-bar { position: relative; flex: 0 1 6rem; min-width: 1.5rem; height: .375rem; margin: 0 .75rem; border-radius: .2rem; background: rgb(255 255 255 / .06); overflow: hidden; }
+.mission-dock-bar > i { position: absolute; top: 0; bottom: 0; border-inline: 1px solid transparent; background-clip: padding-box; background-color: rgb(255 255 255 / .22); }
+.mission-dock-bar > i[data-kind=station] { background-color: rgb(255 255 255 / .7); }
+.mission-dock-bar > i[data-kind=reserve] { background-color: transparent; background-image: repeating-linear-gradient(135deg, rgb(255 255 255 / .2) 0 2px, transparent 2px 5px); }
+.mission-dock-bar > b { position: absolute; top: -2px; bottom: -2px; width: 2px; background: #fff; }
+.mission-dock-toggle { flex-shrink: 0; display: inline-flex; align-items: center; gap: .25rem; height: 2rem; padding: 0 .75rem; border-radius: 999px; background: rgb(255 255 255 / .1); font-size: .8125rem; font-weight: 600; color: var(--color-label); }
+.mission-dock-toggle:hover { background: rgb(255 255 255 / .18); }
+.mission-dock-toggle:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.mission-dock-toggle svg { width: 1rem; height: 1rem; }
+.mission-dock .mission-time[data-bare] { padding: .25rem 1.25rem 1.125rem; border-top: 1px solid var(--color-separator); }
+.mission-dock .mission-time[data-bare] .mission-time-inner { padding-top: 2rem; }
+.mission-dock .mission-time[data-bare] .mission-walkback { height: 2rem; }
+.mission-dock .mission-time[data-bare] .mission-time-track { height: 2.25rem; margin-top: .75rem; }
+.mission-dock .mission-time[data-bare] .mission-time-station, .mission-dock .mission-time[data-bare] .mission-time-segment { height: 2.25rem; }
+.mission-dock .mission-time[data-bare] .mission-time-axis { margin-top: .5rem; font-size: .6875rem; }
+.mission-dock .mission-time[data-bare] .mission-time-scroll { overflow-y: hidden; padding-right: .75rem; }
+/* In the dock the timeline fits its width (no sideways scroll): it is at least 36 rem wide at 1024 px. */
+.mission-dock .mission-time[data-bare] .mission-time-inner { min-width: 0; }
+
+.mission-legend-card { padding: .625rem .75rem; border-radius: 1.25rem; }
+.mission-legend-toggle svg { width: .875rem; height: .875rem; margin-left: .125rem; }
+@media (min-width: 760px) {
+  /* Map tools stay at the bottom left and ride on top of the dock: they rise when the timeline opens. */
+  .mission-app .mission-map-tools { top: auto; left: var(--mission-edge); bottom: calc(var(--mission-timeline-y, 3rem) + 1.5rem); width: auto; max-width: 24rem; gap: .5rem; }
+  .mission-app .mission-map-card { padding: .375rem; }
+  .mission-app .mission-dock-position { right: calc(var(--dc-col, 400px) + 2 * var(--mission-edge)); }
+  .mission-app .mission-panel-presence { bottom: var(--mission-edge); }
+  /* North arrow and scale at the top right of the map, beside the panel; the credit sits on the dock. */
+  .mission-app .site-hud { top: calc(var(--dc-header, 5rem) + .75rem); bottom: auto; }
+  .mission-app .site-hud .site-credit { display: none; }
+  .mission-map-credit { position: absolute; right: calc(var(--dc-col, 400px) + 2 * var(--mission-edge) + .5rem); bottom: calc(var(--mission-timeline-y, 3rem) + .375rem); margin: 0; font-size: .625rem; color: rgb(255 255 255 / .6); text-shadow: 0 0 3px #000, 0 1px 3px #000; pointer-events: none; white-space: nowrap; }
+}
+@media (max-width: 759px) { .mission-map-credit { display: none; } }
+
+/* Planner view, EVA level (alternativa 2, 15/11): one-line answer, the goal, the flight rules as tiles
+   (value, limit in plain words, state with icon and word) and the approve button, all without scrolling. */
+.mission-plan-eva { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.mission-answer { margin: 0; font-size: .9375rem; line-height: 1.35; color: var(--color-label); text-wrap: balance; }
+.mission-answer strong { font-weight: 700; }
+.mission-goal { display: flex; flex-direction: column; gap: .3rem; }
+.mission-goal [data-text-style=footnote] { font-size: .75rem; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-rules-head { display: flex; justify-content: space-between; align-items: baseline; font-size: .6875rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--color-label-secondary); margin-top: .125rem; }
+.mission-rules-head strong { font-size: .8125rem; letter-spacing: 0; text-transform: none; color: var(--color-label); }
+.mission-rules { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .375rem; }
+.mission-rule { width: 100%; height: 100%; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: .0625rem; padding: .25rem .625rem; border-radius: .75rem; background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .12); text-align: left; color: var(--color-label); font: inherit; line-height: 1.25; }
+button.mission-rule { cursor: pointer; }
+button.mission-rule:hover { background: rgb(255 255 255 / .14); border-color: rgb(255 255 255 / .35); }
+button.mission-rule:hover .mission-rule-top svg { opacity: 1; transform: translateX(1px); }
+button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 1px; }
+.mission-rule-top, .mission-rule-bottom { display: flex; justify-content: space-between; align-items: center; gap: .375rem; min-width: 0; }
+.mission-rule-name { font-size: .625rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--color-label-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-rule-value { flex-shrink: 0; display: inline-flex; align-items: center; gap: .25rem; font-size: .875rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mission-rule-state { display: inline-flex; align-items: center; gap: .2rem; color: var(--color-label-secondary); font-size: .6875rem; }
+.mission-rule-state b { font-weight: 700; }
+.mission-rules > li[data-level=caution] .mission-rule-state { color: var(--color-caution); }
+.mission-rules > li[data-level=warning] .mission-rule-state { color: var(--color-warning, #ff453a); }
+.mission-rules > li[data-level=advisory] .mission-rule-state, .mission-rules > li[data-level=unknown] .mission-rule-state { color: var(--color-label); }
+.mission-rule-state svg { width: .8125rem; height: .8125rem; }
+.mission-rule-limit { font-size: .6875rem; color: var(--color-label-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-rule-limit b { font-weight: 700; }
+.mission-rule-limit b[data-level=caution] { color: var(--color-caution); }
+.mission-rule-limit b[data-level=warning] { color: var(--color-warning, #ff453a); }
+.mission-rule-limit b[data-level=advisory], .mission-rule-limit b[data-level=unknown] { color: var(--color-label); }
+.mission-rule-top svg { width: .875rem; height: .875rem; flex-shrink: 0; opacity: .85; color: var(--color-label); transition: transform .15s; }
+.mission-rule-limit { flex-shrink: 1; min-width: 0; text-align: right; }
+.mission-rules > li[data-level=caution] .mission-rule { border-color: var(--color-caution); }
+.mission-rules > li[data-level=caution] .mission-rule-state { color: var(--color-caution); }
+.mission-rules > li[data-level=warning] .mission-rule { border-color: var(--color-warning, #ff453a); }
+.mission-rules > li[data-level=warning] .mission-rule-state { color: var(--color-warning, #ff453a); }
+.mission-rules > li[data-level=advisory] .mission-rule, .mission-rules > li[data-level=unknown] .mission-rule { border-color: rgb(255 255 255 / .3); }
+.mission-rules > li[data-level=advisory] .mission-rule-state, .mission-rules > li[data-level=unknown] .mission-rule-state { color: var(--color-label); }
+.mission-plan-links { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.mission-plan-links [data-text-style=footnote] { font-size: .75rem; }
+.mission-plan-links .mission-text-link { display: inline-flex; align-items: center; gap: .125rem; white-space: nowrap; align-self: center; }
+.mission-plan-links .mission-text-link svg { width: .875rem; height: .875rem; }
+.mission-plan-eva .mission-plan-footer { position: static; margin-top: 0; padding: .125rem 0 0; background: none; }
+.mission-panel-scroll:has(.mission-plan-eva) { padding-bottom: .375rem; }
+.mission-back-link { align-self: start; display: inline-flex; align-items: center; gap: .125rem; padding: .25rem .5rem .25rem .25rem; border-radius: 999px; background: rgb(255 255 255 / .08); border: 0; color: var(--color-label); font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.mission-back-link:hover { background: rgb(255 255 255 / .15); }
+.mission-back-link svg { width: 1rem; height: 1rem; }
+.mission-detail-title { margin: 0; font-size: 1.0625rem; font-weight: 700; }
+
+/* Station composition. */
+.mission-station { display: flex; flex-direction: column; gap: .5rem; }
+.mission-station .mission-why { font-size: .8125rem; padding: .5rem .75rem; gap: .125rem; }
+.mission-station-sub { font-size: .75rem; margin-top: -.25rem; }
+.mission-facts { margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem .75rem; }
+.mission-facts > div { display: flex; flex-direction: column; min-width: 0; }
+.mission-facts dt { font-size: .6875rem; font-weight: 500; color: var(--color-label-secondary); }
+.mission-facts dd { margin: 0; font-size: .9375rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.mission-facts dd { line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mission-facts dd small { display: block; font-size: .6875rem; font-weight: 500; color: var(--color-label-secondary); overflow: hidden; text-overflow: ellipsis; }
+.mission-after { font-size: .8125rem; line-height: 1.4; padding-top: .5rem; border-top: 1px solid var(--color-separator); }
+.mission-legend i[data-key=station] { width: .875rem; height: .875rem; border-radius: 50%; border: 1px solid #fff; display: inline-grid; place-items: center; font-size: .5rem; font-style: normal; font-weight: 700; background: rgb(20 20 24 / .8); }
+.mission-approved-line { margin: 0; display: flex; align-items: center; gap: .375rem; font-size: .8125rem; font-weight: 600; color: var(--color-label-secondary); }
+.mission-approved-line svg { width: 1rem; height: 1rem; }
+.mission-station-strip { display: flex; align-items: center; gap: .5rem; padding: .3rem .375rem .3rem .625rem; border-radius: .75rem; background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .12); }
+.mission-station-strip > span:first-child { font-size: .75rem; font-weight: 600; color: var(--color-label); white-space: nowrap; }
+.mission-station-chips { flex: 1; display: flex; justify-content: flex-end; gap: .25rem; }
+.mission-station-chips button { width: 1.625rem; height: 1.625rem; border-radius: 50%; border: 1px solid rgb(255 255 255 / .6); background: rgb(20 20 24 / .7); color: #fff; font-size: .75rem; font-weight: 700; cursor: pointer; }
+.mission-station-chips button:hover { background: #0a84ff; border-color: #0a84ff; }
+.mission-station-chips button:focus-visible { outline: 2px solid #0a84ff; outline-offset: 2px; }
+.mission-station-strip > svg { width: .875rem; height: .875rem; opacity: .6; }
+.mission-station-nav { display: flex; justify-content: space-between; gap: .5rem; }
+.mission-station-nav button { display: inline-flex; align-items: center; gap: .125rem; padding: .3rem .625rem; border-radius: 999px; border: 0; background: rgb(255 255 255 / .08); color: var(--color-label); font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.mission-station-nav button:hover { background: rgb(255 255 255 / .16); }
+.mission-station-nav svg { width: 1rem; height: 1rem; }
+/* Detail views: compact grids and tables so they fit the panel without scrolling (rule for every panel). */
+.mission-plan-detail { gap: .5rem; }
+.mission-detail { display: flex; flex-direction: column; gap: .5rem; }
+.mission-detail-lead { margin: 0; font-size: .8125rem; line-height: 1.4; }
+.mission-detail [data-text-style=footnote] { font-size: .6875rem; line-height: 1.35; }
+.mission-facts-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mission-table { width: 100%; border-collapse: collapse; font-size: .75rem; font-variant-numeric: tabular-nums; }
+.mission-table caption { text-align: left; font-size: .6875rem; color: var(--color-label-secondary); padding-bottom: .25rem; }
+.mission-table th { text-align: left; font-size: .625rem; font-weight: 600; color: var(--color-label-secondary); padding: .2rem .3rem; border-bottom: 1px solid var(--color-separator); }
+.mission-table td { padding: .12rem .3rem; border-bottom: 1px solid rgb(255 255 255 / .06); white-space: nowrap; }
+.mission-table tr[data-level=caution] td:last-child { color: var(--color-caution); font-weight: 600; }
+.mission-table tr[data-level=warning] td:last-child { color: var(--color-warning, #ff453a); font-weight: 600; }
+.mission-detail-title .mission-detail-value { font-size: .8125rem; font-weight: 500; color: var(--color-label-secondary); margin-left: .25rem; }
+.mission-detail .mission-text-link { display: inline-flex; align-items: center; gap: .125rem; }
+.mission-detail .mission-text-link svg { width: .875rem; height: .875rem; }
+.mission-table-fixed { table-layout: fixed; }
+.mission-table td.mission-wrap { white-space: normal; line-height: 1.25; }
+/* The planner's answer when it refuses a dragged habitat. */
+.mission-map-banner { position: absolute; z-index: 3; top: calc(var(--dc-header, 5rem) + .75rem); left: calc(var(--mission-edge) + 4.5rem); max-width: min(30rem, calc(100% - var(--dc-col, 400px) - 9rem)); margin: 0; padding: .5rem .875rem; border-radius: 999px; background: rgb(20 20 24 / .82); border: 1px solid rgb(255 255 255 / .2); font-size: .8125rem; color: #fff; text-align: center; backdrop-filter: blur(12px); }
+.mission-map-banner[data-level=caution] { border-color: var(--color-caution); color: var(--color-caution); }
+@media (max-width: 759px) { .mission-map-banner { left: 1rem; right: 1rem; max-width: none; border-radius: 1rem; } }
+/* Building a new plan: placeholders the size of the real content, so nothing jumps and nothing stale shows. */
+@keyframes mission-pulse { 0%, 100% { opacity: .45; } 50% { opacity: .8; } }
+.mission-skeleton { border-radius: .75rem; background: rgb(255 255 255 / .08); animation: mission-pulse 1.4s ease-in-out infinite; }
+.mission-skeleton-goal { height: 2.25rem; }
+.mission-skeleton-strip { height: 2.25rem; }
+.mission-skeleton-line { display: block; height: .75rem; width: 70%; margin-top: .2rem; border-radius: .375rem; }
+.mission-skeleton-rule { min-height: 2.625rem; }
+@media (prefers-reduced-motion: reduce) { .mission-skeleton { animation: none; } }
+.mission-dock[data-pending] .mission-dock-cell strong { color: var(--color-label-secondary); }
+.mission-ice-why { display: inline-grid; place-items: center; width: .875rem; height: .875rem; margin-left: .25rem; border-radius: 50%; border: 1px solid currentColor; font-size: .5625rem; font-style: italic; vertical-align: .05rem; cursor: help; pointer-events: auto; }
+/* Narrow screens (the panel is 360 px): the dock keeps PET, walkback, bingo, alerts and the toggle. */
+@media (max-width: 1100px) {
+  .mission-dock-bar, .mission-dock-long, .mission-dock-cell[data-k=walkback] small { display: none; }
+  .mission-dock-cell { padding: 0 .5rem; }
+  .mission-dock-line { padding-left: .875rem; }
+  .mission-dock-toggle { margin-left: auto; }
+  .mission-answer { font-size: .875rem; }
+  .mission-dock-alert { min-width: 2.5rem; }
+}
+
+/* EVA role choice (role-select.tsx): two seats over the scene; the panel, map tools and dock wait. */
+.mission-app[data-choosing="true"] > :not(.mission-scene):not(.mission-heading):not(.mission-tabs):not(.mission-roles):not(.sr-only) { display: none !important; }
+.mission-roles { position: absolute; inset: var(--mission-tabs-bottom, 88px) 16px 16px; display: grid; place-items: center; z-index: 5; pointer-events: none; }
+.mission-roles-window { pointer-events: auto; width: min(680px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: .875rem; padding: 1.125rem 1.25rem 1.25rem; }
+.mission-roles-head { display: flex; flex-direction: column; gap: .25rem; }
+.mission-roles-head [data-text-style=title-2] { font-size: 1.25rem; }
+.mission-roles-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.mission-role { display: flex; flex-direction: column; gap: .625rem; padding: .875rem; border-radius: 16px; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .12); }
+.mission-role-title { display: flex; align-items: center; gap: .625rem; }
+.mission-role-title > svg { width: 1.5rem; height: 1.5rem; flex: none; color: var(--color-label-secondary); }
+.mission-role-title strong { display: block; font-size: 1rem; font-weight: 600; }
+.mission-role-title span { display: block; font-size: .75rem; color: var(--color-label-secondary); }
+.mission-role-does { margin: 0; font-size: .8125rem; line-height: 1.4; color: var(--color-label-secondary); flex: 1; }
+.mission-role-facts { margin: 0; display: flex; flex-direction: column; gap: .25rem; font-size: .75rem; }
+.mission-role-facts > div { display: flex; gap: .5rem; }
+.mission-role-facts dt { flex: none; width: 4.25rem; color: var(--color-label-secondary); }
+.mission-role-facts dd { margin: 0; color: var(--color-label); }
+.mission-role > button { width: 100%; }
+.mission-role-window { align-self: center; display: inline-flex; align-items: center; gap: .25rem; font-size: .75rem; color: var(--color-label-secondary); text-decoration: underline; text-underline-offset: 3px; }
+.mission-role-window:hover { color: var(--color-label); }
+.mission-role-window svg { width: .8125rem; height: .8125rem; }
+button.mission-role-window { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: .75rem; }
+.mission-role-links { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1rem; }
+.mission-roles-link { text-align: center; }
+.mission-roles-link b { color: var(--color-label); font-weight: 600; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .mission-roles-cards { grid-template-columns: 1fr; } }
+.mission-role-row { display: flex; justify-content: space-between; align-items: center; gap: .75rem; font-size: .8125rem; color: var(--color-label-secondary); }
+.mission-role-row > :first-child { flex: 1; min-width: 0; }
+.mission-role-row > .mission-text-link { align-self: center; white-space: nowrap; }
+.mission-role-row b { color: var(--color-label); font-weight: 600; margin-left: .25rem; }
+
+/* EVA dock: the top alert shrinks with an ellipsis (full text on hover) so the Timeline button stays in. */
+.mission-app[data-phase="execute"] .mission-dock-alert:has(.mission-dock-badge) { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+.mission-app[data-phase="execute"] .mission-dock-badge { display: block; min-width: 0; }
+.mission-app[data-phase="execute"] .mission-dock-badge [data-slot=status-badge] { max-width: 100%; }
+.mission-app[data-phase="execute"] .mission-dock-bar { min-width: 1.5rem; }
+/* The status dock also runs along the bottom of the EV helmet and of the IV's EV camera. */
+.mission-app.mission-app[data-helmet="true"] > .mission-dock-position.mission-dock-position { display: block !important; left: var(--mission-edge); right: var(--mission-edge); }
+.mission-app[data-phase="execute"] .mission-dock-position { z-index: 4; }
+/* IV window (execute-panel.tsx): compact, no scrolling. */
+.mission-iv { gap: .5rem; }
+.mission-iv-station { display: flex; flex-direction: column; gap: .125rem; padding: .5rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); font-size: .8125rem; line-height: 1.35; color: var(--color-label-secondary); }
+.mission-iv-station strong { font-size: .9375rem; color: var(--color-label); font-weight: 600; }
+.mission-iv-station b { color: var(--color-label); font-weight: 600; }
+.mission-iv-key { font-size: .6875rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+/* Site (site-panel.tsx, site-card.tsx): verdict, compact tool table and the step to the plan, no scrolling. */
+.mission-site { gap: .5rem; }
+.mission-site .mission-next { padding-top: 0; margin-top: 0; border-top: 0; }
+.mission-site .mission-why { padding: .5rem .75rem; font-size: .8125rem; }
+.mission-site-lead { font-size: .8125rem; line-height: 1.4; color: var(--color-label-secondary); }
+.mission-site-card { gap: .5rem; }
+.mission-site-tools { width: 100%; border-collapse: collapse; font-size: .8125rem; font-variant-numeric: tabular-nums; }
+.mission-site-tools th, .mission-site-tools td { padding: .2rem .25rem; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--color-separator); }
+.mission-site-tools thead th { font-size: .6875rem; font-weight: 600; color: var(--color-label-secondary); border-bottom: 0; padding-top: 0; }
+.mission-site-tools th:first-child { text-align: left; font-weight: 500; overflow: hidden; text-overflow: ellipsis; max-width: 11rem; }
+.mission-site-tools thead th:first-child { font-weight: 600; }
+.mission-site-tools tbody tr:last-child > * { border-bottom: 0; }
+.mission-site-card .mission-verdict { font-weight: 600; color: var(--color-label-secondary); }
+.mission-site-card .mission-verdict[data-verdict="GO"] { color: var(--color-label); }
+.mission-site-card .mission-verdict[data-verdict="CONDITIONAL"] { color: var(--color-caution, #d9a400); }
+.mission-site-links { display: flex; gap: 1rem; align-items: baseline; }
+.mission-site-skip { margin-left: auto; }
+.mission-site-back { display: inline-flex; align-items: center; gap: .125rem; }
+.mission-site-back svg { width: 1rem; height: 1rem; }
+/* Debrief (debrief-panel.tsx): the answer, the last results with what each one means, links that open in place. */
+.mission-debrief-log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .375rem; }
+.mission-debrief-log > li { padding: .375rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); border-left: 3px solid rgb(255 255 255 / .25); }
+.mission-debrief-log > li[data-result=ice] { border-left-color: #3987e5; }
+.mission-debrief-row { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .5rem; min-width: 0; font-size: .875rem; }
+.mission-debrief-row > span { white-space: nowrap; }
+.mission-debrief-row strong { font-weight: 700; }
+.mission-debrief-row small { margin-left: auto; font-size: .75rem; color: var(--color-label-secondary); white-space: nowrap; }
+.mission-debrief-note { font-size: .75rem; line-height: 1.35; color: var(--color-label-secondary); }
+.mission-debrief-links { display: flex; flex-direction: column; border-radius: 12px; background: rgb(255 255 255 / .06); }
+.mission-debrief-link { display: flex; align-items: center; justify-content: space-between; padding: .4rem .75rem; font-size: .875rem; color: var(--color-label); background: none; border: 0; border-top: 1px solid var(--color-separator); cursor: pointer; text-align: left; }
+.mission-debrief-link:first-child { border-top: 0; }
+.mission-debrief-link:hover { background: rgb(255 255 255 / .06); }
+.mission-debrief-link svg { width: 1rem; height: 1rem; color: var(--color-label-secondary); }
+.mission-debrief .mission-campaign > svg { max-height: 8.5rem; }
+.mission-debrief .mission-campaign { gap: .25rem; }
+.mission-debrief .mission-campaign-hero > strong { font-size: 1.25rem; }
+.mission-debrief .mission-campaign-legend { font-size: .75rem; gap: .125rem; }
+.mission-debrief .mission-campaign-hero { font-size: .8125rem; line-height: 1.3; }
+.mission-debrief .mission-campaign-tip { min-height: 0; font-size: .6875rem; }
+.mission-evidence .mission-site-tools th, .mission-evidence .mission-site-tools td { padding-block: .125rem; }
+@media (max-height: 620px) {
+  .mission-debrief .mission-campaign > svg { max-height: 6.25rem; }
+  .mission-debrief .mission-campaign-tip { display: none; }
+}
+.mission-debrief .mission-campaign figcaption [data-text-style=footnote] { font-size: .6875rem; line-height: 1.35; }
+.mission-evidence { gap: .375rem; }
+.mission-evidence-lead { margin: 0; font-size: .8125rem; line-height: 1.4; color: var(--color-label-secondary); }
+.mission-evidence-lead strong { color: var(--color-label); font-weight: 600; }
+.mission-evidence [data-text-style=footnote] { font-size: .6875rem; line-height: 1.35; }
+.mission-evidence-truth { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .25rem; }
+.mission-evidence-truth li { display: flex; flex-direction: column; padding: .3rem .625rem; border-radius: 10px; background: rgb(255 255 255 / .06); font-size: .75rem; line-height: 1.35; color: var(--color-label-secondary); }
+.mission-evidence-truth li > span:first-child { color: var(--color-label); }
+.mission-evidence-truth b { font-weight: 600; }
+.mission-site-notes [data-text-style=footnote] { font-size: .75rem; line-height: 1.4; }
+.mission-site [aria-label="Zones ranked"] { gap: .375rem; }
+
+/* IV replan review (execute-panel.tsx): the call fits above the fold, the IV decides without scrolling. */
+.mission-replan { gap: .375rem; }
+.mission-replan .mission-replan-title { font-size: 1.0625rem; }
+.mission-replan .mission-reasons { margin: 0; font-size: .8125rem; line-height: 1.35; }
+.mission-replan [data-text-style=footnote] { font-size: .75rem; line-height: 1.35; }
+
+/* Plan edited by hand (plan-panel.tsx): in place of the goal switch, the verdict, before → after and undo. */
+.mission-edit { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: .5rem; padding: .375rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .2); font-size: .8125rem; line-height: 1.35; }
+.mission-edit[data-level=caution] { border-color: var(--color-caution); }
+.mission-edit[data-level=warning] { border-color: var(--color-warning, #ff453a); }
+.mission-edit-verdict { font-weight: 700; }
+.mission-edit-verdict small { font-weight: 500; font-size: .75rem; color: var(--color-label-secondary); }
+.mission-edit[data-level=caution] .mission-edit-verdict { color: var(--color-caution); }
+.mission-edit[data-level=warning] .mission-edit-verdict { color: var(--color-warning, #ff453a); }
+.mission-edit-numbers { grid-column: 1; font-size: .75rem; color: var(--color-label-secondary); font-variant-numeric: tabular-nums; }
+.mission-edit-undo { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.mission-why-edit { display: block; margin-top: .125rem; font-size: .75rem; color: var(--color-label-secondary); }
+.mission-why-edit .mission-text-link { font-size: inherit; }
+/* Carry detail: a switch per tool the crew may take. */
+.mission-tools { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-radius: 12px; background: rgb(255 255 255 / .06); }
+.mission-tools li { display: flex; align-items: center; gap: .5rem; padding: .3rem .75rem; border-top: 1px solid var(--color-separator); font-size: .8125rem; }
+.mission-tools li:first-child { border-top: 0; }
+.mission-tools label { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 0; cursor: pointer; }
+.mission-tools input { width: 1rem; height: 1rem; accent-color: #0a84ff; flex: none; }
+.mission-tools small { margin-left: auto; color: var(--color-label-secondary); font-size: .75rem; white-space: nowrap; font-variant-numeric: tabular-nums; }

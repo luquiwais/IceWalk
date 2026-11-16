@@ -1,0 +1,14 @@
+{
+  "station_id": "E03S24",
+  "tool": "core_drill",
+  "result": "no_ice",
+  "depth_m": 1,
+  "weh_percent": null,
+  "position": [
+    300.0,
+    -2400.0
+  ],
+  "timestamp": "2040-03-12T14:35:00Z",
+  "crew_member": "EV1",
+  "notes": "Demo scenario: no ice down to 1 m at the first station; triggers replan."
+}

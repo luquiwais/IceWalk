@@ -158,6 +158,19 @@ Variables del servidor: `CORS_ORIGINS` con la URL pública de la web (coma entre
 3. En el servidor, descomprimir los dos primeros en `data/processed/s1094b/`; `/health` tiene que decir `planner: real`.
 4. Web: `NEXT_PUBLIC_PLANNER_API_URL` apunta a la API. Sin ella, la web usa los mocks del modelo real.
 
+## Re-plan, campaña y lista de puño (14/11, tarde)
+
+- `/replan` suma `replan` (`app/replan_check.py`): estaciones que se mantienen, entran y salen, margen antes y después, `recommendation` (`continue` o `return_to_habitat`) y `reasons`. Umbral de cambio en `config/eva.yaml` (`replan_return_changed_fraction`, supuesto). El front dibuja la ruta vieja contra la nueva con `replanned_from`.
+- `GET /campaign?drill_m=1&evas=6` (`app/campaign.py`): curvas de P(hielo confirmado) por EVA, a ciegas contra radar primero.
+- `GET /plan/{plan_id}`: un plan de la sesión del servidor (los planes viven en memoria; se pierden al reiniciar).
+- Esfuerzo con desnivel (`feasibility.effort.climb_m`, `moved_mass_kg`) y exclusión de 150 m alrededor del hábitat (`habitat_exclusion_m`).
+- Web: `/cuff?plan=<id>` imprime la lista de puño (`apps/web/lib/cuff.ts`).
+
+## Edición del plan y herramientas (15/11, noche)
+
+- `POST /plan` acepta `tools` (ids del catálogo): el planificador usa solo esas herramientas (422 con ids desconocidos). El re-plan y la edición conservan la lista.
+- `POST /evaluate` con `plan_id` y `stations` (`{id?, position, tools?}`, en orden de caminata; 1 a 12): el plan con las estaciones del operador, sin reelegir ninguna (`eva_planner.evaluate`, que comparte con `build` la salida `_assemble`). Una estación con `id` del plan hereda herramientas, objetivos y motivo si no se movió; si se movió o es nueva, `reason: "Placed by the operator."`. Un plan no viable vuelve igual, con margen negativo y un warning "Not viable" por estación; 422 si un punto está fuera del modelo de terreno o sin suelo transitable a 50 m; 409 si el plan ya tiene mediciones. `decisions: false` (por defecto) para la vista previa al arrastrar (15 a 140 ms); `true` al soltar, con puntos de decisión (~0.15 s).
+
 ## Contrato y cambios pendientes
 
 | Cuestión | Qué | Estado |

@@ -37,6 +37,18 @@ effort:
     value: 0.85
     source: Cociente respiratorio usado por ICES-2026-127
     assumption: false
+  suit_mass_kg:
+    value: 104
+    source: >-
+      Masa máxima del traje para Marte que propone NASA, 104 kg contra 170 kg del xEMU
+      (ICES-2026-127). Se suma al tripulante y a la carga para el trabajo de subir
+    assumption: false
+  positive_work_efficiency:
+    value: 0.25
+    source: >-
+      Eficiencia del músculo en trabajo positivo al subir caminando, ~25 % (Margaria 1968,
+      Int. Z. angew. Physiol. 25:339-351). Medida en la Tierra y sin traje
+    assumption: true
   vo2max_ml_kg_min:
     value: 36
     source: Mínimo de regla de vuelo para EVA (ICES-2026-127, lámina 6)

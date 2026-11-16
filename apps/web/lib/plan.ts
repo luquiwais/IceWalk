@@ -7,6 +7,7 @@ import type { AlertLevel } from "@icewalk/ui/status-badge";
 import mockMeasurement from "@/mock/measurement.json";
 import mockPlan from "@/mock/plan.json";
 import mockReplan from "@/mock/replan.json";
+import mockConfirm from "@/mock/plan-confirm.json";
 import toolsCatalog from "../../../packages/contracts/examples/tools.catalog.json";
 import defaultStm from "../../../packages/contracts/examples/stm.s1094b.json";
 
@@ -41,12 +42,14 @@ export type Station = {
   comm_los?: boolean | null;
   /** THEMIS thermal inertia at the station (J m-2 K-1 s-1/2); below 100 is dust. */
   soil_ti?: number | null;
+  /** Why the planner put the station here, in words. */
+  reason?: string;
 };
 
 /** "Can we walk it?" from app/feasibility.py (all values are planning assumptions). */
 export type Feasibility = {
   mobility: { mode: "walk" | "cart" | "rover"; reasons: string[] };
-  effort: { average_btu_h: number; peak_btu_h: number; average_limit_btu_h?: number; peak_limit_btu_h?: number; vo2max_fraction?: number; vo2max_fraction_limit?: number; o2_kg_per_crew?: number };
+  effort: { average_btu_h: number; peak_btu_h: number; average_limit_btu_h?: number; peak_limit_btu_h?: number; vo2max_fraction?: number; vo2max_fraction_limit?: number; o2_kg_per_crew?: number; climb_m?: number; moved_mass_kg?: number };
   carry: { per_crew_kg: number; allowance_kg?: number; heaviest?: { tool: string; mass_kg: number } | null; unknown_mass?: string[] };
   soil: { class: "dust" | "loose" | "firm" | "unknown"; thermal_inertia_median?: number | null; terrain_coefficient?: number; dust_fraction?: number; source?: string | null };
   comms: { route_los_fraction?: number | null; max_min_without_los: number; limit_min?: number; stations_without_los?: string[] };
@@ -76,6 +79,8 @@ export type PlanSummary = {
   ice_threshold_m?: number;
   craters_in_model?: number;
   feasibility?: Feasibility;
+  /** learn: reduce the map's uncertainty; confirm: go where ice is likeliest. */
+  strategy?: "learn" | "confirm";
 };
 
 export type PlanAlert = {
@@ -122,6 +127,10 @@ export type Plan = {
   mission_id: string;
   plan_id: string;
   replanned_from?: string | null;
+  /** Habitat the plan starts and ends at (grid meters); the operator can move it. Absent in older plans. */
+  habitat_xy?: [number, number];
+  /** Where the operator may move the habitat (grid meters); null or absent: it cannot be moved. */
+  habitat_area_m?: { xmin: number; xmax: number; ymin: number; ymax: number } | null;
   stations: Station[];
   route: { type: "FeatureCollection"; features: unknown[] };
   timeline: TimelineItem[];
@@ -130,6 +139,26 @@ export type Plan = {
   summary: PlanSummary;
   alerts?: PlanAlert[];
   site_assessment?: SiteAssessment;
+  replan?: ReplanAssessment;
+};
+
+/** plan.replan (plan.schema.json): what a replan changed and whether to go on or head back. */
+export type ReplanAssessment = {
+  from_plan_id?: string | null;
+  trigger?: { station_id: string; result: "ice" | "no_ice" | "inconclusive" };
+  stations_kept: string[];
+  stations_added: string[];
+  stations_dropped: string[];
+  changed_fraction?: number;
+  changed_fraction_limit?: number;
+  margin_before_min?: number | null;
+  margin_after_min?: number | null;
+  objective_met?: boolean;
+  /** Large replan: the IV decides before going on (not a reason to return). */
+  iv_decision?: boolean;
+  recommendation: "continue" | "return_to_habitat";
+  reasons: string[];
+  is_assumption?: boolean;
 };
 
 /** A measurement logged at a station (contracts/schemas/measurement.schema.json). */
@@ -153,6 +182,8 @@ export type Measurement = {
  */
 export const demoPlan = mockPlan as unknown as Plan;
 export const demoReplan = mockReplan as unknown as Plan;
+/** The same EVA planned to confirm ice (strategy "confirm"). */
+export const demoConfirm = mockConfirm as unknown as Plan;
 export const demoMeasurement = mockMeasurement as unknown as Measurement;
 
 export function orderedStations(plan: Plan): Station[] {
@@ -221,6 +252,11 @@ export function diffPlans(before: Plan, after: Plan): PlanDiff {
 type CatalogTool = { id: string; name: string; mass_kg?: number | null; depth_m?: number; measures?: string[] };
 const TOOLS = new Map((toolsCatalog as CatalogTool[]).map((t) => [t.id, t]));
 
+/** Every tool in the certified catalog, in catalog order (the crew may take any of them). */
+export function catalogTools(): readonly { id: string; name: string; mass_kg?: number | null; depth_m?: number; mode?: string }[] {
+  return toolsCatalog as (CatalogTool & { mode?: string })[];
+}
+
 /** Tool name from the certified catalog (contracts/examples/tools.catalog.json). */
 export function toolName(id: string): string {
   return TOOLS.get(id)?.name ?? id.replaceAll("_", " ");
@@ -271,6 +307,29 @@ export function traverseHeading(plan: Plan, measurements: readonly Measurement[]
 /** The planner's default STM is known only for this mission id (main.py DEFAULT_STM). */
 export function evaLimitMin(plan: Plan): number | undefined {
   return plan.mission_id === defaultStm.mission_id ? defaultStm.constraints.eva_max_h * 60 : undefined;
+}
+
+/** A station with the ones before and after it in walking order: what the map frames when it is selected. */
+export function stationWithNeighbors(plan: Plan, id: string): string[] {
+  const order = orderedStations(plan);
+  const i = order.findIndex((s) => s.id === id);
+  if (i < 0) return [id];
+  // Three stations, centered on this one when it can be; at either end, the three nearest.
+  const start = Math.min(Math.max(0, i - 1), Math.max(0, order.length - 3));
+  return order.slice(start, start + 3).map((s) => s.id);
+}
+
+/** The STM constraints of this plan's mission, when the web bundles that STM. */
+export function missionConstraints(plan: Plan): typeof defaultStm.constraints | undefined {
+  return plan.mission_id === defaultStm.mission_id ? defaultStm.constraints : undefined;
+}
+
+/** Steepest leg of the traverse, from the route's GeoJSON properties (DTM routing). */
+export function routeMaxSlope(plan: Plan): number | undefined {
+  const slopes = plan.route.features
+    .map((f) => (f as { properties?: { max_slope_deg?: number } }).properties?.max_slope_deg)
+    .filter((v): v is number => typeof v === "number");
+  return slopes.length ? Math.max(...slopes) : undefined;
 }
 
 export function missionObjective(plan: Plan): string | undefined {

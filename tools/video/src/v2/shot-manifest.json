@@ -1,0 +1,23 @@
+{
+  "orbit": 72,
+  "drill": 60,
+  "drill_establish": 60,
+  "grip": 60,
+  "drill_tip": 60,
+  "drill_result": 84,
+  "section": 72,
+  "core_profile": 204,
+  "console_wide": 64,
+  "console_tools": 64,
+  "console_reverse": 64,
+  "console_pending": 44,
+  "console_replan": 64,
+  "console_review": 80,
+  "pov": 60,
+  "pov_start": 60,
+  "pov_mid": 60,
+  "pov_end": 60,
+  "walk": 72,
+  "approach": 72,
+  "depart": 72
+}

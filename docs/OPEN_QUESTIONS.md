@@ -35,18 +35,23 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 63 | Deploy público para el jurado: no hay link. ¿Quién lo arma y dónde (web en Vercel, API en Render o Hugging Face Spaces)? Las capas del terreno van a Releases (CC0); el catálogo de cráteres, como archivo privado del servidor (cuestión 26). Sin esos datos, la API desplegada usa el planificador mock | Antes del 14/11; Frontend la web, Planificador la API. Ver `research/hackaton-2026.md` | Luqui + Planificador + Frontend | 11/11 |
 | 64 | El guion del teaser y el pitch del PRD usan afirmaciones que ya no sostenemos ("decides where to measure", el número de la simulación, «We plan what to learn»). ¿Se reescriben alrededor de la tarjeta de sitio (taladro NO_GO, radar GO) y de los 97 cm frente a los 2.35 m? | Sí, antes de grabar; confirmar el formato con la guía del 13/11 | Luqui + Diseño | 11/11 |
 | 65 | ¿Se sube la tabla original de Dundas 2023 (`data/raw/dundas2023_craters.csv`, sin modificar) a un Release público, con cita y licencia? CC BY-NC-ND 4.0 lo permite sin fines comerciales. Sirve para que el equipo regenere el catálogo sin pasarse archivos | Sí, con un `LICENSE-dundas2023.txt` al lado. Es publicar: lo decide Luqui | Luqui | 12/11 |
-| 66 | El prior regional usa solo la latitud. En Arcadia (165-190°E) hay el doble de impactos con hielo que lo esperado, y Byrne et al. (2009) estiman hielo justo debajo de la zanja de Viking 2 (el prior da 1 % a 15 cm). ¿Se suma un término de longitud o de SWIM? Latitud + SWIM sobreajustaba (26 impactos con hielo) | Después del hackatón. Mientras, la tarjeta avisa con el control local (`nearby_impacts`) | GP | 12/11 |
-| 68 | Darionautas no tiene canal privado en el Discord de la sede, que es por donde pasan los mentores. ¿Se pide en #equipos? | Sí, con nombre e integrantes, como hacen los demás equipos | Luqui | 14/11 |
+| 66 | El prior regional usa solo la latitud. En Arcadia (165-190°E) hay el doble de impactos con hielo que lo esperado, y Byrne et al. (2009) estiman hielo justo debajo de la zanja de Viking 2 (el prior da 1 % a 15 cm). ¿Se suma un término de longitud o de SWIM? Latitud + SWIM sobreajustaba (26 impactos con hielo). La inercia térmica tampoco suma ni explica Arcadia (z 2.6 → 2.1; `EXPERIMENTS.md`, 14/11) | Después del hackatón. Mientras, la tarjeta avisa con el control local (`nearby_impacts`) | GP | 12/11 |
 | 69 | ¿Qué texto va en la declaración de IA de la entrega? (asistentes de código e investigación; la idea y las decisiones, del equipo) | Redactarla con la lista de herramientas y para qué se usó cada una | Luqui + Diseño | 14/11 |
 | 70 | SkyFall (NASA) recibe propuestas de sitio hasta el 1/12/2026 (skyfall_lsw_input@jpl.nasa.gov; coordenadas, imagen HiRISE, trazabilidad). ¿Mandamos una con IceWalk (tarjeta en las 5 regiones, S1094b o AP-105) después del hackatón? Es enviar algo afuera: lo decide el equipo | Mencionarlo en el pitch como impacto inmediato; decidir el envío después del 15/11 | Luqui + equipo | 14/11 |
-| 72 | El hábitat por defecto (300, −2200) coincide con la estación 1 (E03S22), con traverse de 0 min. ¿Es lo esperado? | Revisar con Planificador; la web desplaza el marcador para que se vean los dos | Planificador | 10/11 |
 | 73 | ¿El planificador real puede devolver un plan sin estaciones? Hoy el cliente web lo rechaza como respuesta inválida | Si puede, la web necesita un estado vacío | Planificador | 10/11 |
-| 74 | Verdad de terreno de visión (paso 2 del plan): faltan las etiquetas a mano. Sin ellas no hay F1 real del detector, y sus umbrales son supuestos elegidos a ojo. Los recortes ya están (`python -m vision.labels`) | Anotar `test_eva` y `test_ejecta` en QGIS (≥ 150 bloques, a ciegas), correr `python -m vision.evaluate labels` y recién ahí tocar umbrales, solo sobre `tune` | Visión (Guido) | 13/11 |
+| 74 | Verdad de terreno de visión (paso 2 del plan): faltan las etiquetas a mano. Sin ellas no hay F1 real del detector, y sus umbrales son supuestos elegidos a ojo. Los recortes ya están (`python -m vision.labels`) | Anotar `test_eva` y `test_ejecta` en QGIS (≥ 150 bloques, a ciegas), correr `python -m vision.evaluate labels` y recién ahí tocar umbrales, solo sobre `tune`. Con esas etiquetas (y pozos chicos como negativos) también se podría reentrenar BoulderNet, que sin eso no sirve en S1094b (14/11) | Visión (Guido) | 13/11 |
 | 75 | Lejos del cráter, lo que el detector encuentra son sobre todo resaltos del terreno, no eyecta (305 objetos ≥ 1.5 m por km², sin caída con la distancia). ¿La web los dibuja como rocas 3D? | Dibujar solo `form: block` con `confidence` alta, y mostrar el resto como aviso de relieve; para la ruta, todos son obstáculo | Frontend + Visión | 13/11 |
 | 76 | ¿Qué imagen manda en el catálogo? Febrero de 2022 (casi vertical) es más nítida y da entre 1.5 y 2.4 veces más detecciones que abril, que es la "última" y la que fija `last_seen_image` y la huella | Mantener abril como última (es el orden real de las fechas) y medir con las dos; revisarlo con las etiquetas | Visión | 13/11 |
 | 79 | ¿Cuánto tiempo sin línea de vista al hábitat se tolera en una EVA? Artemis lo usa como restricción pero no publica el valor; usamos 15 min (supuesto) | Mantener 15 min y decirlo en la demo; buscar las flight rules de Artemis si aparecen | Planificador | 14/11 |
-| 80 | El esfuerzo de caminar escala lineal con la velocidad y el suelo, y la pendiente solo baja el ritmo. ¿Se suma un término de pendiente (Pandolf, o los datos de Norcross et al. 2010 en traje)? | Dejarlo así para la demo, marcado como supuesto | Planificador | 14/11 |
 | 77 | Con bloques reales, la regla del pasillo no prohíbe ninguna celda en la zona de la EVA (mínimo 3.0 m contra 1.02 m): las rutas no cambian. ¿La capa entra además como costo (caminar más lento entre bloques) o queda como está? | Dejarla como está para la demo y mostrar los bloques en el mapa; un costo por densidad no tiene fuente | Planificador + Visión | 13/11 |
+
+| 82 | Color natural del terreno: el IRB de 8 bits no sirve. ¿Se intenta con el COLOR RDR calibrado (I/F) de ESP_073077, registrado sobre el DTM? | Después del hackatón; mientras, gris | Frontend | 14/11 |
+| 83 | El azul de los mapas de hielo y el cian de los avisos advisory se parecen (el HIDH 10.11.5.5 asocia azul con advisory). ¿Se cambia uno de los dos? | Decide Diseño; hoy los avisos llevan ícono y texto | Diseño | 14/11 |
+
+| 85 | El progreso de la expedición no se entiende (PET simulado que salta, "Now" en el timeline). ¿Una vista única de avance (estaciones hechas / total, adelanto o atraso contra el plan, margen, posición en la ruta) igual en el casco y en la consola del IV? | Sí, próxima tarea de la web | Frontend | 14/11 |
+| 86 | La rama de José (`web/rediseno-dc`) quedó superada por las 5 fases y choca con `main`. ¿Se rescata su "Key finding" del panel de Site y se le pide que parta de `main`? | Sí | Luqui + José | 14/11 |
+
+
 
 ## A averiguar
 
@@ -57,8 +62,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 12 | ¿Tusberti comparte los polígonos de bloques y hielo? Desde el 13/11 importa más: contra sus totales damos ~25 % del conteo sobre 1.8 m y no se puede saber por qué sin comparar bloque por bloque | Visión |
 | 13 | VRAM, CUDA y uso prolongado del servidor con GPU | Luqui |
 | 14 | ¿Hay imágenes HiRISE posteriores a feb 2023 con el cráter cubierto? | Visión |
-| 16 | Cómo evalúa el jurado local | Producto |
-| 17 | Criterios y guías 2026 (salen el 13 nov). El 12/11 se leyó el enunciado oficial en el navegador (`research/hackaton-2026.md`); los recursos del desafío también salen el 13/11 | Producto |
+| 16 | ¿Hay una rúbrica adicional para premios locales? La guía NASA ya confirma cinco criterios en todos los niveles para la nominación global; la página de la sede resume cuatro y no prueba una sustitución. Ver `research/submission-brief-2026-11-14.md` | Producto |
+| 92 | Enlace del Drive de organización, fecha/hora exacta, nombre de archivo y material adicional del video local. Santi confirmó 3 min en castellano a las 09:50 y solo video con más tiempo a las 18:02; no confundir con cierre NASA 15/11 23:59 ART | Eitan + Producto |
 | 18 | ¿Diciembre de 2022 tiene escarcha? | Visión |
 | 78 | `SOURCES.md` cita «Densidad de bloques de S1094b, feb y dic 2022» como arXiv 2608.02492, pero ese identificador abre un artículo sobre rayos de cráteres en Marte y la Luna. ¿Cuál era la fuente? Hasta saberlo, esa fila no respalda nada | Quien la agregó |
 | 19 | Sincronizar el PRD del repo con el doc de claude.ai | Luqui |
@@ -69,6 +74,8 @@ Lo que falta decidir o averiguar. Al resolver algo, se saca de acá y se anota e
 | 45 | Textura del globo y del sitio: hoy el respaldo es Viking MDIM 2.1 (232 m/px, imágenes de los 70) y a escala del sitio se ve borroso. ¿Qué sirve el backend como teselas (mosaico CTX de Murray Lab ~5 m/px para el globo/región, ortoimagen HiRISE para el sitio) y con qué URL/formato las consume `MarsGlobe`? | Datos + backend (Frontend solo consume) |
 
 ## Riesgo aceptado
+
+Actualización de Codex (14/11 tarde): #17 resuelta por lectura directa de las guías 2026 y Resources; #68 resuelta, Darionautas tiene Equipo 30 (mensaje de Eitan 15:02). Fuentes, formatos de ambos videos y estado del repo en [`research/submission-brief-2026-11-14.md`](research/submission-brief-2026-11-14.md). Se preservan los registros anteriores como historia.
 
 La FAQ prohíbe empezar antes del evento; el equipo decidió seguir. No se retoca el historial.
 

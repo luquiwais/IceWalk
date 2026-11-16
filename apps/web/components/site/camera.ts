@@ -12,7 +12,8 @@ export type Insets = { top: number; right: number; bottom: number; left: number 
 export type Box = { xmin: number; ymin: number; xmax: number; ymax: number };
 
 /** Zoom limits (docs/plans/web-design.md, "Cámara"). */
-export const MIN_PX_PER_M = 0.15;
+// Farthest zoom: about 3.5 km across the map, enough for the 1.5 km ice map around the habitat.
+export const MIN_PX_PER_M = 0.22;
 export const MAX_PX_PER_M = 6;
 /** The 0.25 m/px detail image fades in from this zoom. */
 export const DETAIL_FROM_PX_PER_M = 1.2;
@@ -47,7 +48,9 @@ export function freeArea(view: Size, insets: Insets) {
  * it on that axis instead.
  */
 export function clampCamera(cam: Camera, view: Size, insets: Insets, bounds: Box): Camera {
-  const k = clamp(cam.pxPerM, MIN_PX_PER_M, MAX_PX_PER_M);
+  // Never zoom out past the imagery: the whole view stays covered, no black around it.
+  const cover = Math.max(view.width / (bounds.xmax - bounds.xmin), view.height / (bounds.ymax - bounds.ymin));
+  const k = clamp(cam.pxPerM, Math.min(Math.max(MIN_PX_PER_M, cover), MAX_PX_PER_M), MAX_PX_PER_M);
   const free = freeArea(view, insets);
   // World coordinates at the free area's edges for a given center.
   const dx = (free.cx - view.width / 2) / k; // world x offset of the free center from cx
