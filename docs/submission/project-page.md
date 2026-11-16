@@ -1,6 +1,6 @@
 # Project page: draft for the Space Apps submission form
 
-Draft of each field of the official form (Project Submission Guide, 13/11). All content in English, as the rules require. Review before pasting: links marked `TODO` depend on the deploy, and the "Use of Super Intelligence" text must match how the team actually worked. Images to upload with the page: `img/conops.png` (concept of operations) and `img/evidence.png` (validation), made by `make_figures.py` from the numbers in `docs/EXPERIMENTS.md`. Wording follows `docs/research/categorias-globales-2026-11-14.md` (Science, Mission Concept, Data).
+Draft of each field of the official form (Project Submission Guide, 13/11). All content in English, as the rules require. Review before pasting: the demo link (`TODO`) waits for the published video, and the "Use of Super Intelligence" text must match how the team actually worked. Images to upload with the page: `img/conops.png` (concept of operations) and `img/evidence.png` (validation), made by `make_figures.py` from the numbers in `docs/EXPERIMENTS.md`. Wording follows `docs/research/categorias-globales-2026-11-14.md` (Science, Mission Concept, Data).
 
 ---
 
@@ -10,7 +10,7 @@ IceWalk
 
 ## High-Level Project Summary
 
-*Will this EVA reach ice, and with which instrument?* IceWalk answers that question for the first Mars crews. Every Mars EVA tool tells astronauts where they can walk; IceWalk also tells them whether the walk is worth it. At crater S1094b (35°N, the lowest-latitude ice ever exposed on Mars) it estimates, from 349 real craters and a model calibrated on 383 fresh impacts, the probability of ice within each tool's reach, with its uncertainty. It plans a two-person EVA inside NASA limits (slope, 1.8 km walk-back, effort and consumables, comms line of sight, live space weather from NASA DONKI, dust from the Emirates Mars Mission) on the real HiRISE terrain, gives the EV a helmet view with waypoints and the IV a console in the habitat, and re-plans after every measurement the crew logs. Drilling where a radar flags shallow ice needs 2.9 times fewer EVAs to confirm ice than drilling blind: the strategy NASA's SkyFall radar helicopters will enable.
+*Will this EVA reach ice, and with which instrument?* IceWalk answers that question for the first Mars crews. Every Mars EVA tool tells astronauts where they can walk; IceWalk also tells them whether the walk is worth it. At crater S1094b (35°N, the lowest-latitude ice ever exposed on Mars) it estimates, from 349 real craters and a model calibrated on 383 fresh impacts, the probability of ice within each tool's reach, with its uncertainty. It plans a two-person EVA inside NASA limits (slope, 1.8 km walk-back, effort and consumables, comms line of sight, live space weather from NASA DONKI, dust from the Emirates Mars Mission) on the real HiRISE terrain, gives the EV a helmet view with waypoints and the IV a console in the habitat (linked across devices, with the IV directing the EVA as NASA's Mars concept of operations prescribes), re-plans after every measurement the crew logs, and on EVA TERMINATE routes the crew home by the fastest path over the terrain. Drilling where a radar flags shallow ice needs 2.9 times fewer EVAs to confirm ice than drilling blind: the strategy NASA's SkyFall radar helicopters will enable.
 
 ## Link to Project Demo
 
@@ -18,7 +18,8 @@ TODO: public link (YouTube or Google Drive) to the 30-second video. Test it in a
 
 ## Link to Final Project
 
-TODO: deployed web app (first) and public repository (https://github.com/luquiwais/IceWalk).
+- Web app: https://icewalk.vercel.app (project page, with the planner at https://icewalk.vercel.app/app)
+- Public repository: https://github.com/luquiwais/IceWalk
 
 ## Detailed Project Description
 
@@ -30,19 +31,27 @@ TODO: deployed web app (first) and public repository (https://github.com/luquiwa
 
 **Concept of operations** (image: `conops.png`). NASA's SkyFall radar helicopters (launch 2028) will sound ice at 0.5-3 m. IceWalk turns those soundings into crew decisions: the site card chooses the instrument, the planner builds a two-person traverse inside NASA limits, and every radar or drill result re-plans the EVA. At SkyFall's reference site AP-105, a 3 m radar is GO (93 %); SkyFall site proposals close on December 1, 2026.
 
-**See it.** Five phases, in the order of NASA's plan, train, fly: Site (is ice within reach?), Plan (where, and is it safe?), Brief (the real HiRISE terrain in 3D: fly over, stand at each station, print the cuff checklist), EVA and Debrief. During the EVA the EV walks the real terrain in a helmet view: waypoint rings and light columns, range and steering to the next station, walk-back margin, bingo and comms. Only the EV logs a result, on arrival at the station; the planner re-plans, the EV sees the plan update in the helmet (new route, old route faded, continue or EVA TERMINATE) and copies it, and the IV console in the habitat sees the same review and concurs. The ice map shows where the model has local evidence and where it only has the regional prior, instead of a uniform probability.
+**See it.** Five phases, in the order of NASA's plan, train, fly:
+- **Site:** is ice within reach, and with which tool?
+- **Plan:** where, and is it safe? The planner's traverse with its eight flight rules; the crew can drag a station or switch a tool off and sees at once whether the EVA still fits.
+- **Brief:** the real HiRISE terrain in 3D: fly over, stand where the crew will work at each station, print the cuff checklist.
+- **EVA:** each crewmember joins a seat, on the same screen or on two devices linked by a code. The EV walks the real terrain in a helmet view (waypoint rings and light columns, range and steering, a track map, PET, walk-back margin and bingo) and logs each result at the station; only the EV logs. The planner re-plans; the IV in the habitat reviews it and makes the call (continue or EVA TERMINATE), and the EV copies it. On EVA TERMINATE both see the fastest walk-back route over the terrain model, with its length and time. The IV can also look through the EV's camera.
+- **Debrief:** what each measurement means (no ice within 1 m means ice deeper than the tool reaches) and what the last re-plan changed.
+
+The ice map shows where the model has local evidence and where it only has the regional prior, instead of a uniform probability.
 
 **The science** (image: `evidence.png`).
 - **Question.** Can orbital data tell a crew whether ice lies within reach of a drill or a radar at a specific EVA site?
 - **Hypothesis we tested and rejected.** Neighbouring ice-exposing craters predict ice at site scale. They do not (349 craters, AUC 0.52), and a power test shows that check cannot rule spatial structure in or out. So IceWalk reports uncertainty instead of promising where the ice is.
 - **What holds, out of sample.** A latitude prior calibrated on 383 fresh impacts it never saw: Brier score 0.033 against 0.087 for a constant rate, and 36.2 expected ice exposures against 37 observed. Independent ground truth: Phoenix measured ice at 4.6 cm; IceWalk predicts 7 cm (90 %: 2-22 cm). At Viking Lander 2, no ice in a 15 cm trench, and the model gives 1 %.
 - **Test of the strategy.** Radar first, then drill: ice found per drill station rises from 6 % to 50 %, and EVAs to confirm ice drop from 3.3 to 1.16 with 50 radar soundings per EVA (1.58 with 20).
-- **Limits.** The prior extrapolates south of 39.1°N, where S1094b sits, and is conservative in Arcadia; the card flags both. Our shadow boulder detector reaches F1 0.30-0.49 for boulders of 3 m or more against expert labels (BoulderNet); it is a hazard map, not a rock census. All EVA thresholds without a NASA value are marked as assumptions.
+- **Limits.** The prior extrapolates south of 39.1°N, where S1094b sits, and is conservative in Arcadia; the card flags both. Our shadow boulder detector reaches F1 0.30-0.49 for boulders of 3 m or more against expert labels (BoulderNet); it is a hazard map, not a rock census. A Mask R-CNN we trained on BoulderNet does better on that benchmark (F1 0.63-0.64) but finds half as many boulders at S1094b, so the hazard map keeps the shadow detector. All EVA thresholds without a NASA value are marked as assumptions.
 
 **How it works.**
 - **Ice model:** a Gaussian-process (kriging) model of the depth to the ice table that handles censored data with expectation propagation. Craters with a flat floor give a depth; craters without one give a lower bound. Radar and neutron spectrometer readings enter with their documented errors.
 - **Planner:** classic and explainable (value of a measurement per minute plus least-time routing on the terrain). No reinforcement learning. Every rule traces to a NASA source (EVA-EXP-0042, ICES-2025-129, ICES-2026-127, Artemis EVA planning); values without a source are flagged as assumptions.
-- **Vision:** shadow-based boulder detection on two HiRISE orthoimages of 25 cm, with height from shadow length and sun geometry.
+- **Vision:** shadow-based boulder detection on two HiRISE orthoimages of 25 cm, with height from shadow length and sun geometry; a Mask R-CNN (torchvision) trained on BoulderNet as the comparison.
+- **Walk-back:** the same least-time search over the terrain that builds every leg of the plan gives the route home from wherever the EV is when the IV calls EVA TERMINATE.
 
 **Beyond one crater.** The same card runs on the 51 candidate Exploration Zones NASA proposed for human missions (Mars Trek) and on SkyFall's reference site AP-105.
 
@@ -51,7 +60,7 @@ TODO: deployed web app (first) and public repository (https://github.com/luquiwa
 - Explicit uncertainty and verdicts that a science team can audit.
 - A way to turn precursor radar data (SkyFall) into crew decisions, on site and without waiting for Earth.
 
-**Tools.** Python (FastAPI, NumPy, SciPy, rasterio), TypeScript (Next.js, Tailwind, CesiumJS with the Mars ellipsoid, three.js), Bun and moon (monorepo), JSON Schema contracts between modules, GitHub Actions CI.
+**Tools.** Python (FastAPI, NumPy, SciPy, rasterio, PyTorch/torchvision), TypeScript (Next.js, Tailwind, CesiumJS with the Mars ellipsoid, three.js), Bun and moon (monorepo), JSON Schema contracts between modules, GitHub Actions CI.
 
 ## Use of Super Intelligence (SI)
 
@@ -79,6 +88,7 @@ More than a dozen datasets from NASA and three partner agencies, from 463 m/px t
 | Climate and surface images | Viking Lander 2 (PDS; PIA00399, PIA00571) | Point | Temperature and wind; first-person analogue |
 | Ground truth | Phoenix lander (Mellon et al. 2009) | Point | Model validation |
 | Precursor mission | NASA SkyFall mission information | - | Site card tool, AP-105 |
+| Habitat model | NASA 3D Resources, Habitat Demonstration Unit (shape only, untextured) | - | Habitat and airlock in the 3D views |
 
 ## Space Agency Partner Data and Other References
 
