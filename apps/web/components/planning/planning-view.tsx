@@ -12,13 +12,14 @@ import { Site3DStage } from "@/components/site3d/site-3d-stage";
 import type { FreePose } from "@/components/site3d/site-3d";
 import { EvaMinimap } from "@/components/site3d/eva-minimap";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
-import { getWalkback, postEvaluate, type PlannerApiError } from "@/lib/api";
+import { getWalkback, plannerBaseUrl, postEvaluate, type PlannerApiError } from "@/lib/api";
 import { editedStations, editVerdict } from "@/lib/plan-edit";
 import { polylinePath, walkPath, type PathPoint } from "@/lib/site3d";
 import { Body } from "@icewalk/ui/text";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
 import { useIceMap } from "@/lib/use-ice-map";
 import { useEvaLink, type IvCall } from "@/lib/use-eva-link";
+import { crewLink } from "@/lib/crew-link";
 import { ICE_RADIUS_M, ICE_VIEW_MODES, renderIceView, type IceViewMode } from "@/lib/ice-view";
 import { bearing, stationWithNeighbors, demoConfirm, demoPlan, demoReplan, measuringTool, nextStation, orderedStations, stationBlock, stationById, type Measurement, type Plan, type Station } from "@/lib/plan";
 import { habitatOf, SITE_IMAGERY } from "@/components/site/site-data";
@@ -61,9 +62,10 @@ function startPose(plan: Plan): FreePose {
  */
 /**
  * `initialEvaView` opens the EVA in that seat (a window of its own, `/?phase=eva&role=iv`); without
- * it the EVA starts on the role choice.
+ * it the EVA starts on the role choice. `initialLink` is the crew link code of a window opened from
+ * another device (`&link=K7Q2MX`): both then share the EVA through the planner API's relay.
  */
-export function PlanningView({ initialPhase = "site", initialEvaView }: { initialPhase?: Phase; initialEvaView?: EvaRole }) {
+export function PlanningView({ initialPhase = "site", initialEvaView, initialLink }: { initialPhase?: Phase; initialEvaView?: EvaRole; initialLink?: string | null }) {
   const compact = useSyncExternalStore(subscribeCompact, () => window.matchMedia?.(COMPACT_QUERY).matches ?? false, () => false);
   const [phase, setPhase] = useState<Phase>(initialPhase);
   const [flying, setFlying] = useState(false);
@@ -88,6 +90,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
   // The EVA seat: EV1 in the helmet or the IV console; null until chosen.
   const [evaView, setEvaView] = useState<EvaRole | null>(initialEvaView ?? null);
   const [ivScene, setIvScene] = useState<"map" | "camera">("map");
+  // Crew link code: windows on other devices with the same code share the EVA (planner API relay).
+  const [linkCode] = useState(() => (typeof window === "undefined" ? null : crewLink(initialLink)));
   // EVA TERMINATE: the planner's fastest route back from where the EV was (GET /walkback); null if unknown.
   const [walkback, setWalkback] = useState<{ path: PathPoint[]; line: [number, number][]; distanceM: number; minutes: number } | null>(null);
   // The EV and brief poses live here so a phase change never loses the walk.
@@ -137,7 +141,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
   // The planner is building a new plan (start, habitat, goal or a result): the old one is hidden, not frozen.
   const replanning = pending && session.apiConfigured;
   const current = PHASES[phaseIndex(phase)];
-  // EV1 and IV windows stay in step (BroadcastChannel): session, review, TERMINATE, walkback and the EV's pose.
+  // EV1 and IV windows stay in step (this browser and, with the crew link, other devices): session,
+  // review, TERMINATE, walkback and the EV's pose.
   const link = useEvaLink({
     seat: phase === "execute" ? evaView : null,
     snapshot: { plan, previous: session.previous, measurements: session.measurements, status: session.status, source: session.source, reviewing, returning, walkback, ivCall, approvedId },
@@ -149,6 +154,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
     pose: evPose,
     sendPose: helmet,
     onPose: (p) => { if (!helmet) setEvPose({ x: p.x, y: p.y, headingDeg: p.headingDeg }); },
+    room: linkCode,
   });
 
   useLayoutEffect(() => {
@@ -264,7 +270,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
     // The fastest route back over the DTM, from where the EV is now; without the planner, no route is invented.
     if (session.source !== "api") return;
     const from = evPose;
-    getWalkback(plan.plan_id, from.x, from.y)
+    // With the habitat, the planner answers even if it lost the plan (restarted mid-EVA).
+    getWalkback(plan.plan_id, from.x, from.y, habitatOf(plan))
       .then((w) => {
         setWalkback({ path: polylinePath(w.xy), line: w.xy, distanceM: w.distance_m, minutes: w.minutes });
         setAnnouncement(`EVA terminated: fastest walkback ${Math.round(w.distance_m)} m, ${Math.round(w.minutes)} min.`);
@@ -324,7 +331,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView }: { initia
   return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-choosing={choosing} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); else if (briefPoint) backToFlyOver(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>
     <div className="mission-scene">{scene}</div>
-    {choosing ? <RoleSelect plan={plan} onJoin={(role) => { setEvaView(role); setAnnouncement(role === "ev" ? "Joined as EV1: helmet view." : "Joined as IV: habitat console."); }} /> : null}
+    {choosing ? <RoleSelect plan={plan} linkCode={plannerBaseUrl() ? linkCode : null} linked={link.relay} onJoin={(role) => { setEvaView(role); setAnnouncement(role === "ev" ? "Joined as EV1: helmet view." : "Joined as IV: habitat console."); }} /> : null}
     <header className="mission-heading"><Title1>IceWalk</Title1><Footnote>S1094b · 35.11°N, 189.83°E</Footnote></header>
     <div className="mission-tabs" ref={tabsRef}><TabBar label="Mission phase" layout={compact ? "compact" : "regular"} value={phase} tabs={TABS} onValueChange={goTo} /></div>
     {onMap ? <div className="mission-camera"><IconButton variant="glass" label="Zoom in" onClick={() => sceneRef.current?.zoomBy(1.5)}><Plus /></IconButton><IconButton variant="glass" label="Zoom out" onClick={() => sceneRef.current?.zoomBy(1 / 1.5)}><Minus /></IconButton><IconButton variant="glass" label="Frame plan" onClick={() => sceneRef.current?.fit()}><Scan /></IconButton></div> : null}

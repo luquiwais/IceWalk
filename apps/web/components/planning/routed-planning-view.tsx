@@ -16,5 +16,5 @@ export function RoutedPlanningView() {
   const roleKey = params.get("role")?.toLowerCase() ?? "";
   const phase = Object.hasOwn(PHASE_PARAM, phaseKey) ? PHASE_PARAM[phaseKey] : undefined;
   const role = Object.hasOwn(ROLE_PARAM, roleKey) ? ROLE_PARAM[roleKey] : undefined;
-  return <PlanningView initialPhase={phase ?? (role ? "execute" : undefined)} initialEvaView={role} />;
+  return <PlanningView initialPhase={phase ?? (role ? "execute" : undefined)} initialEvaView={role} initialLink={params.get("link")} />;
 }

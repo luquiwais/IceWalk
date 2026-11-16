@@ -141,6 +141,13 @@ def test_walkback_is_the_fastest_route_to_the_habitat():
     straight = ((fx - hx) ** 2 + (fy - hy) ** 2) ** 0.5
     assert body["distance_m"] >= straight * 0.95 and body["minutes"] > 0
     assert _walkback(plan["plan_id"], 99999, 0).status_code == 422
+    # El servidor ya no tiene el plan (se reinició a mitad de la EVA): con el hábitat, igual.
+    lost = client.get("/walkback", params={"plan_id": "plan-gone", "x": fx, "y": fy,
+                                           "hx": hx, "hy": hy})
+    assert lost.status_code == 200
+    assert lost.json()["distance_m"] == pytest.approx(body["distance_m"], rel=0.05)
+    assert client.get("/walkback", params={"plan_id": "plan-gone", "x": fx, "y": fy,
+                                           "hx": 99999, "hy": 0}).status_code == 422
 
 
 def _edits(plan, **moves):

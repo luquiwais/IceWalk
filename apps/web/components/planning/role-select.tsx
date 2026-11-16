@@ -1,8 +1,9 @@
 import { Button } from "@icewalk/ui/button";
 import { Footnote, Title2 } from "@icewalk/ui/text";
 import { Window } from "@icewalk/ui/window";
-import { ExternalLink, Footprints, MonitorDot } from "lucide-react";
-import type { ReactNode } from "react";
+import { Copy, ExternalLink, Footprints, MonitorDot } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { seatUrl } from "@/lib/crew-link";
 import { formatDuration, formatNumber } from "@/lib/format";
 import { orderedStations, type Plan } from "@/lib/plan";
 
@@ -39,9 +40,17 @@ const ROLES: RoleCard[] = [
   },
 ];
 
-/** First screen of the EVA phase: pick the seat. Each seat can also open in a window of its own. */
-export function RoleSelect({ plan, onJoin }: { plan: Plan; onJoin: (role: EvaRole) => void }) {
+/**
+ * First screen of the EVA phase: pick the seat. Each seat can also open in a window of its own, or
+ * on another device with the crew link (`linkCode`, shared through the planner API).
+ */
+export function RoleSelect({ plan, onJoin, linkCode = null, linked = false }: { plan: Plan; onJoin: (role: EvaRole) => void; linkCode?: string | null; linked?: boolean }) {
   const s = plan.summary;
+  const [copied, setCopied] = useState<EvaRole | null>(null);
+  const here = typeof window === "undefined" ? { origin: "", path: "/" } : { origin: window.location.origin, path: window.location.pathname };
+  const copy = (role: EvaRole) => {
+    navigator.clipboard?.writeText(seatUrl(here.origin, here.path, ROLE_PARAM[role], linkCode)).then(() => setCopied(role), () => {});
+  };
   return (
     <section className="mission-roles" aria-labelledby="mission-roles-title">
       <Window className="mission-roles-window">
@@ -59,10 +68,14 @@ export function RoleSelect({ plan, onJoin }: { plan: Plan; onJoin: (role: EvaRol
                 <div><dt>{r.role === "ev" ? "Controls" : "Logging"}</dt><dd>{r.note}</dd></div>
               </dl>
               <Button variant="prominent" onClick={() => onJoin(r.role)}>{r.join}</Button>
-              <a className="mission-role-window" href={`/?phase=eva&role=${ROLE_PARAM[r.role]}`} target="_blank" rel="noopener">Open in a new window<ExternalLink aria-hidden /></a>
+              <div className="mission-role-links">
+                <a className="mission-role-window" href={seatUrl("", here.path, ROLE_PARAM[r.role], linkCode)} target="_blank" rel="noopener">Open in a new window<ExternalLink aria-hidden /></a>
+                {linkCode ? <button type="button" className="mission-role-window" onClick={() => copy(r.role)}>{copied === r.role ? "Link copied" : "Copy link for another device"}<Copy aria-hidden /></button> : null}
+              </div>
             </article>
           ))}
         </div>
+        {linkCode ? <Footnote tone="secondary" className="mission-roles-link">Crew link <b>{linkCode}</b> · {linked ? "devices with this link share the EVA" : "connecting to the planner…"}</Footnote> : null}
       </Window>
     </section>
   );
