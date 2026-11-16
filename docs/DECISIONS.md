@@ -322,3 +322,7 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 ## 2026-11-16 · Registro de decisiones en el Debrief
 
 - Cada decisión sobre un re-plan queda registrada: resultado y estación, recomendación del planificador, la llamada (continuar o EVA TERMINATE), quién la tomó (el IV, o el EV si no había IV en el enlace), cuánto cambió el plan y el margen antes y después. Viaja en la sincronización EV1-IV. El Debrief lo muestra en "Decision log", con el plan contra lo ejecutado arriba; una llamada contra el planificador se dice ("against the planner"). Fuente del rol del IV: xEVA Con Ops, sec. 4.3.2 y 8.1.
+
+## 2026-11-16 · Agregar y reordenar estaciones en Plan
+
+- En el detalle de la estación (Plan, antes de aprobar): "Earlier" y "Later" la mueven un lugar en el orden de caminata, y "Add after" agrega una estación nueva a mitad de camino hacia la siguiente parada (o el hábitat), para arrastrarla después. Cada cambio lo puntúa `POST /evaluate` (respeta el orden dado, hasta 12 estaciones) y se deshace con "Undo". Sin interacción nueva en el mapa.
