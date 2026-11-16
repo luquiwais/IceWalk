@@ -23,7 +23,6 @@ export const metadata: Metadata = {
     "EVA planner for ice prospecting on Mars: the probability of ice within each tool's reach, a two-person traverse inside NASA limits on real HiRISE terrain, and a new plan after every measurement. NASA Space Apps Challenge 2026.",
 };
 
-const REPO = "https://github.com/luquiwais/IceWalk";
 /** The 30-second demo submitted to NASA Space Apps (public link). */
 const DEMO = "https://drive.google.com/file/d/1anZsRElUcrL2DbDIZDFlYQW7qZZU5jLL/view";
 
@@ -113,7 +112,6 @@ export default function Landing() {
           <div className="landing-actions">
             <Link href="/app" className="landing-cta">Open the planner</Link>
             <a href={DEMO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Watch the 30 s demo</a>
-            <a href={REPO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Source on GitHub</a>
           </div>
           <figure className="landing-shot landing-hero-shot">
             <Image src={plan} alt="IceWalk Plan view: the ice map over HiRISE at crater S1094b, a six-station traverse and its flight rules" priority sizes="(max-width: 1200px) 100vw, 1120px" />
@@ -223,14 +221,13 @@ export default function Landing() {
           <div className="landing-actions">
             <Link href="/app" className="landing-cta">Open the planner</Link>
             <a href={DEMO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Watch the 30 s demo</a>
-            <a href={REPO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Source on GitHub</a>
           </div>
         </section>
       </main>
 
       <footer className="landing-footer">
         <p><b>IceWalk</b> · Team Darionautas, Buenos Aires · NASA Space Apps Challenge 2026</p>
-        <p>HiRISE imagery: NASA/JPL-Caltech/UArizona. Mars Trek: NASA/JPL-Caltech. THEMIS: NASA/JPL-Caltech/ASU. Full references in the repository (docs/SOURCES.md).</p>
+        <p>HiRISE imagery: NASA/JPL-Caltech/UArizona. Mars Trek: NASA/JPL-Caltech. THEMIS: NASA/JPL-Caltech/ASU.</p>
         <p>NASA does not endorse this project. No NASA branding is used or implied.</p>
       </footer>
     </div>
