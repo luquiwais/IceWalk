@@ -32,6 +32,9 @@
   "scripts": {
     "dev": "node node_modules/@remotion/cli/remotionb-cli.js studio",
     "build": "node node_modules/@remotion/cli/remotionb-cli.js bundle --out-dir=out/bundle",
+    "media:fetch": "python3 scripts/media.py fetch",
+    "media:verify": "python3 scripts/media.py verify",
+    "render": "zsh scripts/export_films.sh",
     "upgrade": "remotionb upgrade",
     "lint": "eslint src && tsc"
   }

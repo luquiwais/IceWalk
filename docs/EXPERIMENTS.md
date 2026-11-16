@@ -992,3 +992,10 @@ explicación específica del fin de estación, no se trata como telemetría en r
 - **Registrar una medición automatizada** (falló): la pregunta "What did you find?" aparece solo a ≤ 5 m de la estación; los `keydown` sintéticos de página no mueven al EV1, `agent-browser keydown` sí, pero el HUD va atrasado, se pasó 121 m y la pestaña volvió a Plan perdiendo el estado.
 - **Gemini TTS en paralelo**: 2 de 6 pedidos devolvieron 429; no hizo falta reintentar.
 - **Niebla volumétrica de mundo en EEVEE 5.3** (falló): la dispersión volumétrica del mundo deja el cuadro negro con densidad 0,0025 y 0,0006. Se mantiene la bruma de los materiales y se suma bruma en composición (Remotion).
+
+
+## 2026-11-15 · Restauración de medios desde cero
+
+- Restauración en carpeta temporal sin los medios del checkout: 528 archivos comprobados por tamaño/SHA-256, incluidos ambos MP4; `bun install --frozen-lockfile` y 17 tests (12 de entrega + 5 de descarga/integridad) pasan. Los tests nuevos comprueban medios corruptos, rutas inesperadas/symlinks, repetición y preservación de ediciones locales.
+- Blender 5.3.0: rig reconstruido desde fuentes, 60 cuadros validados (error máximo de palmas 0,00000598 m, avance 0,22 m, giro 46,50 rad); consola v3 y taladro v4 renderizados e inspeccionados en la carpeta nueva. Se añadió creación de `assets/scenes/` al validador para que funcione sin carpetas previas.
+- Remotion 4.0.543: nueve cuadros Global y siete Local renderizados desde esa restauración limpia, cubriendo clips e interfaz. Lint y TypeScript pasan. No se afirman nuevos exports completos de ambas películas ni nueva aprobación estética; los MP4 publicados son los exportados a las 22:36 ART.

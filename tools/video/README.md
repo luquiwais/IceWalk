@@ -1,12 +1,78 @@
 # IceWalk — video
 
 Proyecto Remotion y Blender. Fuente editorial: [docs/submission/video](../../docs/submission/video/README.md).
-Estado vigente v3: `GlobalFilm` exportado (708 cuadros, 29,5 s); `LocalFilm`
-(4320 cuadros, 180 s) quedó pausado. Astronauta articulado, pantallas integradas
-y voces Gemini Orus/Charon. Sin filmación ni material Higgsfield.
+Estado vigente al cierre del 15/11: `GlobalFilm` (708 cuadros, 29,5 s) y
+`LocalFilm` (4320 cuadros, 180 s) exportados, con capturas/grabaciones reales de
+la app, astronauta articulado y voces Gemini Orus/Charon. Sin material Higgsfield.
 Preview en `http://localhost:3100/GlobalFilm` y `/LocalFilm`.
-Studio y renders están apagados por pedido de Eitan. Antes de reanudarlos, leer
-[el traspaso editorial y técnico](../../docs/submission/video/handoff-2026-11-15.md).
+Studio y renders están apagados. El [traspaso](../../docs/submission/video/handoff-2026-11-15.md)
+describe la pausa anterior; las revisiones posteriores y sus límites están en
+[el log del 15/11](../../docs/log/2026-11-15.md).
+
+## Recuperar y renderizar desde un clon limpio
+
+Los dos MP4, subtítulos, créditos y medios están en el
+[Release video-2026-11-15](https://github.com/luquiwais/IceWalk/releases/tag/video-2026-11-15).
+El código permanece en Git; los binarios se recuperan con
+[media-release.json](media-release.json), que fija tamaños y SHA-256 por archivo.
+No hace falta Git LFS, una clave de IA, el backend ni los datos pesados de `data/`.
+
+Requisitos: Python 3.10+, Bun, Node compatible con `package.json`, FFmpeg/ffprobe
+y zsh. Para reconstruir los planos 3D, Blender **5.3.0** (incluye NumPy).
+La publicación se comprobó con Bun 1.4.2, Node 25.6.0, Python 3.12.3 y FFmpeg 9.0.1.
+
+```sh
+git clone --branch video-2026-11-15 https://github.com/luquiwais/IceWalk.git
+cd IceWalk/tools/video
+bun install --frozen-lockfile
+python3 scripts/media.py fetch --include-films
+bun run lint
+python3 -m unittest discover -s scripts -p 'test_*.py'
+bun run render                  # exporta ambos MP4 a out/
+# O uno solo: bun run render GlobalFilm
+```
+
+`fetch` descarga unos 452 MiB de medios; `--include-films` también recupera los
+MP4/SRT/créditos publicados (unos 110 MiB adicionales). Sin esa opción alcanza
+para renderizar. Verifica hashes antes de instalar y conserva archivos locales
+que difieran, deteniéndose con su ruta. `python3 scripts/media.py verify` permite
+comprobar los medios después. `bun run dev` abre el Studio para editar el montaje.
+
+Para reconstruir escenas desde las fuentes descargadas, desde `tools/video`:
+
+```sh
+# Construye y valida el rig; guarda assets/scenes/drill-v3.blend.
+blender -b --python-exit-code 1 --python blender/v2/validate_scene.py
+
+# Un cuadro de consola: guarda también la escena .blend.
+blender -b --python-exit-code 1 --python blender/v3/render_shots.py -- console_wide --still 30
+
+# Secuencia v4 del taladro y codificación del clip que consume Remotion.
+blender -b --python-exit-code 1 --python blender/v4/render_shots.py -- drill
+RENDER_REVISION=v4 zsh scripts/encode_shots.sh drill
+bun run render GlobalFilm
+```
+
+`src/v2/shot-manifest.json` enumera las tomas y cantidades de cuadros. El resto
+de la cobertura se genera con `blender/v3/render_shots.py -- <toma>`; para `walk`
+y `drill_result` también existe el pase v4. La órbita se genera con
+`blender/v2/shots.py -- orbit --revision v3`. Luego se codifica con
+`RENDER_REVISION=v3 zsh scripts/encode_shots.sh <toma>`.
+Los `.blend` y fotogramas intermedios se regeneran en el nuevo equipo, evitando
+rutas absolutas de la máquina original. La ventana de la consola usa una imagen
+de referencia de la caminata incluida en el paquete de fuentes.
+
+Las mezclas listas y las tomas de voz están incluidas. Para volver a mezclar sin
+llamar servicios de IA: `uv run --with numpy --with scipy --with soundfile
+scripts/sound_global.py` (o `sound_local.py`). Regenerar voces es opcional,
+requiere credenciales propias y puede cambiar la actuación/sincronización.
+No usar `produce_v3.py` para repetir los exports publicados: instala plantillas
+de un montaje anterior. Usar `render`, que conserva el montaje vigente.
+
+Licencias y atribución: [MEDIA-CREDITS.md](MEDIA-CREDITS.md). Los originales de
+referencias ajenas, cachés, backups, fotogramas intermedios y secretos no forman
+parte del Release. El inventario histórico `docs/submission/video/assets.json`
+describe un estado anterior; el manifiesto de esta publicación es `media-release.json`.
 
 ## Comandos
 
@@ -33,14 +99,13 @@ en los workspaces Bun de la app. `build` compila a `out/bundle`, sin exportar vi
 | `fixtures/` | Ocho fuentes JSON del episodio original, commit `2a633fb` | Sí |
 | `public/data/data.json` | Números y hashes consumidos por Remotion | Sí |
 | `public/site/*.json` | Metadata del sitio | Sí |
-| `assets/` | Originales NASA, IA existente, PBR y referencias ajenas | Local, ignorado |
-| `public/` (resto) | Imágenes, clips, modelos y heightmaps | Local, ignorado |
+| `assets/` | Fuentes NASA, astronauta, PBR, mocap y voces | Ignorado; fuentes necesarias en Release |
+| `public/` (resto) | Imágenes, clips, modelos y heightmaps | Ignorado; incluido en Release |
 | `out/`, `blender/renders/`, `blender/*.blend*` | Animatic, capturas y pruebas 3D | Local, ignorado |
 
-Inventario con rutas desde la raíz, tamaños, SHA-256 y procedencia:
-[assets.json](../../docs/submission/video/assets.json). Ningún Release publicado.
-Un clon limpio necesita recuperar los medios antes de compilar; el manifiesto no
-es un descargador ni una autorización de redistribución.
+Inventario de publicación con rutas relativas a `tools/video`, tamaños y SHA-256:
+[media-release.json](media-release.json). Los MP4 actuales se distribuyen en el
+mismo Release; las pruebas y exportaciones anteriores permanecen locales.
 
 ## Episodio congelado
 

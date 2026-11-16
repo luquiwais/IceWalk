@@ -330,3 +330,8 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 ## 2026-11-16 · Agregar y reordenar estaciones en Plan
 
 - En el detalle de la estación (Plan, antes de aprobar): "Earlier" y "Later" la mueven un lugar en el orden de caminata, y "Add after" agrega una estación nueva a mitad de camino hacia la siguiente parada (o el hábitat), para arrastrarla después. Cada cambio lo puntúa `POST /evaluate` (respeta el orden dado, hasta 12 estaciones) y se deshace con "Undo". Sin interacción nueva en el mapa.
+
+
+## 2026-11-15 · Publicación reproducible de los videos
+
+- Por pedido de Eitan, los MP4 Global/Local y los medios necesarios para Blender/Remotion se distribuyen en GitHub Releases (`video-2026-11-15`); el código, comandos de descarga y manifiesto SHA-256 quedan en Git. Se mantienen los binarios fuera del historial Git y no se requieren Git LFS ni claves de IA para repetir las exportaciones. Las escenas .blend se reconstruyen desde fuentes en la máquina de destino para evitar rutas absolutas antiguas. Referencias de otros equipos, secretos y fotogramas intermedios quedan locales. Instrucciones vigentes: `tools/video/README.md`; manifiesto de publicación: `tools/video/media-release.json` (el inventario anterior sigue como registro histórico).

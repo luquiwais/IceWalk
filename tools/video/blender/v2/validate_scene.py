@@ -37,6 +37,7 @@ sc.frame_set(30)
 mars.render_settings(samples=48,res=(1920,804),pct=100)
 sc.render.use_motion_blur=True;sc.render.motion_blur_shutter=.25
 out=shots.ROOT/'assets/scenes/drill-v3.blend'
+out.parent.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(out))
 report={'frames':60,'palm_max_error_m':max(errors),'feed_m':max(feed)-min(feed),'rotation_rad':angles[-1]-angles[0],'saved_scene':str(out)}
 (shots.ROOT/'assets/scenes/drill-v3-checks.json').write_text(json.dumps(report,indent=2))
