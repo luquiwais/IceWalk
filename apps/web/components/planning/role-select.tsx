@@ -47,7 +47,8 @@ const ROLES: RoleCard[] = [
 export function RoleSelect({ plan, onJoin, linkCode = null, linked = false }: { plan: Plan; onJoin: (role: EvaRole) => void; linkCode?: string | null; linked?: boolean }) {
   const s = plan.summary;
   const [copied, setCopied] = useState<EvaRole | null>(null);
-  const here = typeof window === "undefined" ? { origin: "", path: "/" } : { origin: window.location.origin, path: window.location.pathname };
+  // The planner lives at /app (the landing is at /).
+  const here = { origin: typeof window === "undefined" ? "" : window.location.origin, path: "/app" };
   const copy = (role: EvaRole) => {
     navigator.clipboard?.writeText(seatUrl(here.origin, here.path, ROLE_PARAM[role], linkCode)).then(() => setCopied(role), () => {});
   };
