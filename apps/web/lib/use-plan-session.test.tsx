@@ -367,3 +367,31 @@ describe("moving the habitat", () => {
     expect(session.getSnapshot()).toMatchObject({ plan: demoPlan, habitatError: "Moving the habitat needs the planner API." });
   });
 });
+
+describe("adopting another window's session", () => {
+  const peer = { plan: demoPlan, previous: null, measurements: [], status: "error" as const, source: "mock" as const };
+
+  it("ignores a peer stuck on the bundled mock and keeps its own API request going", async () => {
+    const slow = deferred();
+    const fetch = routes({ ...healthy, "/plan": slow.route });
+    const session = createPlanSession({ baseUrl: BASE, fetch, fallback });
+    const starting = session.start();
+    expect(session.adopt(peer)).toBe(false);
+    slow.release(json(apiPlan));
+    await starting;
+    expect(session.getSnapshot()).toMatchObject({ plan: apiPlan, source: "api", status: "ready" });
+  });
+
+  it("takes a peer's API session", async () => {
+    const session = await started(routes({ ...healthy, "/plan": () => json(apiPlan) }));
+    const moved: Plan = { ...apiPlan, plan_id: "plan-api0009" };
+    expect(session.adopt({ ...peer, plan: moved, status: "ready", source: "api" })).toBe(true);
+    expect(session.getSnapshot()).toMatchObject({ plan: moved, source: "api" });
+  });
+
+  it("takes a peer's mock session when there is no API at all", () => {
+    const session = createPlanSession({ baseUrl: null, fallback });
+    expect(session.adopt({ ...peer, status: "ready" })).toBe(true);
+  });
+});
+
