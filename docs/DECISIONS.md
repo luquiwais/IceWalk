@@ -318,3 +318,7 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 ## 2026-11-16 · Egress en la esclusa (Luqui)
 
 - El hábitat del 3D gira su esclusa hacia la primera estación y la EVA arranca en la puerta (9 m del centro del modelo de 12 m, mirando a la estación). La vista "HAB" del Brief es ese mismo punto. Antes el EV arrancaba a 15 m y el Brief miraba desde 45 m: se veía lejos de la base. Un solo cálculo: `egressPose` en `components/site/site-data.ts`.
+
+## 2026-11-16 · Registro de decisiones en el Debrief
+
+- Cada decisión sobre un re-plan queda registrada: resultado y estación, recomendación del planificador, la llamada (continuar o EVA TERMINATE), quién la tomó (el IV, o el EV si no había IV en el enlace), cuánto cambió el plan y el margen antes y después. Viaja en la sincronización EV1-IV. El Debrief lo muestra en "Decision log", con el plan contra lo ejecutado arriba; una llamada contra el planificador se dice ("against the planner"). Fuente del rol del IV: xEVA Con Ops, sec. 4.3.2 y 8.1.
