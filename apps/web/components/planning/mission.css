@@ -265,7 +265,7 @@
 .mission-brief-station { gap: .5rem; }
 .mission-brief-hint { margin: 0; }
 .mission-brief .mission-station-strip { padding: .3125rem .5rem; gap: .375rem; }
-.mission-brief .mission-station-chips { justify-content: space-between; gap: .1875rem; }
+.mission-brief .mission-station-chips { justify-content: flex-start; gap: .375rem; flex-wrap: wrap; }
 .mission-brief .mission-station-chips button { width: 1.5rem; height: 1.5rem; padding: 0; display: inline-grid; place-items: center; line-height: 1; font-variant-numeric: tabular-nums; }
 .mission-brief .mission-station-chips .mission-chip-hab { width: auto; padding: 0 .4375rem; border-radius: 999px; font-size: .625rem; letter-spacing: .04em; }
 .mission-brief .mission-station-chips button[aria-pressed=true] { background: #0a84ff; border-color: #0a84ff; }
@@ -438,6 +438,8 @@
 @media (min-width: 760px) {
   /* Map tools stay at the bottom left and ride on top of the dock: they rise when the timeline opens. */
   .mission-app .mission-map-tools { top: auto; left: var(--mission-edge); bottom: calc(var(--mission-timeline-y, 3rem) + 1.5rem); width: auto; max-width: 24rem; gap: .5rem; }
+  /* Zoom and frame in a row under the header, so the map tools rising with the dock never cover them. */
+  .mission-app .mission-camera { flex-direction: row; }
   .mission-app .mission-map-card { padding: .375rem; }
   .mission-app .mission-dock-position { right: calc(var(--dc-col, 400px) + 2 * var(--mission-edge)); }
   .mission-app .mission-panel-presence { bottom: var(--mission-edge); }
@@ -694,3 +696,29 @@ button.mission-role-window { background: none; border: 0; padding: 0; cursor: po
 .mission-debrief-links .mission-debrief-link:first-child { grid-column: 1 / -1; }
 .mission-debrief-links .mission-debrief-link:nth-child(2) { border-top: 1px solid var(--color-separator); }
 .mission-debrief-links .mission-debrief-link:nth-child(odd):not(:first-child) { border-left: 1px solid var(--color-separator); }
+
+/* IV window: the EV's status inside the station card; the track map a little smaller, so nothing scrolls. */
+.mission-iv-status { margin-top: .125rem; font-size: .75rem; color: var(--color-label-secondary); }
+.mission-iv .eva-minimap[data-layout="panel"] { grid-template-columns: 6.5rem 1fr; padding: 8px; }
+/* Join the EVA: tighter cards so the window keeps a margin at 1280 x 551. */
+.mission-roles-window { gap: .625rem; padding: .875rem 1rem 1rem; }
+.mission-role { gap: .5rem; padding: .75rem; }
+.mission-role-does { font-size: .78rem; }
+/* Debrief summary, no scrolling with several results: one-line notes (the full text on hover), the
+   views as pills in two rows, reset as a link beside the note. */
+.mission-debrief > .mission-debrief-log .mission-debrief-note { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.mission-debrief .mission-debrief-links { display: flex; flex-direction: row; flex-wrap: wrap; gap: .375rem; background: none; border-radius: 0; }
+.mission-debrief .mission-debrief-links .mission-debrief-link { grid-column: auto; border: 1px solid rgb(255 255 255 / .16); border-radius: 999px; padding: .25rem .5rem .25rem .625rem; font-size: .75rem; background: rgb(255 255 255 / .05); }
+.mission-debrief .mission-debrief-links .mission-debrief-link:hover { background: rgb(255 255 255 / .12); }
+.mission-debrief .mission-debrief-links .mission-debrief-link svg { width: .875rem; height: .875rem; }
+.mission-debrief-next { padding-top: 0; margin-top: 0; border-top: 0; }
+.mission-debrief-next-note { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.mission-debrief-next-note .mission-text-link { white-space: nowrap; font-size: .75rem; }
+.mission-debrief > .mission-debrief-log li { padding-top: .375rem; padding-bottom: .375rem; }
+.mission-app .mission-debrief nav.mission-debrief-links > button.mission-debrief-link { width: auto; flex: 0 0 auto; }
+.mission-app .mission-debrief nav.mission-debrief-links > button.mission-debrief-link { padding: .2rem .45rem .2rem .55rem; font-size: .7rem; }
+/* Debrief summary rows on one line: id and result, the tool to the right with an ellipsis. */
+.mission-debrief > .mission-debrief-log .mission-debrief-row { flex-wrap: nowrap; }
+.mission-debrief > .mission-debrief-log .mission-debrief-row small { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mission-app .mission-debrief nav.mission-debrief-links > button.mission-debrief-link svg { display: none; }
+.mission-debrief .mission-debrief-reset { align-self: center; margin-left: auto; font-size: .7rem; }

@@ -7,7 +7,6 @@ import { measurementSummary, toolName, toolReachM, type Measurement, type Plan, 
 import type { DecisionEntry } from "@/lib/use-eva-link";
 import { CampaignChart } from "./campaign-chart";
 import { Evidence, GroundTruth, Limits } from "./evidence";
-import { NextStep } from "./phases";
 
 type View = "summary" | "decisions" | "campaign" | "trust" | "truth" | "limits";
 const VIEW_LABEL: Record<Exclude<View, "summary">, string> = { decisions: "Decision log", campaign: "Beyond one EVA", trust: "Why trust the numbers", truth: "Where a mission dug", limits: "Limits" };
@@ -38,7 +37,6 @@ export function DebriefPanel({ plan, previousPlan, measurements, decisions = [],
   const planned = (id: string): Station | undefined => plan.stations.find((s) => s.id === id) ?? previousPlan?.stations.find((s) => s.id === id);
   const count = (r: Measurement["result"]) => measurements.filter((m) => m.result === r).length;
   const visited = new Set(measurements.map((m) => m.station_id)).size;
-  const replan = plan.replan;
   const answer = measurements.length
     ? `${visited} station${visited === 1 ? "" : "s"} measured · ${count("ice")} ice · ${count("no_ice")} not within reach${count("inconclusive") ? ` · ${count("inconclusive")} inconclusive` : ""}`
     : "No measurements yet";
@@ -48,36 +46,27 @@ export function DebriefPanel({ plan, previousPlan, measurements, decisions = [],
       <p className="mission-answer"><strong>{measurements.length ? "Debrief" : "Waiting"}</strong> · {answer}</p>
       {measurements.length ? (
         <ol className="mission-debrief-log" aria-label="Measurement log">
-          {measurements.slice(-4).map((m, i) => {
+          {measurements.slice(-2).map((m, i) => {
             const s = planned(m.station_id);
             return (
-              <li key={`${m.station_id}-${i}`} data-result={m.result}>
-                <div className="mission-debrief-row"><strong>{m.station_id}</strong><span>{measurementSummary(m)}</span><small>{toolName(m.tool)}{m.crew_member ? ` · ${m.crew_member}` : ""}</small></div>
-                <div className="mission-debrief-note">{s ? <>Expected P(ice) {formatPercent(s.p_ice)}, {s.uncertainty.toFixed(2)} bits unknown; now measured. </> : null}{meaning(m)}</div>
+              <li key={`${m.station_id}-${i}`} data-result={m.result} title={`${s ? `Expected P(ice) ${formatPercent(s.p_ice)}, ${s.uncertainty.toFixed(2)} bits unknown; now measured. ` : ""}${meaning(m)}`}>
+                <div className="mission-debrief-row"><strong>{m.station_id}</strong><span>{measurementSummary(m)}</span><small>{toolName(m.tool).replace("Powered hand core drill", "Core drill")}{m.crew_member ? ` · ${m.crew_member}` : ""}</small></div>
+                <div className="mission-debrief-note">{meaning(m)}</div>
               </li>
             );
           })}
         </ol>
       ) : <Footnote tone="secondary">The EV logs results from the helmet; each one updates the ice map and the plan.</Footnote>}
-      {measurements.length > 4 ? <Footnote tone="secondary">Showing the last 4 of {measurements.length} measurements.</Footnote> : null}
-      {replan ? (
-        <div className="mission-iv-station">
-          <span className="mission-iv-key">What the last result changed</span>
-          <span>
-            {replan.changed_fraction != null ? <><b>{formatPercent(replan.changed_fraction)}</b> of the plan changed. </> : null}
-            {replan.stations_added.length ? <>Added {replan.stations_added.join(", ")}. </> : null}
-            {replan.stations_dropped.length ? <>Dropped {replan.stations_dropped.join(", ")}. </> : null}
-            {replan.recommendation === "return_to_habitat" ? "Recommendation: EVA TERMINATE." : "Recommendation: continue."}
-          </span>
-        </div>
-      ) : null}
+      {measurements.length > 2 ? <Footnote tone="secondary">Last 2 of {measurements.length} results; the decision log has every call.</Footnote> : null}
       <nav className="mission-debrief-links" aria-label="More">
         {(Object.keys(VIEW_LABEL) as Exclude<View, "summary">[]).map((v) => (
           <button key={v} type="button" className="mission-debrief-link" onClick={() => setView(v)}>{VIEW_LABEL[v]}<ChevronRight aria-hidden /></button>
         ))}
+        <button type="button" className="mission-text-link mission-debrief-reset" onClick={onReset}>Reset session</button>
       </nav>
-      <NextStep label="Plan the next EVA" onClick={onNext} note="The next plan starts from what this EVA measured." />
-      <Button size="small" variant="plain" onClick={onReset}>Reset session</Button>
+      <div className="mission-next mission-debrief-next">
+        <Button variant="prominent" onClick={onNext} title="The next plan starts from what this EVA measured">Plan the next EVA</Button>
+      </div>
     </section>
   );
 }
@@ -91,11 +80,15 @@ const fmtPet = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)
  */
 function DecisionLog({ plan, previousPlan, measurements, decisions, terminated }: { plan: Plan; previousPlan?: Plan; measurements: Measurement[]; decisions: DecisionEntry[]; terminated: boolean }) {
   const measured = new Set(measurements.map((m) => m.station_id)).size;
+  const replan = plan.replan;
   // The first plan of the EVA is the one the crew approved; replans keep its count as the yardstick.
   const planned = Math.max(previousPlan?.stations.length ?? 0, plan.stations.length + measured);
   return (
     <section className="mission-stack" aria-label="Decisions">
       <p className="mission-answer"><strong>As run</strong> · {measured} of {planned} planned stations measured · {terminated ? "EVA terminated early" : measured >= planned ? "plan completed" : "EVA in progress"}</p>
+      {replan && !decisions.length ? (
+        <p className="mission-debrief-note">Last replan: {replan.changed_fraction != null ? `${formatPercent(replan.changed_fraction)} of the plan changed` : "change not measured"}{replan.stations_added.length ? ` · added ${replan.stations_added.join(", ")}` : ""}{replan.stations_dropped.length ? ` · dropped ${replan.stations_dropped.join(", ")}` : ""} · planner: {replan.recommendation === "return_to_habitat" ? "EVA TERMINATE" : "continue"}.</p>
+      ) : null}
       {decisions.length ? (
         <ol className="mission-debrief-log mission-decision-log" aria-label="Decision log">
           {decisions.slice(-4).map((d, i) => {

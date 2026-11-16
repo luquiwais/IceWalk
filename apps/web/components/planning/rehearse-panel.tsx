@@ -110,11 +110,12 @@ export function RehearsePanel({ plan, at, onStand, onNext }: Props) {
 function expectation(station: Station, tool: string, reach: number | undefined): string {
   const depth = station.depth_median_m;
   const name = toolName(tool).replace("Powered hand core drill", "core drill");
-  if (depth == null) return `ice depth unknown here; the ${name} samples ${reach ? `to ${reach} m` : "the near subsurface"}.`;
-  if (reach == null) return `ice at about ${formatNumber(depth, 1)} m (model median).`;
+  const m = (v: number) => `${Number.isInteger(v) ? v : formatNumber(v, 1)} m`; // number and unit never split across lines
+  if (depth == null) return `ice depth unknown here; the ${name} samples ${reach ? `to ${m(reach)}` : "the near subsurface"}.`;
+  if (reach == null) return `ice at about ${m(depth)} (model median).`;
   return depth <= reach
-    ? `ice at about ${formatNumber(depth, 1)} m, within the ${reach} m ${name}.`
-    : `ice at about ${formatNumber(depth, 1)} m, below the ${reach} m ${name}: "not within ${reach} m" is likely.`;
+    ? `ice at about ${m(depth)}, within the ${m(reach)} ${name}.`
+    : `ice at about ${m(depth)}, below the ${m(reach)} ${name}: "not within ${m(reach)}" is likely.`;
 }
 
 /** What the crew will find and do at the station: the ground truth they are walking to. */
