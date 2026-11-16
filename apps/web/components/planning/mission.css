@@ -688,3 +688,9 @@ button.mission-role-window { background: none; border: 0; padding: 0; cursor: po
 .mission-tools label { display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 0; cursor: pointer; }
 .mission-tools input { width: 1rem; height: 1rem; accent-color: #0a84ff; flex: none; }
 .mission-tools small { margin-left: auto; color: var(--color-label-secondary); font-size: .75rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* Debrief links in two columns, the decision log first and full width: five links in three rows. */
+.mission-debrief-links { display: grid; grid-template-columns: 1fr 1fr; }
+.mission-debrief-links .mission-debrief-link { font-size: .8125rem; min-width: 0; gap: .25rem; }
+.mission-debrief-links .mission-debrief-link:first-child { grid-column: 1 / -1; }
+.mission-debrief-links .mission-debrief-link:nth-child(2) { border-top: 1px solid var(--color-separator); }
+.mission-debrief-links .mission-debrief-link:nth-child(odd):not(:first-child) { border-left: 1px solid var(--color-separator); }

@@ -23,6 +23,22 @@ export type EvaSeat = "ev" | "iv" | null;
 /** The IV's call on a replan under review (xEVA Con Ops, sec. 4.3.2 and 8.1); the EV copies it. */
 export type IvCall = "continue" | "terminate" | null;
 
+/**
+ * One decision of the EVA: what the planner recommended after a result and what the crew did.
+ * The IV makes the call (xEVA); `by: "EV"` means the EV decided with no IV on the loop.
+ */
+export type DecisionEntry = {
+  stationId: string;
+  result: "ice" | "no_ice" | "inconclusive";
+  recommended: "continue" | "return_to_habitat" | null;
+  call: "continue" | "terminate";
+  by: "IV" | "EV";
+  changedFraction: number | null;
+  marginBefore: number | null;
+  marginAfter: number | null;
+  petMin: number;
+};
+
 export type EvaSnapshot = {
   plan: Plan;
   previous: Plan | null;
@@ -34,6 +50,8 @@ export type EvaSnapshot = {
   walkback: unknown;
   ivCall: IvCall;
   approvedId: string | null;
+  /** The EVA's decision log, oldest first. */
+  decisions?: DecisionEntry[];
 };
 
 export type EvaPose = { x: number; y: number; headingDeg: number; [k: string]: unknown };
@@ -56,7 +74,7 @@ const ROOM = /^[A-Za-z0-9_-]{4,32}$/;
 /** What a snapshot changes, in one string: equal keys mean nothing to send. */
 export function snapshotKey(s: EvaSnapshot): string {
   const last = s.measurements.at(-1);
-  return [s.plan.plan_id, s.previous?.plan_id ?? "", s.measurements.length, last?.station_id ?? "", last?.result ?? "", s.status, s.source, s.reviewing, s.returning, s.walkback ? "w" : "", s.ivCall ?? "", s.approvedId ?? ""].join("|");
+  return [s.plan.plan_id, s.previous?.plan_id ?? "", s.measurements.length, last?.station_id ?? "", last?.result ?? "", s.status, s.source, s.reviewing, s.returning, s.walkback ? "w" : "", s.ivCall ?? "", s.approvedId ?? "", s.decisions?.length ?? 0].join("|");
 }
 
 /** Whether an incoming snapshot replaces the local one: newer revision, or same and a higher id. */
