@@ -40,6 +40,8 @@ Las reglas de Space Apps exigen citar toda fuente usada. Sumar acá cada dato, i
 | Densidad de bloques de S1094b, feb y dic 2022 | arXiv 2608.02492, https://arxiv.org/pdf/2608.02492 |
 | Detección de bloques por sombras | Golombek et al. (2008) JGR, doi:10.1029/2007JE003065; Hood et al. (2022) Earth and Space Science, doi:10.1029/2022EA002410 |
 | Índice de una ley de potencias por máxima verosimilitud (comparación de tamaños de bloques con Tusberti et al., que citan el mismo método) | Clauset, Shalizi & Newman (2009) SIAM Review 51(4), 661-703, doi:10.1137/070710111 |
+| BoulderNet: detección de bloques con Mask R-CNN (datos y pesos CC BY 4.0) | Prieur et al. (2023) JGR Planets; https://zenodo.org/records/8171052 |
+| Mask R-CNN ResNet-50 FPN v2 con pesos COCO (punto de partida del detector de `vision/maskrcnn.py`) | torchvision (BSD-3); Li et al. (2021) "Benchmarking Detection Transfer Learning with Vision Transformers", arXiv:2111.11429 |
 | BoulderNet: detección de bloques con Mask R-CNN (datos y pesos CC BY 4.0). Usados: recortes de Marte y `model_0055999.pth`, para medir; no entra en el producto (`EXPERIMENTS.md`, 2026-11-14) | Prieur et al. (2023) JGR Planets; https://zenodo.org/records/8171052 |
 | Prioridades científicas para humanos en Marte | National Academies (2025), A Science Strategy for the Human Exploration of Mars |
 | Hielo limpio a < 1 m en latitudes medias | Dundas et al. (2021) JGR Planets |
