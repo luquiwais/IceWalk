@@ -141,7 +141,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
     seat: phase === "execute" ? evaView : null,
     snapshot: { plan, previous: session.previous, measurements: session.measurements, status: session.status, source: session.source, reviewing, returning, walkback, ivCall, approvedId, decisions },
     onSnapshot: (s) => {
-      session.adopt(s);
+      if (!session.adopt(s)) return;
       setReviewing(s.reviewing); setReturning(s.returning); setIvCall(s.ivCall); setApprovedId(s.approvedId);
       if (s.decisions) setDecisions(s.decisions);
       setWalkback(s.walkback as typeof walkback);

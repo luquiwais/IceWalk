@@ -74,7 +74,12 @@ export type PlanSession = {
   /** Re-plans from the habitat with only these tools (catalog ids); null: the whole catalog. */
   setTools: (tools: string[] | null) => Promise<void>;
   /** Takes the session another window holds (the EV1 / IV link): drops any request of its own. */
-  adopt: (from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">) => void;
+  /**
+   * Takes another window's session (EV1-IV link). Returns false, and changes nothing, when it is a
+   * bundled mock and this window has the planner API: that window's request failed, and taking its
+   * state would cancel this one's request and leave both on mock data.
+   */
+  adopt: (from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">) => boolean;
   dispose: () => void;
 };
 
@@ -269,10 +274,12 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     await start();
   }
 
-  function adopt(from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">) {
+  function adopt(from: Pick<PlanSessionState, "plan" | "previous" | "measurements" | "status" | "source">): boolean {
+    if (baseUrl && from.source !== "api") return false;
     begin();
     if (from.source === "api" && !from.previous && !from.measurements.length) nominal = from.plan;
     set({ plan: from.plan, previous: from.previous, measurements: from.measurements, status: from.status, source: from.source, isMock: isMock(from.plan), error: null, habitatError: null });
+    return true;
   }
 
   return {
