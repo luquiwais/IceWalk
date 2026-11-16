@@ -2,7 +2,7 @@ import { Button } from "@icewalk/ui/button";
 import { Body, Footnote } from "@icewalk/ui/text";
 import { Printer } from "lucide-react";
 import { useState } from "react";
-import { habitatOf } from "@/components/site/site-data";
+import { egressPose, habitatOf } from "@/components/site/site-data";
 import { formatDuration, formatNumber, formatPercent } from "@/lib/format";
 import { bearing, decisionPointFor, measuringTool, orderedStations, stationBlock, toolName, toolReachM, type Plan, type Station } from "@/lib/plan";
 import { clock } from "./parts";
@@ -14,9 +14,6 @@ export const AT_HABITAT = "@habitat";
 
 /** Where the viewer stands after a jump: 15 m short of the station on the arriving leg, looking at it. */
 const STAND_BACK_M = 15;
-/** At the habitat the viewer stands behind it and aside, so the habitat model is in the foreground. */
-const HABITAT_BACK_M = 45;
-const HABITAT_ASIDE_M = 14;
 /** Every jump gets a newer key, so the 3D view knows a jump came after the view the user picked. */
 let jumpSeq = 0;
 export const nextJumpKey = () => ++jumpSeq;
@@ -69,13 +66,10 @@ export function RehearsePanel({ plan, at, onStand, onNext }: Props) {
     const [ux, uy] = d > 1 ? [dx / d, dy / d] : [Math.SQRT1_2, Math.SQRT1_2];
     stand(s.id, s.position[0] - ux * STAND_BACK_M, s.position[1] - uy * STAND_BACK_M, s.position);
   };
-  // At the habitat: behind it and a little aside, facing the first station, so the habitat is in view.
+  // At the habitat: where the EVA starts, at the airlock hatch facing the first station (drag to look back at it).
   const standAtHabitat = () => {
-    const first = stations[0]?.position ?? [habitat[0], habitat[1] + 1];
-    const dx = first[0] - habitat[0], dy = first[1] - habitat[1];
-    const d = Math.hypot(dx, dy) || 1;
-    const [ux, uy] = [dx / d, dy / d];
-    stand(AT_HABITAT, habitat[0] - ux * HABITAT_BACK_M + uy * HABITAT_ASIDE_M, habitat[1] - uy * HABITAT_BACK_M - ux * HABITAT_ASIDE_M, first);
+    const e = egressPose(plan);
+    onStand(AT_HABITAT, { x: e.x, y: e.y, headingDeg: e.headingDeg, key: nextJumpKey(), view: "stand" });
   };
   const station = stations.find((s) => s.id === at);
 

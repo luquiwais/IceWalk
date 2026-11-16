@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import { CRATER_XY, habitatOf, SITE_IMAGERY } from "@/components/site/site-data";
+import { CRATER_XY, egressPose, habitatOf, SITE_IMAGERY } from "@/components/site/site-data";
 import { orderedStations, type Plan } from "@/lib/plan";
 import { circle, Heightfield, walkPath, type Box, type PathPoint, type Site3DData, type Site3DLevelName } from "@/lib/site3d";
 
@@ -109,7 +109,9 @@ export function Site3D({ data, level, plan, previousPlan, path, walkback, mode, 
   useEffect(() => { moveCb.current = onMove; }, [onMove]);
   // The terrain is built once per level; it reads the plan's habitat at that moment (set just before).
   const habitatRef = useRef<[number, number]>(habitatOf(plan));
-  useEffect(() => { habitatRef.current = habitatOf(plan); }, [plan]);
+  // The habitat turns its airlock toward the first station (where the EV steps out).
+  const egressRef = useRef(egressPose(plan).headingDeg);
+  useEffect(() => { habitatRef.current = habitatOf(plan); egressRef.current = egressPose(plan).headingDeg; }, [plan]);
   useEffect(() => {
     if (teleport) free.current = { ...free.current, x: teleport.x, y: teleport.y, yaw: (teleport.headingDeg * Math.PI) / 180 };
   }, [teleport]);
@@ -267,7 +269,7 @@ export function Site3D({ data, level, plan, previousPlan, path, walkback, mode, 
       const [hx, hy] = habitatRef.current;
       if (inBox(hx, hy)) {
         const footprint = HABITAT_FOOTPRINT_M[level];
-        void addHabitat(scene, toWorld(hx, hy), footprint, () => disposed).then((dispose) => { if (dispose) disposers.push(dispose); });
+        void addHabitat(scene, toWorld(hx, hy), footprint, egressRef.current, () => disposed).then((dispose) => { if (dispose) disposers.push(dispose); });
         addLabel("Habitat", toWorld(hx, hy, footprint * 0.8), "habitat");
       }
       if (inBox(...CRATER_XY)) addLabel("S1094b · ice exposed by a 2021 impact", toWorld(CRATER_XY[0], CRATER_XY[1], 25), "crater");
@@ -611,7 +613,7 @@ function loadHabitat(): Promise<THREE.Group | null> {
  * Places the NASA habitat model on the ground at `at`, scaled to `footprint` meters; a plain
  * cylinder stands in if the model does not load. Returns how to remove what it added.
  */
-async function addHabitat(scene: THREE.Scene, at: THREE.Vector3, footprint: number, gone: () => boolean): Promise<(() => void) | null> {
+async function addHabitat(scene: THREE.Scene, at: THREE.Vector3, footprint: number, airlockDeg: number, gone: () => boolean): Promise<(() => void) | null> {
   const model = await loadHabitat();
   if (gone()) return null;
   if (!model) {
@@ -624,6 +626,9 @@ async function addHabitat(scene: THREE.Scene, at: THREE.Vector3, footprint: numb
   }
   const obj = model.clone(true);
   const size = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3());
+  // The model's airlock points along its +x; turn it to the compass bearing `airlockDeg`
+  // (world +x is grid east, world -z is grid north): +x maps to (sin, 0, -cos) of the bearing.
+  obj.rotation.y = Math.PI / 2 - (airlockDeg * Math.PI) / 180;
   obj.scale.multiplyScalar(footprint / Math.max(size.x, size.z, 1e-6));
   const box = new THREE.Box3().setFromObject(obj);
   const center = box.getCenter(new THREE.Vector3());
