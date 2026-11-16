@@ -1,9 +1,9 @@
 import { Footnote } from "@icewalk/ui/text";
 import { ChevronRight } from "lucide-react";
-import { HABITAT_XY } from "@/components/site/site-data";
+import { habitatOf } from "@/components/site/site-data";
 import type { FlightRule } from "@/lib/flight-rules";
 import { formatNumber, formatPercent } from "@/lib/format";
-import { decisionPointFor, missionConstraints, orderedStations, stationBlock, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
+import { catalogTools, decisionPointFor, missionConstraints, orderedStations, stationBlock, toolName, totalEquipmentMass, type Plan } from "@/lib/plan";
 import type { EvaWindow } from "@/lib/use-eva-window";
 import { EvaWindowCard } from "./eva-window-card";
 import { clock } from "./parts";
@@ -21,7 +21,11 @@ function Fact({ label, value, note }: { label: string; value: string; note?: str
  * The detail of one flight rule: what supports that number, from the plan, the planner's feasibility, the
  * STM and the EVA window. Each rule shows its own evidence; nothing repeats the tile's headline.
  */
-export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRule; plan: Plan; window: EvaWindow; onTimeline: () => void }) {
+export function RuleDetail({ rule, plan, window, onTimeline, tools }: {
+  rule: FlightRule; plan: Plan; window: EvaWindow; onTimeline: () => void;
+  /** Tools the crew may take (null: all): a switch per tool re-plans with that set. */
+  tools?: { carried: readonly string[] | null; onChange: (tools: string[]) => void; disabled?: boolean };
+}) {
   const f = plan.summary.feasibility;
   const stations = orderedStations(plan);
   const head = <h3 className="mission-detail-title">{rule.name} <span className="mission-detail-value">{rule.value} · {rule.limit.replace("*", "")}</span></h3>;
@@ -36,7 +40,7 @@ export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRul
         <Fact label="Walking" value={clock(sum("traverse"))} note={`${formatNumber(plan.summary.distance_km, 2)} km`} />
         <Fact label="At stations" value={clock(sum("station"))} note={`${stations.length} stations`} />
         <Fact label="Ingress" value={clock(sum("ingress"))} />
-        <Fact label="Reserve" value={c ? clock(c.eva_max_h * 60 * c.reserve) : dash} note={c ? `${Math.round(c.reserve * 100)} % of ${c.eva_max_h} h, kept free` : "STM unknown"} />
+        <Fact label="Reserve" value={c ? clock(c.eva_max_h * 60 * c.reserve) : dash} note={c ? `${Math.round(c.reserve * 100)} % of ${c.eva_max_h} h` : "STM unknown"} />
         <Fact label="Left in budget" value={budget ? clock(Math.max(0, budget - plan.summary.duration_min)) : dash} />
       </dl>
       <button type="button" className="mission-text-link" onClick={onTimeline}>Show on the timeline<ChevronRight aria-hidden /></button>
@@ -55,11 +59,12 @@ export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRul
   }
 
   if (rule.id === "distance") {
-    const far = Math.max(...stations.map((s) => Math.hypot(s.position[0] - HABITAT_XY[0], s.position[1] - HABITAT_XY[1])));
+    const [hx, hy] = habitatOf(plan);
+    const far = Math.max(...stations.map((s) => Math.hypot(s.position[0] - hx, s.position[1] - hy)));
     return <section className="mission-detail" aria-label="Distance detail">{head}
       <table className="mission-table">
         <thead><tr><th>#</th><th>Station</th><th>From habitat</th><th></th></tr></thead>
-        <tbody>{stations.map((s) => { const d = Math.hypot(s.position[0] - HABITAT_XY[0], s.position[1] - HABITAT_XY[1]); return <tr key={s.id}><td>{s.order}</td><td>{s.id}</td><td>{formatNumber(d / 1000, 2)} km</td><td>{d === far ? "farthest" : ""}</td></tr>; })}</tbody>
+        <tbody>{stations.map((s) => { const d = Math.hypot(s.position[0] - hx, s.position[1] - hy); return <tr key={s.id}><td>{s.order}</td><td>{s.id}</td><td>{formatNumber(d / 1000, 2)} km</td><td>{d === far ? "farthest" : ""}</td></tr>; })}</tbody>
       </table>
       <Footnote tone="secondary">{f ? `${MODE_LABEL[f.mobility.mode]}: ${f.mobility.reasons.join("; ").toLowerCase()}. ` : ""}Straight-line distance. The walkback limit is 30 min at 3.5 km/h if a suit or rover fails (NASA ICES-2026-127).</Footnote>
     </section>;
@@ -111,15 +116,45 @@ export function RuleDetail({ rule, plan, window, onTimeline }: { rule: FlightRul
     const perEv = f?.carry.per_crew_kg;
     return <section className="mission-detail" aria-label="Gear list">{head}
       <p className="mission-detail-lead">{formatNumber(mass.known_kg, 1)} kg known across {equipment.length} items, split evenly{crew != null ? ` between ${crew} EVs` : ""}{mass.unknown ? `; ${mass.unknown} item${mass.unknown === 1 ? " has" : "s have"} no mass yet` : ""}.</p>
-      <table className="mission-table mission-table-fixed">
+      {tools ? <ToolSwitches plan={plan} tools={tools} /> : <table className="mission-table mission-table-fixed">
         <colgroup><col /><col style={{ width: "4.5rem" }} /><col style={{ width: "6.5rem" }} /></colgroup>
         <thead><tr><th>Tool</th><th>Mass</th><th>Used</th></tr></thead>
         <tbody>{equipment.map((item) => <tr key={item.tool}><td className="mission-wrap">{item.count > 1 ? `${item.count} × ` : ""}{toolName(item.tool)}</td><td>{item.mass_kg == null ? "Unknown" : `${formatNumber(item.mass_kg, 1)} kg`}</td><td>{/while walking/i.test(item.justification ?? "") ? "While walking" : "At stations"}</td></tr>)}</tbody>
-      </table>
+      </table>}
       <Footnote tone="secondary">{heaviest && perEv != null && heaviest.mass_kg > perEv ? `The even split is an average: the ${toolName(heaviest.tool).toLowerCase()} alone weighs more, so one EV carries it. ` : ""}Allowance: 50 lbm of tools and samples per crewmember (NASA ICES-2026-127).</Footnote>
     </section>;
   }
 
   // EVA window
   return <section className="mission-detail" aria-label="Window detail">{head}<EvaWindowCard data={window} /></section>;
+}
+
+/**
+ * The catalog with a switch per tool: what the crew may take. The plan says what it uses of them; turning
+ * one off re-plans from the habitat without it (POST /plan with the list), so the radar-first choice and
+ * its cost in mass and time are visible.
+ */
+const SHORT_TOOL: Record<string, string> = { neutron_spectrometer: "Neutron spectrometer", gpr: "Ground radar", core_drill: "Core drill", camera_spectrometer: "Camera / spectrometer", sample_kit: "Sample containers" };
+
+function ToolSwitches({ plan, tools }: { plan: Plan; tools: { carried: readonly string[] | null; onChange: (tools: string[]) => void; disabled?: boolean } }) {
+  const all = catalogTools();
+  const allowed = new Set(tools.carried ?? all.map((t) => t.id));
+  const used = new Map((plan.equipment ?? []).map((e) => [e.tool, /while walking/i.test(e.justification ?? "") ? "While walking" : "At stations"]));
+  const toggle = (id: string, on: boolean) => {
+    const next = all.map((t) => t.id).filter((t) => (t === id ? on : allowed.has(t)));
+    if (next.length) tools.onChange(next);
+  };
+  return (
+    <ul className="mission-tools" aria-label="Tools the crew may take">
+      {all.map((t) => (
+        <li key={t.id}>
+          <label title={t.depth_m ? `Reaches ${t.depth_m} m` : undefined}>
+            <input type="checkbox" checked={allowed.has(t.id)} disabled={tools.disabled || (allowed.has(t.id) && allowed.size === 1)} onChange={(e) => toggle(t.id, e.target.checked)} />
+            <span>{SHORT_TOOL[t.id] ?? toolName(t.id)}{t.depth_m ? ` · ${t.depth_m} m` : ""}</span>
+          </label>
+          <small>{t.mass_kg == null ? "mass unknown" : `${formatNumber(t.mass_kg, 1)} kg`} · {allowed.has(t.id) ? used.get(t.id) ?? "Not used" : "Left behind"}</small>
+        </li>
+      ))}
+    </ul>
+  );
 }

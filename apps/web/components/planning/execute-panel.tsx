@@ -1,12 +1,11 @@
 import { Button } from "@icewalk/ui/button";
-import { ListRow, ListSection } from "@icewalk/ui/list";
 import { StatusBadge } from "@icewalk/ui/status-badge";
 import { Body, Footnote, Title3 } from "@icewalk/ui/text";
 import type { ReactNode } from "react";
-import { HABITAT_XY } from "@/components/site/site-data";
+import { habitatOf } from "@/components/site/site-data";
 import { formatNumber } from "@/lib/format";
 import { bearing, decisionPointFor, diffPlans, measurementSummary, measuringTool, nextStation, toolName, type Measurement, type Plan, type ReplanAssessment } from "@/lib/plan";
-import { RESULT_LABEL, RowLabel, Value } from "./parts";
+import { RESULT_LABEL } from "./parts";
 import { NextStep } from "./phases";
 
 /**
@@ -14,40 +13,42 @@ import { NextStep } from "./phases";
  * at the station (the IV is not there to measure); the IV sees them arrive, reviews the replan
  * and concurs or calls the EVA terminate.
  */
-export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, onAccept, onReturn, onDebrief, tracker }: {
+export function ExecutePanel({ plan, previous, measurements, pending, reviewing, returning, walkback, evOnline = false, ivCall = null, onAccept, onReturn, onDebrief, tracker }: {
   plan: Plan; previous: Plan | null; measurements: Measurement[]; pending: boolean; reviewing: boolean; returning: boolean;
+  /** An EV1 window is on the loop: the IV's call goes to the helmet to be copied. */
+  evOnline?: boolean;
+  /** The call the IV already sent on this replan, waiting for EV1 to copy. */
+  ivCall?: "continue" | "terminate" | null;
+  /** EVA TERMINATE: length and time of the fastest route back (GET /walkback); null if unknown. */
+  walkback?: { distanceM: number; minutes: number } | null;
   onAccept: () => void; onReturn: () => void; onDebrief: () => void;
   /** The EV's track map and progress, the same the EV sees in the helmet. */
   tracker?: ReactNode;
 }) {
   const last = measurements.at(-1);
-  if (reviewing && previous && last) return <>{tracker}<ReplanReview before={previous} after={plan} measurement={last} onAccept={onAccept} onReturn={onReturn} /></>;
+  if (reviewing && previous && last) return <>{tracker}<ReplanReview before={previous} after={plan} measurement={last} onAccept={onAccept} onReturn={onReturn} evOnline={evOnline} ivCall={ivCall} /></>;
   const station = returning ? undefined : nextStation(plan, measurements);
-  const origin = last?.position ?? HABITAT_XY;
+  const origin = last?.position ?? habitatOf(plan);
   const direction = station ? bearing(origin, station.position) : undefined;
   const decision = station ? decisionPointFor(plan, station.id) : undefined;
+  const nexts = decision ? [...new Set(decision.options.map((o) => o.next_station_ids[0] ?? ""))] : [];
+  const then = !decision ? undefined : nexts.length === 1
+    ? `${nexts[0] || "habitat"} for any result`
+    : decision.options.map((o) => `${RESULT_LABEL[o.if_result]} → ${o.next_station_ids[0] ?? "habitat"}`).join(" · ");
   return (
-    <section aria-label="EVA execution" className="mission-stack">
+    <section aria-label="EVA execution" className="mission-stack mission-iv">
       {tracker}
-      {returning ? <StatusBadge level="caution">EVA TERMINATE · walkback to the habitat · margin {formatNumber(plan.summary.min_walkback_margin_min ?? 0, 0)} min</StatusBadge> : null}
+      {returning ? <StatusBadge level="caution">EVA TERMINATE · {walkback ? `fastest walkback ${formatNumber(walkback.distanceM, 0)} m, ${formatNumber(walkback.minutes, 0)} min` : "walkback to the habitat"}</StatusBadge> : null}
       {station && direction ? (
-        <ListSection header={last ? "Next station" : "Current station"} headerId="ev-station">
-          <ListRow trailing={<Value>{String(station.order).padStart(2, "0")}</Value>}><RowLabel title={station.id} detail={station.tools.map(toolName).join(" · ")} /></ListRow>
-          <ListRow trailing={<Value>{Math.round(direction.distanceM)} m</Value>}><RowLabel title={direction.distanceM ? direction.label : "At the habitat"} detail="Straight-line distance from the last position" /></ListRow>
-          <ListRow trailing={<Value>{Math.round(station.p_ice * 100)}%</Value>}><RowLabel title="P(ice within reach)" detail={`${toolName(measuringTool(station))} · model estimate`} /></ListRow>
-        </ListSection>
-      ) : <Body>{returning ? "Follow the traverse back to the habitat." : "All planned stations measured. Return to the habitat."}</Body>}
-      {decision && station ? (
-        <ListSection header="After this station" footer="Options from the planner. The crew decides.">
-          {decision.options.map((o) => <ListRow key={o.rank}><RowLabel title={`${RESULT_LABEL[o.if_result]} → ${o.next_station_ids[0] ?? "habitat"}${o.rank === decision.default_option ? " (nominal)" : ""}`} detail={o.rationale} /></ListRow>)}
-        </ListSection>
-      ) : null}
+        <section className="mission-iv-station" aria-label={last ? "Next station" : "Current station"}>
+          <span className="mission-iv-key">{last ? "Next station" : "Current station"}</span>
+          <strong>{String(station.order).padStart(2, "0")} · {station.id}</strong>
+          <span>{direction.distanceM >= 1 ? `${Math.round(direction.distanceM)} m ${direction.label}` : "At the habitat"} · {toolName(measuringTool(station)).replace("Powered hand core drill", "Core drill")} · P(ice) {Math.round(station.p_ice * 100)}%</span>
+          {then ? <span><b>Then:</b> {then}</span> : null}
+        </section>
+      ) : <Body>{returning ? (walkback ? "The EV follows the amber route: the fastest way back over the terrain model." : "Walkback route unavailable: the EV heads for the habitat light.") : "All planned stations measured. Return to the habitat."}</Body>}
       {station ? <Footnote role="status">{pending ? "Planner replanning..." : `Waiting for EV1 to report at ${station.id}.`}</Footnote> : null}
-      {measurements.length ? (
-        <ListSection header="Reported by the crew" footer="Results are logged by the EV at the station.">
-          {[...measurements].reverse().map((m, i) => <ListRow key={`${m.station_id}-${i}`} trailing={<Value>{m.crew_member ?? "EV"}</Value>}><RowLabel title={`${m.station_id} · ${measurementSummary(m)}`} detail={toolName(m.tool)} /></ListRow>)}
-        </ListSection>
-      ) : null}
+      {last ? <Footnote tone="secondary" aria-label="Last report">Last report: {last.station_id} · {measurementSummary(last)} · {last.crew_member ?? "EV"} ({measurements.length} logged by the EV)</Footnote> : null}
       {!station ? <NextStep label="Debrief the EVA" onClick={onDebrief} /> : null}
     </section>
   );
@@ -56,8 +57,8 @@ export function ExecutePanel({ plan, previous, measurements, pending, reviewing,
 const TITLE: Record<ReplanAssessment["recommendation"], string> = { continue: "Continue the EVA", return_to_habitat: "EVA TERMINATE: begin the walkback" };
 
 /** What a measurement changed, and the planner's call, for the IV. Shown over the map with the old route dashed. */
-export function ReplanReview({ before, after, measurement, onAccept, onReturn }: {
-  before: Plan; after: Plan; measurement: Measurement; onAccept: () => void; onReturn: () => void;
+export function ReplanReview({ before, after, measurement, onAccept, onReturn, evOnline = false, ivCall = null }: {
+  before: Plan; after: Plan; measurement: Measurement; onAccept: () => void; onReturn: () => void; evOnline?: boolean; ivCall?: "continue" | "terminate" | null;
 }) {
   const diff = diffPlans(before, after);
   const r: ReplanAssessment = after.replan ?? {
@@ -73,22 +74,24 @@ export function ReplanReview({ before, after, measurement, onAccept, onReturn }:
   return (
     <section aria-label="Replan" className="mission-stack mission-replan">
       <Footnote tone="secondary">{measurementSummary(measurement)} at {measurement.station_id} · replanned</Footnote>
-      <Title3 as="h3">{TITLE[r.recommendation]}</Title3>
+      <Title3 as="h3" className="mission-replan-title">{TITLE[r.recommendation]}</Title3>
       {back ? <StatusBadge level="caution">Planner recommends terminating the EVA</StatusBadge> : null}
       {r.iv_decision ? <StatusBadge level="advisory">Large replan: IV decision</StatusBadge> : null}
       <ul className="mission-reasons">{r.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
-      <ListSection header="What changed" footer="Dashed on the map: the plan before this result.">
-        <ListRow trailing={<Value>{r.stations_kept.length}</Value>}><RowLabel title="Stations kept" detail={r.stations_kept.join(", ") || "None"} /></ListRow>
-        <ListRow trailing={<Value>{r.stations_added.length}</Value>}><RowLabel title="Stations added" detail={r.stations_added.join(", ") || "None"} /></ListRow>
-        <ListRow trailing={<Value>{r.stations_dropped.length}</Value>}><RowLabel title="Stations dropped" detail={r.stations_dropped.join(", ") || "None"} /></ListRow>
-        {r.margin_before_min != null && r.margin_after_min != null ? <ListRow trailing={<Value>{formatNumber(r.margin_before_min, 1)} → {formatNumber(r.margin_after_min, 1)} min</Value>}>Min walkback margin</ListRow> : null}
-      </ListSection>
-      {back ? (
+      <section className="mission-iv-station" aria-label="What changed">
+        <span className="mission-iv-key">What changed · dashed: the plan before</span>
+        <span><b>Kept</b> {r.stations_kept.length} · <b>Added</b> {r.stations_added.join(", ") || "none"} · <b>Dropped</b> {r.stations_dropped.join(", ") || "none"}</span>
+        {r.margin_before_min != null && r.margin_after_min != null ? <span><b>Min walkback margin</b> {formatNumber(r.margin_before_min, 1)} → {formatNumber(r.margin_after_min, 1)} min</span> : null}
+      </section>
+      {ivCall ? (
+        <><StatusBadge level={ivCall === "terminate" ? "caution" : "advisory"}>{ivCall === "terminate" ? "Called EVA TERMINATE" : "Called: continue"} · waiting for EV1 to copy</StatusBadge>
+          <Button variant="plain" onClick={ivCall === "terminate" ? onAccept : onReturn}>{ivCall === "terminate" ? "Change call: continue" : "Change call: EVA terminate"}</Button></>
+      ) : back ? (
         <><Button variant="prominent" onClick={onReturn}>Call EVA terminate</Button><Button variant="plain" onClick={onAccept}>Concur with continuing (crew call)</Button></>
       ) : (
         <><Button variant="prominent" onClick={onAccept}>Concur with replan</Button><Button variant="plain" onClick={onReturn}>Call EVA terminate instead</Button></>
       )}
-      <Footnote tone="secondary">The EV sees the same update in the helmet and copies it.</Footnote>
+      <Footnote tone="secondary">{evOnline ? "EV1 is on the loop and copies your call." : "EV1 not connected: your call takes effect here."}</Footnote>
     </section>
   );
 }

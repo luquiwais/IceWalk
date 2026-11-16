@@ -7,6 +7,8 @@ export type FlightRule = {
   id: string;
   name: string;
   value: string;
+  /** Unit of the value when the tile has no room for it (read in the label and the tooltip). */
+  unit?: string;
   /** The limit in plain words, e.g. "of 6:24 allowed". */
   limit: string;
   /** One sentence on what the rule protects and where the limit comes from. */
@@ -75,9 +77,9 @@ export function flightRules(plan: Plan, window?: EvaWindow): FlightRule[] {
 
   const e = f?.effort;
   rules.push({
-    id: "effort", name: "Metabolic rate", value: e ? formatNumber(e.average_btu_h, 0) : "—",
-    limit: e?.average_limit_btu_h != null ? `avg ≤ ${formatNumber(e.average_limit_btu_h, 0)} BTU/h` : "limit unknown",
-    explain: "Average metabolic rate over the EVA against the suit design average.",
+    id: "effort", name: "Metabolic rate", value: e ? formatNumber(e.average_btu_h, 0) : "—", unit: "BTU/h",
+    limit: e?.average_limit_btu_h != null ? `≤ ${formatNumber(e.average_limit_btu_h, 0)}` : "limit unknown",
+    explain: "Average metabolic rate over the EVA, in BTU/h, against the suit design average.",
     level: !e || e.average_limit_btu_h == null ? "unknown" : e.average_btu_h > e.average_limit_btu_h || (e.peak_limit_btu_h != null && e.peak_btu_h > e.peak_limit_btu_h) ? "caution" : "go",
   });
 

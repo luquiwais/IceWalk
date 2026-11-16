@@ -127,6 +127,10 @@ export type Plan = {
   mission_id: string;
   plan_id: string;
   replanned_from?: string | null;
+  /** Habitat the plan starts and ends at (grid meters); the operator can move it. Absent in older plans. */
+  habitat_xy?: [number, number];
+  /** Where the operator may move the habitat (grid meters); null or absent: it cannot be moved. */
+  habitat_area_m?: { xmin: number; xmax: number; ymin: number; ymax: number } | null;
   stations: Station[];
   route: { type: "FeatureCollection"; features: unknown[] };
   timeline: TimelineItem[];
@@ -247,6 +251,11 @@ export function diffPlans(before: Plan, after: Plan): PlanDiff {
 
 type CatalogTool = { id: string; name: string; mass_kg?: number | null; depth_m?: number; measures?: string[] };
 const TOOLS = new Map((toolsCatalog as CatalogTool[]).map((t) => [t.id, t]));
+
+/** Every tool in the certified catalog, in catalog order (the crew may take any of them). */
+export function catalogTools(): readonly { id: string; name: string; mass_kg?: number | null; depth_m?: number; mode?: string }[] {
+  return toolsCatalog as (CatalogTool & { mode?: string })[];
+}
 
 /** Tool name from the certified catalog (contracts/examples/tools.catalog.json). */
 export function toolName(id: string): string {

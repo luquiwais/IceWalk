@@ -51,6 +51,12 @@ export const SCENE_BOUNDS: Box = SITE_IMAGERY.wide.box;
  */
 export const HABITAT_XY: [number, number] = [300, -2200];
 
+/** The habitat a plan starts and ends at: the operator can move it; older plans used the default. */
+export function habitatOf(plan: { habitat_xy?: readonly number[] | null }): [number, number] {
+  const h = plan.habitat_xy;
+  return h && h.length === 2 ? [h[0], h[1]] : HABITAT_XY;
+}
+
 /**
  * Spatial range of the fitted GP prior: half spatial with a 100 m range, half
  * nugget (docs/plans/planner.md, "Interfaz del GP", make_prior(**FITTED)).
@@ -109,10 +115,10 @@ export function sceneStations(plan: Plan, previous?: Plan) {
 export function framePoints(plan: Plan, ids?: readonly string[]): [number, number][] {
   const chosen = ids?.length ? plan.stations.filter((s) => ids.includes(s.id)) : plan.stations;
   const points = chosen.map((s) => [s.position[0], s.position[1]] as [number, number]);
-  return ids?.length ? points : [...points, HABITAT_XY];
+  return ids?.length ? points : [...points, habitatOf(plan)];
 }
 
 /** Whether the habitat sits on a station, so its mark is offset with a leader line. */
-export function habitatOnStation(stations: readonly Station[]): boolean {
-  return stations.some((s) => Math.hypot(s.position[0] - HABITAT_XY[0], s.position[1] - HABITAT_XY[1]) < 1);
+export function habitatOnStation(stations: readonly Station[], habitat: readonly [number, number] = HABITAT_XY): boolean {
+  return stations.some((s) => Math.hypot(s.position[0] - habitat[0], s.position[1] - habitat[1]) < 1);
 }

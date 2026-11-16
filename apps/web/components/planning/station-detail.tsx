@@ -25,7 +25,7 @@ function soil(ti: number | null | undefined) {
  * numbers that matter at it, and what happens after measuring. Crew tasks, tools and the hypothesis fold
  * into one disclosure so the first view fits without scrolling.
  */
-export function StationDetail({ plan, station, source, onSelect }: { plan: Plan; station: Station; source: PlanSource; onSelect?: (id: string) => void }) {
+export function StationDetail({ plan, station, source, onSelect, onRemove }: { plan: Plan; station: Station; source: PlanSource; onSelect?: (id: string) => void; onRemove?: () => void }) {
   const threshold = plan.summary.ice_threshold_m;
   const point = decisionPointFor(plan, station.id);
   const block = stationBlock(plan, station.id);
@@ -43,21 +43,22 @@ export function StationDetail({ plan, station, source, onSelect }: { plan: Plan;
 
   return (
     <section className="mission-station" aria-label="Station composition">
-      {station.reason ? (
+      {station.reason || onRemove ? (
         <section className="mission-why" aria-label="Why this station">
-          <span><strong>Why here:</strong> {station.reason}</span>
+          {station.reason ? <span><strong>Why here:</strong> {station.reason}</span> : null}
+          {onRemove ? <span className="mission-why-edit">Drag it on the map to move it · <button type="button" className="mission-text-link" onClick={onRemove}>Remove</button></span> : null}
         </section>
       ) : null}
 
       <dl className="mission-facts" aria-label="Station numbers">
         <div><dt>{threshold ? `P(ice ≤ ${threshold} m)` : "P(ice)"}</dt><dd>{formatPercent(station.p_ice)}<small>{formatOdds(station.p_ice)}</small></dd></div>
-        <div><dt>Ice depth</dt><dd>{station.depth_median_m != null ? `${formatNumber(station.depth_median_m, 1)} m` : "Unknown"}{station.depth_shallow_m != null ? <small>shallow case {formatNumber(station.depth_shallow_m, 1)} m</small> : null}</dd></div>
+        <div><dt>Ice depth</dt><dd>{station.depth_median_m != null ? `${formatNumber(station.depth_median_m, 1)} m` : "Unknown"}{station.depth_shallow_m != null ? <small>shallow {formatNumber(station.depth_shallow_m, 1)} m</small> : null}</dd></div>
         <div><dt>At station</dt><dd>{block ? `${clock(block.t_start_min)}–${clock(block.t_end_min)}` : "—"}<small>{formatDuration(station.duration_min)}</small></dd></div>
         <div><dt>Walkback here</dt><dd>{block?.walkback_margin_min != null ? `${formatNumber(block.walkback_margin_min, 0)} min` : "—"}</dd></div>
-        <div><dt>Comms</dt><dd>{station.comm_los == null ? "Unknown" : station.comm_los ? "Habitat in view" : "Relay via EV2"}</dd></div>
+        <div><dt>Comms</dt><dd>{station.comm_los == null ? "Unknown" : station.comm_los ? "In view" : "Relay via EV2"}</dd></div>
         <div><dt>Soil</dt><dd>{ground.value}<small>{ground.note}</small></dd></div>
         <div><dt>Sun · temp.</dt><dd>{conditions ? <>{formatNumber(conditions.sun_elevation_deg, 0)}° · {formatNumber(conditions.temperature_k - 273.15, 0)} °C<small>{conditions.arrival_ltst} LTST</small></> : "—"}</dd></div>
-        <div><dt>Tools</dt><dd>{toolName(tool).replace("Powered hand core drill", "Core drill")}<small>GPR on the traverse</small></dd></div>
+        <div><dt>Tools</dt><dd>{toolName(tool).replace("Powered hand core drill", "Core drill")}<small>+ GPR walking</small></dd></div>
         {point ? <div><dt>Bingo</dt><dd>{clock(point.decide_by_min)}<small>latest departure</small></dd></div> : null}
       </dl>
 

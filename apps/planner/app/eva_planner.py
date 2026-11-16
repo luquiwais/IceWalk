@@ -74,6 +74,11 @@ def eva_config(path: Path = CONFIG) -> EvaConfig:
     )
 
 
+def _area_dict(a: tuple[float, float, float, float] | None) -> dict | None:
+    """El área donde se acepta mover el hábitat, para que la web la dibuje."""
+    return None if a is None else {"xmin": a[0], "xmax": a[1], "ymin": a[2], "ymax": a[3]}
+
+
 def _area(v: dict | None) -> tuple[float, float, float, float] | None:
     if not v:
         return None
@@ -330,6 +335,26 @@ class EvaPlanner:
             return None
         return Schedule(visits, t, t + back, end_min)
 
+    def schedule_all(self, stops: list[Stop]) -> Schedule | None:
+        """Como `schedule`, pero sin cortar por margen negativo (para evaluar un plan editado).
+
+        None solo si un tramo no tiene ruta transitable.
+        """
+        t, prev, visits = self.t0, self.start_cell, []
+        for s in stops:
+            walk = self.leg_min(prev, s.cell)
+            if not math.isfinite(walk):
+                return None
+            arrive = t + walk
+            end = arrive + self.duration(s)
+            margin = self.budget_min - (end + self.hab_min[s.cell] + self.cfg.ingress_min)
+            visits.append(Visit(s, t, arrive, end, float(margin)))
+            t, prev = end, s.cell
+        back = self.leg_min(prev, self.hab_cell)
+        if not math.isfinite(back):
+            return None
+        return Schedule(visits, t, t + back, t + back + self.cfg.ingress_min)
+
     def return_now(self) -> Schedule:
         """Volver directo desde donde está la tripulación, aunque ya no alcance el tiempo."""
         back = self.leg_min(self.start_cell, self.hab_cell)
@@ -575,16 +600,29 @@ def build(
     decisions: bool = True,
     config: EvaConfig | None = None,
     strategy: str = "learn",
+    catalog: dict[str, dict] | None = None,
 ) -> dict:
-    """Plan completo en el formato de `plan.schema.json`."""
+    """Plan completo en el formato de `plan.schema.json`.
+
+    `catalog`: las herramientas que la tripulación lleva (por defecto, todo el catálogo).
+    """
     planner = EvaPlanner(stm, tmap, model, start_xy=start_xy, elapsed_min=elapsed_min,
-                         completed=completed, config=config, strategy=strategy)
+                         completed=completed, config=config, strategy=strategy, catalog=catalog)
     stops = planner.plan_stops()
     sched = planner.schedule(stops)
     planned_model = planner.planned_model
     if sched is None:
         # Solo pasa si ya desde el punto de partida no alcanza el tiempo para volver.
         stops, sched, planned_model = [], planner.return_now(), model
+    return _assemble(stm, tmap, model, planner, stops, sched, planned_model,
+                     replanned_from=replanned_from, decisions=decisions, config=config)
+
+
+def _assemble(stm: dict, tmap: TraverseMap, model: IceModel, planner: EvaPlanner,
+              stops: list[Stop], sched: Schedule, planned_model: IceModel, *,
+              replanned_from: str | None, decisions: bool, config: EvaConfig | None,
+              ids_in: list[str | None] | None = None, edited: bool = False) -> dict:
+    """De estaciones y horario al plan del contrato: lo comparten `build` y `evaluate`."""
     catalog, cfg = planner.catalog, planner.cfg
     alerts = planner.alerts
     if model.craters == 0:
@@ -599,7 +637,8 @@ def build(
     stations = []
     for i, visit in enumerate(sched.visits):
         s = visit.stop
-        sid = station_id(s.x, s.y)
+        given = ids_in[i] if ids_in and i < len(ids_in) else None
+        sid = given or station_id(s.x, s.y)
         while sid in ids:
             sid += "b"
         ids.append(sid)
@@ -616,7 +655,7 @@ def build(
             "tools": s.tools,
             "tasks": _tasks(s.tools, catalog),
             "duration_min": planner.duration(s),
-            "hypothesis": reqs[rank].hypothesis,
+            "hypothesis": reqs[rank].hypothesis if rank in reqs else "",
             "p_ice": round(p_ice, 3),
             "uncertainty": round(float(ev["entropy"][i]), 3),
             "value": round(float(ev["value"][i]), 3),
@@ -631,7 +670,8 @@ def build(
         if unit is not None:
             stations[-1]["terrain_unit"] = unit
 
-    alerts.extend(_margin_alerts(planner, sched, ids))
+    margin_alerts = _edit_alerts if edited else _margin_alerts
+    alerts.extend(margin_alerts(planner, sched, ids))
 
     # Timeline y ruta.
     timeline: list[dict] = []
@@ -714,6 +754,7 @@ def build(
         "plan_id": f"plan-{uuid.uuid4().hex[:8]}",
         "replanned_from": replanned_from,
         "habitat_xy": [round(float(v), 1) for v in planner.habitat_xy],
+        "habitat_area_m": _area_dict(planner.cfg.habitat_area_m),
         "stations": stations,
         "route": {
             "type": "FeatureCollection",
@@ -749,6 +790,100 @@ def build(
         plan["decision_points"] = _decision_points(stm, tmap, model, planner, stations, sched,
                                                    config)
     return plan
+
+
+class EditError(ValueError):
+    """Una estación editada que no se puede evaluar (fuera de la grilla, sin suelo transitable)."""
+
+
+OPERATOR_REASON = "Placed by the operator."
+
+
+def evaluate(
+    stm: dict,
+    tmap: TraverseMap,
+    model: IceModel,
+    base: dict,
+    edits: list[dict],
+    *,
+    config: EvaConfig | None = None,
+    strategy: str = "learn",
+    catalog: dict[str, dict] | None = None,
+    decisions: bool = False,
+) -> dict:
+    """El plan con las estaciones que eligió el operador, en ese orden, sin reelegir ninguna.
+
+    Arma horario, margen de regreso, factibilidad (esfuerzo, señal, suelo), P(hielo) y avisos con
+    las mismas reglas que `build`. Cada estación es `{id?, position, tools?}`: con el `id` de una
+    estación de `base` hereda sus herramientas, objetivos y motivo (si no se movió); sin `id`, es
+    nueva y lleva las herramientas del objetivo de hielo. Nunca devuelve None: un plan que no es
+    viable sale igual, con margen negativo y un warning por estación, para que se vea por qué.
+    `decisions`: con puntos de decisión (un re-plan por resultado); sin ellos, para la vista previa.
+    """
+    planner = EvaPlanner(stm, tmap, model, config=config, strategy=strategy, catalog=catalog)
+    planner.reqs, alerts = requirements(stm, planner.catalog)
+    planner.alerts.extend(alerts)
+    survey = next((r for r in planner.reqs if r.is_survey),
+                  planner.reqs[0] if planner.reqs else None)
+    originals = {s["id"]: s for s in base.get("stations", [])}
+    g = tmap.grid
+    stops: list[Stop] = []
+    ids: list[str | None] = []
+    for k, e in enumerate(edits):
+        x, y = (float(v) for v in e["position"])
+        if not (math.isfinite(x) and math.isfinite(y)):
+            raise EditError(f"Station {k + 1}: position must be two finite numbers")
+        if not (g.xmin < x < g.xmax and g.ymin < y < g.ymax):
+            raise EditError(f"Station {k + 1} is outside the terrain model")
+        try:
+            cell = tmap.snap(x, y)
+        except Exception as err:  # NoRouteError: sin suelo transitable cerca
+            raise EditError(f"Station {k + 1}: no walkable ground within 50 m") from err
+        sx, sy = tmap.xy(cell)
+        old = originals.get(e.get("id") or "")
+        tools = list(e.get("tools") or (old["tools"] if old else (survey.tools if survey else [])))
+        unknown = [t for t in tools if t not in planner.catalog]
+        if unknown:
+            raise EditError(f"Station {k + 1}: tools not carried: {', '.join(unknown)}")
+        stop = Stop(float(sx), float(sy), cell, (old or {}).get("kind", "survey"))
+        for r in (old["objective_ranks"] if old else ([survey.rank] if survey else [])):
+            stop.add(int(r), [])
+        stop.tools = tools
+        moved = old is None or math.dist(old["position"], (sx, sy)) > 1.0
+        stop.reason = OPERATOR_REASON if moved else old.get("reason", "")
+        stops.append(stop)
+        # Una estación que no se movió conserva su id; si se movió, el id sale de su posición.
+        ids.append(None if moved else old["id"])
+    if not stops:
+        raise EditError("The plan needs at least one station")
+    sched = planner.schedule_all(stops)
+    if sched is None:
+        raise EditError("A station cannot be reached over the terrain model")
+    planned = model
+    for s in stops:
+        planned = planned.believe(s.x, s.y, planner.cfg.believer_error_m)
+    return _assemble(stm, tmap, model, planner, stops, sched, planned,
+                     replanned_from=base["plan_id"], decisions=decisions, config=config,
+                     ids_in=ids, edited=True)
+
+
+def _edit_alerts(planner: EvaPlanner, sched: Schedule, ids: list[str]) -> list[dict]:
+    """Avisos de un plan editado: warning donde no hay regreso a tiempo, caution bajo el umbral."""
+    out = []
+    for sid, v in zip(ids, sched.visits, strict=True):
+        if v.margin_min < 0:
+            out.append(_alert("warning", f"Not viable: walkback margin {v.margin_min:.0f} min at "
+                                         f"{sid}. The crew could not get back within the EVA."))
+    if out:
+        return out
+    margin = planner.min_margin(sched)
+    if sched.end_min > planner.budget_min + 1e-9:
+        return [_alert("warning", f"Not viable: the EVA ends at {sched.end_min:.0f} min, past the "
+                                  f"{planner.budget_min:.0f} min limit.")]
+    if margin < planner.caution_min:
+        return [_alert("caution", f"Walkback margin {margin:.1f} min, below the "
+                                  f"{planner.caution_min:g} min caution limit.")]
+    return []
 
 
 def _margin_alerts(planner: EvaPlanner, sched: Schedule, ids: list[str]) -> list[dict]:
@@ -810,7 +945,7 @@ def _decision_points(stm, tmap, model, planner, stations, sched: Schedule, confi
             sub_model = model.with_observations([obs] if obs else [])
             sub = EvaPlanner(stm, tmap, sub_model, start_xy=(x, y), elapsed_min=visit.end_min,
                              completed=stations[: i + 1], config=config,
-                             strategy=planner.strategy)
+                             strategy=planner.strategy, catalog=planner.catalog)
             stops = sub.plan_stops()
             ids = [station_id(s.x, s.y) for s in stops]
             extra = []

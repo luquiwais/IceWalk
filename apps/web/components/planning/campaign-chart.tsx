@@ -60,7 +60,7 @@ export function CampaignChart() {
         {series.slice().reverse().map((s) => <li key={s.strategy}><svg width="22" height="8" aria-hidden><line x1="0" x2="22" y1="4" y2="4" stroke={STYLE[s.strategy].color} strokeWidth="2" strokeDasharray={STYLE[s.strategy].dash} /></svg>{STYLE[s.strategy].label} · {s.evas_to_confirm} EVAs expected</li>)}
       </ul>
       <figcaption><Footnote tone="secondary">EVAs (x) against P(at least one station with ice within the 1 m drill), {data.stations_per_eva} stations per EVA. Monte Carlo on the S1094b prior; EVAs assumed independent; radar performance is an assumption.</Footnote></figcaption>
-      <table className="sr-only"><caption>P(ice confirmed) by EVA</caption><thead><tr><th>EVAs</th>{series.map((s) => <th key={s.strategy}>{STYLE[s.strategy].label}</th>)}</tr></thead><tbody>{data.evas.map((e, i) => <tr key={e}><td>{e}</td>{series.map((s) => <td key={s.strategy}>{Math.round(s.p_confirmed[i] * 100)}%</td>)}</tr>)}</tbody></table>
+      <div className="sr-only"><table><caption>P(ice confirmed) by EVA</caption><thead><tr><th>EVAs</th>{series.map((s) => <th key={s.strategy}>{STYLE[s.strategy].label}</th>)}</tr></thead><tbody>{data.evas.map((e, i) => <tr key={e}><td>{e}</td>{series.map((s) => <td key={s.strategy}>{Math.round(s.p_confirmed[i] * 100)}%</td>)}</tr>)}</tbody></table></div>
     </figure>
   );
 }

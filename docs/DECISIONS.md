@@ -253,3 +253,61 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 - Cycles (GPU Metal) para los planos de superficie; EEVEE para órbita, consola y corte del subsuelo, por tiempo de render.
 - La interfaz de los monitores se compone en Remotion con corner pin exportado por cuadro desde Blender, para que el texto quede legible y editable sin re-render.
 - El corte del subsuelo se rotula como estimación del modelo, no como imagen del subsuelo. Sin telemetría de traje inventada en el HUD: solo valores de IceWalk.
+
+## 2026-11-15 · Brief (Luqui)
+
+- El Brief es para ver la EVA antes de salir, desde arriba o desde los ojos del astronauta; no se camina ni se registra (eso es la fase EVA).
+- Pararse en una estación titula la ventana con la estación y muestra la flecha de volver, como una estación en Plan; volver (o Esc) lleva al sobrevuelo. La tira "Stand at" (HAB y números) reemplaza los botones de salto.
+- Cada estación del Brief abre con "Expect": la profundidad del hielo del modelo contra el alcance de la herramienta ("not within 1 m" es lo probable cuando el hielo está más abajo). Sin scroll en ninguna vista ni en la confirmación.
+- "Go for EVA" pide confirmación en la misma fila (Cancel / Confirm), sin sumar altura.
+- Al pararse en una estación se llega como la tripulación: 15 m antes, sobre el tramo desde la parada anterior, mirando la estación. En el hábitat, 45 m detrás y 14 m al costado, para verlo.
+- Saltos instantáneos entre puntos: Luqui prefirió el corte al viaje animado.
+- El camino en el 3D sigue siendo una línea sobre el piso, apenas más ancha (3.2 m de radio desde arriba, 9 cm a pie); nada de volumen ni borde.
+- Alrededor del DTM, el terreno se extiende solo como decorado (grilla que continúa el relieve del borde y se aplana, con THEMIS, HiRISE amplio y el orto del nivel); adentro el terreno no cambia. El zoom out del sobrevuelo tiene tope y el centro de la órbita no sale del sitio.
+- Hábitat del 3D: geometría del modelo HDU de NASA 3D Resources (parte 1) sin su textura (trae la insignia de NASA y la bandera, que Space Apps no permite), en blanco mate liso; el decodificador Draco viene de three (`public/draco`). Si no carga, queda el cilindro.
+- Cuff checklist: "EVA TERMINATE" en los hard stops, ramas que llevan a la misma estación en una sola línea, protección planetaria una vez en las notas.
+
+## 2026-11-15 · EVA: elección de rol (Luqui)
+
+- La fase EVA abre con "Join the EVA": dos tarjetas, EV1 · Field crew (casco: camina, mide, copia los re-planes) e IV · Habitat console (supervisa, revisa los re-planes, no registra). Reemplaza el selector "EV1 helmet / IV console".
+- Cada rol tiene link propio (`/?phase=eva&role=ev1`, `/?phase=eva&role=iv`) para abrirlo en su ventana; `phase` acepta site, plan, brief, eva y debrief. La URL se lee en el cliente dentro de un `<Suspense>` para que `/` siga siendo estática.
+- Cambiar de rol: "Switch role" en la barra del casco y en el panel del IV; vuelve a la elección.
+- Las dos ventanas todavía no se sincronizan: es el paso siguiente (`BroadcastChannel`, en `use-plan-session.ts`).
+
+## 2026-11-15 · EVA: vistas, minimapa y TERMINATE (Luqui)
+
+- El EV arranca 15 m afuera del hábitat, mirando a la primera estación (antes quedaba adentro del modelo).
+- Estaciones más visibles: aros como bandas sobre el piso, disco interior apenas iluminado y columna de luz más fuerte; aros y camino levantados unos centímetros para que el relieve no los tape.
+- El dock de estado (PET, margen, bingo, alertas, barra del día) también en el casco y en la cámara del EV; el HUD queda solo con la navegación (Next, Range, Steer, Tool) y con la letra de la web.
+- Minimapa: se rota primero y se encuadra después, así la ruta completa siempre entra; rumbo arriba para el EV, norte arriba para el IV; el progreso se busca solo en el tramo actual (la ruta vuelve al hábitat).
+- IV: sin scroll (minimapa y números lado a lado, estación en dos líneas, solo la última medición); "Site map / EV1 camera" muestra lo que ve el EV, solo para mirar.
+- EVA TERMINATE: `GET /walkback` en el planificador (TraverseMap.route, la misma búsqueda de los tramos del plan) da la ruta más rápida al hábitat desde donde está el EV; se dibuja en ámbar (caution) en el casco, la cámara, los minimapas y el mapa del IV, con distancia y tiempo. Sin planificador no se inventa la ruta: queda la luz del hábitat.
+- Quién decide seguir o terminar: el IV en el hábitat, según xEVA Con Ops (sec. 4.3.2 y 8.1, «EVA operations will be directed by an IV crewmember in-situ»). Se implementa junto con la sincronización de ventanas: el IV decide y el EV copia.
+
+## 2026-11-15 · Site sin scroll
+
+- Site: veredicto arriba ("GO with ground radar: 97 % within 10 m · median depth"), una fila por herramienta (alcance, P(hielo), veredicto) y el botón a la vista; las notas del modelo y las zonas de NASA se abren en el panel con "Back". "No-go" se lee "Out of reach" y va en gris: no es un warning (HIDH 10.6.19).
+
+## 2026-11-15 · EV1 e IV sincronizados
+
+- Las ventanas EV1 e IV se sincronizan con `BroadcastChannel` (`apps/web/lib/use-eva-link.ts`), sin servidor ni líder: cada cambio local sale como foto (plan, mediciones, re-plan en revisión, TERMINATE, walkback, aprobación) y las otras ventanas la adoptan; la que se abre tarde pide el estado. La pose del EV va aparte, a 10 Hz. Motivo: el video en pantalla dividida, sin agregar estado en la API.
+- Con un IV conectado, el casco muestra "Awaiting IV call", el IV da la orden ("Concur" o "Call EVA terminate", que puede cambiar) y el EV la copia ("Copy, continue" / "Copy, terminate"). Sin IV conectado, el EV decide como antes y la decisión del IV en la misma ventana se aplica directo. Motivo: xEVA Con Ops 4.3.2 y 8.1 sin trabar la demo de una sola ventana.
+
+## 2026-11-15 · Editar el plan y elegir herramientas
+
+- Edición en Plan antes de aprobar: arrastrar una estación en el mapa (como el hábitat) o quitarla desde su detalle. Mientras se arrastra, el fantasma muestra el veredicto del planificador para ese punto (`POST /evaluate` sin puntos de decisión, cada 90 ms); al soltar, el plan editado reemplaza al otro y el panel muestra "Viable / Viable, tight / Not viable", antes y después (duración y margen) y "Undo". Motivo: Luqui pidió respuesta instantánea de si la reubicación es viable; nada lo decide la web, todo sale del planificador.
+- Herramientas: interruptores en el detalle de "Carry per EV" (lo que puede llevar la tripulación); apagar una re-planifica desde el hábitat sin ella (`POST /plan` con `tools`). Motivo: que se vea el costo de dejar el radar, la decisión central del proyecto.
+- Sin "agregar estación" ni reordenar a mano por ahora: falta tiempo antes de la entrega; el endpoint ya los acepta (estación sin `id`, orden de la lista).
+
+## 2026-11-15 · Landing
+
+- Landing en `/` y el planificador en `/app`; los links viejos (`/?phase=…&role=…`) redirigen a `/app` con los mismos parámetros. Motivo: el enlace de "Final Project" en la ficha NASA abre la explicación y desde ahí la app; ningún link existente se rompe.
+- Contenido según el brief de landing (`research/submission-brief-2026-11-14.md`, sección 5) y con los números de `submission/project-page.md`: decisión en una línea, problema, las cinco fases con capturas reales, por qué creerle (y dónde no), datos → decisiones (Mars Trek y SIM 3292 marcados como recursos del desafío), límites, equipo y créditos. Las capturas salen de la app con los datos empaquetados del modelo real (349 cráteres), no de la API local sin catálogo. Sin logo ni marca de NASA; aviso de que NASA no avala el proyecto.
+- Eitan tenía asignada la landing (14/11) y no había rama ni PR suyos: queda para que la revise y la cambie.
+
+## 2026-11-15 · Enlace EV1-IV entre dispositivos
+
+- Las ventanas EV1 e IV también se sincronizan entre dispositivos, por un relevo en la API (`GET/POST /link/{room}`, long polling, en memoria, `app/eva_link.py`), además de `BroadcastChannel` en el mismo navegador. La sala es un código de enlace por navegador (`?link=K7Q2MX`, guardado en localStorage) que la pantalla "Join the EVA" muestra y copia. Motivo: Luqui probó EV1 e IV en dispositivos distintos y no se veían; el IV no decidía porque el casco no lo veía en línea.
+- Cada snapshot lleva un número de revisión y solo se adopta uno más nuevo (empate: el id mayor); una ventana que abre no manda su estado hasta cambiar algo. Motivo: al abrir el IV a mitad de la EVA, el EV adoptaba el plan nuevo y vacío del IV (los estados se intercambiaban).
+- Código de enlace por navegador y no una sala pública única: en el deploy, dos visitantes a la vez se pisarían la EVA.
+- `GET /walkback` acepta el hábitat (`hx`, `hy`) y responde aunque el servidor ya no tenga el plan (Render se durmió o reinició a mitad de la EVA), con la STM por defecto. Motivo: sin eso, EVA TERMINATE quedaba sin ruta de regreso.

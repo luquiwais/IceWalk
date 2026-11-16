@@ -6,6 +6,7 @@ import { useState } from "react";
 import { flightRules, worstLevel, type FlightRule } from "@/lib/flight-rules";
 import { formatDuration } from "@/lib/format";
 import { missionObjective, orderedStations, type Plan } from "@/lib/plan";
+import { editVerdict } from "@/lib/plan-edit";
 import { useEvaWindow } from "@/lib/use-eva-window";
 import type { PlanSource } from "@/lib/use-plan-session";
 import { FlightRuleTiles } from "./flight-rules";
@@ -28,7 +29,7 @@ function answer(plan: Plan, rules: readonly FlightRule[]) {
  * rules, value against limit; each rule opens what supports it. Stations live on the map and in the dock;
  * selecting one opens its composition (station-detail.tsx). After approval it folds to a card.
  */
-export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEdit, onStrategy, onNext, onSelect, onTimeline }: {
+export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEdit, onStrategy, onNext, onSelect, onTimeline, edit, tools }: {
   plan: Plan; planSource: PlanSource; pending?: boolean;
   approved: boolean; onApprove: () => void; onEdit: () => void;
   onStrategy?: (strategy: "learn" | "confirm") => void; onNext: () => void;
@@ -36,6 +37,10 @@ export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEd
   onSelect: (id: string) => void;
   /** Open the dock's timeline: where duration and the walkback margin are drawn. */
   onTimeline: () => void;
+  /** The plan was edited by hand: the one before it, to compare and undo. */
+  edit?: { base: Plan; onUndo: () => void };
+  /** Tools the crew carries, with a switch per tool (in the carry detail). */
+  tools?: { carried: readonly string[] | null; onChange: (tools: string[]) => void; disabled?: boolean };
 }) {
   const [detail, setDetail] = useState<string | null>(null);
   const evaWindow = useEvaWindow(plan.plan_id, planSource);
@@ -60,7 +65,19 @@ export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEd
     return (
       <section aria-label={open.name} className="mission-stack mission-plan-detail">
         <button type="button" className="mission-back-link" onClick={() => setDetail(null)}><ChevronLeft aria-hidden />Flight rules</button>
-        <RuleDetail rule={open} plan={plan} window={evaWindow} onTimeline={onTimeline} />
+        <RuleDetail rule={open} plan={plan} window={evaWindow} onTimeline={onTimeline} tools={tools} />
+      </section>
+    );
+  }
+
+  if (pending) {
+    return (
+      <section aria-label="EVA plan" aria-busy="true" className="mission-plan-eva mission-plan-loading">
+        <p className="mission-answer" role="status">Building a new plan…</p>
+        <div className="mission-skeleton mission-skeleton-goal" />
+        <ul className="mission-rules" aria-hidden>{rules.map((r) => <li key={r.id}><div className="mission-rule mission-skeleton-rule"><span className="mission-rule-name">{r.name}</span><span className="mission-skeleton mission-skeleton-line" /></div></li>)}</ul>
+        <div className="mission-skeleton mission-skeleton-strip" />
+        <div className="mission-plan-footer"><Button variant="prominent" disabled>Approve plan</Button></div>
       </section>
     );
   }
@@ -68,7 +85,7 @@ export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEd
   return (
     <section aria-label="EVA plan" className="mission-plan-eva">
       <p className="mission-answer"><strong>{verdict}</strong> · {text}</p>
-      {onStrategy ? (
+      {edit ? <EditStrip plan={plan} base={edit.base} onUndo={edit.onUndo} /> : onStrategy ? (
         <section className="mission-goal" aria-label="EVA goal">
           <div title={`${missionObjective(plan) ?? "EVA goal"}. ${strategy === "confirm" ? "Stations go where ice is likeliest, to confirm a usable resource." : "Stations go where a measurement teaches the most, one per terrain type first."}`}><SegmentedControl label="EVA goal" value={strategy} options={[{ value: "learn", label: "Reduce uncertainty" }, { value: "confirm", label: "Confirm ice" }]} onValueChange={(v) => onStrategy(v as "learn" | "confirm")} /></div>
           {pending ? <Footnote tone="secondary" role="status">Replanning...</Footnote> : null}
@@ -83,6 +100,21 @@ export function PlanPanel({ plan, planSource, pending, approved, onApprove, onEd
       <div className="mission-plan-footer">
         <Button variant="prominent" onClick={onApprove} disabled={pending}>Approve plan</Button>
       </div>
+    </section>
+  );
+}
+
+/** The plan as the operator left it against the planner's: verdict, the numbers that moved, and undo. */
+function EditStrip({ plan, base, onUndo }: { plan: Plan; base: Plan; onUndo: () => void }) {
+  const v = editVerdict(plan);
+  const hm = (min: number) => `${Math.floor(min / 60)}:${String(Math.round(min % 60)).padStart(2, "0")}`;
+  const a = base.summary, b = plan.summary;
+  const margin = (m?: number | null) => (m == null ? "—" : `${Math.round(m)}`);
+  return (
+    <section className="mission-edit" aria-label="Edited plan" data-level={v.level}>
+      <span className="mission-edit-verdict">{v.level === "warning" ? "Not viable" : v.level === "caution" ? "Viable, tight" : "Viable"}<small> · edited by hand</small></span>
+      <span className="mission-edit-numbers">EVA {hm(a.duration_min)} → {hm(b.duration_min)} · margin {margin(a.min_walkback_margin_min)} → {margin(b.min_walkback_margin_min)} min</span>
+      <button type="button" className="mission-text-link mission-edit-undo" onClick={onUndo}>Undo</button>
     </section>
   );
 }

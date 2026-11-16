@@ -930,3 +930,11 @@ la distancia queda fija, rotulada desde E03S24. El HUD pide revisar la partida
 en estación. Comprobación de DOM verde, eslint/TypeScript limpios y Global
 reexportado; cuadro450 del MP4 inspeccionado. El reloj4h16m permanece en la
 explicación específica del fin de estación, no se trata como telemetría en ruta.
+
+## 2026-11-15 · Brief: bordes del 3D, camino y saltos
+
+- **Faldón de anillos alrededor del DTM** (descartado): anillos desplazados desde el borde con esquinas en abanico. Se veía como un aro facetado con muchos polígonos. Reemplazado por una grilla pareja de 240 × 240 que sigue el relieve del borde y se aplana, sin celdas dentro de la caja del DTM (la primera versión pasaba por debajo del terreno y asomaba en los pozos con su textura más borrosa).
+- **Camino con borde oscuro y tubo grueso** (descartado): a pie parecía una ruta en 3D. Queda la línea original, apenas más ancha.
+- **Viaje animado entre estaciones** (descartado, 1.3 s con arco): Luqui prefirió el salto instantáneo.
+- **Modelo HDU de NASA**: el GLB exige `KHR_draco_mesh_compression` (sin el decodificador cae al cilindro) y su material con transmisión se ve negro sin mapa de entorno; con DRACOLoader y material mate se ve bien.
+- Medido: panel del Brief sin scroll a 1280 × 551 en el sobrevuelo, el hábitat, las 6 estaciones y la confirmación. A 1024 × 768 no se pudo medir (la ventana del navegador de prueba no se achicó).

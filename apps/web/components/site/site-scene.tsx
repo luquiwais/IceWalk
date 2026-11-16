@@ -53,6 +53,7 @@ import {
   CRATER_XY,
   framePoints,
   HABITAT_XY,
+  habitatOf,
   habitatOnStation,
   MODEL_RANGE_M,
   pIceLabel,
@@ -83,6 +84,8 @@ export type SiteSceneProps = {
   plan: Plan;
   /** The plan before a re-plan: its route is drawn dashed and the diff is labeled. */
   previousPlan?: Plan;
+  /** EVA TERMINATE only: the fastest route back to the habitat, in grid meters. */
+  walkback?: RouteLine;
   measurements?: readonly Measurement[];
   /**
    * Oblique presentation of the ortho, heading up, pivoting on `focus` (grid
@@ -99,6 +102,16 @@ export type SiteSceneProps = {
   raster?: SiteRaster;
   /** Where the EV is during the EVA (grid meters, heading clockwise from north), for the IV. */
   crew?: { x: number; y: number; headingDeg: number };
+  /** A new plan is being built: the old route and stations are hidden instead of shown frozen. */
+  stale?: boolean;
+  /** While set, the habitat marker can be dragged; on release it reports the new grid point. */
+  onMoveHabitat?: (xy: [number, number]) => void;
+  /** While set, station markers can be dragged; on release each reports its new grid point. */
+  onMoveStation?: (id: string, xy: [number, number]) => void;
+  /** Live while a station is dragged (grid point), null when the drag ends: the caller scores it. */
+  onDragStation?: (id: string, xy: [number, number] | null) => void;
+  /** The verdict on the point under the dragged station, shown under its ghost. */
+  dragNote?: { text: string; level: "go" | "caution" | "warning" | "pending" };
   className?: string;
   ref?: Ref<SiteSceneHandle>;
 };
@@ -183,12 +196,16 @@ type Live = {
   spacingM: number;
   lines: RouteLine[];
   previousLines: RouteLine[];
+  /** EVA TERMINATE: the fastest route back to the habitat. */
+  walkbackLine: RouteLine | null;
   points: Map<string, [number, number]>;
   selected: string | null;
   layers: SiteLayers;
   insets: Insets;
   habitatOffset: boolean;
   projection: SiteProjection | null;
+  /** The plan's habitat, in grid meters. */
+  habitat: [number, number];
 };
 
 export function SiteScene({
@@ -204,10 +221,55 @@ export function SiteScene({
   insets = NO_INSETS,
   raster,
   crew,
+  stale = false,
+  walkback,
+  onMoveHabitat,
+  onMoveStation,
+  onDragStation,
+  dragNote,
   className,
   ref,
 }: SiteSceneProps) {
   const helpId = useId();
+  const habitat = useMemo(() => habitatOf(plan), [plan]);
+  // Dragging the habitat: where the pointer started and is (screen px) and the grid point under it.
+  type HabDrag = { ox: number; oy: number; sx: number; sy: number; wx: number; wy: number; released?: string; area?: { x: number; y: number; w: number; h: number }; outside: boolean };
+  const [habDrag, setHabDrag] = useState<HabDrag | null>(null);
+  // The ghost shows while dragging, and after release until this plan is replaced (or the move is refused).
+  const ghost = habDrag && (!habDrag.released || (stale && habDrag.released === plan.plan_id)) ? habDrag : null;
+  const localPoint = (e: { clientX: number; clientY: number }): [number, number] => {
+    const rect = root.current?.getBoundingClientRect();
+    return rect ? [e.clientX - rect.left, e.clientY - rect.top] : [0, 0];
+  };
+  const dragTo = (sx: number, sy: number, ox: number, oy: number) => {
+    const cam = camera.current;
+    if (!cam) return;
+    const [wx, wy] = screenToWorld(cam, size.current, sx, sy);
+    const a = plan.habitat_area_m;
+    // The allowed area in screen px (the camera does not move while dragging), and whether the point is out.
+    let area: HabDrag["area"];
+    if (a) {
+      const [x0, y0] = worldToScreen(cam, size.current, a.xmin, a.ymax);
+      const [x1, y1] = worldToScreen(cam, size.current, a.xmax, a.ymin);
+      area = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+    }
+    const outside = !!a && (wx < a.xmin || wx > a.xmax || wy < a.ymin || wy > a.ymax);
+    setHabDrag({ ox, oy, sx, sy, wx: Math.round(wx), wy: Math.round(wy), area, outside });
+  };
+  // Dragging a station: the same ghost as the habitat, with the planner's verdict under it.
+  type StDrag = { id: string; order: number; ox: number; oy: number; sx: number; sy: number; wx: number; wy: number; moved: boolean; released?: string };
+  const [stDrag, setStDrag] = useState<StDrag | null>(null);
+  const suppressClick = useRef(false);
+  const stGhost = stDrag && stDrag.moved && (!stDrag.released || (stale && stDrag.released === plan.plan_id)) ? stDrag : null;
+  const stationDragTo = (d: Omit<StDrag, "sx" | "sy" | "wx" | "wy" | "moved">, sx: number, sy: number) => {
+    const cam = camera.current;
+    if (!cam) return;
+    const [wx, wy] = screenToWorld(cam, size.current, sx, sy);
+    const moved = Math.hypot(sx - d.ox, sy - d.oy) > 6;
+    const next = { ...d, sx, sy, wx: Math.round(wx), wy: Math.round(wy), moved };
+    setStDrag(next);
+    if (moved) onDragStation?.(d.id, [next.wx, next.wy]);
+  };
   const crewRef = useRef(crew);
   useEffect(() => { crewRef.current = crew; }, [crew]);
   const { stations, dropped } = useMemo(() => sceneStations(plan, previousPlan), [plan, previousPlan]);
@@ -220,7 +282,7 @@ export function SiteScene({
   const nextId = measurements.length ? nextStation(plan, measurements)?.id : undefined;
   const lines = useMemo(() => routeLines(plan), [plan]);
   const previousLines = useMemo(() => (previousPlan ? routeLines(previousPlan) : []), [previousPlan]);
-  const habitatOffset = habitatOnStation([...stations, ...dropped]);
+  const habitatOffset = habitatOnStation([...stations, ...dropped], habitat);
   const selected = stations.find((s) => s.id === selectedStationId) ?? null;
 
   const [ready, setReady] = useState(false);
@@ -234,6 +296,7 @@ export function SiteScene({
   const rings = useRef<(SVGCircleElement | null)[]>([]);
   const ringLabels = useRef<(SVGTextElement | null)[]>([]);
   const previousPath = useRef<SVGPathElement>(null);
+  const walkbackPath = useRef<SVGPathElement>(null);
   const haloPath = useRef<SVGPathElement>(null);
   const routePath = useRef<SVGPathElement>(null);
   const chevronPath = useRef<SVGPathElement>(null);
@@ -266,12 +329,14 @@ export function SiteScene({
     spacingM: STATION_CELL_M,
     lines,
     previousLines,
+    walkbackLine: null,
     points: new Map(),
     selected: selectedStationId,
     layers,
     insets,
     habitatOffset,
     projection: null,
+    habitat: HABITAT_XY,
   });
 
   const draw = useCallback(() => {
@@ -392,7 +457,7 @@ export function SiteScene({
     const free = freeArea(view, L.insets);
     const [imgLeft, imgTop] = toScreen(SCENE_BOUNDS.xmin, SCENE_BOUNDS.ymax);
     const [imgRight, imgBottom] = toScreen(SCENE_BOUNDS.xmax, SCENE_BOUNDS.ymin);
-    const [hx, hy] = toScreen(HABITAT_XY[0], HABITAT_XY[1]);
+    const [hx, hy] = toScreen(L.habitat[0], L.habitat[1]);
     rings.current.forEach((ring, i) => {
       const meters = (i + 1) * 100;
       const label = ringLabels.current[i];
@@ -438,6 +503,7 @@ export function SiteScene({
     haloPath.current?.setAttribute("d", d);
     routePath.current?.setAttribute("d", d);
     previousPath.current?.setAttribute("d", L.previousLines.length ? pathOf(L.previousLines) : "");
+    walkbackPath.current?.setAttribute("d", L.walkbackLine ? pathOf([L.walkbackLine]) : "");
 
     // Direction chevrons every ~80 px, clear of the markers.
     const markerPts = [...L.points.values()].map(([x, y]) => toScreen(x, y));
@@ -628,12 +694,14 @@ export function SiteScene({
       spacingM: minSpacing([...stations, ...dropped].map((s) => s.position)),
       lines,
       previousLines,
+      walkbackLine: walkback ?? null,
       points: new Map([...stations, ...dropped].map((s) => [s.id, [s.position[0], s.position[1]]])),
       selected: selectedStationId,
       layers,
       insets,
       habitatOffset,
       projection: projection ?? null,
+      habitat,
     };
     if (projection?.focus) pivotWorld.current = projection.focus;
     const flatCamera = () =>
@@ -668,7 +736,7 @@ export function SiteScene({
       );
     }
     schedule();
-  }, [plan, framing, lines, previousLines, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera, crew]);
+  }, [plan, framing, lines, previousLines, walkback, stations, dropped, selectedStationId, layers, insets, habitatOffset, projection, schedule, animateTo, setCamera, crew, habitat]);
 
   // Size, gestures and keys: native listeners, so wheel can be non-passive and
   // nothing goes through React per frame.
@@ -862,6 +930,8 @@ export function SiteScene({
       className={["site-scene", className].filter(Boolean).join(" ")}
       data-ready={ready ? "" : undefined}
       data-projected={projection ? "" : undefined}
+      data-stale={stale ? "" : undefined}
+      aria-busy={stale || undefined}
       tabIndex={projection ? -1 : 0}
       role="group"
       aria-roledescription="map"
@@ -982,6 +1052,7 @@ export function SiteScene({
         <path ref={previousPath} className="site-route-previous" />
         <path ref={haloPath} className="site-route-halo" />
         <path ref={routePath} className="site-route" />
+        <path ref={walkbackPath} className="site-route-walkback" />
         <path ref={chevronPath} className="site-chevrons" />
         <circle ref={rangeCircle} className="site-range" style={{ display: "none" }} />
         <text ref={rangeLabel} className="site-svg-label site-range-label" style={{ display: "none" }}>
@@ -1023,8 +1094,47 @@ export function SiteScene({
             </div>
           </div>
         ) : null}
+        {stGhost ? (
+          <div className="site-hab-drag" aria-hidden>
+            <svg width="100%" height="100%"><line x1={stGhost.ox} y1={stGhost.oy} x2={stGhost.sx} y2={stGhost.sy} /></svg>
+            <div className="site-station-ghost" data-level={stGhost.released ? "pending" : dragNote?.level ?? "pending"} style={{ left: stGhost.sx, top: stGhost.sy }}>{stGhost.order}
+              <span>{stGhost.released ? "Scoring the edited plan…" : dragNote?.text ?? `x ${signed(stGhost.wx)} m · y ${signed(stGhost.wy)} m`}</span>
+            </div>
+          </div>
+        ) : null}
+        {ghost ? (
+          <div className="site-hab-drag" aria-hidden>
+            <svg width="100%" height="100%">
+              {ghost.area && !ghost.released ? <rect className="site-hab-area" x={ghost.area.x} y={ghost.area.y} width={ghost.area.w} height={ghost.area.h} /> : null}
+              <line x1={ghost.ox} y1={ghost.oy} x2={ghost.sx} y2={ghost.sy} />
+            </svg>
+            <div className="site-hab-ghost" data-outside={ghost.outside ? "" : undefined} style={{ left: ghost.sx, top: ghost.sy }}>HAB<span>{ghost.outside ? "Outside the planning area" : `x ${signed(ghost.wx)} m · y ${signed(ghost.wy)} m`}</span></div>
+          </div>
+        ) : null}
         <div ref={anchorRef("@habitat")} className="site-anchor">
-          <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(HABITAT_XY[0])} m, y ${signed(HABITAT_XY[1])} m`} data-site-object>
+          <div className="site-hab" role="img" aria-label={`Habitat, x ${signed(habitat[0])} m, y ${signed(habitat[1])} m${onMoveHabitat ? ". Drag to move it and re-plan" : ""}`} data-site-object
+            data-draggable={onMoveHabitat ? "" : undefined} data-dragging={ghost ? "" : undefined}
+            title={onMoveHabitat ? "Drag to move the habitat and re-plan" : undefined}
+            onPointerDown={onMoveHabitat ? (e) => {
+              if (e.button !== 0) return;
+              e.stopPropagation();
+              try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* no capture: the drag still works over the marker */ }
+              const [sx, sy] = localPoint(e);
+              dragTo(sx, sy, sx, sy);
+            } : undefined}
+            onPointerMove={onMoveHabitat ? (e) => {
+              if (!habDrag || habDrag.released) return;
+              const [sx, sy] = localPoint(e);
+              dragTo(sx, sy, habDrag.ox, habDrag.oy);
+            } : undefined}
+            onPointerUp={onMoveHabitat ? () => {
+              const d = habDrag;
+              if (d && !d.released && Math.hypot(d.sx - d.ox, d.sy - d.oy) > 6) {
+                setHabDrag({ ...d, released: plan.plan_id });
+                onMoveHabitat([d.wx, d.wy]);
+              } else setHabDrag(null);
+            } : undefined}
+            onPointerCancel={onMoveHabitat ? () => setHabDrag(null) : undefined}>
             HAB
           </div>
         </div>
@@ -1043,7 +1153,32 @@ export function SiteScene({
                 data-selected={isSelected ? "" : undefined}
                 data-hovered={isHovered ? "" : undefined}
                 data-status={s.status}
-                onClick={() => onSelectStation(isSelected ? null : s.id)}
+                data-draggable={onMoveStation ? "" : undefined}
+                data-dragging={stGhost?.id === s.id ? "" : undefined}
+                title={onMoveStation ? "Drag to move the station; the planner scores the change" : undefined}
+                onPointerDown={onMoveStation ? (e) => {
+                  if (e.button !== 0) return;
+                  e.stopPropagation();
+                  try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* drag still works over the marker */ }
+                  const [sx, sy] = localPoint(e);
+                  stationDragTo({ id: s.id, order: s.order, ox: sx, oy: sy }, sx, sy);
+                } : undefined}
+                onPointerMove={onMoveStation ? (e) => {
+                  if (!stDrag || stDrag.released || stDrag.id !== s.id) return;
+                  const [sx, sy] = localPoint(e);
+                  stationDragTo(stDrag, sx, sy);
+                } : undefined}
+                onPointerUp={onMoveStation ? () => {
+                  const d = stDrag;
+                  if (d && !d.released && d.moved) {
+                    suppressClick.current = true;
+                    setStDrag({ ...d, released: plan.plan_id });
+                    onDragStation?.(d.id, null);
+                    onMoveStation(d.id, [d.wx, d.wy]);
+                  } else setStDrag(null);
+                } : undefined}
+                onPointerCancel={onMoveStation ? () => { setStDrag(null); onDragStation?.(s.id, null); } : undefined}
+                onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } onSelectStation(isSelected ? null : s.id); }}
                 onPointerEnter={() => onHoverStation(s.id)}
                 onPointerLeave={() => onHoverStation(null)}
                 onFocus={() => reveal(s.id)}

@@ -194,3 +194,39 @@
 /* Same tracker inside the IV console panel. */
 .mission-tracker .eva-minimap { position: static; width: 100%; max-width: 320px; }
 .eva-minimap-north { fill: #f06a5a; }
+
+/* EVA views (15/11): web type instead of monospace, navigation-only HUD, one-line credits, the status
+   dock along the bottom and the track map above its right end. */
+.site3d-stage[data-mode="helmet"] .site3d-hud, .site3d-stage[data-mode="helmet"] .site3d-update {
+  font: 500 13px/1.45 var(--font-sans, system-ui, sans-serif); text-shadow: none; }
+.site3d-stage[data-mode="helmet"] .site3d-hud { min-width: 220px; top: calc(50% - 40px); }
+.site3d-stage[data-mode="helmet"] .site3d-hud-key { font-size: 11px; font-weight: 600; }
+.site3d-stage[data-mode="helmet"] .site3d-hud-value { font-weight: 600; }
+.eva-topbar { font: 600 14px/1 var(--font-sans, system-ui, sans-serif); letter-spacing: 0; }
+.eva-topbar > span { display: inline-flex; align-items: center; gap: .5rem; }
+.site3d-credit[data-compact] { left: auto; right: var(--mission-edge, 1rem); bottom: auto; top: 56px; max-width: min(520px, 50%);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10px; opacity: .7; }
+/* Above the dock as measured (--mission-timeline-y: its top from the bottom), so an open timeline never
+   covers the arrival question or the track map. */
+.site3d-stage[data-mode="helmet"] .eva-minimap, .site3d-stage[data-mode="watch"] .eva-minimap { bottom: calc(var(--mission-timeline-y, 80px) + 8px); }
+.site3d-stage[data-mode="helmet"] .eva-arrival { bottom: calc(var(--mission-timeline-y, 80px) + 12px); z-index: 5; }
+.eva-minimap { font-family: var(--font-sans, system-ui, sans-serif); }
+.eva-minimap-label { font-family: var(--font-sans, system-ui, sans-serif); font-size: 10px; }
+.eva-progress dl { font-family: var(--font-sans, system-ui, sans-serif); }
+.eva-minimap-previous { fill: none; stroke: rgb(255 255 255 / .35); stroke-width: 1.5; stroke-dasharray: 4 4; }
+/* IV window: map and numbers side by side, so the whole track map fits without scrolling. */
+.eva-minimap[data-layout="panel"] { display: grid; grid-template-columns: 7.5rem 1fr; gap: .75rem; align-items: center; }
+.eva-minimap[data-layout="panel"] .eva-progress { margin: 0; }
+.eva-minimap[data-layout="panel"] .eva-progress dl { grid-template-columns: 1fr; gap: 6px; }
+.eva-minimap[data-layout="panel"] .eva-progress dl > div { display: flex; justify-content: space-between; gap: .5rem; }
+.mission-tracker .eva-minimap[data-layout="panel"] { max-width: none; }
+.site3d-credit[data-compact="watch"] { top: auto; bottom: calc(var(--mission-dock-h, 64px) + 24px); left: var(--mission-edge, 1rem); right: auto; }
+.site3d-watch-chip { display: inline-flex; align-items: center; gap: .5rem; padding: 0 .5rem; font: 600 13px/1 var(--font-sans, system-ui, sans-serif); color: #e6f4ff; white-space: nowrap; }
+.eva-minimap-route[data-faded] { stroke: rgb(255 255 255 / .18); }
+.eva-minimap-walkback { fill: none; stroke: var(--color-caution, #f0bf4f); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+
+/* Helmet, plan update with an IV on the loop: the EV waits for the IV's call, then copies it. */
+.site3d-await { display: inline-flex; align-items: center; gap: .5rem; font-size: .8125rem; font-weight: 600; color: var(--color-label-secondary, rgb(255 255 255 / .7)); }
+.site3d-await::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: currentColor; animation: site3d-await 1.2s ease-in-out infinite; }
+@keyframes site3d-await { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .site3d-await::before { animation: none; } }
