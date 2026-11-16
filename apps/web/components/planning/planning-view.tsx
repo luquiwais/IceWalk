@@ -18,7 +18,7 @@ import { polylinePath, walkPath, type PathPoint } from "@/lib/site3d";
 import { Body } from "@icewalk/ui/text";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
 import { useIceMap } from "@/lib/use-ice-map";
-import { useEvaLink, type IvCall } from "@/lib/use-eva-link";
+import { useEvaLink, type DecisionEntry, type IvCall } from "@/lib/use-eva-link";
 import { crewLink } from "@/lib/crew-link";
 import { ICE_RADIUS_M, ICE_VIEW_MODES, renderIceView, type IceViewMode } from "@/lib/ice-view";
 import { stationWithNeighbors, demoConfirm, demoPlan, demoReplan, measuringTool, nextStation, stationBlock, stationById, type Measurement, type Plan, type Station } from "@/lib/plan";
@@ -91,6 +91,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
   const [briefPose, setBriefPose] = useState<FreePose>(() => startPose(demoPlan));
   // The IV's call on the replan under review; the EV copies it (xEVA Con Ops, sec. 4.3.2 and 8.1).
   const [ivCall, setIvCall] = useState<IvCall>(null);
+  // Decision log of the EVA: the planner's recommendation after each result and the crew's call.
+  const [decisions, setDecisions] = useState<DecisionEntry[]>([]);
   const [announcement, setAnnouncement] = useState("");
   const [insets, setInsets] = useState<Insets>({ top: 0, right: 0, bottom: 0, left: 0 });
   const rootRef = useRef<HTMLElement>(null);
@@ -137,10 +139,11 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
   // review, TERMINATE, walkback and the EV's pose.
   const link = useEvaLink({
     seat: phase === "execute" ? evaView : null,
-    snapshot: { plan, previous: session.previous, measurements: session.measurements, status: session.status, source: session.source, reviewing, returning, walkback, ivCall, approvedId },
+    snapshot: { plan, previous: session.previous, measurements: session.measurements, status: session.status, source: session.source, reviewing, returning, walkback, ivCall, approvedId, decisions },
     onSnapshot: (s) => {
       session.adopt(s);
       setReviewing(s.reviewing); setReturning(s.returning); setIvCall(s.ivCall); setApprovedId(s.approvedId);
+      if (s.decisions) setDecisions(s.decisions);
       setWalkback(s.walkback as typeof walkback);
     },
     pose: evPose,
@@ -254,7 +257,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
     if (target === "debrief") requestAnimationFrame(() => sceneRef.current?.fit());
   }
   const arrive = useCallback(() => { setFlying(false); setPhase("plan"); }, []);
-  function reset() { session.reset(); setStationId(null); setReviewing(false); setIvCall(null); setReturning(false); setWalkback(null); setEvPose(startPose(demoPlan)); setAnnouncement("Session reset to the nominal plan."); }
+  function reset() { session.reset(); setStationId(null); setReviewing(false); setIvCall(null); setDecisions([]); setReturning(false); setWalkback(null); setEvPose(startPose(demoPlan)); setAnnouncement("Session reset to the nominal plan."); }
   const accept = () => { setReviewing(false); setIvCall(null); setAnnouncement("Replan accepted."); };
   const terminate = () => {
     setReviewing(false); setIvCall(null); setReturning(true); setWalkback(null);
@@ -282,8 +285,23 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
     setAnnouncement(`${result === "no_ice" ? "No ice" : result === "ice" ? "Ice" : "Inconclusive"} recorded at ${target.id}. ${outcome === "replanned" ? "Replanned traverse ready for review." : "Nominal traverse retained."}`);
   }
 
+  /** Logs the call on the replan under review: what the planner recommended and what was decided, by whom. */
+  const recordDecision = (call: Exclude<IvCall, null>, by: DecisionEntry["by"]) => {
+    const last = session.measurements.at(-1);
+    if (!last) return;
+    const r = plan.replan;
+    setDecisions((d) => [...d, {
+      stationId: last.station_id, result: last.result, recommended: r?.recommendation ?? null, call, by,
+      changedFraction: r?.changed_fraction ?? null, marginBefore: r?.margin_before_min ?? null, marginAfter: r?.margin_after_min ?? null, petMin: elapsedMin,
+    }]);
+  };
+  /** The EV in the helmet: copying the IV's call is not a new decision; with no call, the EV decides alone. */
+  const evAccept = () => { if (!ivCall) recordDecision("continue", "EV"); accept(); };
+  const evTerminate = () => { if (!ivCall) recordDecision("terminate", "EV"); terminate(); };
+
   /** The IV decides: with EV1 on the loop the call goes to the helmet to be copied; alone, it takes effect here. */
   const ivDecide = (call: Exclude<IvCall, null>) => {
+    recordDecision(call, "IV");
     if (!link.evOnline) { if (call === "continue") accept(); else terminate(); return; }
     setIvCall(call);
     setAnnouncement(call === "continue" ? "IV call sent: continue. Waiting for EV1 to copy." : "IV call sent: EVA TERMINATE. Waiting for EV1 to copy.");
@@ -293,7 +311,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
     : phase === "rehearse" ? <Site3DStage mode="brief" plan={plan} measurements={session.measurements} source={session.source} jump={jump} pose={briefPose} onPose={setBriefPose} />
       : ivCamera ? <Site3DStage mode="watch" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} returning={returning} walkback={walkback} />
       : helmet ? <Site3DStage mode="helmet" plan={plan} measurements={session.measurements} source={session.source} pose={evPose} onPose={setEvPose} previousPlan={session.previous ?? undefined} walkback={walkback}
-        reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} ivOnline={link.ivOnline} ivCall={ivCall} onLog={logMeasurement} onAccept={accept} onReturn={terminate} onLeave={() => setEvaView(null)}
+        reviewing={reviewing} returning={returning} pending={pending} elapsedMin={elapsedMin} ivOnline={link.ivOnline} ivCall={ivCall} onLog={logMeasurement} onAccept={evAccept} onReturn={evTerminate} onLeave={() => setEvaView(null)}
         onComplete={() => { setReturning(false); setEvaView("iv"); goTo("debrief"); setAnnouncement("EVA complete: back at the habitat."); }} />
       : <SiteScene ref={sceneRef} plan={plan} previousPlan={reviewing || phase === "debrief" ? session.previous ?? undefined : undefined} measurements={session.measurements} selectedStationId={sceneStationId} hoveredStationId={hoveredId} onSelectStation={selectStation} onHoverStation={hoverStation} layers={layers} insets={insets} raster={raster} crew={phase === "execute" ? evPose : undefined} walkback={phase === "execute" && returning ? walkback?.line : undefined} onMoveHabitat={canMoveHabitat ? pickHabitat : undefined} onMoveStation={canEditStations ? moveStation : undefined} onDragStation={canEditStations ? dragStation : undefined} dragNote={dragNote} stale={replanning} />;
 
@@ -318,7 +336,7 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
               evOnline={link.evOnline} ivCall={ivCall} onAccept={() => ivDecide("continue")} onReturn={() => ivDecide("terminate")} onDebrief={() => goTo("debrief")}
               tracker={<div className="mission-tracker"><EvaMinimap plan={plan} path={evaPath} measurements={session.measurements} pose={evPose} nextId={returning ? undefined : next?.id} elapsedMin={elapsedMin} marginMin={plan.summary.min_walkback_margin_min} orientation="north" layout="panel" previousPath={previousPath} walkback={returning ? walkback?.path : undefined} /></div>} />}
         </section>
-          : <DebriefPanel plan={plan} previousPlan={session.previous ?? undefined} measurements={session.measurements} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
+          : <DebriefPanel plan={plan} previousPlan={session.previous ?? undefined} measurements={session.measurements} decisions={decisions} terminated={returning || decisions.some((d) => d.call === "terminate")} onNext={() => { setReturning(false); goTo("plan"); }} onReset={reset} />;
 
   return <main ref={rootRef} className="mission-app" data-phase={phase} data-focused={mapFocus} data-helmet={helmet} data-choosing={choosing} data-panel={compactPanel ? "compact" : "full"} onKeyDown={(e) => { if (e.key === "Escape") { if (mapFocus) setMapFocus(false); else if (stationId) backToPlan(); else if (briefPoint) backToFlyOver(); } }}>
     <h1 className="sr-only">IceWalk: EVA planning</h1><div role="status" aria-label="Session update" className="sr-only">{announcement}</div>

@@ -4,12 +4,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { formatPercent } from "@/lib/format";
 import { measurementSummary, toolName, toolReachM, type Measurement, type Plan, type Station } from "@/lib/plan";
+import type { DecisionEntry } from "@/lib/use-eva-link";
 import { CampaignChart } from "./campaign-chart";
 import { Evidence, GroundTruth, Limits } from "./evidence";
 import { NextStep } from "./phases";
 
-type View = "summary" | "campaign" | "trust" | "truth" | "limits";
-const VIEW_LABEL: Record<Exclude<View, "summary">, string> = { campaign: "Beyond one EVA", trust: "Why trust the numbers", truth: "Where a mission dug", limits: "Limits" };
+type View = "summary" | "decisions" | "campaign" | "trust" | "truth" | "limits";
+const VIEW_LABEL: Record<Exclude<View, "summary">, string> = { decisions: "Decision log", campaign: "Beyond one EVA", trust: "Why trust the numbers", truth: "Where a mission dug", limits: "Limits" };
 
 /** What a result means for the next EVA, in the model's own terms (a "no" is ice deeper than the reach). */
 function meaning(m: Measurement): string {
@@ -23,13 +24,13 @@ function meaning(m: Measurement): string {
  * Phase 5: what the EVA measured and what that changed, all in view; the campaign, the evidence and
  * the limits open in place with a way back (the same pattern as Site), so nothing scrolls.
  */
-export function DebriefPanel({ plan, previousPlan, measurements, onNext, onReset }: { plan: Plan; previousPlan?: Plan; measurements: Measurement[]; onNext: () => void; onReset: () => void }) {
+export function DebriefPanel({ plan, previousPlan, measurements, decisions = [], terminated = false, onNext, onReset }: { plan: Plan; previousPlan?: Plan; measurements: Measurement[]; decisions?: DecisionEntry[]; terminated?: boolean; onNext: () => void; onReset: () => void }) {
   const [view, setView] = useState<View>("summary");
   if (view !== "summary") {
     return (
       <section aria-label={VIEW_LABEL[view]} className="mission-stack mission-site mission-debrief">
         <button type="button" className="mission-text-link mission-site-back" onClick={() => setView("summary")}><ChevronLeft aria-hidden />Back to the debrief</button>
-        {view === "campaign" ? <CampaignChart /> : view === "trust" ? <Evidence /> : view === "truth" ? <GroundTruth /> : <Limits />}
+        {view === "decisions" ? <DecisionLog plan={plan} previousPlan={previousPlan} measurements={measurements} decisions={decisions} terminated={terminated} /> : view === "campaign" ? <CampaignChart /> : view === "trust" ? <Evidence /> : view === "truth" ? <GroundTruth /> : <Limits />}
       </section>
     );
   }
@@ -77,6 +78,41 @@ export function DebriefPanel({ plan, previousPlan, measurements, onNext, onReset
       </nav>
       <NextStep label="Plan the next EVA" onClick={onNext} note="The next plan starts from what this EVA measured." />
       <Button size="small" variant="plain" onClick={onReset}>Reset session</Button>
+    </section>
+  );
+}
+
+const RESULT_WORD: Record<DecisionEntry["result"], string> = { ice: "ice", no_ice: "not within reach", inconclusive: "inconclusive" };
+const fmtPet = (m: number) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
+
+/**
+ * As run against as planned, and every call the crew made on a replan: what the planner recommended
+ * and what the IV (or the EV alone) decided. A call against the planner is said in words.
+ */
+function DecisionLog({ plan, previousPlan, measurements, decisions, terminated }: { plan: Plan; previousPlan?: Plan; measurements: Measurement[]; decisions: DecisionEntry[]; terminated: boolean }) {
+  const measured = new Set(measurements.map((m) => m.station_id)).size;
+  // The first plan of the EVA is the one the crew approved; replans keep its count as the yardstick.
+  const planned = Math.max(previousPlan?.stations.length ?? 0, plan.stations.length + measured);
+  return (
+    <section className="mission-stack" aria-label="Decisions">
+      <p className="mission-answer"><strong>As run</strong> · {measured} of {planned} planned stations measured · {terminated ? "EVA terminated early" : measured >= planned ? "plan completed" : "EVA in progress"}</p>
+      {decisions.length ? (
+        <ol className="mission-debrief-log mission-decision-log" aria-label="Decision log">
+          {decisions.slice(-4).map((d, i) => {
+            const planner = d.recommended === "return_to_habitat" ? "EVA TERMINATE" : d.recommended === "continue" ? "continue" : "no recommendation";
+            const call = d.call === "terminate" ? "EVA TERMINATE" : "continue";
+            const against = d.recommended && ((d.recommended === "return_to_habitat") !== (d.call === "terminate"));
+            return (
+              <li key={`${d.stationId}-${i}`} data-result={d.result}>
+                <div className="mission-debrief-row"><strong>{d.stationId}</strong><span>{RESULT_WORD[d.result]}</span><small>PET {fmtPet(d.petMin)}</small></div>
+                <div className="mission-debrief-note">Planner: {planner} · {d.by}: <b>{call}</b>{against ? " (against the planner)" : ""}{d.changedFraction != null ? ` · ${formatPercent(d.changedFraction)} of the plan changed` : ""}{d.marginBefore != null && d.marginAfter != null ? ` · margin ${Math.round(d.marginBefore)} → ${Math.round(d.marginAfter)} min` : ""}</div>
+              </li>
+            );
+          })}
+        </ol>
+      ) : <Footnote tone="secondary">No replans to decide yet: each result the EV logs can change the plan, and the IV makes the call.</Footnote>}
+      {decisions.length > 4 ? <Footnote tone="secondary">Showing the last 4 of {decisions.length} decisions.</Footnote> : null}
+      {decisions.length < 3 ? <Footnote tone="secondary">The IV directs the EVA in situ (NASA xEVA Con Ops, sec. 4.3.2 and 8.1); the planner recommends.</Footnote> : null}
     </section>
   );
 }

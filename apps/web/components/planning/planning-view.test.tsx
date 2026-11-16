@@ -251,6 +251,13 @@ describe("Mission flow", () => {
     await userEvent.click(screen.getByRole("button", { name: "Beyond one EVA" }));
     expect(screen.getByRole("img", { name: /P\(ice confirmed\) after 1 to 6 EVAs/ })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Back to the debrief" }));
+    // The decision log: the EV decided alone (no IV on the loop), as run against as planned.
+    await userEvent.click(screen.getByRole("button", { name: "Decision log" }));
+    const log = screen.getByRole("list", { name: "Decision log" });
+    expect(log).toHaveTextContent(first.id);
+    expect(log).toHaveTextContent("EV: EVA TERMINATE");
+    expect(screen.getByText(/EVA terminated early/, visible)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Back to the debrief" }));
     const layers = screen.getByRole("region", { name: "Map layers" });
     expect(within(layers).getByRole("button", { name: "What measuring changed" })).toHaveAttribute("aria-pressed", "true");
     await userEvent.click(screen.getByRole("button", { name: "Reset session" }));
