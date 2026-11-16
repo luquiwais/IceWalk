@@ -115,8 +115,10 @@ export function getPlan(planId: string, options?: ApiOptions): Promise<Plan> {
 /** GET /walkback: the fastest route from a point back to the plan's habitat over the DTM (EVA TERMINATE). */
 export type Walkback = { from: [number, number]; to: [number, number]; xy: [number, number][]; distance_m: number; minutes: number; max_slope_deg: number };
 
-export function getWalkback(planId: string, x: number, y: number, options?: ApiOptions): Promise<Walkback> {
+/** EVA TERMINATE route from (x, y). With the habitat, the planner answers even if it no longer has the plan. */
+export function getWalkback(planId: string, x: number, y: number, habitat?: readonly [number, number], options?: ApiOptions): Promise<Walkback> {
   const q = new URLSearchParams({ plan_id: planId, x: x.toFixed(1), y: y.toFixed(1) });
+  if (habitat) { q.set("hx", habitat[0].toFixed(1)); q.set("hy", habitat[1].toFixed(1)); }
   return request(`/walkback?${q}`, { method: "GET" }, isWalkback, options);
 }
 
