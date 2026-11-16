@@ -21,8 +21,8 @@ import { useIceMap } from "@/lib/use-ice-map";
 import { useEvaLink, type IvCall } from "@/lib/use-eva-link";
 import { crewLink } from "@/lib/crew-link";
 import { ICE_RADIUS_M, ICE_VIEW_MODES, renderIceView, type IceViewMode } from "@/lib/ice-view";
-import { bearing, stationWithNeighbors, demoConfirm, demoPlan, demoReplan, measuringTool, nextStation, orderedStations, stationBlock, stationById, type Measurement, type Plan, type Station } from "@/lib/plan";
-import { habitatOf, SITE_IMAGERY } from "@/components/site/site-data";
+import { stationWithNeighbors, demoConfirm, demoPlan, demoReplan, measuringTool, nextStation, stationBlock, stationById, type Measurement, type Plan, type Station } from "@/lib/plan";
+import { egressPose, habitatOf, SITE_IMAGERY } from "@/components/site/site-data";
 import { MissionDock } from "./mission-dock";
 import { StationDetail } from "./station-detail";
 import { sceneInsets } from "./layout";
@@ -43,17 +43,9 @@ function subscribeCompact(listener: () => void) {
   return () => media.removeEventListener("change", listener);
 }
 const TABS = PHASES.map((p, i) => ({ value: p.value, label: `${i + 1} ${p.label}`, icon: p.icon }));
-/** Where the EV starts: at the habitat, facing the first station. */
-/** The EV steps out of the habitat: this far from its centre (m), clear of the model, toward the first station. */
-const EGRESS_M = 15;
-
+/** Where the EV starts: at the airlock hatch, facing the first station. */
 function startPose(plan: Plan): FreePose {
-  const first = orderedStations(plan)[0];
-  const hab = habitatOf(plan);
-  if (!first) return { x: hab[0], y: hab[1], headingDeg: 0 };
-  const dir = bearing(hab, first.position);
-  const rad = (dir.deg * Math.PI) / 180;
-  return { x: hab[0] + Math.sin(rad) * EGRESS_M, y: hab[1] + Math.cos(rad) * EGRESS_M, headingDeg: dir.deg };
+  return egressPose(plan);
 }
 
 /**

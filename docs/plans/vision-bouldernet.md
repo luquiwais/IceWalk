@@ -74,3 +74,9 @@ cd apps/planner && python scripts/export_mocks.py && python scripts/export_mocks
 ## Si no llega
 
 Queda el detector de sombras y la página dice el número medido: "boulder hazard map, F1 0.45 for ≥ 3 m boulders against expert labels (BoulderNet)". Es honesto y coincide con el tono del proyecto.
+
+## Estado al 15/11 (Jose, con GPU)
+
+- **Hecho, con otro camino:** en vez de los pesos publicados (detectron2), un Mask R-CNN propio de torchvision entrenado con BoulderNet dejando cada imagen de Marte afuera (`python -m vision.maskrcnn cv`). F1 medio 0.63 / 0.64 contra 0.34 / 0.43 del detector de sombras.
+- **Sobre S1094b** (`python -m vision.maskrcnn_run`), a **0.25 m/px**, no a 0.5 (paso 3.4 de arriba: a 0.5 marcaba montículos). Catálogo y capas en `data/processed/s1094b-maskrcnn/`, sin pisar `s1094b/`. Detecta la mitad que sombras en el km² de Tusberti.
+- **Falta decidir** si reemplaza al de sombras (ver `DECISIONS.md`, 2026-11-15). No hay Release todavía.

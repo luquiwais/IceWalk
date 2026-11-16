@@ -41,3 +41,4 @@ dist/
 .moon/home
 .moon/proto
 .next/
+.venv-gpu/
