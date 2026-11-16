@@ -147,7 +147,7 @@ El encaje recomendado por investigaciones anteriores es Science / Mission Concep
 
 ## 8. Qué aportaron tus correos y Discord
 
-Se buscaron **NASA** y **Space Apps** en **All Mailboxes** de iCloud. Se leyeron 18 correos relevantes (agosto–noviembre); se excluyeron la publicidad de ITBA y el contenido de verificación de cuenta. Las copias privadas quedaron fuera del repo, en `~/Downloads/IceWalk-hackathon-research-2026-11-14/`.
+Se buscaron **NASA** y **Space Apps** en **All Mailboxes** de iCloud. Se leyeron 18 correos relevantes (agosto–noviembre); se excluyeron la publicidad de ITBA y el contenido de verificación de cuenta. Las copias privadas quedaron fuera del repo, transcriptas en el Brain (`Projects/IceWalk/Communication/Hackathon Submission Sources.md`); la carpeta de Descargas se borró el 16/11.
 
 | Fecha / remitente | Hallazgo |
 | --- | --- |
