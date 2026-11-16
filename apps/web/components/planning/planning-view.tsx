@@ -13,7 +13,7 @@ import type { FreePose } from "@/components/site3d/site-3d";
 import { EvaMinimap } from "@/components/site3d/eva-minimap";
 import { SegmentedControl } from "@icewalk/ui/segmented-control";
 import { getWalkback, plannerBaseUrl, postEvaluate, type PlannerApiError } from "@/lib/api";
-import { editedStations, editVerdict } from "@/lib/plan-edit";
+import { editedStations, editVerdict, midpointAfter } from "@/lib/plan-edit";
 import { polylinePath, walkPath, type PathPoint } from "@/lib/site3d";
 import { Body } from "@icewalk/ui/text";
 import { describeSource, usePlanSession } from "@/lib/use-plan-session";
@@ -216,6 +216,17 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
     setAnnouncement(`Scoring ${id} moved to x ${xy[0]} m, y ${xy[1]} m.`);
     void evaluate(editedStations(plan, { move: { id, xy } }));
   }, [evaluate, plan]);
+  const shiftStation = (id: string, by: -1 | 1) => {
+    setApprovedId(null);
+    setAnnouncement(`Scoring ${id} one place ${by < 0 ? "earlier" : "later"} in the walking order.`);
+    void session.evaluate(editedStations(plan, { shift: { id, by } }));
+  };
+  const addStationAfter = (id: string) => {
+    setStationId(null); setApprovedId(null);
+    const xy = midpointAfter(plan, id, habitatOf(plan));
+    setAnnouncement(`Scoring a new station after ${id}; drag it where the crew should measure.`);
+    void session.evaluate(editedStations(plan, { add: { after: id, xy } }));
+  };
   const removeStation = (id: string) => {
     setStationId(null); setApprovedId(null);
     setAnnouncement(`Scoring the plan without ${id}.`);
@@ -317,7 +328,8 @@ export function PlanningView({ initialPhase = "site", initialEvaView, initialLin
 
   const panel = phase === "site" ? <SitePanel plan={plan} flying={flying} onPlan={() => setFlying(true)} onSkip={arrive} />
     : phase === "plan" ? station
-      ? <StationDetail plan={plan} station={station} source={session.source} onSelect={selectStation} onRemove={canEditStations && plan.stations.length > 1 ? () => removeStation(station.id) : undefined} />
+      ? <StationDetail plan={plan} station={station} source={session.source} onSelect={selectStation} onRemove={canEditStations && plan.stations.length > 1 ? () => removeStation(station.id) : undefined}
+        onShift={canEditStations ? (by) => shiftStation(station.id, by) : undefined} onAddAfter={canEditStations && plan.stations.length < 12 ? () => addStationAfter(station.id) : undefined} />
       : <PlanPanel plan={plan} planSource={session.source} pending={pending} approved={approved}
         onApprove={() => { setApprovedId(plan.plan_id); if (!timelineOpen) toggleTimeline(); setAnnouncement("Plan approved."); }} onEdit={() => setApprovedId(null)}
         onStrategy={(s) => { setStationId(null); setApprovedId(null); void session.setStrategy(s); }} onNext={() => goTo("rehearse")}

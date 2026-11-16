@@ -25,7 +25,7 @@ function soil(ti: number | null | undefined) {
  * numbers that matter at it, and what happens after measuring. Crew tasks, tools and the hypothesis fold
  * into one disclosure so the first view fits without scrolling.
  */
-export function StationDetail({ plan, station, source, onSelect, onRemove }: { plan: Plan; station: Station; source: PlanSource; onSelect?: (id: string) => void; onRemove?: () => void }) {
+export function StationDetail({ plan, station, source, onSelect, onRemove, onShift, onAddAfter }: { plan: Plan; station: Station; source: PlanSource; onSelect?: (id: string) => void; onRemove?: () => void; onShift?: (by: -1 | 1) => void; onAddAfter?: () => void }) {
   const threshold = plan.summary.ice_threshold_m;
   const point = decisionPointFor(plan, station.id);
   const block = stationBlock(plan, station.id);
@@ -43,10 +43,17 @@ export function StationDetail({ plan, station, source, onSelect, onRemove }: { p
 
   return (
     <section className="mission-station" aria-label="Station composition">
-      {station.reason || onRemove ? (
+      {station.reason || onRemove || onAddAfter ? (
         <section className="mission-why" aria-label="Why this station">
           {station.reason ? <span><strong>Why here:</strong> {station.reason}</span> : null}
-          {onRemove ? <span className="mission-why-edit">Drag it on the map to move it · <button type="button" className="mission-text-link" onClick={onRemove}>Remove</button></span> : null}
+          {onRemove || onAddAfter ? (
+            <span className="mission-why-edit" title="Drag the station on the map to move it">Drag on the map
+              {onShift && prev ? <> · <button type="button" className="mission-text-link" onClick={() => onShift(-1)}>Earlier</button></> : null}
+              {onShift && after ? <> · <button type="button" className="mission-text-link" onClick={() => onShift(1)}>Later</button></> : null}
+              {onAddAfter ? <> · <button type="button" className="mission-text-link" onClick={onAddAfter}>Add after</button></> : null}
+              {onRemove ? <> · <button type="button" className="mission-text-link" onClick={onRemove}>Remove</button></> : null}
+            </span>
+          ) : null}
         </section>
       ) : null}
 
