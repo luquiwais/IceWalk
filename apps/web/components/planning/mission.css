@@ -626,7 +626,8 @@ button.mission-rule:focus-visible { outline: 2px solid #0a84ff; outline-offset: 
 .mission-debrief-log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .375rem; }
 .mission-debrief-log > li { padding: .375rem .75rem; border-radius: 12px; background: rgb(255 255 255 / .06); border-left: 3px solid rgb(255 255 255 / .25); }
 .mission-debrief-log > li[data-result=ice] { border-left-color: #3987e5; }
-.mission-debrief-row { display: flex; align-items: baseline; gap: .5rem; min-width: 0; font-size: .875rem; }
+.mission-debrief-row { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: .5rem; min-width: 0; font-size: .875rem; }
+.mission-debrief-row > span { white-space: nowrap; }
 .mission-debrief-row strong { font-weight: 700; }
 .mission-debrief-row small { margin-left: auto; font-size: .75rem; color: var(--color-label-secondary); white-space: nowrap; }
 .mission-debrief-note { font-size: .75rem; line-height: 1.35; color: var(--color-label-secondary); }
