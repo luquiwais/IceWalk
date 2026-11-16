@@ -314,3 +314,7 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 - Cada snapshot lleva un número de revisión y solo se adopta uno más nuevo (empate: el id mayor); una ventana que abre no manda su estado hasta cambiar algo. Motivo: al abrir el IV a mitad de la EVA, el EV adoptaba el plan nuevo y vacío del IV (los estados se intercambiaban).
 - Código de enlace por navegador y no una sala pública única: en el deploy, dos visitantes a la vez se pisarían la EVA.
 - `GET /walkback` acepta el hábitat (`hx`, `hy`) y responde aunque el servidor ya no tenga el plan (Render se durmió o reinició a mitad de la EVA), con la STM por defecto. Motivo: sin eso, EVA TERMINATE quedaba sin ruta de regreso.
+
+## 2026-11-16 · Egress en la esclusa (Luqui)
+
+- El hábitat del 3D gira su esclusa hacia la primera estación y la EVA arranca en la puerta (9 m del centro del modelo de 12 m, mirando a la estación). La vista "HAB" del Brief es ese mismo punto. Antes el EV arrancaba a 15 m y el Brief miraba desde 45 m: se veía lejos de la base. Un solo cálculo: `egressPose` en `components/site/site-data.ts`.

@@ -58,6 +58,25 @@ export function habitatOf(plan: { habitat_xy?: readonly number[] | null }): [num
 }
 
 /**
+ * The airlock hatch: the 3D habitat model turns its airlock toward the first station, and the EV
+ * steps out here, 3 m past the airlock's end, facing that station: half the model's 12 m length
+ * plus 3 m (the model's footprint is in site-3d.tsx).
+ */
+export const EGRESS_M = 9;
+
+/** Where the EVA starts (grid meters and compass heading): at the hatch, facing the first station. */
+export function egressPose(plan: Plan): { x: number; y: number; headingDeg: number } {
+  const [hx, hy] = habitatOf(plan);
+  const first = orderedStations(plan)[0];
+  if (!first) return { x: hx, y: hy, headingDeg: 0 };
+  const dx = first.position[0] - hx, dy = first.position[1] - hy;
+  const d = Math.hypot(dx, dy);
+  if (d < 1) return { x: hx, y: hy, headingDeg: 0 };
+  const headingDeg = ((Math.atan2(dx, dy) * 180) / Math.PI + 360) % 360;
+  return { x: hx + (dx / d) * EGRESS_M, y: hy + (dy / d) * EGRESS_M, headingDeg };
+}
+
+/**
  * Spatial range of the fitted GP prior: half spatial with a 100 m range, half
  * nugget (docs/plans/planner.md, "Interfaz del GP", make_prior(**FITTED)).
  * Read it from the backend once it is exposed.
