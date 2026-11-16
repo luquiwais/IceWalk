@@ -43,7 +43,7 @@ export const PlanTimeline = memo(function PlanTimeline({ plan, previousPlan, sta
               tabIndex={focused === index ? 0 : -1} onFocus={() => { setFocused(index); onHoverStation(station.id); }} onBlur={() => onHoverStation(null)}
               onPointerEnter={() => onHoverStation(station.id)} onPointerLeave={() => onHoverStation(null)} onMouseEnter={() => onHoverStation(station.id)} onMouseLeave={() => onHoverStation(null)}
               onKeyDown={(e) => keydown(e, index)} onClick={() => onSelectStation(station.id)} title={label}>{station.order}</Button>
-              : <span key={i} className="mission-time-segment" data-kind={t.kind} style={style} title={label}>{t.kind === "traverse" ? "›" : t.kind}</span>;
+              : <span key={i} className="mission-time-segment" data-kind={t.kind} style={style} title={label}>{segmentText(t.kind, (t.t_end_min - t.t_start_min) / end)}</span>;
           })}
           {(plan.decision_points ?? []).map((p, i) => <span className="mission-bingo" data-first={i === 0} key={`${p.station_id}-${i}`} style={{ left: `${p.decide_by_min / end * 100}%` }} title={`Bingo ${p.station_id}: latest departure ${clock(p.decide_by_min)}`}><span>Bingo {clock(p.decide_by_min)}</span></span>)}
           {elapsedMin !== undefined ? <span className="mission-time-now" style={{ left: `${Math.min(100, elapsedMin / end * 100)}%` }}><span>Now {clock(elapsedMin)} · simulated</span></span> : null}
@@ -54,3 +54,9 @@ export const PlanTimeline = memo(function PlanTimeline({ plan, previousPlan, sta
     </div>
   </section>;
 });
+
+/** A segment's text only when it fits: the walk arrow needs ~2 % of the day, a word ~7 %; narrower, the tooltip says it. */
+function segmentText(kind: string, fraction: number): string {
+  if (kind === "traverse") return fraction >= 0.02 ? "›" : "";
+  return fraction >= 0.07 ? kind : "";
+}

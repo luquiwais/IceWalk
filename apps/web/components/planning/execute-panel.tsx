@@ -45,10 +45,10 @@ export function ExecutePanel({ plan, previous, measurements, pending, reviewing,
           <strong>{String(station.order).padStart(2, "0")} · {station.id}</strong>
           <span>{direction.distanceM >= 1 ? `${Math.round(direction.distanceM)} m ${direction.label}` : "At the habitat"} · {toolName(measuringTool(station)).replace("Powered hand core drill", "Core drill")} · P(ice) {Math.round(station.p_ice * 100)}%</span>
           {then ? <span><b>Then:</b> {then}</span> : null}
+          <span role="status" className="mission-iv-status">{pending ? "Planner replanning..." : `Waiting for EV1 to report at ${station.id}.`}</span>
         </section>
       ) : <Body>{returning ? (walkback ? "The EV follows the amber route: the fastest way back over the terrain model." : "Walkback route unavailable: the EV heads for the habitat light.") : "All planned stations measured. Return to the habitat."}</Body>}
-      {station ? <Footnote role="status">{pending ? "Planner replanning..." : `Waiting for EV1 to report at ${station.id}.`}</Footnote> : null}
-      {last ? <Footnote tone="secondary" aria-label="Last report">Last report: {last.station_id} · {measurementSummary(last)} · {last.crew_member ?? "EV"} ({measurements.length} logged by the EV)</Footnote> : null}
+      {last ? <Footnote tone="secondary" aria-label="Last report" title={`${measurements.length} results logged by the EV`}>Last report: {last.station_id} · {measurementSummary(last)} · {last.crew_member ?? "EV"}</Footnote> : null}
       {!station ? <NextStep label="Debrief the EVA" onClick={onDebrief} /> : null}
     </section>
   );
