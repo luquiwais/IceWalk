@@ -299,6 +299,12 @@ Registro corto. Una línea por decisión: fecha, qué, por qué. El detalle vive
 - Herramientas: interruptores en el detalle de "Carry per EV" (lo que puede llevar la tripulación); apagar una re-planifica desde el hábitat sin ella (`POST /plan` con `tools`). Motivo: que se vea el costo de dejar el radar, la decisión central del proyecto.
 - Sin "agregar estación" ni reordenar a mano por ahora: falta tiempo antes de la entrega; el endpoint ya los acepta (estación sin `id`, orden de la lista).
 
+## 2026-11-15 · Landing
+
+- Landing en `/` y el planificador en `/app`; los links viejos (`/?phase=…&role=…`) redirigen a `/app` con los mismos parámetros. Motivo: el enlace de "Final Project" en la ficha NASA abre la explicación y desde ahí la app; ningún link existente se rompe.
+- Contenido según el brief de landing (`research/submission-brief-2026-11-14.md`, sección 5) y con los números de `submission/project-page.md`: decisión en una línea, problema, las cinco fases con capturas reales, por qué creerle (y dónde no), datos → decisiones (Mars Trek y SIM 3292 marcados como recursos del desafío), límites, equipo y créditos. Las capturas salen de la app con los datos empaquetados del modelo real (349 cráteres), no de la API local sin catálogo. Sin logo ni marca de NASA; aviso de que NASA no avala el proyecto.
+- Eitan tenía asignada la landing (14/11) y no había rama ni PR suyos: queda para que la revise y la cambie.
+
 ## 2026-11-15 · Enlace EV1-IV entre dispositivos
 
 - Las ventanas EV1 e IV también se sincronizan entre dispositivos, por un relevo en la API (`GET/POST /link/{room}`, long polling, en memoria, `app/eva_link.py`), además de `BroadcastChannel` en el mismo navegador. La sala es un código de enlace por navegador (`?link=K7Q2MX`, guardado en localStorage) que la pantalla "Join the EVA" muestra y copia. Motivo: Luqui probó EV1 e IV en dispositivos distintos y no se veían; el IV no decidía porque el casco no lo veía en línea.

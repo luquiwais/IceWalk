@@ -197,7 +197,7 @@ describe("Mission flow", () => {
     expect(tab("EVA")).toHaveAttribute("aria-selected", "true");
     // The EVA opens on the role choice: EV1 in the helmet or the IV console, each with a window of its own.
     const roles = screen.getByRole("region", { name: "Join the EVA" });
-    expect(within(roles).getAllByRole("link", { name: /Open in a new window/ }).map((a) => a.getAttribute("href"))).toEqual(["/?phase=eva&role=ev1", "/?phase=eva&role=iv"]);
+    expect(within(roles).getAllByRole("link", { name: /Open in a new window/ }).map((a) => a.getAttribute("href"))).toEqual(["/app?phase=eva&role=ev1", "/app?phase=eva&role=iv"]);
     expect(within(roles).getByRole("article", { name: "IV · Habitat console" })).toHaveTextContent("Does not log measurements");
     await userEvent.click(screen.getByRole("button", { name: "Join as EV1" }));
     expect(screen.queryByRole("region", { name: "Join the EVA" })).not.toBeInTheDocument();

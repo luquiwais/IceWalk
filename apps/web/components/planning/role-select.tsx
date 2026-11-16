@@ -8,7 +8,7 @@ import { formatDuration, formatNumber } from "@/lib/format";
 import { orderedStations, type Plan } from "@/lib/plan";
 
 export type EvaRole = "ev" | "iv";
-/** URL value of each role, for a window of its own (`/?phase=eva&role=ev1`). */
+/** URL value of each role, for a window of its own (`/app?phase=eva&role=ev1`). */
 export const ROLE_PARAM: Record<EvaRole, string> = { ev: "ev1", iv: "iv" };
 
 type RoleCard = { role: EvaRole; icon: ReactNode; title: string; subtitle: string; does: string; sees: string; note: string; join: string };
