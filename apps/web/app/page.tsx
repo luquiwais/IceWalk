@@ -24,6 +24,8 @@ export const metadata: Metadata = {
 };
 
 const REPO = "https://github.com/luquiwais/IceWalk";
+/** The 30-second demo submitted to NASA Space Apps (public link). */
+const DEMO = "https://drive.google.com/file/d/1anZsRElUcrL2DbDIZDFlYQW7qZZU5jLL/view";
 
 const PHASES: { n: number; name: string; question: string; image: StaticImageData; alt: string; points: string[] }[] = [
   {
@@ -40,7 +42,7 @@ const PHASES: { n: number; name: string; question: string; image: StaticImageDat
     alt: "Plan view: the ice map over HiRISE, a six-station traverse from the habitat and eight flight rules with their limits",
     points: [
       "A two-person traverse on the HiRISE terrain model at 10 m, checked against eight flight rules: duration, walk-back margin, distance, slope, comms, metabolic rate, carried mass and EVA window.",
-      "Every station says why it is there. Drag one on the map and the planner answers at once whether the new point is viable.",
+      "Every station says why it is there. Drag one, add one, move it earlier or later, and the planner answers at once whether the EVA still fits.",
       "Choose the tools the crew carries and see what leaving the radar behind costs.",
     ],
   },
@@ -57,9 +59,9 @@ const PHASES: { n: number; name: string; question: string; image: StaticImageDat
     n: 4, name: "EVA", question: "During the EVA: what now?", image: helmet,
     alt: "EV1 helmet view: a plan update after a result at station E03S24, awaiting the IV's call",
     points: [
-      "EV1 walks the terrain in a helmet view with waypoint cues, range and steering, and logs each result at the station.",
-      "The planner re-plans on site: the crew cannot wait up to 22 minutes for an answer from Earth.",
-      "The IV in the habitat sees the same update and makes the call; EV1 copies it.",
+      "EV1 walks the terrain in a helmet view with waypoint cues, range and steering, and logs each result at the station; the IV follows from the habitat, on the same screen or on another device linked by a code.",
+      "The planner re-plans on site: the crew cannot wait up to 22 minutes for an answer from Earth. The IV makes the call, as NASA's Mars concept of operations prescribes, and EV1 copies it.",
+      "On EVA TERMINATE both see the fastest route home over the terrain model, with its length and time.",
     ],
   },
   {
@@ -67,7 +69,7 @@ const PHASES: { n: number; name: string; question: string; image: StaticImageDat
     alt: "Debrief: the measurement log, what it means for the next EVA and how the ice map changed",
     points: [
       "What each result means: a \"no\" within 1 m is ice deeper than the tool, a candidate for radar or a deeper core.",
-      "How the ice map moved, and what the last re-plan changed.",
+      "How the ice map moved, and a decision log: what the planner recommended after each result and what the IV decided.",
       "The next plan starts from what this EVA measured.",
     ],
   },
@@ -106,10 +108,11 @@ export default function Landing() {
           <p className="landing-eyebrow">NASA Space Apps Challenge 2026 · Interplanetary Survival Guide: Martian Map</p>
           <h1 id="hero-title">Will this EVA reach ice, and with which instrument?</h1>
           <p className="landing-lead">
-            IceWalk plans ice-prospecting EVAs for the first Mars crews. Every EVA tool tells astronauts where they can walk; IceWalk also tells them whether the walk is worth it: the probability of ice within each tool&apos;s reach, a two-person traverse inside NASA limits on the real HiRISE terrain, and a new plan after every measurement.
+            Every Mars EVA tool tells astronauts where they can walk. IceWalk also tells them whether the walk is worth it: the probability of ice within each tool&apos;s reach, a two-person traverse inside NASA limits on the real HiRISE terrain, and a new plan after every measurement.
           </p>
           <div className="landing-actions">
             <Link href="/app" className="landing-cta">Open the planner</Link>
+            <a href={DEMO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Watch the 30 s demo</a>
             <a href={REPO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Source on GitHub</a>
           </div>
           <figure className="landing-shot landing-hero-shot">
@@ -219,6 +222,7 @@ export default function Landing() {
           <h2 id="end-title">See it on the real terrain</h2>
           <div className="landing-actions">
             <Link href="/app" className="landing-cta">Open the planner</Link>
+            <a href={DEMO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Watch the 30 s demo</a>
             <a href={REPO} className="landing-cta landing-cta-plain" target="_blank" rel="noopener">Source on GitHub</a>
           </div>
         </section>
