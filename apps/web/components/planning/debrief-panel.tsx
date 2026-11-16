@@ -50,7 +50,7 @@ export function DebriefPanel({ plan, previousPlan, measurements, decisions = [],
             const s = planned(m.station_id);
             return (
               <li key={`${m.station_id}-${i}`} data-result={m.result} title={`${s ? `Expected P(ice) ${formatPercent(s.p_ice)}, ${s.uncertainty.toFixed(2)} bits unknown; now measured. ` : ""}${meaning(m)}`}>
-                <div className="mission-debrief-row"><strong>{m.station_id}</strong><span>{measurementSummary(m)}</span><small>{toolName(m.tool)}{m.crew_member ? ` · ${m.crew_member}` : ""}</small></div>
+                <div className="mission-debrief-row"><strong>{m.station_id}</strong><span>{measurementSummary(m)}</span><small>{toolName(m.tool).replace("Powered hand core drill", "Core drill")}{m.crew_member ? ` · ${m.crew_member}` : ""}</small></div>
                 <div className="mission-debrief-note">{meaning(m)}</div>
               </li>
             );
@@ -62,10 +62,10 @@ export function DebriefPanel({ plan, previousPlan, measurements, decisions = [],
         {(Object.keys(VIEW_LABEL) as Exclude<View, "summary">[]).map((v) => (
           <button key={v} type="button" className="mission-debrief-link" onClick={() => setView(v)}>{VIEW_LABEL[v]}<ChevronRight aria-hidden /></button>
         ))}
+        <button type="button" className="mission-text-link mission-debrief-reset" onClick={onReset}>Reset session</button>
       </nav>
       <div className="mission-next mission-debrief-next">
-        <div className="mission-debrief-next-note"><Footnote tone="secondary">The next plan starts from what this EVA measured.</Footnote><button type="button" className="mission-text-link" onClick={onReset}>Reset session</button></div>
-        <Button variant="prominent" onClick={onNext}>Plan the next EVA</Button>
+        <Button variant="prominent" onClick={onNext} title="The next plan starts from what this EVA measured">Plan the next EVA</Button>
       </div>
     </section>
   );

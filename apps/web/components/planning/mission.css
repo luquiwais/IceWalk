@@ -717,3 +717,8 @@ button.mission-role-window { background: none; border: 0; padding: 0; cursor: po
 .mission-debrief > .mission-debrief-log li { padding-top: .375rem; padding-bottom: .375rem; }
 .mission-app .mission-debrief nav.mission-debrief-links > button.mission-debrief-link { width: auto; flex: 0 0 auto; }
 .mission-app .mission-debrief nav.mission-debrief-links > button.mission-debrief-link { padding: .2rem .45rem .2rem .55rem; font-size: .7rem; }
+/* Debrief summary rows on one line: id and result, the tool to the right with an ellipsis. */
+.mission-debrief > .mission-debrief-log .mission-debrief-row { flex-wrap: nowrap; }
+.mission-debrief > .mission-debrief-log .mission-debrief-row small { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mission-app .mission-debrief nav.mission-debrief-links > button.mission-debrief-link svg { display: none; }
+.mission-debrief .mission-debrief-reset { align-self: center; margin-left: auto; font-size: .7rem; }
