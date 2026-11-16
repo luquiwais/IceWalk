@@ -36,9 +36,9 @@
 .landing-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
 
 /* Hero */
-.landing-hero { max-width: var(--l-max); margin: 0 auto; padding: clamp(3rem, 9vw, 6.5rem) var(--l-pad) 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
+.landing-hero { max-width: var(--l-max); margin: 0 auto; padding: clamp(2rem, 5vw, 3.5rem) var(--l-pad) 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
 .landing-eyebrow { font-size: .8125rem; font-weight: 600; letter-spacing: .04em; color: var(--l-ice-soft); }
-.landing-hero h1 { max-width: 15ch; font-size: clamp(2.25rem, 6vw, 4.25rem); line-height: 1.04; letter-spacing: -.03em; font-weight: 700; text-wrap: balance; }
+.landing-hero h1 { max-width: 19ch; font-size: clamp(2.125rem, 5vw, 3.5rem); line-height: 1.04; letter-spacing: -.03em; font-weight: 700; text-wrap: balance; }
 .landing-lead { max-width: 46rem; font-size: clamp(1.0625rem, 1.6vw, 1.25rem); line-height: 1.55; color: var(--l-muted); text-wrap: pretty; }
 .landing-hero .landing-actions { justify-content: center; }
 .landing-hero-shot { margin-top: 1.5rem; width: 100%; }
