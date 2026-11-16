@@ -1,0 +1,115 @@
+/* Landing page (app/page.tsx). Dark like the app, neutral type, ice blue as the only accent
+   (the project's rule: color for alerts, blue for ice). Plain CSS scoped under .landing. */
+.landing {
+  --l-max: 1120px;
+  --l-pad: clamp(1.25rem, 4vw, 2.5rem);
+  --l-ice: #3987e5;
+  --l-ice-soft: #9fe8ff;
+  --l-line: rgb(255 255 255 / .1);
+  --l-muted: rgb(235 235 245 / .62);
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 520px at 50% -120px, rgb(57 135 229 / .22), transparent 70%),
+    #08090b;
+  color: #f2f4f7;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+}
+.landing a { color: inherit; }
+.landing h1, .landing h2, .landing h3, .landing p { margin: 0; }
+
+/* Navigation */
+.landing-nav { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 1.5rem; padding: .875rem var(--l-pad); background: rgb(8 9 11 / .72); backdrop-filter: blur(14px); border-bottom: 1px solid var(--l-line); }
+.landing-mark { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; text-decoration: none; }
+.landing-nav nav { display: flex; gap: 1.25rem; margin-left: auto; }
+.landing-nav nav a { font-size: .875rem; color: var(--l-muted); text-decoration: none; }
+.landing-nav nav a:hover { color: #fff; }
+@media (max-width: 720px) { .landing-nav nav { display: none; } .landing-nav .landing-cta-small { margin-left: auto; } }
+
+/* Buttons */
+.landing-cta { display: inline-flex; align-items: center; justify-content: center; height: 3rem; padding: 0 1.5rem; border-radius: 999px; background: #0a84ff; color: #fff; font-weight: 600; font-size: 1rem; text-decoration: none; transition: background .15s; }
+.landing-cta:hover { background: #2b95ff; }
+.landing-cta:focus-visible, .landing-nav a:focus-visible { outline: 2px solid var(--l-ice-soft); outline-offset: 3px; }
+.landing-cta-plain { background: rgb(255 255 255 / .1); }
+.landing-cta-plain:hover { background: rgb(255 255 255 / .18); }
+.landing-cta-small { height: 2.25rem; padding: 0 1rem; font-size: .875rem; }
+.landing-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+
+/* Hero */
+.landing-hero { max-width: var(--l-max); margin: 0 auto; padding: clamp(3rem, 9vw, 6.5rem) var(--l-pad) 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
+.landing-eyebrow { font-size: .8125rem; font-weight: 600; letter-spacing: .04em; color: var(--l-ice-soft); }
+.landing-hero h1 { max-width: 15ch; font-size: clamp(2.25rem, 6vw, 4.25rem); line-height: 1.04; letter-spacing: -.03em; font-weight: 700; text-wrap: balance; }
+.landing-lead { max-width: 46rem; font-size: clamp(1.0625rem, 1.6vw, 1.25rem); line-height: 1.55; color: var(--l-muted); text-wrap: pretty; }
+.landing-hero .landing-actions { justify-content: center; }
+.landing-hero-shot { margin-top: 1.5rem; width: 100%; }
+
+/* Screenshots: the app in a window frame */
+.landing-shot { margin: 0; border-radius: 18px; overflow: hidden; border: 1px solid rgb(255 255 255 / .14); box-shadow: 0 30px 80px rgb(0 0 0 / .55), 0 0 0 1px rgb(0 0 0 / .4); background: #111; }
+.landing-shot img { display: block; width: 100%; height: auto; }
+.landing-shot figcaption { padding: .875rem 1.125rem; font-size: .875rem; line-height: 1.5; color: var(--l-muted); border-top: 1px solid var(--l-line); background: #0d0e11; text-align: left; }
+
+/* Key numbers */
+.landing-stats { width: 100%; margin: 1rem 0 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--l-line); border: 1px solid var(--l-line); border-radius: 16px; overflow: hidden; text-align: left; }
+.landing-stats > div { display: flex; flex-direction: column; gap: .25rem; padding: 1.125rem 1.25rem; background: #0b0c0f; }
+.landing-stats dt { order: 0; font-size: .75rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--l-muted); }
+.landing-stats dd { order: 1; margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.landing-stats span { order: 2; font-size: .8125rem; line-height: 1.4; color: var(--l-muted); }
+@media (max-width: 860px) { .landing-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Sections */
+.landing-section { scroll-margin-top: 3rem; max-width: var(--l-max); margin: 0 auto; padding: clamp(4rem, 9vw, 7rem) var(--l-pad) 0; display: flex; flex-direction: column; gap: 1.5rem; }
+.landing-section h2, .landing-end h2 { font-size: clamp(1.75rem, 3.6vw, 2.75rem); line-height: 1.1; letter-spacing: -.02em; font-weight: 700; max-width: 22ch; text-wrap: balance; }
+.landing-section-lead { max-width: 44rem; font-size: 1.0625rem; line-height: 1.55; color: var(--l-muted); }
+.landing-section h3 { font-size: 1.125rem; font-weight: 650; letter-spacing: -.005em; }
+.landing-section p { line-height: 1.6; }
+
+.landing-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.landing-cards article, .landing-evidence article { display: flex; flex-direction: column; gap: .625rem; padding: 1.5rem; border-radius: 16px; background: rgb(255 255 255 / .04); border: 1px solid var(--l-line); }
+.landing-cards p, .landing-evidence p:not(.landing-big) { font-size: .9375rem; color: var(--l-muted); }
+@media (max-width: 860px) { .landing-cards, .landing-evidence { grid-template-columns: 1fr !important; } }
+
+/* The loop: tool → plan → measure → re-plan */
+.landing-loop { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem; counter-reset: step; }
+.landing-loop li { position: relative; display: flex; flex-direction: column; gap: .25rem; padding: 1rem 1.125rem; border-radius: 14px; border: 1px solid rgb(57 135 229 / .45); background: rgb(57 135 229 / .08); counter-increment: step; }
+.landing-loop li::before { content: counter(step); font-size: .75rem; font-weight: 700; color: var(--l-ice-soft); }
+.landing-loop li:not(:last-child)::after { content: "→"; position: absolute; right: -.7rem; top: 50%; transform: translateY(-50%); color: var(--l-ice-soft); font-weight: 700; }
+.landing-loop li:last-child::after { content: "↺ back to Plan"; position: absolute; right: 1rem; top: 1rem; font-size: .75rem; color: var(--l-ice-soft); }
+.landing-loop b { font-size: 1rem; }
+.landing-loop span { font-size: .8125rem; color: var(--l-muted); }
+@media (max-width: 860px) { .landing-loop { grid-template-columns: repeat(2, minmax(0, 1fr)); } .landing-loop li::after { display: none; } }
+
+/* Phases: screenshot and text, alternating */
+.landing-phases { display: flex; flex-direction: column; gap: clamp(2.5rem, 6vw, 4.5rem); margin-top: 1.5rem; }
+.landing-phase { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 3rem); align-items: center; }
+.landing-phase:nth-child(even) .landing-shot { order: 2; }
+.landing-phase-text { display: flex; flex-direction: column; gap: .75rem; }
+.landing-phase-step { font-size: .8125rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--l-ice-soft); }
+.landing-phase h3 { font-size: clamp(1.375rem, 2.4vw, 1.75rem); line-height: 1.2; letter-spacing: -.015em; }
+.landing-phase ul { margin: .25rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .5rem; color: var(--l-muted); font-size: .9375rem; line-height: 1.55; }
+.landing-phase li::marker { color: var(--l-ice); }
+@media (max-width: 900px) { .landing-phase { grid-template-columns: 1fr; } .landing-phase:nth-child(even) .landing-shot { order: 0; } }
+.landing-wide { margin-top: clamp(1.5rem, 4vw, 3rem); }
+
+/* Evidence */
+.landing-evidence { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.landing-big { font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 700; letter-spacing: -.02em; color: var(--l-ice-soft); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.landing-big small { font-size: .45em; font-weight: 600; color: var(--l-muted); letter-spacing: 0; }
+.landing-callout { display: flex; flex-direction: column; gap: .5rem; padding: 1.5rem; border-radius: 16px; border: 1px solid rgb(255 255 255 / .18); border-left: 4px solid var(--l-ice); background: rgb(255 255 255 / .03); }
+.landing-callout p { color: var(--l-muted); max-width: 60rem; }
+
+/* Data table */
+.landing-table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--l-line); }
+.landing-table { width: 100%; border-collapse: collapse; font-size: .9375rem; }
+.landing-table th, .landing-table td { padding: .875rem 1.125rem; text-align: left; vertical-align: top; border-top: 1px solid var(--l-line); line-height: 1.45; }
+.landing-table thead th { border-top: 0; font-size: .75rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--l-muted); background: rgb(255 255 255 / .03); }
+.landing-table tbody th { font-weight: 600; }
+.landing-table td { color: var(--l-muted); }
+.landing-badge { display: inline-block; margin-left: .5rem; padding: .1rem .5rem; border-radius: 999px; border: 1px solid rgb(57 135 229 / .6); color: var(--l-ice-soft); font-size: .6875rem; font-weight: 600; letter-spacing: .02em; white-space: nowrap; vertical-align: .1em; }
+
+/* Limits */
+.landing-limits { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: .625rem; max-width: 52rem; color: var(--l-muted); line-height: 1.6; }
+
+/* End and footer */
+.landing-end { max-width: var(--l-max); margin: 0 auto; padding: clamp(4.5rem, 10vw, 8rem) var(--l-pad); display: flex; flex-direction: column; align-items: center; gap: 1.5rem; text-align: center; }
+.landing-footer { padding: 2rem var(--l-pad) 3rem; border-top: 1px solid var(--l-line); display: flex; flex-direction: column; align-items: center; gap: .375rem; text-align: center; font-size: .8125rem; color: var(--l-muted); }
+.landing-footer b { color: #fff; }

@@ -9,7 +9,7 @@ import type { EvaRole } from "./role-select";
 const PHASE_PARAM: Record<string, Phase> = { site: "site", plan: "plan", brief: "rehearse", eva: "execute", debrief: "debrief" };
 const ROLE_PARAM: Record<string, EvaRole> = { ev1: "ev", iv: "iv" };
 
-/** `/?phase=eva&role=iv` opens the EVA in that seat; unknown values are ignored. */
+/** `/app?phase=eva&role=iv` opens the EVA in that seat; unknown values are ignored. */
 export function RoutedPlanningView() {
   const params = useSearchParams();
   const phaseKey = params.get("phase")?.toLowerCase() ?? "";

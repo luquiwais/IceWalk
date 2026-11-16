@@ -60,7 +60,7 @@ function startPose(plan: Plan): FreePose {
  * 3D terrain); the right column always holds the phase's question, its content and the next step.
  */
 /**
- * `initialEvaView` opens the EVA in that seat (a window of its own, `/?phase=eva&role=iv`); without
+ * `initialEvaView` opens the EVA in that seat (a window of its own, `/app?phase=eva&role=iv`); without
  * it the EVA starts on the role choice.
  */
 export function PlanningView({ initialPhase = "site", initialEvaView }: { initialPhase?: Phase; initialEvaView?: EvaRole }) {
