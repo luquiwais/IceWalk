@@ -3,7 +3,7 @@ import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from "rem
 import { CornerPin } from "../ui/cornerpin";
 import { IceWalkMark } from "../ui/chrome";
 import { ConsoleMap, EvaWindow, ReviewCard } from "../ui/screens";
-import { D, T, fmtH, round1 } from "../ui/theme";
+import { D, T, round1 } from "../ui/theme";
 import { PIC, Shot, clamp, ease } from "./kit";
 import wide from "./console_wide-screens.json";
 import review from "./console_review-screens.json";
@@ -135,7 +135,8 @@ export const SectionLabels: React.FC<{ from?: number; es?: boolean; profile?: bo
   const s = tracking[Math.min(tracking.length - 1, f + from)] as Record<string, number[]>;
   const st = D.stations_before[0];
   const row = (p: number[], top: string, bottom: string, color: string, appear: number) => {
-    const o = interpolate(f, [appear, appear + 10], [0, 1], clamp);
+    // The local profile continues across two cuts; keep its labels revealed.
+    const o = interpolate(profile ? f + from : f, [appear, appear + 10], [0, 1], clamp);
     if (p[1] < 20 || p[1] > PIC.h - 20) return null;
     return (
       <div style={{ position: "absolute", left: Math.max(40, p[0] - 360), top: p[1] - 30, width: 330, textAlign: "right", opacity: o, fontFamily: T.mono, color }}>
@@ -167,13 +168,11 @@ export const ResultCard: React.FC<{ es?: boolean }> = ({ es = false }) => {
   );
 };
 
-/** EV1 helmet HUD (AR concept): bearing tape, station marker, departure clock. All values from IceWalk. */
-export const Hud: React.FC<{ dur: number }> = ({ dur }) => {
+/** Transit HUD: the station distance is a snapshot, and no live return clock is validated. */
+export const Hud: React.FC<{ dur: number }> = () => {
   const f = useCurrentFrame();
   const on = interpolate(f, [2, 12], [0, 1], clamp);
-  const c = D.clock.station_end;
   const sway = Math.sin(f / 9) * 6;
-  const dist = Math.round(interpolate(f, [0, dur], [D.next.distance_m, D.next.distance_m - 3], clamp));
   return (
     <AbsoluteFill style={{ top: PIC.top, height: PIC.h, color: "#eaf3ff", fontFamily: T.mono, textShadow: "0 0 10px rgba(120,170,255,.45)", opacity: on }}>
       {/* Visor edge: curved glass, slight chromatic vignette. */}
@@ -184,7 +183,7 @@ export const Hud: React.FC<{ dur: number }> = ({ dur }) => {
         {Array.from({ length: 25 }, (_, i) => i - 12).map((k) => (
           <line key={k} x1={960 + k * 40 + sway} y1={k % 3 === 0 ? 20 : 30} x2={960 + k * 40 + sway} y2={44} stroke="rgba(234,243,255,.6)" strokeWidth={1.2} />
         ))}
-        <text x={960 + sway} y={70} fill="#eaf3ff" fontSize={18} textAnchor="middle" fontFamily={T.mono}>S 180°</text>
+        <text x={960 + sway} y={70} fill="#eaf3ff" fontSize={18} textAnchor="middle" fontFamily={T.mono}>NEXT STATION</text>
         <path d="M955 4 L965 4 L960 14 Z" fill="#eaf3ff" />
       </svg>
       {/* Station marker anchored at the horizon ahead. */}
@@ -192,19 +191,19 @@ export const Hud: React.FC<{ dur: number }> = ({ dur }) => {
         <svg width={28} height={28}><path d="M14 2 L26 14 L14 26 L2 14 Z" fill="none" stroke="#eaf3ff" strokeWidth={2} /></svg>
         <div style={{ position: "absolute", left: 40, top: -6, whiteSpace: "nowrap" }}>
           <div style={{ fontSize: 24, fontWeight: 600 }}>{D.next.id}</div>
-          <div style={{ fontSize: 18, opacity: .85 }}>{dist} m · CORE DRILL</div>
+          <div style={{ fontSize: 18, opacity: .85 }}>{D.next.distance_m} m FROM {D.measurement.station_id} · CORE DRILL</div>
         </div>
       </div>
-      {/* Left block: plan state. Right block: departure clock. */}
+      {/* Left block: reviewed plan. Right block: a check, never a fabricated transit clock. */}
       <div style={{ position: "absolute", left: 120, top: 150 }}>
         <div style={{ fontSize: 15, letterSpacing: 2, opacity: .75 }}>PLAN REVIEWED</div>
         <div style={{ fontSize: 30, fontWeight: 600 }}>GO {D.next.id}</div>
         <div style={{ fontSize: 15, opacity: .7, marginTop: 6 }}>{D.replan.stations_kept.length} STATIONS KEPT</div>
       </div>
       <div style={{ position: "absolute", right: 120, top: 150, textAlign: "right" }}>
-        <div style={{ fontSize: 15, letterSpacing: 2, opacity: .75 }}>TO REQUIRED DEPARTURE</div>
-        <div style={{ fontSize: 30, fontWeight: 600 }}>{fmtH(c.h, c.m)}</div>
-        <div style={{ fontSize: 15, opacity: .7, marginTop: 6 }}>PET {Math.round(c.pet_min)} MIN</div>
+        <div style={{ fontSize: 15, letterSpacing: 2, opacity: .75 }}>TRAVERSE IN PROGRESS</div>
+        <div style={{ fontSize: 30, fontWeight: 600 }}>FOLLOW REVIEWED PLAN</div>
+        <div style={{ fontSize: 15, opacity: .7, marginTop: 6 }}>RECHECK DEPARTURE AT STATION</div>
       </div>
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 26, textAlign: "center", fontSize: 13, letterSpacing: 3, opacity: .55 }}>AR INTERFACE CONCEPT</div>
     </AbsoluteFill>
@@ -267,12 +266,15 @@ export const EndCard: React.FC<{ es?: boolean }> = ({ es = false }) => {
     <AbsoluteFill style={{ background: "#000", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: T.sans }}>
       <div style={{ display: "flex", alignItems: "center", gap: 28, opacity: o }}><IceWalkMark size={74} /><span style={{ fontSize: 96, fontWeight: 600, letterSpacing: 1 }}>IceWalk</span></div>
       <div style={{ fontSize: 30, marginTop: 26, color: "#c9d1d8", opacity: sub }}>{es ? "Entender la incertidumbre. Planificar el siguiente paso." : "Understand uncertainty. Plan the next step."}</div>
-      <div style={{ position: "absolute", bottom: 64, fontFamily: T.mono, fontSize: 15, letterSpacing: 1.6, color: "#6f7b87", opacity: sub }}>
+      <div style={{ position: "absolute", bottom: PIC.top + 88, fontFamily: T.mono, fontSize: 15, letterSpacing: 1.6, color: "#6f7b87", opacity: sub }}>
         {es
           ? "DARIONAUTAS · NASA SPACE APPS CHALLENGE 2026 · PROTOTIPO · EVA SIMULADA · AR CONCEPTUAL · VISUALIZACIÓN 3D"
           : "DARIONAUTAS · NASA SPACE APPS CHALLENGE 2026 · PROTOTYPE · SIMULATED EVA · AR CONCEPT · 3D VISUALIZATION"}
       </div>
-      <div style={{ position: "absolute", bottom: 28, fontFamily: T.mono, fontSize: 14, color: "#89939d", opacity: sub }}>
+      <div style={{ position: "absolute", bottom: PIC.top + 54, fontFamily: T.mono, fontSize: 14, letterSpacing: 1.2, color: "#89939d", opacity: sub }}>
+        {es ? "VOCES SINTÉTICAS" : "SYNTHETIC VOICES"}: GEMINI · ORUS / CHARON
+      </div>
+      <div style={{ position: "absolute", bottom: PIC.top + 28, fontFamily: T.mono, fontSize: 14, color: "#89939d", opacity: sub }}>
         Astronaut: “Animated Astronaut Character in Space Suit Loop” · LasquetiSpice · CC BY 4.0 · Adapted
       </div>
     </AbsoluteFill>

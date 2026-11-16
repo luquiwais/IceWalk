@@ -50,7 +50,7 @@ def build(name,n):
         if name=='approach':
             camera([(1,shots.G(-4.2,-8.8,1.2),shots.G(-.5,-.8,1.05)),(n,shots.G(-4,-9.6,1.25),shots.G(-.5,-2.4,1.05))],lens=40,focus=8)
         elif name=='depart':
-            camera([(1,shots.G(3.8,4.5,1.45),shots.G(-.6,-1.5,1.1)),(n,shots.G(3.3,3.5,1.5),shots.G(-.6,-3,1.1))],lens=40,focus=8)
+            camera([(1,shots.G(-5,4.5,1.45),shots.G(-.6,-1.5,1.1)),(n,shots.G(-4.5,3.5,1.5),shots.G(-.6,-3,1.1))],lens=40,focus=8)
     elif name in POV:
         shots.shot_pov(False)
         cam=bpy.context.scene.camera

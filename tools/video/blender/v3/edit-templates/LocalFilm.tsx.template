@@ -72,7 +72,7 @@ export const LocalFilm: React.FC = () => (
     <S k="unc"><MapStory dur={len("unc")} layer="uncertainty" reveal="layer" caption="LO QUE TODAVÍA NO SABEMOS" sub="1 = SOLO EL PRIOR, SIN MEDICIONES" /></S>
     <S k="tools2"><ToolsInsert dur={len("tools2")} detail /></S>
     <S k="section"><Shot name="section" /><SectionLabels es /></S>
-    <S k="desert"><Archive src="nasa/desert-rats-context.mp4" frames={120} /></S>
+    <S k="desert"><Archive src="nasa/desert-rats-context.mp4" frames={144} /></S>
     <S k="stations"><MapStory dur={len("stations")} layer="probability" reveal="stations" caption="ESTACIONES · LO QUE PUEDE ENSEÑARNOS CADA PUNTO" /></S>
     <S k="route"><MapStory dur={len("route")} layer="probability" reveal="route" caption="RUTA · OBSTÁCULOS VISTOS POR HiRISE" sub="CON TIEMPO PARA VOLVER AL HÁBITAT" /></S>
     <S k="window"><WindowInsert dur={len("window")} zoom={[1.0, 1.12]} origin="50% 30%" /></S>

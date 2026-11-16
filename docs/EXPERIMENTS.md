@@ -903,3 +903,30 @@ vueltas y avance visibles sin depender del desenfoque para comunicar giro.
 Fuente, licencia y adaptación de shaders:
 [`research/astronaut-assets-2026-11-15.md`](research/astronaut-assets-2026-11-15.md).
 Los clips siguen en producción; falta revisión continua de las películas.
+
+# 2026-11-15 — Recuperación de render y archivo NASA sin congelado
+
+El estado de la cola decía `rendering`, pero no existían procesos Blender ni
+`produce_v3`: el log POV terminaba en el cuadro32 a las17:08ART. Se cargó el
+`.blend` guardado y se renderizaron33–60 con el mismo encuadre y ajustes, sin
+repetir los primeros32. Completado; continúa la cola para los planos restantes.
+
+La plantilla Local usaba cinco segundos (120cuadros) de Desert RATS en un corte
+de seis (144). `Archive` congelaba el último cuadro. Test nuevo confirma el fallo
+120<144. Se amplió el recorte del original local NASA a112–118s (antes112–117),
+sin audio y a24fps; ahora hay144cuadros. Se elimina el congelado y se limita el
+video con `trimAfter`. Test específico, eslint y TypeScript pasan. El montaje
+v3 completo se activa cuando termine su cobertura; estos checks no implican
+aprobación estética ni escucha humana del video terminado.
+
+## HUD de tránsito: reloj y números sin respaldo (21:10 ART)
+
+La prueba histórica solo cubría `ui/screens.tsx`; no detectaba que `v2/Hud`
+mostraba el reloj de fin de estación mientras la cámara caminaba, además de un
+rumbo180° fijo y una distancia interpolada100→97m sin trayectoria validada.
+Comprobación real en Remotion, Global cuadro450: falla al exigir ausencia de
+`TO REQUIRED DEPARTURE`. Se elimina el reloj de tránsito y el rumbo numérico;
+la distancia queda fija, rotulada desde E03S24. El HUD pide revisar la partida
+en estación. Comprobación de DOM verde, eslint/TypeScript limpios y Global
+reexportado; cuadro450 del MP4 inspeccionado. El reloj4h16m permanece en la
+explicación específica del fin de estación, no se trata como telemetría en ruta.

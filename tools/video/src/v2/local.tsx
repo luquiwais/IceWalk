@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Freeze, OffthreadVideo, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, OffthreadVideo, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { Legend, IceMap, stationsView } from "../ui/map";
 import { EvaWindow, ReviewCard, Tools } from "../ui/screens";
 import { D, T, fmtH } from "../ui/theme";
@@ -88,13 +88,11 @@ export const ClockExplainer: React.FC<{ dur: number }> = ({ dur }) => {
 };
 
 /** NASA archive insert (Earth analogues), cropped to the film frame and labelled as context. */
-export const Archive: React.FC<{ src: string; frames: number; hold?: boolean }> = ({ src, frames, hold = true }) => {
-  const f = useCurrentFrame();
-  const v = <OffthreadVideo src={staticFile(src)} muted style={{ width: 1920, height: 1080, objectFit: "cover", filter: "saturate(.85) contrast(1.05)" }} />;
+export const Archive: React.FC<{ src: string; frames: number }> = ({ src, frames }) => {
   return (
     <AbsoluteFill style={{ top: PIC.top, height: PIC.h, overflow: "hidden", background: "#000" }}>
       <div style={{ position: "absolute", left: 0, top: -138, width: 1920, height: 1080 }}>
-        {hold && f >= frames - 1 ? <Freeze frame={frames - 1}>{v}</Freeze> : v}
+        <OffthreadVideo src={staticFile(src)} trimAfter={frames} muted style={{ width: 1920, height: 1080, objectFit: "cover", filter: "saturate(.85) contrast(1.05)" }} />
       </div>
     </AbsoluteFill>
   );

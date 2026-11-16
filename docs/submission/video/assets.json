@@ -1663,10 +1663,11 @@
     },
     {
       "path": "tools/video/public/nasa/desert-rats-context.mp4",
-      "bytes": 6160294,
-      "sha256": "9baf3d7de952b40cfe5360d537f641e884d57cef4e0f3e0e1c9ddb80f77b921d",
+      "bytes": 4102253,
+      "sha256": "1eb7533c6605532a9d336c98911013beee59e81c78ff0dcef54a1b1675724d51",
       "git": "local_ignored",
-      "stage": "work_in_progress_not_final"
+      "stage": "work_in_progress_not_final",
+      "derivation": "NASA DesertRATS_2010.mp4,112–118s,silent,24fps,144frames; full6s motion."
     },
     {
       "path": "tools/video/assets/neural-voice/global-00.mp3",
@@ -1919,7 +1920,527 @@
       "sha256": "75031fa63ccd11b3037635482cac9db403d6f973d56537bec93ee672da672f33",
       "git": "local_ignored",
       "stage": "work_in_progress_not_final"
+    },
+    {
+      "path": "tools/video/public/v2/astronaut-proof.mp4",
+      "git": "local_ignored",
+      "bytes": 965317,
+      "sha256": "fee4b792c37c65db74c9b92d1f87f57b2f7fa9d453fba25bb7dcdb9bf049e404",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/console_wide.mp4",
+      "git": "local_ignored",
+      "bytes": 2987032,
+      "sha256": "b7f1e241d1cbef3e30be47b15e35ce6ec68304104098529cc32355e265313173",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/core_profile.mp4",
+      "git": "local_ignored",
+      "bytes": 5191497,
+      "sha256": "a0aaf8b5beae96ba1966978156944277a81b46e1bc4a16d771382a8af7ccf999",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/pov.mp4",
+      "git": "local_ignored",
+      "bytes": 3423070,
+      "sha256": "039fdc58c6f7d0b4a2c04ef8050fb7e1e980e3c6bed54b6ec482a3c75c1c8409",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/depart.mp4",
+      "git": "local_ignored",
+      "bytes": 7791430,
+      "sha256": "e1b69624a160be26ed736444140ffcbc9157204bbb0942bd3b84f81a3e67fde0",
+      "stage": "paused_production_snapshot_2026-11-15",
+      "review": "Old overlapping camera; corrected render has54/72frames. Do not use as corrected final."
+    },
+    {
+      "path": "tools/video/public/v2/walk.mp4",
+      "git": "local_ignored",
+      "bytes": 3591489,
+      "sha256": "6191a298b5217999841893285687fc24fe24947fe43bbd2363bab467e65b385b",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/drill.mp4",
+      "git": "local_ignored",
+      "bytes": 3664152,
+      "sha256": "741b7d0918105bbef44b41dae39a5d8d0d8fefee9211cf80b97b31b62776ea80",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/drill_establish.mp4",
+      "git": "local_ignored",
+      "bytes": 3737377,
+      "sha256": "8f0b065d87ba58f87438287364602421032aa570802fc793d8ccd69408666c50",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/console_review.mp4",
+      "git": "local_ignored",
+      "bytes": 2172915,
+      "sha256": "6f6e674e78feadf699f2aec1075f7e2e0ac01224110b39b52e08d8ca7da1a072",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/astronaut-proof-follow.mp4",
+      "git": "local_ignored",
+      "bytes": 869093,
+      "sha256": "aed1e73687b87d2b9f2a392ce76fd7d66ba877cb243499ec055bc0b4ff2145a8",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/pov_start.mp4",
+      "git": "local_ignored",
+      "bytes": 3462527,
+      "sha256": "cf2cde29af99194cb023310b0721c34d54afe0ca9a86509155123b00503c4caa",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/section.mp4",
+      "git": "local_ignored",
+      "bytes": 3107241,
+      "sha256": "c31b145c3ac32aeaa329cfdea72ab49b5d59c276384c4a5752e4f59631ad2765",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/approach.mp4",
+      "git": "local_ignored",
+      "bytes": 4845728,
+      "sha256": "049f646606804f4525e02dd72bc6efc4541d80049c564b1e8cdd61fa65f92ef8",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/drill_result.mp4",
+      "git": "local_ignored",
+      "bytes": 2353368,
+      "sha256": "80db971a9d75cd2033792b9244a99dba075df53048819ccb064f6a0bc8ca6d26",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/public/v2/orbit.mp4",
+      "git": "local_ignored",
+      "bytes": 1007105,
+      "sha256": "0f51a77db2d6b4ec14d3835efd05787a267dfa54b7db46b695214828392f0fc4",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-24.wav",
+      "git": "local_ignored",
+      "bytes": 232398,
+      "sha256": "ac80ef4c6219fcddf66e21b35c8ddd50f4d4b69598eb851f336fee23000169d5",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-18.wav",
+      "git": "local_ignored",
+      "bytes": 560718,
+      "sha256": "51ee47e7c11831fe6362c1a3689060be1d0dcb51fab774f57d221a6b773e1e1b",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-19.wav",
+      "git": "local_ignored",
+      "bytes": 364878,
+      "sha256": "ca7ad7cddd606e8219521fa156ebfcc5f7887509817748a577f73794e534be1e",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-25.wav",
+      "git": "local_ignored",
+      "bytes": 551118,
+      "sha256": "212c168775b9cb7d1bcc72215c4b295c8cef081d6f7a7ad53183ad8c3fbf4955",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-27.wav",
+      "git": "local_ignored",
+      "bytes": 247758,
+      "sha256": "81aa8172fc0e6d753c376cf6c217397f503a5208d969a20bb4581fa1d0ea992c",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-26.wav",
+      "git": "local_ignored",
+      "bytes": 716238,
+      "sha256": "a591a309adcaef118811ea63a46d2e9c1c88ab53e042cd300953fbac9c9a5242",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-22.wav",
+      "git": "local_ignored",
+      "bytes": 547278,
+      "sha256": "f8454b298678ff115e911d35c0f9b8228f79585650e76444f71b9f5502cdd407",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-23.wav",
+      "git": "local_ignored",
+      "bytes": 370638,
+      "sha256": "705984e5fe7d8f471a3dd120e5ba4ecebcf838bc2835728c3387a4e407dac852",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-09.wav",
+      "git": "local_ignored",
+      "bytes": 589518,
+      "sha256": "bdf3ed222480dd71b1e159907c2fceb2cf9b92f997b89d10e3e85f13e6ae863f",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-21.wav",
+      "git": "local_ignored",
+      "bytes": 376398,
+      "sha256": "dddeba729fde07d992dabc9a24c78e7faa562ab4d054c03e5b3fcd4228067a00",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-20.wav",
+      "git": "local_ignored",
+      "bytes": 512718,
+      "sha256": "70e64309633917f7ec2ff5790c729930c84a44bc223c48f86a293bbe44eccafa",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-08.wav",
+      "git": "local_ignored",
+      "bytes": 372558,
+      "sha256": "2a73a5343b4eacf3f5c8a63cea3c4fb7908e1cf8ad129abefa59342f87e1a4da",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-04.wav",
+      "git": "local_ignored",
+      "bytes": 48078,
+      "sha256": "c9d7636bde07d4a35b867b3093fe582a7cee36712ad0c0a553febb9d7361048a",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-11.wav",
+      "git": "local_ignored",
+      "bytes": 501198,
+      "sha256": "133c9ce32bc9e7fcea226ee4f1673a069917e3da88e39195d4e1edcbf7cdae6e",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-05.wav",
+      "git": "local_ignored",
+      "bytes": 295758,
+      "sha256": "5efa76351d90f21cfb8d64782870880ad8565d4ba81793bb08118db3ceb688fd",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-04.wav",
+      "git": "local_ignored",
+      "bytes": 351438,
+      "sha256": "8951c1b2a41d05b2e754d25b5925432a0fe652ca16d893400b3ebbf8c8531de8",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-10.wav",
+      "git": "local_ignored",
+      "bytes": 656718,
+      "sha256": "ac81a2176e97b21d42d1b9124d406965b39fb7f6680de4f743fb0c62e9ce079e",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-05.wav",
+      "git": "local_ignored",
+      "bytes": 322638,
+      "sha256": "f47aafd4521f8aa5e62a467b09d64d12de6eba947900fae705b9d25ce9c6bfd6",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-06.wav",
+      "git": "local_ignored",
+      "bytes": 520398,
+      "sha256": "6a9c8b3ecb38aff5c834bd0e0950225a3cbcf36e409e44bb5eb8a345e5e62838",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-12.wav",
+      "git": "local_ignored",
+      "bytes": 380238,
+      "sha256": "abe4355a18046aacbab3d672b877dd3ac1c01e8cedce791debfe740d74e7ba2a",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-13.wav",
+      "git": "local_ignored",
+      "bytes": 601038,
+      "sha256": "e0bad811c04bca17c2933047eac425eed8e386487be00e340e457a907e2fdb8d",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-07.wav",
+      "git": "local_ignored",
+      "bytes": 328398,
+      "sha256": "674f4eda14d50e8a11c2455089c3a5101c6ac735c64352aa35c840469cb2cd08",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-06.wav",
+      "git": "local_ignored",
+      "bytes": 76878,
+      "sha256": "88e5d144700692a08bfc1e0f6b73a11d2c01552d6d5cd69e2de81b30cb020cc7",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-02.wav",
+      "git": "local_ignored",
+      "bytes": 305358,
+      "sha256": "7749eb7b71867b1b31ead47b3d800488dae6586ba456cf5422c8bb9791eb571e",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-03.wav",
+      "git": "local_ignored",
+      "bytes": 514638,
+      "sha256": "0a351a87531eb466f0b529ffee51e7dcea70202029fbea389f4609d0e58f88c4",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-17.wav",
+      "git": "local_ignored",
+      "bytes": 69198,
+      "sha256": "acb3a633841acde4540ed3c311d8b52ca69616ba6e562da6baeaa238e3ae2081",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-16.wav",
+      "git": "local_ignored",
+      "bytes": 261198,
+      "sha256": "e2b573bf521e3c91f805c61f9c8c1793d75d93657b4f4885ef8dfcb16273f7e4",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-02.wav",
+      "git": "local_ignored",
+      "bytes": 366798,
+      "sha256": "675f428c3b2c7c4b129067183b3a42be4b34b162622e33b378b45769d854a765",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-03.wav",
+      "git": "local_ignored",
+      "bytes": 324558,
+      "sha256": "b63000ba3faeef63e46993caeac85891ac41fbab938fc03bd5a2787058a496e6",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-01.wav",
+      "git": "local_ignored",
+      "bytes": 180558,
+      "sha256": "2ecc6ecdfd6183e6483181798b6345714261f4ab7bbbd0e69c2136ab6f54a2eb",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-28.wav",
+      "git": "local_ignored",
+      "bytes": 430158,
+      "sha256": "20864fd0346c8cb97c8a6da138ad113b0f7bba5f1a498d04f9b0fd29be43165c",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-14.wav",
+      "git": "local_ignored",
+      "bytes": 418638,
+      "sha256": "07461db1baa199b98eae78c38a1660630e64bfc5337f438dc1e20042f4fa5c67",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-00.wav",
+      "git": "local_ignored",
+      "bytes": 305358,
+      "sha256": "cb212a88a80e5a8b2de95acd4e8a85d30f338697c42d4eac1a2b07371ed59303",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-01.wav",
+      "git": "local_ignored",
+      "bytes": 170958,
+      "sha256": "76b03c9f2d2a0acff2881ab0a80c271ff733b297b6c81a38b657c0b075d42162",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-15.wav",
+      "git": "local_ignored",
+      "bytes": 372558,
+      "sha256": "99574076a2fd66b5ee2c396dafb3b68d292cc8cbebc10a169d1b1a9c52dfd940",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-00.wav",
+      "git": "local_ignored",
+      "bytes": 351438,
+      "sha256": "433cb23f5c47f8f64c6d505be29f06946bfdda7cec1264cc05f4da276f31ed54",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/global-timing.json",
+      "git": "local_ignored",
+      "bytes": 1774,
+      "sha256": "35af3d84cc3e76cec9a817ae00a119856aebe6834f2fa26b3e32a962d65c570b",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/directed-voice/local-timing.json",
+      "git": "local_ignored",
+      "bytes": 8627,
+      "sha256": "2c178fe4a17e3f964ea87ba35fe2cb204d468a0bb3a3678ea8c921a2a0e23402",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/gemini-dialogue/global.wav",
+      "git": "local_ignored",
+      "bytes": 1021468,
+      "sha256": "764b8e0716dbbc914a769522d7c5fc6c9aa235c88185bec18507d193b85761af",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/gemini-dialogue/local.wav",
+      "git": "local_ignored",
+      "bytes": 6852508,
+      "sha256": "f991b4f854977103e31dd3b246a593970179df16e1a0072b9988112bb852c748",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/source.json",
+      "git": "local_ignored",
+      "bytes": 2177,
+      "sha256": "b120f87065f8e6d0345da2c3b9bcbeaf8d51e886779c316de44610c18a4f9fa0",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/scene.gltf",
+      "git": "local_ignored",
+      "bytes": 624115,
+      "sha256": "2a0c452d74a26faa173bc7b3295b13af05383f0dfa2cb8ded8ee7791be40eea0",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/scene.bin",
+      "git": "local_ignored",
+      "bytes": 14767568,
+      "sha256": "6e68f5151fdf44fb1cdad091985d3fc1454fb80c5cac401490c6edef6b789cb7",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/license.txt",
+      "git": "local_ignored",
+      "bytes": 828,
+      "sha256": "49220e3a26fb0076e4a6c7c9dd0a008245e093422d443b6dac6d20899d25822d",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_0_normal.png",
+      "git": "local_ignored",
+      "bytes": 1228655,
+      "sha256": "5c766076a97677e243a6138e49932358c8e9c0da69741d01a9b870c3edc41fc4",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_2_occlusion.png",
+      "git": "local_ignored",
+      "bytes": 767502,
+      "sha256": "44d167ed268b3c7311b13f26956b1ad3c5c7cd71bbdf701a66e1f5c7d2a54da5",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_0_diffuse.png",
+      "git": "local_ignored",
+      "bytes": 4152305,
+      "sha256": "f65fd34e61b881b19fe9499cad7e6f462592a5f6547270da5663a54f612dab94",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_2_normal.png",
+      "git": "local_ignored",
+      "bytes": 2614357,
+      "sha256": "9ac97401a568f660f6d93acf6cb4b7f030ac2716da0542ce3ed73315967b0726",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_0_specularGlossiness.png",
+      "git": "local_ignored",
+      "bytes": 1052819,
+      "sha256": "2bc73cecb1cf4f630fad32a078e51ee25138dffc31bc5808e052a735e2be5fd5",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_2_diffuse.png",
+      "git": "local_ignored",
+      "bytes": 5034207,
+      "sha256": "1747ed003140bd1283e947645075d214b9bf11bd3dd23378db0ed28a286c6eef",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_0_occlusion.png",
+      "git": "local_ignored",
+      "bytes": 854317,
+      "sha256": "2b3f51ddd5b3b5ee4f64de1c672de7418eea899314a1b886174f5332b81a67c5",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/third-party/lasqueti-astronaut/textures/material_2_specularGlossiness.png",
+      "git": "local_ignored",
+      "bytes": 1167654,
+      "sha256": "5c0f5fc4064d0253cfa79e8163592ffd0d435812ca0cf96fdd41907a027fa3d7",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/out/IceWalk-GlobalFilm.mp4",
+      "git": "local_ignored",
+      "bytes": 22600385,
+      "sha256": "f19b568d6dc0afb333d31ac472d57e0da2e95784a98e30aebea9b40fb4f82b7e",
+      "stage": "paused_production_snapshot_2026-11-15",
+      "review": "Exported and technically checked; script precedes Lucas feedback. Not a new editorial revision."
+    },
+    {
+      "path": "tools/video/out/IceWalk-GlobalFilm.srt",
+      "git": "local_ignored",
+      "bytes": 447,
+      "sha256": "3049afe24f4d07cc0fd5e162cc84c34eace1f2df9ef2e5022644db2b7bfc20b9",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/out/IceWalk-LocalFilm.srt",
+      "git": "local_ignored",
+      "bytes": 3014,
+      "sha256": "38b6d79f105bafa41668b32c123f2390fe3b12b979d71f524580952a1921d574",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/out/IceWalk-Credits.txt",
+      "git": "local_ignored",
+      "bytes": 1627,
+      "sha256": "2ef46dfe3254a5a37c5ad454d2baaf5c59cb2bdda8d457e65a6d86ac7782935d",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/out/v3-production/pause-inventory.json",
+      "git": "local_ignored",
+      "bytes": 3065,
+      "sha256": "5d4d72451c55ea8dc07c869c61d9459728b981187e3458a0a7ded775765d0bcd",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/renders/v3/console_tools/console_tools.blend",
+      "git": "local_ignored",
+      "bytes": 332869,
+      "sha256": "e1bee4acaa0b9bc2bd9e83fedbce31e103a2d6e9f65b1fd265654d9eb32c7d03",
+      "stage": "paused_production_snapshot_2026-11-15"
+    },
+    {
+      "path": "tools/video/assets/renders/v3/depart/depart.blend",
+      "git": "local_ignored",
+      "bytes": 75207924,
+      "sha256": "81f2b820b3e3c4b845b8462b55d3a23605e5c9dc698fc9187fa679d394a355b7",
+      "stage": "paused_production_snapshot_2026-11-15"
     }
   ],
-  "production_note": "Current proof media. Neural voices synthesized with Microsoft stock voices through edge-tts; no impersonation or voice cloning. Rendered geometry, rigs and camera proofs are not final quality approval."
+  "production_note": "Paused at Eitan request for Claude handoff. Global exported with previous script. Local not exported; console_tools23/64, corrected depart54/72. Raw media remain local/ignored; review handoff-2026-11-15.md before restarting. No publication or new voice generation for Lucas feedback."
 }

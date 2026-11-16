@@ -19,14 +19,12 @@ export const EDL = {
 export const SHOT_USES = [
   {"shot": "orbit", "from": 0, "frames": 60},
   {"shot": "drill", "from": 0, "frames": 60},
-  {"shot": "drill", "from": 59, "frames": 1},
+  {"shot": "drill_result", "from": 0, "frames": 24},
   {"shot": "section", "from": 2, "frames": 69},
   {"shot": "console_wide", "from": 0, "frames": 64},
   {"shot": "console_review", "from": 4, "frames": 74},
   {"shot": "pov", "from": 6, "frames": 46},
-  {"shot": "walk", "from": 18, "frames": 41},
-  {"shot": "walk", "from": 40, "frames": 1},
-  {"shot": "orbit", "from": 0, "frames": 32}
+  {"shot": "walk", "from": 18, "frames": 41}
 ] as const;
 
 const S: React.FC<{ k: keyof typeof EDL; children: React.ReactNode }> = ({ k, children }) => (
@@ -38,16 +36,15 @@ export const GlobalFilm: React.FC = () => (
     <S k="orbit"><Shot name="orbit" from={0} /></S>
     <S k="descent"><Descent dur={32} /></S>
     <S k="drill"><Shot name="drill" from={0} /></S>
-    <S k="result"><Shot name="drill" from={59} hold zoom={[1.0, 1.06]} dur={24} origin="48% 55%" /><ResultCard /></S>
+    <S k="result"><Shot name="drill_result" /><ResultCard /></S>
     <S k="section"><Shot name="section" from={2} /><SectionLabels from={2} /></S>
     <S k="consoleWide"><ConsoleWide from={0} updateAt={18} /></S>
     <S k="insert"><ScreenInsert dur={51} /></S>
     <S k="review"><ConsoleReview from={4} clickAt={52} /></S>
     <S k="pov"><Shot name="pov" from={6} /><Hud dur={46} /></S>
     <S k="walk"><Shot name="walk" from={18} /></S>
-    <S k="campaign"><Shot name="walk" from={40} hold zoom={[1.1, 1.0]} dur={79} /><CampaignGraphic /></S>
-    <Sequence name="back" from={600} durationInFrames={30}><Descent dur={30} reverse /></Sequence>
-    <Sequence name="loop to first frame" from={630} durationInFrames={32}><Shot name="orbit" from={0} /></Sequence>
+    <S k="campaign"><CampaignGraphic /></S>
+    <S k="back"><Descent dur={62} reverse /></S>
     <Sequence name="numbers" from={606} durationInFrames={56}><NumbersCard dur={56} /></Sequence>
     <S k="end"><EndCard /></S>
 

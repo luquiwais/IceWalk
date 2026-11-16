@@ -60,7 +60,7 @@ Yes. We used Claude (Anthropic) as a coding and research assistant:
 - searching and summarising the scientific literature and NASA documents;
 - drafting documentation.
 
-The project concept, the scientific choices (what to model, which validations to run and which results to accept or reject) and the product decisions were made by the team. Each AI-assisted commit carries a `Co-Authored-By: Claude` trailer in the repository metadata, and the README states where SI was used. Charts are plotted from our data with code. No SI-generated images, video or audio are used; if any are added, they will carry a visible watermark. No NASA branding is generated or modified.
+The project concept, the scientific choices (what to model, which validations to run and which results to accept or reject) and the product decisions were made by the team. Claude and Codex also assisted with Blender/Remotion video production. Charts are plotted from our data with code. The submission films use Gemini synthetic voices (Orus and Charon), identified in their closing credits. Visuals use rendered 3D models, data graphics and credited NASA material; rejected image/video generations are excluded. Sources, model credits and adaptations are recorded in the repository. No NASA branding is generated or modified.
 
 ## NASA Data
 

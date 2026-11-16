@@ -1,10 +1,12 @@
 # IceWalk — video
 
 Proyecto Remotion y Blender. Fuente editorial: [docs/submission/video](../../docs/submission/video/README.md).
-Estado: maquetas Global (708 frames) y Local (4320), tres pruebas de animación
-Blender de 72 frames, pantallas con datos congelados y voces Microsoft Neural.
-Sin filmación ni material Higgsfield. Todavía no hay acabado ni export final.
-Preview en `http://localhost:3100/Global`, `/Local` y `/WalkRigProof`.
+Estado vigente v3: `GlobalFilm` exportado (708 cuadros, 29,5 s); `LocalFilm`
+(4320 cuadros, 180 s) quedó pausado. Astronauta articulado, pantallas integradas
+y voces Gemini Orus/Charon. Sin filmación ni material Higgsfield.
+Preview en `http://localhost:3100/GlobalFilm` y `/LocalFilm`.
+Studio y renders están apagados por pedido de Eitan. Antes de reanudarlos, leer
+[el traspaso editorial y técnico](../../docs/submission/video/handoff-2026-11-15.md).
 
 ## Comandos
 
@@ -57,7 +59,11 @@ mapas y márgenes. No se ejecutó durante la reorganización. Blender usa rutas
 relativas al proyecto; el `.blend` puede conservar rutas absolutas antiguas.
 `~/Developer/icewalk-video` enlaza a este proyecto: una sola copia activa.
 
-## Producción y QA
+## Histórico v1: producción y QA
+
+Estos comandos reproducen la primera maqueta. El flujo v3 vigente está en la
+sección «Revisión del 15/11» de abajo; no regenerar las voces Microsoft para la
+entrega actual.
 
 ```sh
 python3 scripts/test_delivery.py
@@ -75,7 +81,7 @@ Los PNG de animación están en `assets/renders/`; se codificaron a MP4 con ffmp
 El mapa y las capas siguen congelados; la migración a Node evita un fallo de
 `stream.unref` de Studio bajo Bun.
 
-## Límites pendientes
+## Límites de la primera maqueta (histórico)
 
 Son pruebas, no un video terminado. Los clips 3D duran 3 s y se mantienen en el
 último frame si el bloque dura más; hay que extenderlos para el local. El rig

@@ -78,6 +78,19 @@ class GlobalFilmTests(unittest.TestCase):
     def film(self):
         return (ROOT / 'src/v2/GlobalFilm.tsx').read_text()
 
+    def test_final_archive_inserts_have_motion_for_the_whole_cut(self):
+        import subprocess
+        source = (ROOT / 'blender/v3/edit-templates/LocalFilm.tsx.template').read_text()
+        cuts = dict((key, int(end) - int(start)) for key, start, end in
+                    re.findall(r'(\w+): \[(\d+), (\d+)\]', source.split('LOCAL_EDL')[1].split('};')[0]))
+        for key, name, frames in re.findall(r'<S k="([^"]+)"><Archive src="([^"]+)" frames=\{(\d+)\}', source):
+            self.assertGreaterEqual(int(frames), cuts[key], (key, 'archive freezes before the cut ends'))
+            count = subprocess.check_output(['ffprobe', '-v', 'error', '-count_frames', '-select_streams', 'v:0',
+                '-show_entries', 'stream=nb_read_frames', '-of', 'csv=p=0', str(ROOT / 'public' / name)], text=True)
+            self.assertGreaterEqual(int(count.strip()), cuts[key], key)
+        archive = (ROOT / 'src/v2/local.tsx').read_text().split('export const Archive:')[1].split('export const ToolsInsert:')[0]
+        self.assertNotIn('<Freeze', archive)
+
     def test_no_frozen_people_or_reused_footage_in_either_film(self):
         for filename,variable in [('GlobalFilm.tsx','SHOT_USES'),('LocalFilm.tsx','LOCAL_SHOT_USES')]:
             source=(ROOT/'src/v2'/filename).read_text()

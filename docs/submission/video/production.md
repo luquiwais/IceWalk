@@ -1,6 +1,40 @@
 # IceWalk — producción en curso
 
-## Versión 2 (15/11, Claude): composiciones `GlobalFilm` y `LocalFilm`
+## Estado vigente: versión 3 (15/11, Codex)
+
+`GlobalFilm` está exportado y revisado técnicamente. `LocalFilm` quedó pausado
+por pedido de Eitan; no hay procesos activos. Leer el
+[traspaso a Claude](handoff-2026-11-15.md) y
+`tools/video/out/v3-production/pause-inventory.json`. Un estado
+guardado debe contrastarse con sus procesos y logs: la cola anterior quedó
+interrumpida aunque decía `rendering`.
+
+| Pieza | Estado vigente |
+| --- | --- |
+| Global | `tools/video/out/IceWalk-GlobalFilm.mp4`, 708 cuadros a 24 fps, 29,5 s, 1080p H.264/AAC |
+| Local | Plantilla de 4320 cuadros, 180 s; pausado, sin export final. Consola tools23/64; despedida corregida54/72 |
+| Astronauta | LasquetiSpice, rig original de 91 huesos y dedos; marcha CMU e IK de manos. Crédito CC BY 4.0 en el cierre y archivo acompañante |
+| Imagen | EEVEE, 96 muestras, 1920×804 dentro de 1080p, sin doble silueta por motion blur |
+| Consolas | Pantallas integradas a la geometría, sin deslizamiento del overlay |
+| Montaje | Plantillas v3 sin `hold` ni intervalos de video duplicados; perfil continuo de 204 cuadros y archivo NASA de seis segundos completos |
+| HUD | Sin reloj de tránsito ni rumbo numérico sin respaldo; distancia identificada desde E03S24. Reloj de estación explicado por separado |
+| Voces | Gemini Orus/Charon, diálogo dirigido, sin aceleración ni clonación; reemplazan a Microsoft Neural |
+| Sonido | Viento SuperCam de NASA, radio, efectos y partitura procedimentales. Global estéreo −13,4 LUFS, −1 dBTP |
+| QA Global | Decodificación completa, metadatos, cortes visuales, datos, sincronía y ausencia de congelados en sus ocho clips 3D; transcripción de la mezcla reconoce todas las intervenciones |
+
+SRT y `IceWalk-Credits.txt` acompañan las exportaciones en `tools/video/out/`.
+Los medios siguen ignorados por Git. No se subieron videos ni se publicó un
+Release; no se afirma escucha humana ni aprobación estética de Eitan.
+
+La escena anterior de despedida superponía a ambos astronautas: se conserva
+como `assets/renders/v3/depart-overlap-check`, y la toma vigente usa una cámara
+lateral que permite ver a ambos. Los renders completos reemplazan los clips
+de preview de forma atómica.
+
+## Histórico: versión 2 inicial (15/11, Claude)
+
+El estado de esta sección describe la primera iteración y está reemplazado por
+la versión 3 de arriba, incluidos el rig, las voces y el sistema de pantallas.
 
 Reemplazan a `Global` y `Local` (que quedan registrados solo como referencia).
 

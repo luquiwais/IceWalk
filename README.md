@@ -67,7 +67,7 @@ Every value and its source: [`docs/SOURCES.md`](docs/SOURCES.md).
 
 ## Use of Super Intelligence (SI)
 
-We used Claude (Anthropic) as a coding and research assistant (code and tests, literature search, documentation drafts). The concept, scientific choices and product decisions are the team's. Each AI-assisted commit carries a `Co-Authored-By: Claude` trailer. No SI-generated images, video or audio are used.
+We used Claude (Anthropic) and Codex (OpenAI) for coding, tests, research, documentation and Blender/Remotion video production. The concept, scientific choices and product decisions are the team's. Submission films use Gemini synthetic voices (Orus and Charon), identified in their closing credits. Their visuals use rendered 3D models, data graphics and credited NASA material; rejected image/video generations are excluded from the films. Sources and adaptations are recorded in [`docs/SOURCES.md`](docs/SOURCES.md).
 
 ## License
 
