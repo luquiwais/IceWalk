@@ -62,8 +62,11 @@ export type ReplanRequest = {
 };
 
 const DEFAULT_TIMEOUT_MS = 8_000;
-/** The real planner builds a GP and a traverse map; give it longer. */
-const PLAN_TIMEOUT_MS = 20_000;
+/**
+ * The real planner builds a GP and a traverse map; give it longer. On the free hosting it takes
+ * ~15 s for a new habitat, so 20 s cut off valid moves whenever the server was a little slower.
+ */
+const PLAN_TIMEOUT_MS = 60_000;
 
 /**
  * Base URL of the planner API, or undefined when it is not configured. Read as a
@@ -100,7 +103,7 @@ export function postPlan(body: PlanRequest, options?: ApiOptions): Promise<Plan>
 
 /** POST /evaluate: the plan with the operator's stations, in that order, without re-choosing any. */
 export function postEvaluate(body: { plan_id: string; stations: EditedStation[]; decisions?: boolean }, options?: ApiOptions): Promise<Plan> {
-  return request("/evaluate", post(body), isPlan, options);
+  return request("/evaluate", post(body), isPlan, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
 }
 
 export function postReplan(body: ReplanRequest, options?: ApiOptions): Promise<Plan> {

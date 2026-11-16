@@ -220,7 +220,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
       if (id !== generation) return;
       const e = asError(error);
       // The plan stays as it was: only the move is refused, with the planner's reason.
-      set({ status: "ready", habitatError: e.detail ?? "The planner could not place the habitat there." });
+      set({ status: "ready", habitatError: e.detail ?? refusal(e, "The planner could not place the habitat there.") });
     }
   }
 
@@ -250,7 +250,7 @@ export function createPlanSession(options: PlanSessionOptions = {}): PlanSession
     } catch (error) {
       if (id !== generation) return;
       const e = asError(error);
-      set({ status: "ready", editError: e.detail ?? "The planner could not score that edit." });
+      set({ status: "ready", editError: e.detail ?? refusal(e, "The planner could not score that edit.") });
     }
   }
 
@@ -326,6 +326,13 @@ export function describeSource(state: PlanSessionState): string {
 
 function isMock(plan: Plan): boolean | null {
   return plan.summary.is_mock ?? null;
+}
+
+/** Why a move or an edit failed: a slow or unreachable planner is not a refusal of the request. */
+function refusal(error: PlannerApiError, refused: string): string {
+  if (error.kind === "timeout") return "The planner took too long to answer. Try again.";
+  if (error.kind === "network") return "The planner API is unreachable. Try again.";
+  return refused;
 }
 
 function asError(error: unknown): PlannerApiError {
