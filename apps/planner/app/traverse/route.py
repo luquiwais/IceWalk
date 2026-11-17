@@ -19,6 +19,7 @@ abierto (los giros van de a 45°).
 from __future__ import annotations
 
 import math
+from collections import OrderedDict
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -31,6 +32,10 @@ from vision.grid import Grid, load_grid
 
 from .params import TraverseParams, default_params
 from .terrain import OUT_DIR
+
+MAX_FIELDS = 16
+"""Campos de tiempo que se guardan. Uno pesa ~6 MB en la grilla del sitio y un plan usa 11-13:
+con más, el servidor gratis (512 MB) se queda sin memoria a los pocos hábitats nuevos."""
 
 _STEPS = ((0, 1), (1, 0), (1, 1), (1, -1))  # el grafo es simétrico: alcanza con la mitad
 
@@ -80,7 +85,7 @@ class TraverseMap:
             passable &= ~(np.isfinite(width) & (width < self.params.min_corridor_width_m))
         self.passable = passable
         self.graph = self._build_graph()
-        self._fields: dict[int, tuple[np.ndarray, np.ndarray]] = {}
+        self._fields: OrderedDict[int, tuple[np.ndarray, np.ndarray]] = OrderedDict()
 
     @classmethod
     def from_processed(
@@ -168,12 +173,18 @@ class TraverseMap:
         return sp.coo_matrix((np.r_[t, t], (np.r_[a, b], np.r_[b, a])), shape=(n, n)).tocsr()
 
     def field(self, cell: int) -> tuple[np.ndarray, np.ndarray]:
-        """Tiempo (s) desde `cell` a cada celda (inf si no se llega) y predecesores."""
-        if cell not in self._fields:
-            if len(self._fields) > 32:
-                self._fields.clear()
-            times, pred = dijkstra(self.graph, indices=cell, return_predecessors=True)
-            self._fields[cell] = (times, pred)
+        """Tiempo (s) desde `cell` a cada celda (inf si no se llega) y predecesores.
+
+        Guarda los últimos `MAX_FIELDS`, con el tiempo en float32 (de sobra para segundos de
+        caminata), y descarta el menos usado.
+        """
+        if cell in self._fields:
+            self._fields.move_to_end(cell)
+            return self._fields[cell]
+        times, pred = dijkstra(self.graph, indices=cell, return_predecessors=True)
+        self._fields[cell] = (times.astype(np.float32), pred)
+        while len(self._fields) > MAX_FIELDS:
+            self._fields.popitem(last=False)
         return self._fields[cell]
 
     def time_from(self, x_m: float, y_m: float) -> np.ndarray:

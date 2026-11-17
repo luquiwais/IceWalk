@@ -62,8 +62,19 @@ export type ReplanRequest = {
 };
 
 const DEFAULT_TIMEOUT_MS = 8_000;
-/** The real planner builds a GP and a traverse map; give it longer. */
-const PLAN_TIMEOUT_MS = 20_000;
+/**
+ * The real planner builds a GP and a traverse map; give it longer. On the free hosting it takes
+ * ~15 s for a new habitat, so 20 s cut off valid moves whenever the server was a little slower.
+ */
+const PLAN_TIMEOUT_MS = 60_000;
+
+/**
+ * The long timeout unless the caller sets one. A plain spread would let `timeoutMs: undefined`
+ * (the plan session passes its options through) wipe it, and plans fell back to the 8 s default.
+ */
+function planOptions(options?: ApiOptions): ApiOptions {
+  return { ...options, timeoutMs: options?.timeoutMs ?? PLAN_TIMEOUT_MS };
+}
 
 /**
  * Base URL of the planner API, or undefined when it is not configured. Read as a
@@ -85,7 +96,7 @@ export function getToolCatalog(options?: ApiOptions): Promise<CatalogTool[]> {
 /** GET /maps: the ice map, with the measurements of `planId` applied when given. */
 export function getIceMap(planId?: string, options?: ApiOptions): Promise<IceMap> {
   const query = planId ? `?plan_id=${encodeURIComponent(planId)}` : "";
-  return request(`/maps${query}`, { method: "GET" }, isIceMap, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
+  return request(`/maps${query}`, { method: "GET" }, isIceMap, planOptions(options));
 }
 
 /** GET /eva-window: best EVA start in the next sols and conditions at each station. */
@@ -95,16 +106,16 @@ export function getEvaWindow(planId?: string, options?: ApiOptions): Promise<Eva
 }
 
 export function postPlan(body: PlanRequest, options?: ApiOptions): Promise<Plan> {
-  return request("/plan", post(body), isPlan, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
+  return request("/plan", post(body), isPlan, planOptions(options));
 }
 
 /** POST /evaluate: the plan with the operator's stations, in that order, without re-choosing any. */
 export function postEvaluate(body: { plan_id: string; stations: EditedStation[]; decisions?: boolean }, options?: ApiOptions): Promise<Plan> {
-  return request("/evaluate", post(body), isPlan, options);
+  return request("/evaluate", post(body), isPlan, planOptions(options));
 }
 
 export function postReplan(body: ReplanRequest, options?: ApiOptions): Promise<Plan> {
-  return request("/replan", post(body), isPlan, { timeoutMs: PLAN_TIMEOUT_MS, ...options });
+  return request("/replan", post(body), isPlan, planOptions(options));
 }
 
 /** GET /plan/{id}: a plan already built in this server session (the cuff checklist reads it). */

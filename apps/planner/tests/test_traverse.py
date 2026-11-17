@@ -139,6 +139,19 @@ def test_routes_are_symmetric():
     assert m.route(a, b).time_s == pytest.approx(m.route(b, a).time_s)
 
 
+def test_walk_fields_are_bounded_and_reused():
+    from app.traverse import route
+
+    m = flat_map(make_grid())
+    first = m.field(0)
+    assert m.field(0) is first  # se reutiliza
+    assert first[0].dtype == np.float32
+    for cell in range(1, route.MAX_FIELDS + 5):
+        m.field(cell)
+    assert len(m._fields) == route.MAX_FIELDS
+    assert 0 not in m._fields  # el menos usado sale primero
+
+
 def test_time_from_has_grid_shape_and_inf_outside():
     grid = make_grid()
     z = np.zeros((grid.height, grid.width))

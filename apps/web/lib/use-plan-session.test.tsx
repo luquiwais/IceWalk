@@ -352,9 +352,46 @@ describe("moving the habitat", () => {
     expect(session.getSnapshot()).toMatchObject({ plan: apiPlan, status: "ready", habitatError: "Habitat outside the planning area covered by the HiRISE terrain model" });
   });
 
+  it("says the planner was too slow instead of refusing the habitat when the request times out", async () => {
+    let first = true;
+    const slow = deferred();
+    const fetch = routes({ ...healthy, "/plan": (init) => { if (first) { first = false; return json(apiPlan); } return slow.route(init); } });
+    const session = await started(fetch, 10);
+    await session.setHabitat([800, -1200]);
+    expect(session.getSnapshot()).toMatchObject({ plan: apiPlan, status: "ready", habitatError: "The planner took too long to answer. Try again." });
+  });
+
   it("says the planner API is needed when there is none", async () => {
     const session = createPlanSession({ baseUrl: null, fallback });
     await session.setHabitat([800, -1200]);
     expect(session.getSnapshot()).toMatchObject({ plan: demoPlan, habitatError: "Moving the habitat needs the planner API." });
   });
 });
+
+describe("adopting another window's session", () => {
+  const peer = { plan: demoPlan, previous: null, measurements: [], status: "error" as const, source: "mock" as const };
+
+  it("ignores a peer stuck on the bundled mock and keeps its own API request going", async () => {
+    const slow = deferred();
+    const fetch = routes({ ...healthy, "/plan": slow.route });
+    const session = createPlanSession({ baseUrl: BASE, fetch, fallback });
+    const starting = session.start();
+    expect(session.adopt(peer)).toBe(false);
+    slow.release(json(apiPlan));
+    await starting;
+    expect(session.getSnapshot()).toMatchObject({ plan: apiPlan, source: "api", status: "ready" });
+  });
+
+  it("takes a peer's API session", async () => {
+    const session = await started(routes({ ...healthy, "/plan": () => json(apiPlan) }));
+    const moved: Plan = { ...apiPlan, plan_id: "plan-api0009" };
+    expect(session.adopt({ ...peer, plan: moved, status: "ready", source: "api" })).toBe(true);
+    expect(session.getSnapshot()).toMatchObject({ plan: moved, source: "api" });
+  });
+
+  it("takes a peer's mock session when there is no API at all", () => {
+    const session = createPlanSession({ baseUrl: null, fallback });
+    expect(session.adopt({ ...peer, status: "ready" })).toBe(true);
+  });
+});
+
